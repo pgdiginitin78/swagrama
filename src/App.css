@@ -1,0 +1,154 @@
+body {
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 248, 214, 0.6),
+    rgba(241, 255, 245, 0.7),
+    rgba(216, 238, 255, 0.6)
+  ) !important;
+  /* Ayurvedic light base */
+  color: #263d21;
+}
+
+.floating-leaf {
+  animation: floatUpDown 5s ease-in-out infinite alternate;
+}
+@keyframes floatUpDown {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(-20px);
+  }
+}
+
+.mandala {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(63, 107, 79, 0.15) 2px,
+    transparent 3px
+  );
+  background-size: 24px 24px;
+}
+
+.wave-underline {
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 160px;
+  height: 3px;
+  border-radius: 999px;
+
+  /* Gradient shine */
+  background: linear-gradient(
+    90deg,
+    #263d21 0%,
+    #e8f3e8 40%,
+    #ffffff 50%,
+    #e8f3e8 60%,
+    #263d21 100%
+  );
+  background-size: 200% 100%;
+  filter: blur(0.2px);
+  animation: waveFlow 4s ease-in-out infinite, shineMove 3s linear infinite;
+}
+
+.shine-wave {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine-wave::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) translateY(-100%) rotate(45deg);
+  }
+
+  100% {
+    transform: translateX(100%) translateY(100%) rotate(45deg);
+  }
+}
+
+.shine-wave::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 70%
+  );
+  animation: shine 3s infinite;
+  pointer-events: none;
+}
+
+ul {
+  list-style: none;
+  /* remove default bullets */
+  padding: 0;
+  margin: 0;
+}
+
+ul li {
+  display: flex;
+
+  gap: 10px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+ul li::before {
+  content: "";
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  background: url("data:image/svg+xml;utf8,\<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 -960 960 960' fill='%234a7c2c'>\<path d='M480-160q-56 0-105.5-17.5T284-227l-56 55q-11 11-28 11t-28-11q-11-11-11-28t11-28l55-55q-32-41-49.5-91T160-480q0-134 93-227t227-93h320v320q0 134-93 227t-227 93Z'/>\</svg>")
+    no-repeat center / contain;
+}
+.wave path {
+  animation: waveMove 14s linear infinite;
+}
+
+@keyframes waveMove {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+.glass-nav {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.18),
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes fadeIn {from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);} }
+.animate-fadeIn {animation:fadeIn .4s ease;}

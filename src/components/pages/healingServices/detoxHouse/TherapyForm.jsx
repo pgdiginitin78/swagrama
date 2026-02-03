@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import {
   Assignment,
   CalendarMonth,
@@ -11,13 +10,8 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
-  Checkbox,
   Chip,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  Modal,
-  TextField,
+  Modal
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
@@ -25,12 +19,12 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
+import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
 import SearchDropdown from "../../../common/formFields/SearchDropdown";
 import TimePickerField from "../../../common/formFields/TimePickerField";
-import DatePickerField from "../../../common/formFields/DatePickerField";
 
 const schema = yup.object().shape({
   diseaseAllotted: yup

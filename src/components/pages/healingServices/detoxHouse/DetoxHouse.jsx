@@ -28,12 +28,9 @@ import { Box, Modal } from "@mui/material";
 import { motion } from "framer-motion";
 
 import {
-  CircleDot,
   Droplets,
-  Ear,
   Filter,
   Flame,
-  Flower2,
   Footprints,
   Hand,
   HeartPulse,
@@ -41,12 +38,8 @@ import {
   Shield,
   ShieldPlus,
   ShowerHead,
-  Smile,
-  Soup,
   Sparkles,
   Syringe,
-  Volume2,
-  Waves,
   Wind,
 } from "lucide-react";
 import { useRef, useState } from "react";
@@ -75,7 +68,7 @@ import WealthEnemaImg from "../../../assets/healingServices/detoxTherapy/WealthE
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
-import BookEventForm from "../../bookEventForm/BookEventForm";
+import BookEventForm from "./TherapyForm";
 
 const getServiceIcon = (name) => {
   const n = name.toLowerCase();
@@ -113,7 +106,7 @@ const detoxServicesData = [
       "Deep relaxation, pain relief, detoxification, and skin nourishment.",
     price: 1500,
     icon: Droplets,
-    image:BodyAnointingImg,
+    image: BodyAnointingImg,
   },
   {
     filterName: "Bathing Sweater Room",
@@ -123,7 +116,7 @@ const detoxServicesData = [
       "Deep relaxation, pain relief, detoxification, and skin nourishment.",
     price: 500,
     icon: Sparkles,
-    image:BodyUnguentImg,
+    image: BodyUnguentImg,
   },
   {
     filterName: "Bathing Sweater Room",
@@ -133,7 +126,7 @@ const detoxServicesData = [
       "Detoxifies, relieves fatigue, hydrates skin, and relaxes muscles.",
     price: 1500,
     icon: ShowerHead,
-    image:BathingSweaterTherapyImg,
+    image: BathingSweaterTherapyImg,
   },
   //
 
@@ -149,8 +142,7 @@ const detoxServicesData = [
       pack5: "1500/5",
     },
     icon: Wind,
-    image:
-      "https://www.freepik.com/search?format=search&query=herbal%20steam%20therapy%20ayurveda",
+    image: HerbalVaporInhalationImg,
   },
   //
   {
@@ -162,8 +154,7 @@ const detoxServicesData = [
       "Improves circulation, nourishes skin, relaxes muscles, balances Doshas, and enhances overall body vitality.",
     price: 1500,
     icon: Hand,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20full%20body%20oil%20massage",
+    image: bodyMassageImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -173,8 +164,7 @@ const detoxServicesData = [
       "Improves circulation, nourishes skin, relaxes muscles, balances Doshas, and enhances overall body vitality.",
     price: 500,
     icon: Droplets,
-    image:
-      "https://www.freepik.com/search?format=search&query=oil%20massage%20therapy%20ayurveda",
+    image: ContinuousPouringImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -184,8 +174,7 @@ const detoxServicesData = [
       "Maintains skin suppleness, prevents dryness, and supports joint and muscular health.",
     price: 1200,
     icon: Sparkles,
-    image:
-      "https://www.freepik.com/search?format=search&query=daily%20body%20oil%20massage%20ayurveda",
+    image: DailyUnguentImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -195,8 +184,7 @@ const detoxServicesData = [
       "Improves foot circulation, relieves fatigue, strengthens lower limbs, and stimulates reflex points.",
     price: 200,
     icon: Footprints,
-    image:
-      "https://www.freepik.com/search?format=search&query=foot%20massage%20therapy%20spa",
+    image: footMassageImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -1306,18 +1294,18 @@ function ServiceModal({ open, onClose, item }) {
 
             <div className="flex space-x-2 items-center bg-lime-200/70 rounded-xl px-3 py-2 mb-2 shadow-inner">
               <div className=" ">
-                <h2 className="text-xl font-semibold text-green-900 leading-tight">
+                <h2 className="text-lg font-semibold text-green-900 leading-tight">
                   Service Name :
                 </h2>
               </div>
               <div>
-                <h2 className="text-xl font-semibold text-green-900 leading-tight">
+                <h2 className="text-lg font-semibold text-green-900 leading-tight">
                   {item?.serviceName}
                 </h2>
               </div>
             </div>
 
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 mb-2 border border-green-200/70 shadow-inner">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 mb-2 border border-green-200 shadow-inner">
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center">
                   <MdEco className="text-white" style={{ fontSize: 18 }} />
@@ -1346,7 +1334,7 @@ function ServiceModal({ open, onClose, item }) {
                   {item.subServices.map((subService, idx) => (
                     <div
                       key={idx}
-                      className="bg-gradient-to-r from-lime-50 via-white to-green-50 rounded-2xl p-5 border-l-4 border-lime-500 shadow-md hover:shadow-lg transition-shadow"
+                      className="bg-gradient-to-r from-lime-50 via-white to-green-50  rounded-2xl p-5 border-l-4 border-lime-500 shadow-md hover:shadow-lg transition-shadow"
                     >
                       <h4 className="font-bold text-green-900 mb-2 flex items-center gap-2">
                         <LocalFlorist
@@ -1394,7 +1382,7 @@ function ServiceModal({ open, onClose, item }) {
               <CommonButton
                 type="button"
                 label="Book Appointment"
-                className=" font-bold rounded-xl text-white bg-gradient-to-r from-green-600 via-lime-600 to-green-700 hover:from-green-700 hover:via-lime-700 hover:to-green-800 shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                className=" text-white bg-gradient-to-r from-green-600  to-green-700 hover:from-green-700  hover:to-green-800  transition-all transform hover:scale-105 "
                 onClick={() => {
                   setOpenModal(true);
                   setSelectedService(item);
@@ -1425,49 +1413,6 @@ function ServiceCard({ item, index }) {
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lora:wght@400;500;600&display=swap');
-        
-        .luxury-card {
-          font-family: 'Poppins', sans-serif;
-        }
-        
-        .luxury-title {
-          font-family: 'Lora', serif;
-          letter-spacing: 0.01em;
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: -200% center; }
-          100% { background-position: 200% center; }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-6px); }
-        }
-        
-        @keyframes pulse-soft {
-          0%, 100% { opacity: 0.6; }
-          50% { opacity: 0.9; }
-        }
-        
-        .shimmer-effect {
-          background: linear-gradient(
-            90deg,
-            transparent 0%,
-            rgba(255, 255, 255, 0.2) 50%,
-            transparent 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 3s ease-in-out infinite;
-        }
-        
-        .icon-float:hover {
-          animation: float 2.5s ease-in-out infinite;
-        }
-      `}</style>
-
       <div className="luxury-card h-full">
         <div className="group relative h-full bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 border border-green-100">
           <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-transparent to-lime-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -1496,7 +1441,7 @@ function ServiceCard({ item, index }) {
             </div>
 
             <div className="px-5 pb-2 flex flex-col flex-grow">
-              <h3 className="luxury-title text-base font-semibold text-green-800 mb-2 group-hover:text-green-700 transition-colors duration-300">
+              <h3 className="luxury-title text-sm font-semibold text-green-800 mb-2 group-hover:text-green-700 transition-colors duration-300">
                 {item.serviceName}
               </h3>
 
@@ -1694,7 +1639,7 @@ export default function DetoxHouse() {
                       isActive ? "text-[#e5c76a]" : "text-[#1f4f3a]"
                     }`}
                   />
-                  <span className="whitespace-nowrap">
+                  <span className="whitespace-nowrap text-sm">
                     {shortText(cat.name, 20)}
                   </span>
                   {cat.subtitle && (

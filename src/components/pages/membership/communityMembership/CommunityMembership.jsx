@@ -587,23 +587,32 @@ const MembershipCard = ({
 
       <div className="p-2.5 sm:p-3 md:p-4 lg:p-5">
         <div className="bg-green-50 rounded-lg sm:rounded-xl p-2 sm:p-2.5 md:p-3 mb-2 sm:mb-3">
-          <div className="flex justify-between items-center mb-1 sm:mb-1.5">
-            <span className="text-xs sm:text-sm text-gray-600 line-through">
+          <div className="flex items-center justify-between gap-3 mb-1.5 sm:mb-2">
+            <span className="text-xs sm:text-sm text-gray-500 line-through">
               ₹{membership.price.toLocaleString()}
             </span>
-            <span className="text-[10px] sm:text-xs bg-amber-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium">
+
+            <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[10px] sm:text-xs font-semibold text-amber-700">
               {membership.couponCode}
             </span>
           </div>
-          <div className="flex justify-between items-center">
-            <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700">
+
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-lg sm:text-xl md:text-2xl font-bold tracking-tight text-green-700">
               ₹{membership.primaryDiscount.toLocaleString()}
             </p>
-            {(membership?.benifits?.length || 0) === 1 ? (
-              <p>Individual</p>
-            ) : (
-              <p>Per Person</p>
-            )}
+            <span
+              className={`px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border
+                ${
+                  (membership?.benifits?.length || 0) === 1
+                    ? "bg-green-50 text-green-700 border-green-200"
+                    : "bg-lime-50 text-lime-700 border-lime-200"
+                }`}
+            >
+              {(membership?.benifits?.length || 0) === 1
+                ? "Individual"
+                : "Per Person"}
+            </span>
           </div>
         </div>
 
@@ -750,7 +759,7 @@ const MembershipModal = ({
                   <p className="text-sm sm:text-base md:text-lg font-bold text-amber-600">
                     ₹
                     {Math.abs(
-                      membership.primaryDiscountAmount
+                      membership.primaryDiscountAmount,
                     ).toLocaleString()}
                   </p>
                 </div>

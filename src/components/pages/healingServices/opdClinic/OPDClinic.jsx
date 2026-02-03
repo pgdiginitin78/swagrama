@@ -1,11 +1,11 @@
-import { Alarm, Forward, Info, Person } from "@mui/icons-material";
-import { CalendarIcon } from "@mui/x-date-pickers";
+import { Alarm, Info, Person } from "@mui/icons-material";
+import CompostIcon from "@mui/icons-material/Compost";
+import HealingIcon from "@mui/icons-material/Healing";
+import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
+// import { CalendarIcon } from "@mui/x-date-pickers";
 import { useState } from "react";
 import OPDBookingModal from "./OPDBookingModal";
-import CompostIcon from "@mui/icons-material/Compost";
-import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
-import HealingIcon from "@mui/icons-material/Healing";
-import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 
 const healthcareServices = [
   {
@@ -350,7 +350,7 @@ const OPDClinic = () => {
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:shimmer" />
                 <span className="relative flex items-center justify-center gap-1.5">
                   <span className="text-base">
-                    <CalendarIcon />
+                    {/* <CalendarIcon /> */}
                   </span>
                   Book Appointment Now
                   <span className="text-base">

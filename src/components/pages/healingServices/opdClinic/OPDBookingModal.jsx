@@ -97,7 +97,6 @@ export default function OPDBookingModal({
       date: null,
     },
   });
-  const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [openPatientRegistrationModal, setOpenPatientRegistrationModal] =
     useState(false);
 

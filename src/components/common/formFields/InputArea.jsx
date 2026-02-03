@@ -1,92 +1,78 @@
-import { TextareaAutosize } from "@mui/base/TextareaAutosize";
-import Textarea from "@mui/joy/Textarea";
-import { styled } from "@mui/joy/styles";
 import React from "react";
 import { Controller } from "react-hook-form";
-import { CssVarsProvider as JoyCssVarsProvider } from "@mui/joy/styles";
-import {
-  THEME_ID as MATERIAL_THEME_ID,
-  Experimental_CssVarsProvider as MaterialCssVarsProvider,
-  experimental_extendTheme as materialExtendTheme,
-} from "@mui/material/styles";
+import TextareaAutosize from "@mui/material/TextareaAutosize";
+import { styled } from "@mui/material/styles";
 
-const materialTheme = materialExtendTheme();
+const Wrapper = styled("div")(({ theme }) => ({
+  position: "relative",
+  width: "100%",
+  backgroundColor: "#fff",
+  borderRadius: 10,
+  border: `1px solid ${theme.palette.grey[300]}`,
+  padding: "6px 14px",
+  transition: "0.2s ease",
+  "&:focus-within": {
+    border: `2px solid ${theme.palette.primary.main}`,
+  },
+}));
 
-const StyledTextarea = styled(TextareaAutosize)(
-  ({ minRows, maxRows, theme }) => {
-    const lineHeight = parseFloat(theme?.typography?.body1?.lineHeight);
-    const fontSize = parseFloat(theme?.typography?.body1?.fontSize);
-
-    const minHeight = minRows * lineHeight * fontSize;
-    const maxHeight = maxRows * lineHeight * fontSize;
-
-    return {
-      resize: "none",
-      border: "none",
-      minWidth: 0,
-      outline: 0,
-      padding: 0,
-      paddingBlockStart: "1em",
-      paddingInlineEnd: `var(--Textarea-paddingInline)`,
-      flex: "auto",
-      alignSelf: "stretch",
-      color: "inherit",
-      backgroundColor: "transparent",
-      fontFamily: "inherit",
-      fontSize: "inherit",
-      fontStyle: "inherit",
-      fontWeight: "inherit",
-      lineHeight: "inherit",
-      minHeight: minHeight,
-      maxHeight: maxHeight,
-      overflowY: "auto",
-      "&::placeholder": {
-        opacity: 0,
-        transition: "0.1s ease-out",
-      },
-      "&:focus::placeholder": {
-        opacity: 1,
-      },
-      "&:focus + textarea + label, &:not(:placeholder-shown) + textarea + label":
-        {
-          top: "0.5rem",
-          fontSize: "0.75rem",
-        },
-      "&:focus + textarea + label": {
-        color: "var(--Textarea-focusedHighlight)",
-      },
-    };
-  }
-);
+const StyledTextarea = styled(TextareaAutosize)(({ theme }) => ({
+  width: "100%",
+  resize: "none",
+  border: "none",
+  outline: "none",
+  background: "transparent",
+  paddingTop: "20px",
+  paddingBottom: "10px",
+  fontFamily: theme.typography.fontFamily,
+  fontSize: theme.typography.body1.fontSize,
+  lineHeight: theme.typography.body1.lineHeight,
+  color: theme.palette.text.primary,
+  overflowY: "auto",
+}));
 
 const StyledLabel = styled("label")(({ theme }) => ({
   position: "absolute",
-  lineHeight: 1,
-  top: "calc((var(--Textarea-minHeight) - 1em) / 2)",
-  color: theme?.vars?.palette?.text?.tertiary,
-  fontWeight: theme?.vars?.fontWeight?.md,
+  left: 14,
+  top: 18,
+  fontSize: 14,
+  color: theme.palette.text.secondary,
+  fontWeight: 500,
+  pointerEvents: "none",
   transition: "all 150ms cubic-bezier(0.4, 0, 0.2, 1)",
 }));
 
 const InnerTextarea = React.forwardRef(function InnerTextarea(
-  { name, label, placeholder, minRows, maxRows, defaultValue, ...props },
-  ref
+  { name, label, placeholder, minRows, maxRows, value, onChange, onBlur },
+  ref,
 ) {
   const id = React.useId();
+  const isFilled = (value ?? "").toString().length > 0;
 
   return (
-    <React.Fragment>
+    <Wrapper>
       <StyledTextarea
-        {...props}
-        {...{ name, id }}
+        id={id}
+        name={name}
         ref={ref}
-        placeholder={placeholder}
+        value={value || ""}
+        onChange={onChange}
+        onBlur={onBlur}
+        placeholder={isFilled ? placeholder : ""}
         minRows={minRows}
         maxRows={maxRows}
-        
       />
-      <StyledLabel htmlFor={id}>{label}</StyledLabel>
-    </React.Fragment>
+
+      <StyledLabel
+        htmlFor={id}
+        style={{
+          top: "8px",
+          fontSize: "12px",
+        }}
+      >
+        {label}
+      </StyledLabel>
+    </Wrapper>
   );
 });
 
@@ -98,44 +84,24 @@ export default function InputArea({
   control,
   minRows,
   maxRows,
-  size,
   ...props
 }) {
   return (
-    <MaterialCssVarsProvider
-      theme={{
-        [MATERIAL_THEME_ID]: materialTheme,
-      }}
-    >
-      <JoyCssVarsProvider>
-        <Controller
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={defaultValue || ""}
+      render={({ field }) => (
+        <InnerTextarea
+          {...props}
+          {...field}
           name={name}
-          control={control}
-          defaultValue={defaultValue}
-          render={({ field }) => (
-            <Textarea
-              slots={{ textarea: InnerTextarea }}
-              slotProps={{
-                textarea: {
-                  ...field,
-                  placeholder,
-                  name,
-                  label,
-                  defaultValue,
-                  minRows,
-                  maxRows,
-                },
-              }}
-              variant="outlined"
-              sx={{ borderRadius: "6px", backgroundColor: "white" }}
-              minRows={minRows}
-              maxRows={maxRows}
-              size={size}
-              {...props}
-            />
-          )}
+          label={label}
+          placeholder={placeholder}
+          minRows={minRows}
+          maxRows={maxRows}
         />
-      </JoyCssVarsProvider>
-    </MaterialCssVarsProvider>
+      )}
+    />
   );
 }

@@ -20,7 +20,6 @@ function TimePickerField({
   onChange,
   value,
   error,
-  onError,
   tableTimePicker,
   ...rest
 }) {
@@ -45,73 +44,51 @@ function TimePickerField({
                   minutes: renderTimeViewClock,
                   seconds: renderTimeViewClock,
                 }}
-                renderInput={(params) => (
-                  <TextField
-                    onError={onError}
-                    error={error}
-                    {...params}
-                    size="small"
-                    fullWidth
-                    variant="outlined"
-                    InputLabelProps={{
-                      ...params.InputLabelProps,
-                      shrink: true,
-                    }}
-                  />
-                )}
                 ampm={!format24hr}
                 sx={{
-                  "& .MuiInputBase-root": {
-                    height: tableTimePicker ? "28px" : "36px",
-                    background: "white",
-                  },
+              
                   "& .MuiInputBase-input": {
                     fontSize: tableTimePicker ? "11px" : "12px",
-                    padding: "5px 12px",
+                    padding: "6px 14px",
                   },
                   "& .MuiInputLabel-root": {
                     fontSize: tableTimePicker ? "11px" : "12px",
-                    color:
-                      error?.type === "required" || error?.type === "nullable"
-                        ? "#DC2626"
-                        : "#263d21",
+                    color: "#263d21 !important",
                     transform: tableTimePicker
                       ? "translate(14px, 7px) scale(1)"
-                      : "translate(14px, 9px) scale(1)",
+                      : "translate(10px, 10px) scale(1)",
                     "&.MuiInputLabel-shrink": {
                       transform: "translate(12px, -6px) scale(0.75)",
+                      fontSize: tableTimePicker ? "10px" : "12px",
                     },
                   },
-                  "& fieldset": {
-                    borderColor:
-                      error?.type === "required" || error?.type === "nullable"
-                        ? "#DC2626"
-                        : "",
-                  },
-                  "&:hover fieldset": {
-                    borderColor:
-                      error?.type === "required" || error?.type === "nullable"
-                        ? "#DC2626"
-                        : "",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor:
-                      error?.type === "required" || error?.type === "nullable"
-                        ? "#DC2626"
-                        : "",
+                  "& .MuiPickersOutlinedInput-root": {
+                    fontSize: tableTimePicker ? "10px" : "12px",
+                    padding: "6.5px 14px",
                   },
                   "& .MuiIconButton-root": {
                     padding: "5px",
-                    marginTop: tableTimePicker ? "0" : "0",
                   },
                   "& .MuiSvgIcon-root": {
                     fontSize: tableTimePicker ? "16px" : "22px",
-                    color:
-                      error?.type === "required" || error?.type === "nullable"
-                        ? "#DC2626"
-                        : disabled
-                        ? "#A9A9A9"
-                        : "#263d21",
+                    color: disabled ? "#A9A9A9 !important" : "#263d21 !important",
+                  },
+                  "& .MuiPickersSectionList-root": {
+                    padding: "0px 0px !important",
+                    fontSize: tableTimePicker
+                      ? "12px !important"
+                      : "13px !important",
+                  },
+              
+           
+                  "& fieldset": {
+                    borderColor: error ? "red !important" : "rgba(0, 0, 0, 0.23) !important",
+                  },
+                  "&:hover fieldset": {
+                    borderColor:error ? "red !important" : "rgba(0, 0, 0, 0.87) !important",
+                  },
+                  "& .Mui-focused fieldset": {
+                    borderColor: error ? "red !important" :"#1976d2 !important",
                   },
                 }}
                 {...rest}
@@ -125,6 +102,7 @@ function TimePickerField({
 }
 
 export default TimePickerField;
+
 {
   /* <TimePickerField
 name="time24hr"

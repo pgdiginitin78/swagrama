@@ -58,7 +58,7 @@ const InputField = ({
                 {
                   style: {
                     fontSize: tableInputField ? "12px" : "14px",
-                    height: tableInputField ? "10px" : "18.5px",
+                    height: tableInputField ? "10px" : "20px",
                   },
                 })
 

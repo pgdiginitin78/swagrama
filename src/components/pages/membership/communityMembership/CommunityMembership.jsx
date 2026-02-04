@@ -38,7 +38,7 @@ const benefits = [
   },
   {
     icon: <Leaf className="w-5 h-5" />,
-    text: "Allow to read - listen – join स्वग्रामCommunity health tips, blogs, appointments, presentations, lectures, animations, videos, trainings, Interaction, Chat, information, programs & regular current affairs.",
+    text: "Allow to read - listen – join स्वग्राम Community health tips, blogs, appointments, presentations, lectures, animations, videos, trainings, Interaction, Chat, information, programs & regular current affairs.",
   },
   {
     icon: <TreePine className="w-5 h-5" />,
@@ -46,7 +46,7 @@ const benefits = [
   },
   {
     icon: <CreditCard className="w-5 h-5" />,
-    text: "Each & every person are Eligible for स्वग्रामग्रCommunityCard physical card.",
+    text: "Each & every person are Eligible for स्वग्रामग्र Community Card physical card.",
   },
   {
     icon: <Award className="w-5 h-5" />,
@@ -130,7 +130,7 @@ const mergedMemberships = [
     description:
       "Designed for Independent Living Souls. Feel Alone in the City? Longing for a Community That Feels Like Family? Swagrama Community introduces the स्वकीयसदस्यत्व, specially crafted for those who live alone.",
     discountText:
-      "Single Person Membership – स्वकीयसदस्यत्व Own Membership: 20% Discount Membership",
+      "Single Person Membership – स्वकीयसदस्यत्व Own Membership : 20% Discount Membership",
     benifits: ["Individual Only"],
     categoryName: "Own : Single / Personal",
     serviceName: "Own Membership",
@@ -308,14 +308,14 @@ const CommunityMembership = () => {
           transition={{ duration: 0.8 }}
           className="relative z-10 flex h-full items-end justify-center px-2 md:px-0   pb-3 sm:pb-6 md:pb-0"
         >
-          <div className="w-full max-w-full backdrop-blur-md bg-green-200/40 px-4 py-3 sm:py-5 md:py-8 border border-white/50 shadow-xl text-center rounded-2xl md:rounded-none">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold mb-1.5 sm:mb-3 md:mb-4 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)]">
+          <div className="w-full max-w-full backdrop-blur-md bg-green-200/40 px-4 py-3 sm:py-5 md:py-5 border border-white/50 shadow-xl text-center rounded-2xl md:rounded-none">
+            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1.5 drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)]">
               <span className="bg-gradient-to-r from-green-800 via-lime-700 to-amber-800 bg-clip-text text-transparent">
                 स्वग्रामसदस्यत्व
               </span>
             </h1>
 
-            <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold text-green-900 mb-1.5 sm:mb-2 drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)]">
+            <h2 className="text-base sm:text-xl md:text-2xl lg:text-2xl font-bold text-green-900 mb-1.5 sm:mb-2 drop-shadow-[0_2px_8px_rgba(255,255,255,0.6)]">
               Community Membership
             </h2>
 
@@ -331,53 +331,165 @@ const CommunityMembership = () => {
           </div>
         </motion.div>
       </section>
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 1 }}
+        viewport={{ once: true }}
+        className="my-5 px-4 md:px-12"
+      >
+        <div className="relative bg-gradient-to-br from-lime-100 to-green-100 backdrop-blur-xl rounded-3xl p-5 md:p-10 border border-lime-300 shadow">
+          <div className="absolute -top-5 -right-5 w-40 h-40 bg-gradient-to-br from-lime-300 via-green-300 to-lime-300 rounded-full blur-3xl opacity-50" />
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <Nature className="text-2xl md:text-4xl text-green-600" />
+              <h3 className="text-lg md:text-2xl font-bold text-green-800">
+                जनता: प्रत्येकजण निसर्गाशी
+              </h3>
+            </div>
+            <div className="prose prose-lg text-xs md:text-sm max-w-none text-green-900 leading-relaxed space-y-4">
+              <p>
+                जनता: प्रत्येकजण निसर्गाशी जवळीक साधारा निसर्गमैत्री आहे. रहाणपण
+                शुद्ध निसर्म, अन्नपाणी आणि दिन-ऋतुयेत त्याने घालविल्याने
+                त्यालाही निसर्गाच्या साहित्यात जावें, एकनित्र कुटुंबात राहावे,
+                विहीरीतील पाणी प्यावे, सनमेवा खावा असे वाटते. आपल्या कुटुंबधानी
+                सुद्धा निसर्म, एकनित्र कुटुंब पद्धती आणि आयुर्वेदीय नैसर्गिक
+                जीवनशैलीचा अनुभव घ्यावा असे त्याला वाटत असते. त्याच्या स्वभातील
+                आयुर्वेदिक गांव, घर, चिकित्सालय, आतुरालय, वनौषधि जंगल, गोशाला,
+                औषधिकरण इत्यादि सर्वेकाही त्याला अनुभवायचे असते. हजारो वर्षे
+                रोकड़ा पिढ्यांनी 100 वर्षे जगण्यासाठी हवी असणारी नैसर्गिक
+                आयुर्वेदीय जीवनशैली जगायची असते.
+              </p>
+              <p>
+                जणकरस्त आपल्यापाती सर्वाचा छद विश्वास निर्माण होईल. आजकाल मोठाली
+                बोती पुन्हा वरील बायका चालवा पाहण्यात येते ती ही स्वग्राम चालवा
+                पाहत आहेत त्या स्वग्राम बरोबर ३६५ दिवस १०० वेळ जरुर स्वग्राम
+                चालवा पाहत आहेत. रवाव्हे पन्नाशी अशाही देतात्यांकड़े उपलब्ध नाही
+                उपलब्ध होणार? कोणाचे मॉडेल तर कोणाचे मार्गदर्शन गाइड तर साहाय्य
+                जणा, स्वतःचे गांव तर बहुताशी खेड़ता राहणारीचे सुद्धा गांव
+                हरवितेच आहे. वरल हे सगळेच जसेच्या तसे तुम्हाला स्वग्राममधे
+                मिळेल. सहभागी व्हा दैवाणेवाण करण्यासाठी.
+              </p>
+              <p>
+                अट्विशेष नाडी परीक्षा आणि वैद साल्याने स्वतःचे कुटुंब नक्की
+                आरोग्यपूर्ण ठेवण्याची संधी. तुमच्या आत्तामधे रुपाले.ल्या कळा आणि
+                ज्ञानाला जागृत करणार स्वप्नरुकूल इथे उपलब्ध आहे. की ज्यामधे 100
+                वर्षे जगण्यासाठी पूर्क असा जीवनशैलीला पूर्ण करणार 10 क्षेत्रातील
+                20 कोर्स आहेत. ते चार महीने देवग्राममधे चालतात. सातत्याने सहभागी
+                होऊन विश्वातील तब्बे गुरुच्या साधियात राहून स्वतःचे एकदिवस गुरु
+                बनण्याच्या पातळीला बनणार असाल तर देवग्राम पूरेसे आहे.
+              </p>
+              <p>
+                स्वतःच्या मुलंना पुढील पिक्षासाठी तुमच्यातील आदर्श
+                दाखवायेप्रमाणे नाही सोधी. सर्व प्रपंचाचा अनुभव थोडाक्यात घेणार
+                आहे असाल तर स्वग्रामुट्ट्या येथे व्यावसायिकी देखील संगाणित्र
+                होता आहे. हे, मुकुच्या मिळकतीचा रीतसरी, येथा, गोपाळक, बरळेदार
+                आणि निसर्गप्रेमी कर्माचे नक्कीचे वाटणारा हे सदस्यराष्ट्र एकदे
+                म्या किंवा कुटुंबासोबत म्या.
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+        className="px-4 md:px-12"
+      >
+        <div className="relative bg-gradient-to-br from-yellow-50 to-amber-50 backdrop-blur-xl rounded-3xl p-5 md:p-10 border border-yellow-300 shadow">
+          <div className="absolute -bottom-5 -left-5 w-40 h-40 bg-gradient-to-br from-yellow-300 to-amber-300 rounded-full blur-3xl opacity-50" />
+          <div className="relative">
+            <div className="flex items-center gap-3 mb-2">
+              <HomeIcon className="text-2xl md:text-4xl text-amber-700" />
+              <h3 className="text-lg md:text-2xl font-bold text-amber-800">
+                एक व्यक्तीला एक कुटुंब
+              </h3>
+            </div>
+            <div className="prose prose-lg text-xs md:text-sm max-w-none text-amber-900 leading-relaxed space-y-4">
+              <p>
+                एक व्यक्तीला एक कुटुंब लागते. एका कुटुंबाला एकनित्र कुटुंब
+                पद्धती गरजेची आहे. अशी अनेक एकनित्र कुटुंबे आपल्या गरजा
+                भागविण्यासाठी एकत्र येतात तावेळी एक समाज बनतो. असा समाजाचा
+                समुदाय एका उद्देशाने एकत्र आल्यावर एक ग्राम स्वग्राम बनते.
+                प्रत्येकाला एवढे हवाकाचा जागा मिळेत. माहेर मिळेत. सुट्टाला
+                मागाचे घर त्या गावात असते. म्हातारपण सुट्ट तरुणारास्स्स
+                जगातेण्याचा तावंद त्या गावात असते.
+              </p>
+              <p>
+                कामाने धकलेल्याला हे गाव विश्रांती देते. उन्हे-वारा-पावसात
+                दाहूनेसुद्धा आरोग्यप्राप्ती या गावात होते. विहिरीत पाहणे, झोडावर
+                चढणे, शेतात काम करणे. बीज साबवने अशी अनेक कार्ये या गावात होतात.
+                असा अनेक कुटुंबांना एकनित्र करणारे असे गाव म्हणजे स्वग्राम!
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
 
       <div className="md:px-10 w-full">
-        <section className="py-4 md:py-12 w-full">
+        <section className="py-4 md:py-8  w-full">
           <div className=" px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-4 md:mb-12"
+              className="text-center mb-4 md:mb-5"
             >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-100 text-green-700 text-sm font-medium mb-4 border border-lime-200">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-100 text-green-700 text-sm font-medium mb-2 border border-lime-200">
                 <Sparkles className="w-4 h-4" />
                 स्वसदस्यत्व Benefits
               </span>
-              <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-1">
                 Membership Benefits
               </h2>
-              <p className="text-amber-700/80 max-w-2xl text-sm md:text-lg mx-auto">
+              <p className="text-amber-700/80  text-sm md:text-lg mx-auto">
                 स्वग्राम Community is a self-dependent village. It's a practical
                 experience of need base life.
               </p>
             </motion.div>
 
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6"
-            >
-              {benefits.map((benefit, index) => (
+            <div className="min-h-screen">
+              <div className="w-full mx-auto">
                 <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  className="group bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-lime-100"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid grid-cols-2 gap-4"
                 >
-                  <div className="grid gap-4">
-                    <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-                      <span className="text-white">{benefit.icon}</span>
-                    </div>
-                    <p className="text-green-800 text-xs md:text-sm leading-relaxed">
-                      {benefit.text}
-                    </p>
-                  </div>
+                  {benefits.map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      variants={itemVariants}
+                      whileHover={{ x: 8, scale: 1.01 }}
+                      className="group relative"
+                    >
+                      <div
+                        className="flex items-start gap-6 p-3 rounded-2xl transition-all duration-300
+                          bg-gradient-to-br from-slate-50 via-emerald-50 to-sky-50 backdrop-blur-xl shadow-sm hover:shadow-xl
+                          border  border-l-4 border-l-emerald-400
+                          hover:border-emerald-500 hover:border-l-emerald-600"
+                      >
+                        <motion.div
+                          whileHover={{ rotate: 360, scale: 1.1 }}
+                          transition={{ duration: 0.6 }}
+                          className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center text-white shadow-lg group-hover:shadow-emerald-500/50 transition-shadow duration-300"
+                        >
+                          {benefit.icon}
+                        </motion.div>
+                        <div className="flex-1 pt-1">
+                          <p className="text-gray-700 text-sm leading-relaxed group-hover:text-gray-900 transition-colors duration-300">
+                            {benefit.text}
+                          </p>
+                        </div>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-emerald-100/20 to-teal-100/20 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </motion.div>
-              ))}
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -387,16 +499,16 @@ const CommunityMembership = () => {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-center mb-4 md:mb-12 w-full"
+              className="text-center mb-4 md:mb-5 w-full"
             >
-              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-4 border border-amber-200">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-medium mb-2 border border-amber-200">
                 <CreditCard className="w-4 h-4" />
                 Choose Your Plan
               </span>
-              <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-4">
+              <h2 className="text-2xl md:text-3xl font-bold text-green-800 mb-1">
                 Membership Plans
               </h2>
-              <p className="text-amber-700/80 max-w-2xl md:max-w-6xl text-center text-sm md:text-lg">
+              <p className="text-amber-700/80  text-center text-sm md:text-lg">
                 Select the perfect membership that suits your needs and join our
                 wellness community.
               </p>
@@ -427,106 +539,6 @@ const CommunityMembership = () => {
             </div>
           </div>
         </section>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
-          className="mb-5 px-4"
-        >
-          <div className="relative bg-gradient-to-br from-lime-100/80 to-green-100/80 backdrop-blur-xl rounded-3xl p-5 md:p-10 border border-lime-300 shadow-2xl">
-            <div className="absolute -top-5 -right-5 w-40 h-40 bg-gradient-to-br from-lime-300 via-green-300 to-lime-300 rounded-full blur-3xl opacity-50" />
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-2">
-                <Nature className="text-2xl md:text-4xl text-green-600" />
-                <h3 className="text-lg md:text-2xl font-bold text-green-800">
-                  जनता: प्रत्येकजण निसर्गाशी
-                </h3>
-              </div>
-              <div className="prose prose-lg text-xs md:text-sm max-w-none text-green-900 leading-relaxed space-y-4">
-                <p>
-                  जनता: प्रत्येकजण निसर्गाशी जवळीक साधारा निसर्गमैत्री आहे.
-                  रहाणपण शुद्ध निसर्म, अन्नपाणी आणि दिन-ऋतुयेत त्याने
-                  घालविल्याने त्यालाही निसर्गाच्या साहित्यात जावें, एकनित्र
-                  कुटुंबात राहावे, विहीरीतील पाणी प्यावे, सनमेवा खावा असे वाटते.
-                  आपल्या कुटुंबधानी सुद्धा निसर्म, एकनित्र कुटुंब पद्धती आणि
-                  आयुर्वेदीय नैसर्गिक जीवनशैलीचा अनुभव घ्यावा असे त्याला वाटत
-                  असते. त्याच्या स्वभातील आयुर्वेदिक गांव, घर, चिकित्सालय,
-                  आतुरालय, वनौषधि जंगल, गोशाला, औषधिकरण इत्यादि सर्वेकाही त्याला
-                  अनुभवायचे असते. हजारो वर्षे रोकड़ा पिढ्यांनी 100 वर्षे
-                  जगण्यासाठी हवी असणारी नैसर्गिक आयुर्वेदीय जीवनशैली जगायची
-                  असते.
-                </p>
-                <p>
-                  जणकरस्त आपल्यापाती सर्वाचा छद विश्वास निर्माण होईल. आजकाल
-                  मोठाली बोती पुन्हा वरील बायका चालवा पाहण्यात येते ती ही
-                  स्वग्राम चालवा पाहत आहेत त्या स्वग्राम बरोबर ३६५ दिवस १०० वेळ
-                  जरुर स्वग्राम चालवा पाहत आहेत. रवाव्हे पन्नाशी अशाही
-                  देतात्यांकड़े उपलब्ध नाही उपलब्ध होणार? कोणाचे मॉडेल तर कोणाचे
-                  मार्गदर्शन गाइड तर साहाय्य जणा, स्वतःचे गांव तर बहुताशी खेड़ता
-                  राहणारीचे सुद्धा गांव हरवितेच आहे. वरल हे सगळेच जसेच्या तसे
-                  तुम्हाला स्वग्राममधे मिळेल. सहभागी व्हा दैवाणेवाण करण्यासाठी.
-                </p>
-                <p>
-                  अट्विशेष नाडी परीक्षा आणि वैद साल्याने स्वतःचे कुटुंब नक्की
-                  आरोग्यपूर्ण ठेवण्याची संधी. तुमच्या आत्तामधे रुपाले.ल्या कळा
-                  आणि ज्ञानाला जागृत करणार स्वप्नरुकूल इथे उपलब्ध आहे. की
-                  ज्यामधे 100 वर्षे जगण्यासाठी पूर्क असा जीवनशैलीला पूर्ण करणार
-                  10 क्षेत्रातील 20 कोर्स आहेत. ते चार महीने देवग्राममधे चालतात.
-                  सातत्याने सहभागी होऊन विश्वातील तब्बे गुरुच्या साधियात राहून
-                  स्वतःचे एकदिवस गुरु बनण्याच्या पातळीला बनणार असाल तर देवग्राम
-                  पूरेसे आहे.
-                </p>
-                <p>
-                  स्वतःच्या मुलंना पुढील पिक्षासाठी तुमच्यातील आदर्श
-                  दाखवायेप्रमाणे नाही सोधी. सर्व प्रपंचाचा अनुभव थोडाक्यात घेणार
-                  आहे असाल तर स्वग्रामुट्ट्या येथे व्यावसायिकी देखील संगाणित्र
-                  होता आहे. हे, मुकुच्या मिळकतीचा रीतसरी, येथा, गोपाळक, बरळेदार
-                  आणि निसर्गप्रेमी कर्माचे नक्कीचे वाटणारा हे सदस्यराष्ट्र एकदे
-                  म्या किंवा कुटुंबासोबत म्या.
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mb-5 px-4"
-        >
-          <div className="relative bg-gradient-to-br from-yellow-100/80 to-amber-100/80 backdrop-blur-xl rounded-3xl p-5 md:p-10 border border-yellow-300 shadow-2xl">
-            <div className="absolute -bottom-5 -left-5 w-40 h-40 bg-gradient-to-br from-yellow-300 to-amber-300 rounded-full blur-3xl opacity-50" />
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-2">
-                <HomeIcon className="text-2xl md:text-4xl text-amber-700" />
-                <h3 className="text-lg md:text-2xl font-bold text-amber-800">
-                  एक व्यक्तीला एक कुटुंब
-                </h3>
-              </div>
-              <div className="prose prose-lg text-xs md:text-sm max-w-none text-amber-900 leading-relaxed space-y-4">
-                <p>
-                  एक व्यक्तीला एक कुटुंब लागते. एका कुटुंबाला एकनित्र कुटुंब
-                  पद्धती गरजेची आहे. अशी अनेक एकनित्र कुटुंबे आपल्या गरजा
-                  भागविण्यासाठी एकत्र येतात तावेळी एक समाज बनतो. असा समाजाचा
-                  समुदाय एका उद्देशाने एकत्र आल्यावर एक ग्राम स्वग्राम बनते.
-                  प्रत्येकाला एवढे हवाकाचा जागा मिळेत. माहेर मिळेत. सुट्टाला
-                  मागाचे घर त्या गावात असते. म्हातारपण सुट्ट तरुणारास्स्स
-                  जगातेण्याचा तावंद त्या गावात असते.
-                </p>
-                <p>
-                  कामाने धकलेल्याला हे गाव विश्रांती देते. उन्हे-वारा-पावसात
-                  दाहूनेसुद्धा आरोग्यप्राप्ती या गावात होते. विहिरीत पाहणे,
-                  झोडावर चढणे, शेतात काम करणे. बीज साबवने अशी अनेक कार्ये या
-                  गावात होतात. असा अनेक कुटुंबांना एकनित्र करणारे असे गाव म्हणजे
-                  स्वग्राम!
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
       </div>
 
       <AnimatePresence>

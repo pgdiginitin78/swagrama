@@ -10,7 +10,6 @@ import {
   WbSunny,
   LocalHospital,
   Healing,
-  
 } from "@mui/icons-material";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -35,7 +34,7 @@ import Empowering from "../assets/landing-page/topStories/Empowering.svg";
 import StoryImg from "../assets/landing-page/topStories/Story-2.png";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
-import OPDBookingModal from "../pages/healingServices/opdClinic/OPDBookingModal";
+import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
 import { Avatar, Card, Container } from "@mui/material";
 
 const healers = [
@@ -303,7 +302,7 @@ export default function AyurvedaLanding() {
 
   const upcommingEvent = useMemo(
     () => getNextTwoEvents(eventsData2026),
-    [eventsData2026]
+    [eventsData2026],
   );
 
   const eventsDataUpdated = useMemo(() => {
@@ -316,7 +315,7 @@ export default function AyurvedaLanding() {
   return (
     <div className="w-full overflow-x-hidden bg-gradient-to-br from-lime-50 via-green-50 to-amber-50">
       <motion.section
-        className="relative h-screen overflow-hidden"
+        className="relative min-h-screen overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
@@ -326,31 +325,31 @@ export default function AyurvedaLanding() {
           loop
           muted
           playsInline
-          className="absolute top-0 left-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover"
         >
           <source src={landigPageS1} type="video/mp4" />
         </video>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-green-900/60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-green-900/70" />
 
-        <div className="relative z-10 h-full flex flex-col items-center justify-between px-4 sm:px-6 lg:px-8 py-8 sm:py-16">
+        <div className="relative z-10 min-h-screen flex flex-col justify-between px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
           <motion.div
-            className="flex-1 flex flex-col items-center justify-center text-center space-y-4 sm:space-y-8 max-w-5xl"
+            className="flex-1 flex flex-col items-center justify-center text-center space-y-5 sm:space-y-8 max-w-5xl mx-auto"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
             <motion.div
-              className="inline-flex items-center gap-2 px-4 sm:px-6 py-3 sm:py-4 bg-lime-100/90 backdrop-blur-sm rounded-full text-green-800 font-medium text-sm sm:text-base shadow-lg"
+              className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-amber-900/20 backdrop-blur-md border border-amber-700/30 rounded-full text-white font-medium text-xs sm:text-sm md:text-base shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Spa className="text-green-600" />
+              <Spa className="text-white" />
               Ancient Wisdom • Modern Healing
             </motion.div>
 
             <motion.h1
-              className="text-3xl md:text-4xl lg:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-lime-200 via-green-300 to-emerald-200 leading-tight px-4"
+              className="text-2xl sm:text-3xl md:text-5xl  font-bold text-transparent bg-clip-text bg-gradient-to-r from-lime-200 via-green-300 to-emerald-200 leading-tight px-2"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.5, duration: 0.8 }}
@@ -359,7 +358,7 @@ export default function AyurvedaLanding() {
             </motion.h1>
 
             <motion.p
-              className="text-lg sm:text-xl md:text-2xl text-white font-light max-w-3xl px-4"
+              className="text-sm sm:text-base md:text-xl lg:text-2xl text-white font-light max-w-3xl px-4"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.8 }}
@@ -370,26 +369,14 @@ export default function AyurvedaLanding() {
           </motion.div>
 
           <motion.div
-            className="pb-4"
+            className="pb-6 sm:pb-10 lg:pb-16 flex justify-center"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
           >
             <motion.button
-              className="px-6 sm:px-8 py-3 sm:py-4
-                        rounded-full
-                        text-base sm:text-lg font-semibold
-                        text-white
-                        backdrop-blur-xl
-                        bg-gradient-to-r from-green-400/25 to-lime-400/25
-                        border border-white/30
-                        shadow-[0_8px_30px_rgba(34,197,94,0.35)]
-                        hover:shadow-[0_12px_40px_rgba(34,197,94,0.55)]
-                        hover:from-green-400/35 hover:to-lime-400/35
-                        transition-all duration-300"
-              whileHover={{
-                scale: 1.06,
-              }}
+              className="px-6 sm:px-8 py-3 rounded-full text-sm sm:text-base md:text-lg font-semibold text-white backdrop-blur-xl bg-gradient-to-r from-green-400/25 to-lime-400/25 border border-white/30 shadow-[0_8px_30px_rgba(34,197,94,0.35)] hover:shadow-[0_12px_40px_rgba(34,197,94,0.55)] hover:from-green-400/35 hover:to-lime-400/35 transition-all duration-300"
+              whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setOpenAppointmentModal(true)}
             >
@@ -400,7 +387,7 @@ export default function AyurvedaLanding() {
         </div>
       </motion.section>
 
-      <section className="py-12 sm:py-10  px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-lime-100 via-green-50 to-amber-100">
+      <section className="py-12 sm:py-10  px-4 sm:px-6 lg:px-12 ">
         <motion.div
           className="max-w-7xl mx-auto text-center space-y-6 sm:space-y-5"
           initial={{ opacity: 0, y: 50 }}
@@ -456,7 +443,7 @@ export default function AyurvedaLanding() {
         </motion.div>
       </section>
 
-      <section className="py-12 sm:py-10 px-4 sm:px-6 lg:px-20 bg-gradient-to-br from-amber-50 via-lime-50 to-green-100 relative overflow-hidden">
+      <section className="py-12 sm:py-10 px-4 sm:px-6 lg:px-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-0 w-64 h-64 bg-green-500 rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-lime-500 rounded-full blur-3xl" />
@@ -545,7 +532,7 @@ export default function AyurvedaLanding() {
         </motion.div>
       </section>
 
-      <section className="py-12 sm:py-10 px-4 sm:px-6 lg:px-12 bg-gradient-to-br from-green-50 to-lime-100">
+      <section className="py-12 sm:py-10 px-4 sm:px-6 lg:px-12 ">
         <motion.div
           className="max-w-7xl mx-auto"
           initial={{ opacity: 0 }}
@@ -591,13 +578,13 @@ export default function AyurvedaLanding() {
               >
                 {event.img ? (
                   <>
-                    <div className="flex justify-center py-6 bg-gradient-to-br from-lime-100 to-green-100">
+                    <div className="flex justify-center items-center py-6 bg-gradient-to-br from-lime-100 to-green-100">
                       <div className="relative">
                         <motion.img
                           src={event.img}
                           className="h-20 sm:h-24 w-20 sm:w-24 rounded-full object-cover shadow-lg ring-4 ring-white"
                           alt={event.title}
-                          whileHover={{ rotate: 360 }}
+                          // whileHover={{ rotate: 360 }}
                           transition={{ duration: 0.6 }}
                         />
                         <div className="absolute -bottom-2 -right-2 bg-green-600 text-white p-2 rounded-full">
@@ -609,7 +596,7 @@ export default function AyurvedaLanding() {
                       <h5 className="font-semibold text-green-900 text-center mb-3 text-sm sm:text-base">
                         {event.title}
                       </h5>
-                      <p className="text-xs sm:text-sm text-gray-600 text-center leading-relaxed mb-5">
+                      <p className="text-xs  text-gray-600 text-start leading-relaxed mb-5">
                         {event.text}
                       </p>
                       {event.btn && (
@@ -753,7 +740,7 @@ export default function AyurvedaLanding() {
         </motion.div>
       </section>
 
-      <section className="py-12 px-12  ">
+      <section className="py-5 px-12  ">
         <div className="w-full mx-auto">
           <motion.div
             ref={foundersRef}
@@ -837,7 +824,7 @@ export default function AyurvedaLanding() {
         </div>
       </section>
 
-      <section ref={healersRef} className="pb-5 px-4 md:px-12 xl:px-20 bg-white">
+      <section ref={healersRef} className="pb-5 px-4 md:px-12 xl:px-20 ">
         <div className="w-full mx-auto">
           <motion.div
             variants={staggerContainer}
@@ -845,70 +832,59 @@ export default function AyurvedaLanding() {
             animate={isHealersInView ? "visible" : "hidden"}
             className="text-center mb-5 pt-5"
           >
+            <motion.span
+              variants={fadeInUp}
+              className="text-[#C65A3A] tracking-[0.2em] uppercase text-sm font-medium"
+            >
+              Our Founders &
+            </motion.span>
+
             <motion.h2
               variants={fadeInUp}
-              className="font-serif text-2xl md:text-3xl text-[#C65A3A] mt-2"
+              className="font-serif text-3xl md:text-4xl text-[#111827] mt-4 mb-6"
             >
               Pillars of SwaGrama
             </motion.h2>
           </motion.div>
-
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 max-w-7xl mx-auto"
           >
             {partnersData.map((healer, index) => (
               <motion.div
-                key={index}
-                variants={cardVariants}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-[#1E8E7A]"
+                variants={scaleIn}
+                className="grid justify-center mx-auto mt-4"
               >
-                <div className="relative h-56 overflow-hidden  bg-gradient-to-tr from-emerald-100 via-green-100 to-emerald-200">
-                  <img
-                    src={healer.image}
-                    alt={healer.name}
-                    className="w-full h-full object-contain object-center shadow-elevated "
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full"
-                  >
-                    <span className="text-xs font-semibold text-[#1E8E7A] flex items-center gap-1">
-                      <Award className="w-3 h-3" />
-                      {healer.specialty}
-                    </span>
-                  </motion.div>
-                </div>
-
-                <div className="p-3">
-                  <div className="mb-2">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
-                      <User className="w-5 h-5 text-[#1E8E7A]" />
+                <div className="relative bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 rounded-3xl p-2 md:p-4 shadow-elevated overflow-hidden border">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-forest/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                  <div className="relative flex flex-col  items-center gap-2">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      className="relative"
+                    >
+                      <img
+                        src={healer.image}
+                        alt="Vaidya Santosh Suryawanshi"
+                        className="w-40 h-40 rounded-2xl object-cover object-top shadow-soft"
+                      />
+                      <div
+                        className="whitespace-nowrap absolute -bottom-4 left-1/2 -translate-x-1/2
+    px-4 py-2 rounded-lg
+    text-sm text-ayuMid font-semibold
+    backdrop-blur-xl
+    bg-gradient-to-r from-green-400/25 to-lime-400/25
+    border border-white/30
+    shadow-[0_6px_20px_rgba(34,197,94,0.45)]"
+                      >
+                        {healer.specialty}
+                      </div>
+                    </motion.div>
+                    <h3 className="font-serif text-2xl text-[#111827] mt-2">
                       {healer.name}
                     </h3>
-                    <p className="text-sm text-gray-600 flex items-center gap-2 ml-7">
-                      <Briefcase className="w-4 h-4 text-[#1E8E7A]" />
-                      {healer.title}
-                    </p>
-                  </div>
-
-                  <div className="space-y-2">
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        height: "auto",
-                        opacity: 1,
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
+                    <div className="text-center md:text-left flex-1">
                       <div className="space-y-2 pt-2">
                         {healer.roles.map((role, roleIndex) => (
                           <motion.div
@@ -926,7 +902,7 @@ export default function AyurvedaLanding() {
                           </motion.div>
                         ))}
                       </div>
-                    </motion.div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -935,8 +911,8 @@ export default function AyurvedaLanding() {
         </div>
       </section>
 
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
-        <Container maxWidth="lg">
+      <div className="min-h-screen py-5 px-4 sm:px-6 lg:px-8">
+        <Container maxWidth="xl">
           <motion.div
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -991,16 +967,34 @@ export default function AyurvedaLanding() {
                   }}
                 >
                   <div className="relative">
-                    <div className="relative h-56 ">
+                    <div className="relative h-56 2xl:h-72">
                       <motion.img
                         src={healer.image}
                         alt={healer.name}
-                        className="w-full h-full object-cover object-top "
+                        className="w-full h-full object-cover object-top"
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.4 }}
                       />
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+
+                      {/* Qualification Badge - Top Right */}
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="absolute top-3 right-3 z-10"
+                      >
+                        <div
+                          className="px-3 py-1.5 rounded-full text-xs font-semibold text-white backdrop-blur-sm shadow-lg"
+                          style={{
+                            backgroundColor: `${healer.color}dd`,
+                            border: `1px solid ${healer.color}`,
+                          }}
+                        >
+                          {healer.qualification}
+                        </div>
+                      </motion.div>
 
                       <div className="relative w-full">
                         <motion.div
@@ -1039,7 +1033,7 @@ export default function AyurvedaLanding() {
                         className="text-gray-600 font-medium"
                         sx={{ fontSize: "0.9rem" }}
                       >
-                        {healer.qualification}
+                        {healer.specialty}
                       </p>
                       <motion.div
                         initial={{ width: 0 }}

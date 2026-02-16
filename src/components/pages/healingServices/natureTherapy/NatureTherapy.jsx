@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { GiMountains } from "react-icons/gi";
 import AirTherepayImg from "../../../assets/healingServices/natureTherapy/AirTherapy.png";
-import OPDBookingModal from "../opdClinic/OPDBookingModal";
+import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 
 const therapiesData = [
   {
@@ -105,8 +105,7 @@ const therapiesData = [
       "https://img.freepik.com/free-photo/high-angle-hand-holding-gardening-scoop_23-2149412606.jpg?t=st=1768286721~exp=1768290321~hmac=14de49a8a30b9f4d381bb3b03047725ed621b22e89baab75349a7427e6288dd8&w=1480",
   },
 ];
-          // मृत्तिकास्नान MudBath | मृदचिकित्सा Soil Therapy | स्त्रीमृदचिकित्सा
-          // Female Soil Therapy / पुरुषचिकित्सा Male Soil Therapy : 1 hrs
+         
 const categories = [
   { name: "मृत्तिकास्नान Mud Therapy", icon: Spa, value: "MudTherapy" },
   { name: "जलचिकित्सा Water Therapy", icon: Pool, value: "WaterTherapy" },

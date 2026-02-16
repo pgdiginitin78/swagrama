@@ -344,12 +344,12 @@ const CommunityMembership = () => {
             <div className="flex items-center gap-3 mb-2">
               <Nature className="text-2xl md:text-4xl text-green-600" />
               <h3 className="text-lg md:text-2xl font-bold text-green-800">
-                जनता: प्रत्येकजण निसर्गाशी
+                जन्मत : प्रत्येकजण निसर्गाशी
               </h3>
             </div>
             <div className="prose prose-lg text-xs md:text-sm max-w-none text-green-900 leading-relaxed space-y-4">
               <p>
-                जनता: प्रत्येकजण निसर्गाशी जवळीक साधारा निसर्गमैत्री आहे. रहाणपण
+                जन्मत : प्रत्येकजण निसर्गाशी जवळीक साधारा निसर्गमैत्री आहे. रहाणपण
                 शुद्ध निसर्म, अन्नपाणी आणि दिन-ऋतुयेत त्याने घालविल्याने
                 त्यालाही निसर्गाच्या साहित्यात जावें, एकनित्र कुटुंबात राहावे,
                 विहीरीतील पाणी प्यावे, सनमेवा खावा असे वाटते. आपल्या कुटुंबधानी

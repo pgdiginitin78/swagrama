@@ -84,8 +84,8 @@ const CommunityActivities = () => {
         className="bg-gradient-to-br from-[#2d6a4f] to-[#7cb518] py-4 px-4 sm:py-5 md:py-6 md:px-8"
       >
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 sm:gap-3">
-          <NatureTwoTone className="text-[#f8f7f3] text-3xl sm:text-4xl md:text-5xl flex-shrink-0" />
-          <h1 className="font-playfair text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-bold text-[#f8f7f3] text-center">
+          <SpaOutlined className="text-[#f8f7f3] text-3xl sm:text-4xl md:text-5xl flex-shrink-0" />
+          <h1 className="font-playfair text-lg sm:text-xl md:text-2xl lg:text-3xl  font-bold text-[#f8f7f3] text-center">
             स्वकर्मण्य Community Activities
           </h1>
           <SpaOutlined className="text-[#f8f7f3] text-3xl sm:text-4xl md:text-5xl flex-shrink-0" />
@@ -94,13 +94,13 @@ const CommunityActivities = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.5 }}
-          className="text-center text-[#f8f7f3]/90 mt-2 sm:mt-3 text-sm sm:text-base md:text-lg max-w-3xl mx-auto font-light px-4"
+          className="text-center text-[#f8f7f3]/90 mt-2  text-sm sm:text-base max-w-3xl mx-auto font-light px-4"
         >
           coming together to perform natural, meaningful duties.
         </motion.p>
       </motion.header>
 
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:py-8 md:px-8 md:py-12">
+      <main className="max-w-screen-xl mx-auto py-6 px-4 sm:py-8 md:px-8 md:py-12">
         <motion.div
           variants={containerVariants}
           initial="hidden"

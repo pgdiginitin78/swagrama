@@ -13,7 +13,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useState } from "react";
-import OPDBookingModal from "../healingServices/opdClinic/OPDBookingModal";
+import OPDBookingModal from "../opdBooking/OPDBookingModal";
 
 const academyData = [
   {

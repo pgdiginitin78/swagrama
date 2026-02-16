@@ -9,6 +9,7 @@ import {
 import { useRef } from "react";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
 import { Link } from "react-router-dom";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 
 const Footer = () => {
   const footerRef = useRef(null);
@@ -70,7 +71,7 @@ const Footer = () => {
         className="relative overflow-hidden bg-gradient-to-r from-green-900 via-green-800 to-lime-900"
       >
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8b6f47] via-[#c9a86a] to-[#8b6f47]" />
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="relative z-10 w-full  mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-6">
             <div className="flex flex-col gap-4">
               <div className="bg-gradient-to-br from-white/60 to-white/30 p-6 md:p-8 rounded-2xl backdrop-blur-md border-2 border-[#8b6f47]/20 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-400">
@@ -80,7 +81,7 @@ const Footer = () => {
                   className="h-28 md:h-36 w-auto mx-auto drop-shadow-lg"
                 />
               </div>
-              <div>
+              {/* <div>
                 <h5 className="font-['Cinzel'] text-white text-sm font-semibold mb-2">
                   Download App
                 </h5>
@@ -99,7 +100,7 @@ const Footer = () => {
                   </svg>
                   <span className="font-medium">Play Store</span>
                 </a>
-              </div>
+              </div> */}
             </div>
             <div>
               <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 footer-heading">
@@ -134,26 +135,16 @@ const Footer = () => {
               </h4>
               <div className="flex flex-col gap-2.5 text-sm">
                 <div className="flex gap-2 items-start text-white/90">
-                  <Phone className="flex-shrink-0 text-white mt-0.5 text-base" />
+                  <WhatsAppIcon className="flex-shrink-0 text-white mt-0.5 text-base" />
                   <div>
                     <p className="font-medium text-xs mb-0.5">
-                      WhatsApp <span className="font-normal">(8AM-6PM)</span>
+                      WhatsApp / Helpline <span className="font-normal"></span>
                     </p>
-                    <p className="text-xs">
-                      +91 9272130399&nbsp;/&nbsp;+91 9272110399
-                    </p>
+                    <p className="text-xs">+91 8048794650</p>
                   </div>
                 </div>
 
                 <div className="flex gap-2 items-center text-white/90">
-                  <Phone className="flex-shrink-0 text-white text-base" />
-                  <p className="text-xs">
-                    Helpline: <span className="font-medium">24×7</span>{" "}
-                    <span className="text-[10px]">(coming soon)</span>
-                  </p>
-                </div>
-
-                <div className="flex gap-2 items-start text-white/90">
                   <Email className="flex-shrink-0 text-white mt-0.5 text-base" />
                   <a
                     href="mailto:swagrama.lavale@gmail.com"

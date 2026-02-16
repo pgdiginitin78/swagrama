@@ -21,7 +21,7 @@ const tabsData = [
     color: "#4a90a4",
   },
   {
-    label: "Wellness Stay ",
+    label: "स्वास्थ्य निवास Wellness Stay ",
     icon: <Spa sx={{ fontSize: 18 }} />,
     component: <IPDHospital />,
     color: "#5a437a",

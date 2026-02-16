@@ -1,8 +1,9 @@
 import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
+import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import { Badge, Drawer } from "@mui/material";
+import { Avatar, Badge, Drawer } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
@@ -15,7 +16,9 @@ const Navbar = () => {
   const [openStore, setOpenStore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openLoginModal, setOpenLoginModal] = useState(false);
-  
+  const [user, setUser] = useState(null);
+
+  const userData = localStorage.getItem("user");
   const location = useLocation();
   const cart = useSelector((s) => s.cart.items);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
@@ -27,6 +30,24 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+  }, [userData]);
+
+  const handleLoginSuccess = () => {
+    if (userData) {
+      setUser(JSON.parse(userData));
+    }
+    setOpenLoginModal(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    setUser(null);
+  };
 
   const navLinks = [
     { name: "स्वारम्भ Home", path: "/" },
@@ -180,7 +201,6 @@ const Navbar = () => {
       >
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20">
-            
             <Link to="/" className="flex-shrink-0 z-10">
               <div className="h-10 sm:h-12 md:h-14 lg:h-16">
                 <img
@@ -195,27 +215,31 @@ const Navbar = () => {
                 {navLinks.map((item) => {
                   const { en, hi } = splitTitle(item.name);
                   const active = isActive(item.path);
-                  
+
                   return (
                     <Link
                       key={item.name}
                       to={item.path}
                       className={`nav-link group font-semibold transition-all leading-tight ${
-                        active ? 'active' : ''
+                        active ? "active" : ""
                       }`}
                     >
-                      <span className={`block text-[10px] xl:text-[11px] 2xl:text-xs transition-colors ${
-                        active 
-                          ? 'text-green-600 font-bold' 
-                          : 'text-green-800 group-hover:text-green-600'
-                      }`}>
+                      <span
+                        className={`block text-[10px] xl:text-[11px] 2xl:text-xs transition-colors ${
+                          active
+                            ? "text-green-600 font-bold"
+                            : "text-green-800 group-hover:text-green-600"
+                        }`}
+                      >
                         {hi}
                       </span>
-                      <span className={`block text-[10px] xl:text-[11px] 2xl:text-xs ${
-                        active 
-                          ? 'text-green-600 font-semibold' 
-                          : 'text-green-700'
-                      }`}>
+                      <span
+                        className={`block text-[10px] xl:text-[11px] 2xl:text-xs ${
+                          active
+                            ? "text-green-600 font-semibold"
+                            : "text-green-700"
+                        }`}
+                      >
                         {en}
                       </span>
                     </Link>
@@ -224,13 +248,37 @@ const Navbar = () => {
               </div>
             </div>
             <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
-              <button
-                type="button"
-                className="btn-outline flex items-center justify-center gap-1 xl:gap-2 px-2 xl:px-3 py-1  border-2 border-green-600 text-green-600 rounded-lg font-medium text-sm hover:bg-green-50"
-                onClick={() => setOpenLoginModal(true)}
-              >
-                <LoginIcon className="text-base xl:text-lg" />
-              </button>
+              {user ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Avatar
+                      sx={{
+                        width: 32,
+                        height: 32,
+                        bgcolor: "#10b981",
+                        fontSize: "0.875rem",
+                      }}
+                    >
+                      {user?.firstName?.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </div>
+                  <button
+                    type="button"
+                    className="btn-outline flex items-center justify-center gap-1 xl:gap-2 px-2 xl:px-3 py-1 border-2 border-red-600 text-red-600 rounded-lg font-medium text-sm hover:bg-red-50"
+                    onClick={handleLogout}
+                  >
+                    <LogoutIcon className="text-base xl:text-lg" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="btn-outline flex items-center justify-center gap-1 xl:gap-2 px-2 xl:px-3 py-1 border-2 border-green-600 text-green-600 rounded-lg font-medium text-sm hover:bg-green-50"
+                  onClick={() => setOpenLoginModal(true)}
+                >
+                  <LoginIcon className="text-base xl:text-lg" />
+                </button>
+              )}
 
               <button
                 onClick={() => setOpenStore(true)}
@@ -255,13 +303,37 @@ const Navbar = () => {
             </div>
 
             <div className="flex lg:hidden items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                className="btn-outline flex items-center justify-center p-[4.5px] sm:p-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50"
-                onClick={() => setOpenLoginModal(true)}
-              >
-                <LoginIcon className="text-lg sm:text-xl" />
-              </button>
+              {user ? (
+                <>
+                  <Avatar
+                    sx={{
+                      width: 28,
+                      height: 28,
+                      bgcolor: "#10b981",
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    {user.userName?.charAt(0).toUpperCase() ||
+                      user.firstName?.charAt(0).toUpperCase() ||
+                      "U"}
+                  </Avatar>
+                  <button
+                    type="button"
+                    className="btn-outline flex items-center justify-center p-[4.5px] sm:p-2 border-2 border-red-600 text-red-600 rounded-lg hover:bg-red-50"
+                    onClick={handleLogout}
+                  >
+                    <LogoutIcon className="text-lg sm:text-xl" />
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  className="btn-outline flex items-center justify-center p-[4.5px] sm:p-2 border-2 border-green-600 text-green-600 rounded-lg hover:bg-green-50"
+                  onClick={() => setOpenLoginModal(true)}
+                >
+                  <LoginIcon className="text-lg sm:text-xl" />
+                </button>
+              )}
 
               <button
                 onClick={() => setOpenStore(true)}
@@ -307,7 +379,6 @@ const Navbar = () => {
         }}
       >
         <div className="w-full h-full px-4 sm:px-5 md:px-6 py-4 sm:py-5 space-y-4 sm:space-y-6 bg-gradient-to-br from-white to-green-50">
-          
           <div className="flex justify-between items-center pb-3 sm:pb-4 border-b-2 border-green-100">
             <h2 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-green-600 to-green-800 bg-clip-text text-transparent">
               Menu
@@ -324,7 +395,7 @@ const Navbar = () => {
             {navLinks.map((item, index) => {
               const { en, hi } = splitTitle(item.name);
               const active = isActive(item.path);
-              
+
               return (
                 <div
                   key={item.name}
@@ -335,16 +406,18 @@ const Navbar = () => {
                     to={item.path}
                     onClick={() => setOpen(false)}
                     className={`block p-2.5 sm:p-3 md:p-3.5 rounded-lg transition-all ${
-                      active 
-                        ? 'bg-green-100 border-l-4 border-green-600' 
-                        : 'hover:bg-green-50'
+                      active
+                        ? "bg-green-100 border-l-4 border-green-600"
+                        : "hover:bg-green-50"
                     }`}
                   >
-                    <div className={`flex flex-col gap-0.5 sm:gap-1 transition-colors ${
-                      active 
-                        ? 'text-green-700' 
-                        : 'text-gray-800 hover:text-green-600'
-                    }`}>
+                    <div
+                      className={`flex flex-col gap-0.5 sm:gap-1 transition-colors ${
+                        active
+                          ? "text-green-700"
+                          : "text-gray-800 hover:text-green-600"
+                      }`}
+                    >
                       <span className="text-xs sm:text-sm md:text-base font-semibold">
                         {en}
                       </span>
@@ -360,12 +433,12 @@ const Navbar = () => {
         </div>
       </Drawer>
 
-      {/* Modals */}
       {openStore && <ShopCart isOpen={openStore} setIsOpen={setOpenStore} />}
       {openLoginModal && (
         <LoginModal
           open={openLoginModal}
           handleClose={() => setOpenLoginModal(false)}
+          onLoginSuccess={handleLoginSuccess}
         />
       )}
     </>

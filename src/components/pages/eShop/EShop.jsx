@@ -26,7 +26,7 @@ const getAllProducts = () => {
   });
 
   console.log(
-    `=== getAllProducts: Found ${allProducts.length} total products ===`
+    `=== getAllProducts: Found ${allProducts.length} total products ===`,
   );
   const categoryCounts = {};
   allProducts.forEach((p) => {
@@ -146,7 +146,7 @@ const LazyProductCard = ({ product, index }) => {
       {
         rootMargin: "100px",
         threshold: 0.01,
-      }
+      },
     );
 
     if (cardRef.current) {
@@ -242,7 +242,7 @@ const ProductCard = ({ product, index }) => {
                       updateQuantity({
                         id: product.id,
                         quantity: cartItem.quantity - 1,
-                      })
+                      }),
                     )
                   }
                   className="bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold hover:bg-red-600 transition-colors text-sm"
@@ -260,7 +260,7 @@ const ProductCard = ({ product, index }) => {
                       updateQuantity({
                         id: product.id,
                         quantity: cartItem.quantity + 1,
-                      })
+                      }),
                     )
                   }
                   className="bg-green-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold hover:bg-green-700 transition-colors text-sm"
@@ -281,7 +281,7 @@ const ProductCard = ({ product, index }) => {
             )}
           </div>
         </div>
-        
+
         <div className="border-t border-green-200 pt-2 min-h-[3.5rem]">
           <p className="text-[10px] font-semibold text-green-800 mb-1">
             Key Benefits :
@@ -343,7 +343,7 @@ const EShop = () => {
     const uniqueCategories = [...Array.from(categorySet).sort(), "All"];
     console.log(
       `Total categories found: ${uniqueCategories.length}`,
-      uniqueCategories
+      uniqueCategories,
     );
     return uniqueCategories;
   }, [allProducts]);
@@ -364,7 +364,7 @@ const EShop = () => {
         (product.category ?? "").toLowerCase().includes(searchLower) ||
         (Array.isArray(product.benefits) &&
           product.benefits.some((b) =>
-            (b ?? "").toLowerCase().includes(searchLower)
+            (b ?? "").toLowerCase().includes(searchLower),
           ));
 
       const matchesCategory =
@@ -665,6 +665,16 @@ const medicineProducts = [
         value: 450,
       },
       {
+        id: 32,
+        name: "विडा -- ताम्बूलविडा Betel Leaf Portion",
+        tagline: "Mouth freshener & digestive",
+        benefits: ["Improves digestion", "Cleanses oral cavity"],
+        ingredients:
+          "Betel Leaves, Lime, Catechu Betel Leaf, Lime, Catechu, Betel Nut, Cardamom, Cloves, Fennel, Coconut, Nutmeg, Jeshthmadh, Camphor, Kankol, Saffron, Poppy Seeds",
+        package: "100 gms Pouch",
+        value: 120,
+      },
+      {
         id: 4,
         name: "तीळ तेल -- तिलतैल Sesame Oil",
         tagline: "Intake in the cold. Apply year-round",
@@ -685,6 +695,47 @@ const medicineProducts = [
         ingredients: "Triticum dicoccum Schrank",
         package: "1 kg Pouch",
         value: 200,
+      },
+      {
+        id: 29,
+        name: "व्यञ्जनपत्रउपसेचन Curry Leaves Chutney",
+        tagline: "Flavorful & healthy",
+        benefits: ["Enhances taste", "Digestive benefits"],
+        ingredients: "Curry Leaves, Spices",
+        package: "100 gms Pouch",
+        value: 120,
+      },
+      {
+        id: 30,
+        name: "लशुनार्द्रकउपसेचन Garlic Ginger Chutney",
+        tagline: "Immunity booster",
+        benefits: ["Supports digestion & immunity", "Enhances flavor"],
+        ingredients: "Garlic, Ginger, Spices",
+        package: "100 gms Pouch",
+        value: 130,
+      },
+      {
+        id: 31,
+        name: "सरबत मसाला - अष्टलवणपेत्व Nectar",
+        tagline: "Refreshing beverage mix",
+        benefits: ["Adds taste & health to drinks"],
+        ingredients: "8 salts & spices",
+        package: "100 gms Pouch",
+        value: 140,
+      },
+      {
+        id: 47,
+        name: "शतावरीकल्प : शतवीर्याकल्प Female Energy",
+        tagline: "Herbal formulation for women",
+        benefits: [
+          "Supports lactation, menstrual regulation",
+          "Fertility & stress management",
+          "Antioxidant; adaptogen",
+        ],
+        ingredients:
+          "Shatavari (Asparagus racemosus), Saffron, Cardamom, Sugar",
+        package: "250 gms Pouch",
+        value: 220,
       },
       {
         id: 19,
@@ -780,20 +831,7 @@ const medicineProducts = [
         package: "500 gms Container",
         value: 600,
       },
-      {
-        id: 9,
-        name: "रोजचा चहा -- सर्वर्तुचाया All Season Tea",
-        tagline: "Tea with flavour & health",
-        benefits: [
-          "Reduce tea addiction",
-          "Add health to daily life",
-          "Antioxidant",
-          "Supports digestion & immunity",
-        ],
-        ingredients: "Camellia sinensis, Ginger, Coriander, Fennel, Spices",
-        package: "250 gms Pouch",
-        value: 160,
-      },
+
       {
         id: 24,
         name: "तिलउपसेचन Sesame Chutney",
@@ -839,58 +877,13 @@ const medicineProducts = [
         package: "100 gms Pouch",
         value: 130,
       },
-      {
-        id: 29,
-        name: "व्यञ्जनपत्रउपसेचन Curry Leaves Chutney",
-        tagline: "Flavorful & healthy",
-        benefits: ["Enhances taste", "Digestive benefits"],
-        ingredients: "Curry Leaves, Spices",
-        package: "100 gms Pouch",
-        value: 120,
-      },
-      {
-        id: 30,
-        name: "लशुनार्द्रकउपसेचन Garlic Ginger Chutney",
-        tagline: "Immunity booster",
-        benefits: ["Supports digestion & immunity", "Enhances flavor"],
-        ingredients: "Garlic, Ginger, Spices",
-        package: "100 gms Pouch",
-        value: 130,
-      },
-      {
-        id: 31,
-        name: "सरबत मसाला - अष्टलवणपेत्व Nectar",
-        tagline: "Refreshing beverage mix",
-        benefits: ["Adds taste & health to drinks"],
-        ingredients: "8 salts & spices",
-        package: "100 gms Pouch",
-        value: 140,
-      },
-      {
-        id: 32,
-        name: "विडा -- ताम्बूलविडा Betel Leaf Portion",
-        tagline: "Mouth freshener & digestive",
-        benefits: ["Improves digestion", "Cleanses oral cavity"],
-        ingredients:
-          "Betel Leaves, Lime, Catechu Betel Leaf, Lime, Catechu, Betel Nut, Cardamom, Cloves, Fennel, Coconut, Nutmeg, Jeshthmadh, Camphor, Kankol, Saffron, Poppy Seeds",
-        package: "100 gms Pouch",
-        value: 120,
-      },
     ],
   },
   {
     category: "स्वस्यसौन्दर्यतत्वसामग्री Own Beauty Essentials",
     categoryDescription: "Beauty Products - Applied Herbs for beauty and care",
     products: [
-      {
-        id: 10,
-        name: "केशवर्धनतैल Hair Grow Oil",
-        tagline: "Hair nourishment",
-        benefits: ["Promotes hair growth", "Strengthens hair roots"],
-        ingredients: "Herbal oils & extracts",
-        package: "100 ml Bottle",
-        value: 220,
-      },
+  
       {
         id: 11,
         name: "लाल मेहंदी - रक्तगर्भमेन्धिका Red Henna",
@@ -1139,20 +1132,7 @@ const medicineProducts = [
         package: "100 gms Pouch",
         value: 150,
       },
-      {
-        id: 47,
-        name: "शतावरीकल्प : शतवीर्याकल्प Female Energy",
-        tagline: "Herbal formulation for women",
-        benefits: [
-          "Supports lactation, menstrual regulation",
-          "Fertility & stress management",
-          "Antioxidant; adaptogen",
-        ],
-        ingredients:
-          "Shatavari (Asparagus racemosus), Saffron, Cardamom, Sugar",
-        package: "250 gms Pouch",
-        value: 220,
-      },
+
       {
         id: 48,
         name: "च्यवनप्राशावलेह Vital Electuary",
@@ -1975,4 +1955,3 @@ const medicineProducts = [
     ],
   },
 ];
-

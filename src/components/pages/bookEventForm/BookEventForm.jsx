@@ -1431,18 +1431,7 @@ const guestCardVariants = {
   },
 };
 
-const headerVariants = {
-  hidden: { y: -50, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 15,
-    },
-  },
-};
+
 
 const buttonHoverVariants = {
   rest: { scale: 1 },
@@ -1733,7 +1722,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                   </ul>
                   <div className="flex justify-end mt-2">
                     <a
-                      href="#"
+                      // href="#"
                       className="text-ayuMid hover:text-ayuMid text-xs font-semibold flex items-center gap-1 transition-all hover:gap-1.5"
                     >
                       View All Rules

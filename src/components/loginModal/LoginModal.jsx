@@ -1,33 +1,72 @@
-import React, { useState } from "react";
-import { useForm, Controller } from "react-hook-form";
 import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  IconButton,
-  InputAdornment,
-  Typography,
-  Alert,
-} from "@mui/material";
-import {
+  Close,
   Email,
   Lock,
   Visibility,
   VisibilityOff,
-  Close,
 } from "@mui/icons-material";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Box,
+  Button,
+  IconButton,
+  InputAdornment,
+  Modal,
+  TextField,
+} from "@mui/material";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { userLogin } from "../../services/login/LoginServices";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
+import ConfirmationModal from "../common/ConfirmationModal";
+import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
 
 const MotionBox = motion.create(Box);
 
-export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
+const modalVariants = {
+  hidden: {
+    opacity: 0,
+    scale: 0.8,
+    y: -50,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.1, 0.25, 1],
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.8,
+    y: -50,
+    transition: {
+      duration: 0.3,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  },
+};
+
+export default function LoginModal({ open, handleClose }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
   const [loginOpen, setLoginOpen] = useState(true);
+  const [formData, setFormData] = useState(null);
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
 
   const {
     control,
@@ -36,64 +75,43 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
     reset,
   } = useForm({
     defaultValues: {
-      email: "",
+      userName: "",
       password: "",
     },
   });
 
   const onSubmit = async (data) => {
-    setIsSubmitting(true);
-    setSubmitSuccess(false);
-
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    console.log("Login data:", data);
-    setIsSubmitting(false);
-    setSubmitSuccess(true);
-
-    setTimeout(() => {
-      setSubmitSuccess(false);
-      reset();
-      handleClose();
-    }, 2000);
+    setFormData(data);
+    setOpenConfirmationModal(true);
   };
 
-  const modalVariants = {
-    hidden: {
-      opacity: 0,
-      scale: 0.8,
-      y: -50,
-    },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: [0.25, 0.1, 0.25, 1],
-        staggerChildren: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      y: -50,
-      transition: {
-        duration: 0.3,
-      },
-    },
-  };
+  const handleUserLogin = async () => {
+    try {
+      // showLoader();
+      setOpenConfirmationModal(false);
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: [0.25, 0.1, 0.25, 1],
-      },
-    },
+      const response = await userLogin(formData);
+      const { data, status } = response;
+
+      if (status === 200 && data?.accessToken) {
+        localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("expiresIn", data.expiresIn);
+        localStorage.setItem("tokenSetTime", Date.now());
+        successAlert(data.message || "Login successful");
+        handleClose();
+        reset();
+      } else {
+        throw new Error(data?.message || "Invalid login credentials");
+      }
+    } catch (error) {
+      errorAlert(
+        error?.response?.data?.message || "Invalid username or password",
+      );
+    } finally {
+      // hideLoader();
+    }
   };
 
   return (
@@ -101,7 +119,6 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
       {loginOpen ? (
         <Modal
           open={open}
-          onClose={handleClose}
           closeAfterTransition
           sx={{
             display: "flex",
@@ -117,93 +134,67 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                sx={{
-                  width: "100%",
-                  maxWidth: 440,
-                  mx: 2,
-                  outline: "none",
-                }}
+                className="w-full max-w-[440px] mx-4 sm:mx-6 md:mx-8 outline-none max-h-[95vh] sm:max-h-[90vh] flex"
               >
-                <Box
-                  sx={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: 3,
-                    boxShadow: "0 24px 48px rgba(0,0,0,0.2)",
-                    position: "relative",
-                    overflow: "hidden",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      height: 6,
-                      background:
-                        "linear-gradient(90deg, #22c55e 0%, #84cc16 100%)",
-                    }}
-                  />
+                <div className="bg-white rounded-3xl shadow-2xl relative w-full flex flex-col max-h-full overflow-hidden">
+                  {/* Top gradient bar */}
+                  <div className="h-1.5 bg-gradient-to-r from-green-500 to-lime-500 flex-shrink-0 rounded-t-3xl" />
 
+                  {/* Close button */}
                   <IconButton
                     onClick={handleClose}
-                    disabled={isSubmitting}
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      color: "#718096",
-                      zIndex: 1,
-                      "&:hover": {
-                        backgroundColor: "rgba(0,0,0,0.04)",
-                        color: "#2d3748",
-                      },
-                    }}
+                    className="!absolute top-3 sm:top-4 right-3 sm:right-4 !text-gray-600 z-10 hover:!bg-gray-100 hover:!text-gray-800"
                   >
                     <Close />
                   </IconButton>
 
-                  <Box sx={{ p: 4, pt: 3 }}>
-                    <MotionBox variants={itemVariants} sx={{ mb: 3 }}>
-                      <div className="flex justify-center">
+                  {/* Content container with scroll */}
+                  <div 
+                    className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar"
+                  >
+                    <style>{`
+                      .custom-green-scrollbar {
+                        scrollbar-width: thin;
+                        scrollbar-color: #22c55e #f3f4f6;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar {
+                        width: 8px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-track {
+                        background: #f3f4f6;
+                        border-radius: 10px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-thumb {
+                        background: #22c55e;
+                        border-radius: 10px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #16a34a;
+                      }
+                    `}</style>
+                    <MotionBox variants={itemVariants} className="mb-6">
+                      <div className="flex justify-center mb-3">
                         <img
                           src={SwagramaLogo}
-                          className="h-[100px]"
+                          className="h-20 sm:h-24 md:h-[100px] w-auto"
                           alt="Swagrama Logo"
                         />
                       </div>
-                      <h1 className="font-semibold text-xl text-ayuBrown text-center">
+                      <h1 className="font-semibold text-lg sm:text-xl text-ayuBrown text-center">
                         Welcome Back
                       </h1>
-                      <p className="text-ayuMid text-xs text-center">
+                      <p className="text-ayuMid text-xs sm:text-sm text-center mt-1">
                         Login To Continue Your Swagrama Journey
                       </p>
                     </MotionBox>
 
-                    <AnimatePresence>
-                      {submitSuccess && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                        >
-                          <Alert
-                            severity="success"
-                            sx={{ mb: 2, borderRadius: 2 }}
-                          >
-                            Login successful!
-                          </Alert>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
                     <form onSubmit={handleSubmit(onSubmit)}>
-                      <MotionBox variants={itemVariants} sx={{ mb: 2.5 }}>
+                      <MotionBox variants={itemVariants} className="mb-4 sm:mb-5">
                         <Controller
-                          name="email"
+                          name="userName"
                           control={control}
                           rules={{
-                            required: "Email is required",
-                            pattern: {
-                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                              message: "Invalid email address",
-                            },
+                            required: "userName is required",
                           }}
                           render={({ field }) => (
                             <Box
@@ -223,11 +214,10 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
                               <TextField
                                 {...field}
                                 fullWidth
-                                label="Email"
-                                type="email"
+                                label="Email / Mobile No."
                                 size="small"
-                                error={!!errors.email}
-                                helperText={errors.email?.message}
+                                error={!!errors.userName}
+                                helperText={errors.userName?.message}
                                 InputProps={{
                                   startAdornment: (
                                     <InputAdornment position="start">
@@ -276,15 +266,15 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
                         />
                       </MotionBox>
 
-                      <MotionBox variants={itemVariants} sx={{ mb: 3 }}>
+                      <MotionBox variants={itemVariants} className="mb-5 sm:mb-6">
                         <Controller
                           name="password"
                           control={control}
                           rules={{
                             required: "Password is required",
                             minLength: {
-                              value: 6,
-                              message: "Password must be at least 6 characters",
+                              value: 1,
+                              message: "Password is required",
                             },
                           }}
                           render={({ field }) => (
@@ -386,7 +376,6 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
                           type="submit"
                           fullWidth
                           variant="contained"
-                          disabled={isSubmitting}
                           component={motion.button}
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
@@ -412,52 +401,27 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
                             },
                           }}
                         >
-                          {isSubmitting ? (
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 1,
-                              }}
-                            >
-                              <motion.div
-                                animate={{ rotate: 360 }}
-                                transition={{
-                                  duration: 1,
-                                  repeat: Infinity,
-                                  ease: "linear",
-                                }}
-                                style={{
-                                  width: 20,
-                                  height: 20,
-                                  border: "3px solid rgba(255,255,255,0.3)",
-                                  borderTopColor: "white",
-                                  borderRadius: "50%",
-                                }}
-                              />
-                              Logging in...
-                            </Box>
-                          ) : (
-                            "Login"
-                          )}
+                          Login
                         </Button>
                       </MotionBox>
 
-                      <div className="flex justify-center items-center space-x-3 mt-5">
-                        <p className="text-ayuBrown">Don't have an account?</p>
+                      <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 mt-5">
+                        <p className="text-ayuBrown text-sm sm:text-base">
+                          Don't have an account?
+                        </p>
                         <button
                           type="button"
                           onClick={() => {
                             setLoginOpen(false);
                           }}
-                          className="text-green-600 hover:text-green-700 font-medium transition-colors"
+                          className="text-green-600 hover:text-green-700 font-medium transition-colors text-sm sm:text-base"
                         >
                           Sign Up
                         </button>
                       </div>
                     </form>
-                  </Box>
-                </Box>
+                  </div>
+                </div>
               </MotionBox>
             )}
           </AnimatePresence>
@@ -465,6 +429,14 @@ export default function LoginModal({ open, handleClose, onSwitchToSignUp }) {
       ) : (
         <SignUpModal open={true} handleClose={() => setLoginOpen(true)} />
       )}
+      <ConfirmationModal
+        confirmationOpen={openConfirmationModal}
+        confirmationHandleClose={() => setOpenConfirmationModal(false)}
+        confirmationSubmitFunc={handleUserLogin}
+        confirmationLabel="Confirmation"
+        confirmationMsg="Are you sure you want to log in?"
+        confirmationButtonMsg="Confirm"
+      />
     </>
   );
 }

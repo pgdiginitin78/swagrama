@@ -824,7 +824,7 @@ const OurVision = () => {
 
   return (
     <div>
-      <div className="md:min-h-screen bg-gradient-to-br from-[#1a3a25] via-[#2d5a3d] to-[#3d6b4f] relative flex items-center justify-center overflow-hidden">
+      <div className="md:min-h-screen 2xl:h-auto bg-gradient-to-br from-[#1a3a25] via-[#2d5a3d] to-[#3d6b4f] relative flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -881,7 +881,7 @@ const OurVision = () => {
       </div>
 
       <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-screen-xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}

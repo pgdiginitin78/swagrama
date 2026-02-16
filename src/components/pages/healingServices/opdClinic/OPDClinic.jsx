@@ -5,7 +5,7 @@ import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 // import { CalendarIcon } from "@mui/x-date-pickers";
 import { useState } from "react";
-import OPDBookingModal from "./OPDBookingModal";
+import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 
 const healthcareServices = [
   {

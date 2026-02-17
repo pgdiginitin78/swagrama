@@ -21,7 +21,7 @@ import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
-import axios from "axios";
+import { useLoader } from "../common/commonLoader/LoaderContext";
 
 const MotionBox = motion.create(Box);
 
@@ -68,6 +68,7 @@ export default function LoginModal({ open, handleClose }) {
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const { showLoader, hideLoader } = useLoader();
 
   const {
     control,
@@ -88,11 +89,12 @@ export default function LoginModal({ open, handleClose }) {
 
   const handleUserLogin = async () => {
     try {
-      // showLoader();
+      showLoader();
       setOpenConfirmationModal(false);
 
-      const response = await axios.post("https://kompasshr.com/WellnessAPI/api/loginJYA",formData);
+      const response = await userLogin(formData);
       const { data, status } = response;
+console.log("loginResponse",data);
 
       if (status === 200 && data?.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
@@ -217,6 +219,8 @@ export default function LoginModal({ open, handleClose }) {
                                 fullWidth
                                 label="Email / Mobile No."
                                 size="small"
+
+                                 inputProps={{ autoComplete: "off" }}
                                 error={!!errors.userName}
                                 helperText={errors.userName?.message}
                                 InputProps={{
@@ -382,7 +386,7 @@ export default function LoginModal({ open, handleClose }) {
                           whileTap={{ scale: 0.98 }}
                           size="small"
                           sx={{
-                            py: 1.5,
+                            py: 1,
                             borderRadius: 2,
                             background:
                               "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",

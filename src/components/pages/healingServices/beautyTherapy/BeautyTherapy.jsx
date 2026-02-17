@@ -44,7 +44,7 @@ const beautyData = [
   },
   {
     category: "beautifulHair",
-    serviceName: "केशत्वग्भ्यङ्ग Scalp Oil",
+    serviceName: "केशत्वग्भ्यङ्ग Scalp Oil Unguent",
     description: "Oil application to scalp",
     benefits: "Reduces dryness and dandruff",
     icon: Droplets,

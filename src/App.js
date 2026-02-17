@@ -6,21 +6,25 @@ import Footer from "./components/footer/Footer";
 import ScrollToTopButton from "./ScrollToTopButton";
 import { ToastContainer } from "react-toastify";
 import AboutUs from "./components/pages/aboutUs/AboutUs";
+import CommonLoader from "./components/common/commonLoader/CommonLoader";
+import { useLoader } from "./components/common/commonLoader/LoaderContext";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
-const ServicesTabs = lazy(() =>
-  import("./components/pages/healingServices/ServicesTabs")
+const ServicesTabs = lazy(
+  () => import("./components/pages/healingServices/ServicesTabs"),
 );
-const CommunityMembership = lazy(() =>
-  import("./components/pages/membership/communityMembership/CommunityMembership")
+const CommunityMembership = lazy(
+  () =>
+    import("./components/pages/membership/communityMembership/CommunityMembership"),
 );
-const CommunityActivitiesTabs = lazy(() =>
-  import("./components/pages/communityActivities/CommunityActivitiesTabs")
+const CommunityActivitiesTabs = lazy(
+  () =>
+    import("./components/pages/communityActivities/CommunityActivitiesTabs"),
 );
 const CommuneTabs = lazy(() => import("./components/pages/commune/Commune"));
 const EShop = lazy(() => import("./components/pages/eShop/EShop"));
-const EventCalander = lazy(() =>
-  import("./components/pages/eventsCalander/EventCalander")
+const EventCalander = lazy(
+  () => import("./components/pages/eventsCalander/EventCalander"),
 );
 
 function PageSkeleton() {
@@ -39,6 +43,7 @@ function PageSkeleton() {
 }
 
 export default function App() {
+  const { loading } = useLoader();
   return (
     <>
       <Navbar />
@@ -72,7 +77,7 @@ export default function App() {
         />
         <ScrollToTopButton />
       </div>
-
+      {loading && <CommonLoader />}
       <Footer />
     </>
   );

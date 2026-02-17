@@ -168,7 +168,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "नित्यअभ्यङ्ग DailyUnguent",
+    serviceName: "नित्यम्भ्यङ्ग DailyUnguent",
     description: "Daily oil application for regular nourishment.",
     benefits:
       "Maintains skin suppleness, prevents dryness, and supports joint and muscular health.",
@@ -178,7 +178,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "कांस्यतालीपादाभ्यङ्ग Bronze Plate Foot Unguent",
+    serviceName: "कांस्यथालिपादाभ्यङ्ग Bronze Plate Foot Unguent",
     description: "Foot massage using bronze plate technique.",
     benefits:
       "Improves foot circulation, relieves fatigue, strengthens lower limbs, and stimulates reflex points.",
@@ -188,7 +188,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "सर्वगात्रमर्दन Full Body Massage",
+    serviceName: "सर्वांगमर्दन Full Body Massage",
     description: "Deep tissue full-body massage.",
     benefits:
       "Reduces muscular tension, improves circulation, detoxifies tissues, and enhances flexibility.",
@@ -199,7 +199,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "सर्वगात्रउद्वर्तन Full Body Powder Massage",
+    serviceName: "सर्वांगउद्वर्तन Full Body Powder Massage",
     description: "Massage using therapeutic powders.",
     benefits:
       "Exfoliates skin, improves blood circulation, detoxifies, and revitalizes the body.",
@@ -210,7 +210,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "सर्वगात्रउत्सादन Full Body Oil Powder Massage",
+    serviceName: "सर्वांगउत्सादन Full Body Oil Powder Massage",
     description: "Combination of oil and powder massage.",
     benefits:
       "Deeply nourishes skin, relaxes muscles, detoxifies, and restores vitality.",
@@ -221,7 +221,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Massage & Anointing",
-    serviceName: "सर्वगात्रलेपण Full Body Anointing",
+    serviceName: "सर्वांगलेपन Full Body Anointing",
     description:
       "Application of powders, food-based pastes, or medicinal pastes on body.",
     benefits:
@@ -258,7 +258,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Steam & Incensing Therapy",
-    serviceName: "प्रधानविरेचकर्म Main Laxative Detox",
+    serviceName: "प्रधानविरेचनकर्म Main Laxative Detox",
     description:
       "Therapeutic purgation under physician supervision using ghee and medicine. (10-day program includes preparatory therapies: digestive medicines, internal oleation, 3 sessions of external oleation, steam fomentation; main therapy; post-therapy & extra hospital stay/meal charges)",
     benefits:
@@ -270,7 +270,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Steam & Incensing Therapy",
-    serviceName: "प्रधानवस्तिकर्म Main Enema Detox",
+    serviceName: "प्रधानबस्तिकर्म Main Enema Detox",
     description:
       "Under physician supervision, a sequence of medicated enemas is administered for several days as part of a 7-day detox program. Includes Deepan-Pachan (digestive preparation), Snehana (oleation), Swedana (steam therapy), followed by main Basti course and post-care phase. (Additional inpatients stay and food charges apply.)",
     benefits:
@@ -282,7 +282,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Steam & Incensing Therapy",
-    serviceName: "प्रधाननस्यचिकित्सणालय Main Nasal Detox",
+    serviceName: "प्रधानशिरोविरेचननस्य Main Nasal Detox",
     description:
       "Guided nasal cleansing using medicated oils or decoctions under supervision.",
     benefits:
@@ -294,7 +294,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Steam & Incensing Therapy",
-    serviceName: "प्रणातकस्त्राविणम् Systemic Bloodletting",
+    serviceName: "प्रधानरक्तमोक्षण Systemic Bloodletting",
     description:
       "Whole-body bloodletting therapy under physician supervision to remove impure blood and balance Doshas. (Package includes preparatory therapies, main procedure, and post-care; additional stay and food charges apply)",
     benefits:
@@ -343,7 +343,7 @@ const detoxServicesData = [
   },
   {
     filterName: "5 Main Detox Therapy",
-    serviceName: "प्रधाननस्यचिकित्सणालय Main Nasal Detox",
+    serviceName: "प्रधानशिरोविरेचननस्य Main Nasal Detox",
     description:
       "Guided nasal cleansing using medicated oils or decoctions under supervision.",
     benefits:
@@ -355,7 +355,7 @@ const detoxServicesData = [
   },
   {
     filterName: "5 Main Detox Therapy",
-    serviceName: "प्रणातकस्त्राविणम् Systemic Bloodletting",
+    serviceName: "प्रधानरक्तमोक्षण Systemic Bloodletting",
     description:
       "Whole-body bloodletting therapy under physician supervision to remove impure blood and balance Doshas. (Package includes preparatory therapies, main procedure, and post-care; additional stay and food charges apply)",
     benefits:
@@ -368,7 +368,7 @@ const detoxServicesData = [
   //
   {
     filterName: "Female Care",
-    serviceName: "स्त्रीउत्तरवस्ति - Female Genital Enema Detox",
+    serviceName: "स्त्रीउत्तरबस्ति - Female Genital Enema Detox",
     description:
       "Specialized Ayurvedic detox procedure for female reproductive system. Includes internal oleation, external oil massage, medicated enema, and localized therapies as per physician's guidance. (Package with full procedure and follow-up; additional stay and food charges apply)",
     benefits:
@@ -380,7 +380,7 @@ const detoxServicesData = [
   {
     filterName: "Female Care",
     serviceName:
-      "स्त्रीगुप्तक्षा - Female Genital Care (योनिधावन - Female Genital Cleansing, योनिधूपन - Female Genital Fumigation, योनिपिचु - Female Genital Oil Application, योनिपूरण - Female Genital Filling Therapy)",
+      "स्त्रीङ्गरक्षा - Female Genital Care (योनिधावन - Female Genital Cleansing, योनिधूपन - Female Genital Fumigation, योनिपिचु - Female Genital Oil Application, योनिपूरण - Female Genital Filling Therapy)",
     description:
       "External cleansing of female genital area using herbal decoctions and medicated oils. Fumigation therapy with herbal vapors and medicated ghee for female genital area. Application of warm medicated oil-soaked cotton swab over the genital region. Gentle instillation of herbal oils or medicated ghee under supervision.",
     benefits:
@@ -403,7 +403,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Abdominal Purification",
-    serviceName: "सद्यात्रावस्ति - Instant Wealth Enema",
+    serviceName: "सद्यमात्राबस्ति - Instant Wealth Enema",
     description:
       "Single-day mild enema for constipation relief and light detox.",
     benefits: "Gives instant bowel clearance and comfort.",
@@ -413,7 +413,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Abdominal Purification",
-    serviceName: "सद्यामधुतैलीकवस्ति - Instant Honey Oil Enema",
+    serviceName: "सद्यमाधुतैलीकबस्ति - Instant Honey Oil Enema",
     description: "One-day honey-oil enema for mild detox and nourishment.",
     benefits: "Quick cleansing and lubrication of colon.",
     price: "1700",
@@ -514,7 +514,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "उद्गर्षण Dry Brushing",
+    serviceName: "उद्घर्षण Dry Brushing",
     description: "Dry brushing",
     benefits: "Exfoliates skin, stimulates circulation, relaxes muscles.",
     price: "300",
@@ -524,7 +524,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "नाडीस्वप्तोस्वेदन Tube Steam Fomentation",
+    serviceName: "नाडीबाष्पस्वेदन Tube Steam Fomentation",
     description: "Tube Steam Fomentation",
     benefits: "Detoxifies tissues, opens energy pathways, reduces stiffness.",
     price: "500",
@@ -534,7 +534,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "पिण्डस्वेद Herbal Bolus Fomentation",
+    serviceName: "पिंडस्वेद  Herbal Bolus Fomentation",
     description: "Herbal bolus massage/fomentation",
     benefits:
       "Relieves deep fatigue, reduces muscular pain, improves flexibility.",
@@ -545,7 +545,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "सेक: पात्रोच्चल Pouring Therapy",
+    serviceName: "सेक:पिझिच्चिल Pouring Therapy",
     description: "Pouring medicated liquids",
     benefits: "Soothes muscles, relieves stiffness, improves circulation.",
     price: "750",
@@ -575,7 +575,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "उष्माहुदस्वेद Wet Cloth Fomentation",
+    serviceName: "उपनाहस्वेद Wet Cloth Fomentation",
     description: "Wet cloth fomentation",
     benefits: "Reduces inflammation, soothes muscles.",
     price: "500",
@@ -625,7 +625,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "आर्द्रवटस्वेदन Wet Cloth Fomentation",
+    serviceName: "आर्द्रवस्त्रस्वेदन Wet Cloth Fomentation",
     description: "Wet cloth fomentation.",
     benefits: "Reduces inflammation, eases stiffness.",
     price: "300",
@@ -635,7 +635,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "रूक्षवटस्वेदन Dry Cloth Fomentation",
+    serviceName: "रुक्षवस्त्रस्वेदन Dry Cloth Fomentation",
     description: "Dry cloth fomentation.",
     benefits: "Stimulates circulation, relaxes muscles.",
     price: "300",
@@ -645,7 +645,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Organ Care",
-    serviceName: "विद्युतोऊष्मौषधिस्वेद Electric Herbs Fomenting",
+    serviceName: "विद्युतोषधिपोट्टलीस्वेद Electric Herbs Fomenting",
     description: "Herbal bolus with mild electric heat.",
     benefits: "Deep relaxation, pain relief, improves circulation.",
     price: "300",
@@ -847,7 +847,7 @@ const detoxServicesData = [
   //
   {
     filterName: "Nasal Care",
-    serviceName: "वृंहणतर्पणनस्य Nourishing Nasal Therapy",
+    serviceName: "बृंहणतर्पणनस्य Nourishing Nasal Therapy",
     description: "Nourishing nasal therapy with medicated oils.",
     benefits:
       "Strengthens nasal tissues, reduces dryness, enhances olfactory function.",
@@ -882,7 +882,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Nasal Care",
-    serviceName: "ऊष्माद्धूमपान Unctuous Smoke Inhalation",
+    serviceName: "स्नैहिकधूमपान Unctuous Smoke Inhalation",
     description: "Medicated herbal smoke inhalation.",
     benefits:
       "Relieves nasal dryness, strengthens sinus mucosa, detoxifies nasal passages.",
@@ -893,7 +893,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Nasal Care",
-    serviceName: "क्षीरद्धूमपान Milk Smoke Inhalation",
+    serviceName: "क्षीरधूमपान Milk Smoke Inhalation",
     description: "Milk-based medicated smoke inhalation.",
     benefits:
       "Soothes irritation, nourishes nasal tissues, enhances breathing.",
@@ -904,7 +904,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Nasal Care",
-    serviceName: "औषधि धूमपान Herbal Smoke Inhalation",
+    serviceName: "वनोषधि धूमपान  Herbal Smoke Inhalation",
     description: "Herbal smoke inhalation for nasal wellness.",
     benefits:
       "Detoxifies, relieves sinus congestion, improves respiratory function.",
@@ -1004,7 +1004,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Cauterization Blood Letting Piercing & Wound Therapy",
-    serviceName: "लौहाग्निकर्म Iron Cauterization",
+    serviceName: "लोहाग्निकर्म Iron Cauterization",
     description: "Thermal therapy using iron.",
     benefits:
       "Supports bone and muscle strength, relieves pain, and improves tissue metabolism.",
@@ -1026,7 +1026,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Cauterization Blood Letting Piercing & Wound Therapy",
-    serviceName: "पाणिाग्निकर्म Heel Cauterization",
+    serviceName: "पार्ष्णिग्निकर्म Heel Cauterization",
     description: "Heel-focused thermal therapy.",
     benefits: "Relieves heel pain, plantar fasciitis, and local stiffness.",
     price: "200/Per",
@@ -1036,7 +1036,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Cauterization Blood Letting Piercing & Wound Therapy",
-    serviceName: "कद्राग्निकर्म Corn Cauterization",
+    serviceName: "कदराग्निकर्म Corn Cauterization",
     description: "Thermal therapy for corns.",
     benefits:
       "Softens and removes corns, relieves pain, and prevents recurrence.",
@@ -1047,7 +1047,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Cauterization Blood Letting Piercing & Wound Therapy",
-    serviceName: "स्थानिक शिराश्रुत रक्तमोक्षण Local Vein Blood Letting",
+    serviceName: "स्थानिक सिरावेध रक्तमोक्षण Local Vein Blood Letting",
     description:
       "Targeted bloodletting on specific body areas using traditional methods.",
     benefits:
@@ -1149,7 +1149,7 @@ const detoxServicesData = [
   },
   {
     filterName: "Cauterization Blood Letting Piercing & Wound Therapy",
-    serviceName: "क्षोत्रव्रणकर्म Immediate Wound Treatment",
+    serviceName: "सद्योव्रणकर्म Immediate Wound Treatment",
     description: "Immediate care for fresh wounds.",
     benefits: "Stops bleeding, prevents infection, supports fast healing.",
     price: "250/Per",
@@ -1173,7 +1173,7 @@ const categories = [
   {
     id: "massage",
     label: "Massage & Anointing",
-    name: "अभ्यंग एवं लेपन Massage & Anointing",
+    name: "अभ्यंग मर्दन एवं लेपन  Massage & Anointing",
     filterName: "Massage & Anointing",
     icon: Spa,
   },

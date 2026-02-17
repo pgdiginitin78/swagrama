@@ -7,12 +7,15 @@ import "./index.css";
 import ScrollToTop from "./ScrollToTop.jsx";
 import { Provider } from "react-redux";
 import { store } from "./components/redux/Store.jsx";
+import { LoaderProvider } from "./components/common/commonLoader/LoaderContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <BrowserRouter>
-    <ScrollToTop />
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </BrowserRouter>
+  <Provider store={store}>
+    <BrowserRouter>
+      <ScrollToTop />
+      <LoaderProvider>
+        <App />
+      </LoaderProvider>
+    </BrowserRouter>
+  </Provider>,
 );

@@ -174,7 +174,7 @@ const CommunityActivities = () => {
                 </span>
                 with&nbsp;
                 <span className="font-semibold text-[#7cb518]">
-                  हरियाया Green Tea&nbsp;
+                  हरिचाया Green Tea&nbsp;
                 </span>
                 /&nbsp;
                 <span className="font-semibold text-[#7cb518]">
@@ -186,7 +186,7 @@ const CommunityActivities = () => {
                 </span>
                 /&nbsp;
                 <span className="font-semibold text-[#7cb518]">
-                  सात्व्ययास Wholesome Bites&nbsp;
+                  सात्म्यग्रास  Wholesome Bites&nbsp;
                 </span>
                 &&nbsp;
                 <span className="font-semibold text-[#7cb518]">
@@ -194,7 +194,7 @@ const CommunityActivities = () => {
                 </span>
                 followed by&nbsp;
                 <span className="font-semibold text-[#7a5c40]">
-                  ताम्बूलश्रक्षण Betal Chewing&nbsp;
+                  ताम्बूलभक्षण Betal Chewing&nbsp;
                 </span>
                 ;
               </p>

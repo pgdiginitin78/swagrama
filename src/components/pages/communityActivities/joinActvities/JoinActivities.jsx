@@ -56,6 +56,8 @@ import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import SpaIcon from "@mui/icons-material/Spa";
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
+
 
 const getServiceIcon = (service) => {
   if (service.includes("Ayurvedic")) return <SpaIcon />;
@@ -98,7 +100,7 @@ const JoinActivities = () => {
     { id: 4, label: "Services", icon: <Celebration fontSize="small" /> },
     { id: 5, label: "Rules", icon: <Rule fontSize="small" /> },
     { id: 6, label: "Community Programs", icon: <Event fontSize="small" /> },
-    { id: 7, label: "Pricing", icon: <AttachMoney fontSize="small" /> },
+    { id: 7, label: "Pricing", icon: <CurrencyRupeeIcon fontSize="small" /> },
   ];
 
   const tabImages = {
@@ -121,12 +123,12 @@ const JoinActivities = () => {
     >
       <motion.div
         whileHover={{ scale: 1.01 }}
-        className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl group"
+        className="relative h-[400px] 2xl:h-[600px] rounded-2xl overflow-hidden shadow-2xl group"
       >
         <img
           src={tabImages[0]}
           alt="Wedding"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          className="w-full h-full object-cover  bg-top transition-transform duration-700 group-hover:scale-105"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
@@ -3124,7 +3126,7 @@ const JoinActivities = () => {
         </div>
       </motion.header>
 
-      <main className="max-w-6xl mx-auto px-3 py-4">
+      <main className="max-w-7xl mx-auto px-3 py-4">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}

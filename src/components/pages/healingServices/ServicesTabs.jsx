@@ -64,7 +64,6 @@ const ServicesTabs = () => {
         <h1 className="text-ayuBrown font-semibold text-center text-2xl">
           <HealingIcon /> स्वउपचारसेवा Healing Services <HealingIcon />
         </h1>
-        {/* Tabs Header - Reduced Size */}
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
           <Tabs
             value={selectedTab}
@@ -97,8 +96,6 @@ const ServicesTabs = () => {
             ))}
           </Tabs>
         </Box>
-
-        {/* Child Buttons - Reduced Size */}
         {hasChildren && (
           <Stack
             direction="row"

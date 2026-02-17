@@ -1,41 +1,41 @@
 import {
   Cancel,
   Event,
+  Healing,
   LocalFlorist,
+  LocalHospital,
   MedicalServices,
   Nature,
   Person,
   Schedule,
   Spa,
   WbSunny,
-  LocalHospital,
-  Healing,
 } from "@mui/icons-material";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { useEffect, useMemo, useRef, useState } from "react";
 import ReadMoreIcon from "@mui/icons-material/ReadMore";
-import { Award, Briefcase, User } from "lucide-react";
+import { Avatar, Card, Container } from "@mui/material";
+import { AnimatePresence, motion, useInView } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
-import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.jpg";
-import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import AgroWellness from "../assets/landing-page/ayurvedaservices/Agro_wellness.png";
 import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.png";
 import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.png";
 import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.png";
 import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.png";
 import landigPageS1 from "../assets/landing-page/landigPageS1.mp4";
+import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
 import PradipTaware from "../assets/landing-page/ourexperts/PradipTaware.jpg";
+import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.jpg";
 import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
+import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
 import selfWila from "../assets/landing-page/self-wila.png";
 import Connecting from "../assets/landing-page/topStories/Connecting.svg";
 import Empowering from "../assets/landing-page/topStories/Empowering.svg";
 import StoryImg from "../assets/landing-page/topStories/Story-2.png";
+import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
 import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
-import { Avatar, Card, Container } from "@mui/material";
 
 const healers = [
   {
@@ -239,9 +239,12 @@ export default function AyurvedaLanding() {
   const [openEventRegisterModal, setOpenRegisterModal] = useState(false);
   const [selectedEvents, setSelectedEvents] = useState(null);
   const [openAppointementModal, setOpenAppointmentModal] = useState(false);
-  const foundersRef = useRef(null);
   const [hoveredId, setHoveredId] = useState(null);
+
+  const userData = JSON.parse(localStorage.getItem("user"));
+
   const navigate = useNavigate();
+  const foundersRef = useRef(null);
   const healersRef = useRef(null);
 
   const isFoundersInView = useInView(foundersRef, {
@@ -302,7 +305,7 @@ export default function AyurvedaLanding() {
 
   const upcommingEvent = useMemo(
     () => getNextTwoEvents(eventsData2026),
-    [eventsData2026],
+    [getNextTwoEvents],
   );
 
   const eventsDataUpdated = useMemo(() => {
@@ -310,7 +313,9 @@ export default function AyurvedaLanding() {
       return [...eventsArray.slice(0, 2), ...upcommingEvent];
     }
     return eventsArray;
-  }, [upcommingEvent, eventsArray]);
+  }, [upcommingEvent]);
+
+  console.log("userData", new Date());
 
   return (
     <div className="w-full overflow-x-hidden bg-gradient-to-br from-lime-50 via-green-50 to-amber-50">
@@ -378,7 +383,13 @@ export default function AyurvedaLanding() {
               className="px-6 sm:px-8 py-3 rounded-full text-sm sm:text-base md:text-lg font-semibold text-white backdrop-blur-xl bg-gradient-to-r from-green-400/25 to-lime-400/25 border border-white/30 shadow-[0_8px_30px_rgba(34,197,94,0.35)] hover:shadow-[0_12px_40px_rgba(34,197,94,0.55)] hover:from-green-400/35 hover:to-lime-400/35 transition-all duration-300"
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setOpenAppointmentModal(true)}
+              onClick={() => {
+                if (userData !== null) {
+                  setOpenAppointmentModal(true);
+                } else {
+                  errorAlert("Please login to proceed.");
+                }
+              }}
             >
               <Event className="inline mr-2" />
               Book Appointment
@@ -871,12 +882,12 @@ export default function AyurvedaLanding() {
                       />
                       <div
                         className="whitespace-nowrap absolute -bottom-4 left-1/2 -translate-x-1/2
-    px-4 py-2 rounded-lg
-    text-sm text-ayuMid font-semibold
-    backdrop-blur-xl
-    bg-gradient-to-r from-green-400/25 to-lime-400/25
-    border border-white/30
-    shadow-[0_6px_20px_rgba(34,197,94,0.45)]"
+                                  px-4 py-2 rounded-lg
+                                  text-sm text-ayuMid font-semibold
+                                  backdrop-blur-xl
+                                  bg-gradient-to-r from-green-400/25 to-lime-400/25
+                                  border border-white/30
+                                  shadow-[0_6px_20px_rgba(34,197,94,0.45)]"
                       >
                         {healer.specialty}
                       </div>

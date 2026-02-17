@@ -161,7 +161,6 @@ const OPDClinic = () => {
       `}</style>
 
       <div className="relative max-w-6xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-4 slide-in">
           <div className="relative inline-block">
        
@@ -178,9 +177,8 @@ const OPDClinic = () => {
           </div>
         </div>
 
-        {/* Premium Tab Navigation */}
         <div className="flex justify-center mb-4">
-          <div className="inline-flex bg-white/80 backdrop-blur-xl p-1.5 rounded-xl shadow-2xl border border-green-100/50">
+          <div className="inline-flex bg-white/80 backdrop-blur-xl p-1.5 rounded-xl shadow-2xl border border-green-200">
             {healthcareServices.map((service, index) => (
               <button
                 key={service.id}

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import BookEventForm from "../../bookEventForm/BookEventForm";
+import { errorAlert } from "../../../common/toast/CustomToast";
 
 export const wellnessServices = [
   {
@@ -117,6 +118,8 @@ const cardVariants = {
 };
 
 const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
+  const userData = JSON.parse(localStorage.getItem("user"));
+
   const getServiceIcon = () => {
     if (service.serviceName.includes("Outdoor")) return Trees;
     if (service.serviceName.includes("Well House")) return Home;
@@ -228,8 +231,12 @@ const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
           <button
             type="button"
             onClick={() => {
-              setOpenModal(true);
-              setSelectedService(service);
+              if (userData !== null) {
+                setOpenModal(true);
+                setSelectedService(service);
+              } else {
+                errorAlert("Please login to proceed.");
+              }
             }}
             className="relative px-5 py-2 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 backdrop-blur-md text-white font-bold rounded-xl shadow-lg overflow-hidden border border-lime-400/30 hover:scale-105 active:scale-95 transition-transform duration-200"
           >
@@ -275,7 +282,7 @@ const WellnessSection = () => {
       ? wellnessServices
       : wellnessServices.filter((s) => {
           const matchInRooms = s.rooms?.some((r) =>
-            r.toLowerCase().includes(selectedRoom.toLowerCase())
+            r.toLowerCase().includes(selectedRoom.toLowerCase()),
           );
 
           const matchInServiceName = s.serviceName

@@ -21,6 +21,7 @@ import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
+import axios from "axios";
 
 const MotionBox = motion.create(Box);
 
@@ -90,7 +91,7 @@ export default function LoginModal({ open, handleClose }) {
       // showLoader();
       setOpenConfirmationModal(false);
 
-      const response = await userLogin(formData);
+      const response = await axios.post("https://kompasshr.com/WellnessAPI/api/loginJYA",formData);
       const { data, status } = response;
 
       if (status === 200 && data?.accessToken) {

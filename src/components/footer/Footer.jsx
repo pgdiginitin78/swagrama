@@ -3,13 +3,12 @@ import {
   Facebook,
   Instagram,
   LocationOn,
-  Phone,
-  YouTube,
+  YouTube
 } from "@mui/icons-material";
-import { useRef } from "react";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
-import { Link } from "react-router-dom";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
 
 const Footer = () => {
   const footerRef = useRef(null);

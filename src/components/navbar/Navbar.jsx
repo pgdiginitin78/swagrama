@@ -7,7 +7,7 @@ import { Avatar, Badge, Drawer } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import LoginModal from "../loginModal/LoginModal";
 import ShopCart from "../pages/eShop/ShopCart";
 

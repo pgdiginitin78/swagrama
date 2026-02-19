@@ -16,12 +16,12 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { userLogin } from "../../services/login/LoginServices";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
 import { useLoader } from "../common/commonLoader/LoaderContext";
+import { userLogin } from "../../services/login/LoginServices";
 
 const MotionBox = motion.create(Box);
 
@@ -68,6 +68,7 @@ export default function LoginModal({ open, handleClose }) {
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  
   const { showLoader, hideLoader } = useLoader();
 
   const {
@@ -94,7 +95,7 @@ export default function LoginModal({ open, handleClose }) {
 
       const response = await userLogin(formData);
       const { data, status } = response;
-console.log("loginResponse",data);
+      console.log("loginResponse", data);
 
       if (status === 200 && data?.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
@@ -113,7 +114,7 @@ console.log("loginResponse",data);
         error?.response?.data?.message || "Invalid username or password",
       );
     } finally {
-      // hideLoader();
+      hideLoader();
     }
   };
 
@@ -152,9 +153,7 @@ console.log("loginResponse",data);
                   </IconButton>
 
                   {/* Content container with scroll */}
-                  <div 
-                    className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar"
-                  >
+                  <div className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar">
                     <style>{`
                       .custom-green-scrollbar {
                         scrollbar-width: thin;
@@ -192,7 +191,10 @@ console.log("loginResponse",data);
                     </MotionBox>
 
                     <form onSubmit={handleSubmit(onSubmit)}>
-                      <MotionBox variants={itemVariants} className="mb-4 sm:mb-5">
+                      <MotionBox
+                        variants={itemVariants}
+                        className="mb-4 sm:mb-5"
+                      >
                         <Controller
                           name="userName"
                           control={control}
@@ -219,8 +221,7 @@ console.log("loginResponse",data);
                                 fullWidth
                                 label="Email / Mobile No."
                                 size="small"
-
-                                 inputProps={{ autoComplete: "off" }}
+                                inputProps={{ autoComplete: "off" }}
                                 error={!!errors.userName}
                                 helperText={errors.userName?.message}
                                 InputProps={{
@@ -271,7 +272,10 @@ console.log("loginResponse",data);
                         />
                       </MotionBox>
 
-                      <MotionBox variants={itemVariants} className="mb-5 sm:mb-6">
+                      <MotionBox
+                        variants={itemVariants}
+                        className="mb-5 sm:mb-6"
+                      >
                         <Controller
                           name="password"
                           control={control}

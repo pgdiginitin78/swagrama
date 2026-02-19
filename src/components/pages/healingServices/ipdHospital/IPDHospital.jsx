@@ -12,6 +12,11 @@ import {
 import { useState } from "react";
 import BookEventForm from "../../bookEventForm/BookEventForm";
 import { errorAlert } from "../../../common/toast/CustomToast";
+import ipdSingleImg from "../../../assets/healingServices/ipd/ipdSingle.jpg"
+import ipdDoubleImg from "../../../assets/healingServices/ipd/ipdDouble.jpg"
+import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.jpg"
+
+
 
 export const wellnessServices = [
   {
@@ -25,8 +30,7 @@ export const wellnessServices = [
       "Immersion in nature, relaxation, fresh air, mental rejuvenation.",
     price: 3000,
     rooms: [],
-    image:
-      "https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=800&q=80",
+    image:OutdoorLeavingImg,
     badge: "Nature Retreat",
   },
   {
@@ -45,8 +49,7 @@ export const wellnessServices = [
       "स्वनैष्ठिककक्ष | Firmness Room",
       "स्वअनन्तकक्ष | Infinite Room",
     ],
-    image:
-      "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80",
+    image:ipdSingleImg,
     badge: "Premium Stay",
   },
   {
@@ -65,8 +68,7 @@ export const wellnessServices = [
       "स्वनैष्ठिककक्ष | Firmness Room",
       "स्वअनन्तकक्ष | Infinite Room",
     ],
-    image:
-      "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&q=80",
+    image:ipdDoubleImg,
     badge: "Couple's Choice",
   },
   {

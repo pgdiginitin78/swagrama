@@ -8,6 +8,8 @@ import { ToastContainer } from "react-toastify";
 import AboutUs from "./components/pages/aboutUs/AboutUs";
 import CommonLoader from "./components/common/commonLoader/CommonLoader";
 import { useLoader } from "./components/common/commonLoader/LoaderContext";
+import NewDomain from "./components/pages/newDomain/NewDomain";
+import ManagingHostingDashboard from "./components/pages/newDomain/ManagingHostingDashboard";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -61,6 +63,11 @@ export default function App() {
             <Route path="/eShop" element={<EShop />} />
             <Route path="/calendar" element={<EventCalander />} />
             <Route path="/aboutUs" element={<AboutUs />} />
+            {/* <Route path="/newDomain" element={<NewDomain />} /> */}
+            <Route path="/newDomain" element={<ManagingHostingDashboard />} />
+
+            
+
           </Routes>
         </Suspense>
         <ToastContainer

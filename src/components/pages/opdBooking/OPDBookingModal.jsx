@@ -4,12 +4,15 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, Clock, FileText, Stethoscope, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
 import DatePickerField from "../../common/formFields/DatePickerField";
 import DropdownField from "../../common/formFields/DropdownField";
 import InputField from "../../common/formFields/InputField";
 import {
+  bookAppointment,
   getClinicList,
   getDoctorAvailableSlots,
   getDoctorsByClinicId,
@@ -19,6 +22,10 @@ import {
 } from "../../../services/bookAppointment/BookAppointmentServices";
 import { format } from "date-fns";
 import AddPatientModal from "./AddPatientModal";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import ConfirmationModal from "../../common/ConfirmationModal";
+import { errorAlert, successAlert } from "../../common/toast/CustomToast";
+import { useLoader } from "../../common/commonLoader/LoaderContext";
 
 const style = {
   position: "absolute",
@@ -55,6 +62,37 @@ const sectionVariants = {
   },
 };
 
+const statusData = [
+  { id: "1", value: "1", label: "Check-In" },
+  { id: "2", value: "2", label: "Check-Out" },
+];
+
+const dropdownObjectSchema = yup
+  .object()
+  .shape({
+    id: yup.mixed().required(),
+    label: yup.string().required(),
+  })
+  .nullable()
+  .required("This field is required");
+
+const validationSchema = yup.object().shape({
+  location: dropdownObjectSchema.typeError("Location is required"),
+  clinicFid: dropdownObjectSchema.typeError("Clinic is required"),
+  serviceFid: dropdownObjectSchema.typeError("Service is required"),
+  patientFid: dropdownObjectSchema.typeError("Patient is required"),
+  doctorFid: dropdownObjectSchema.typeError("Doctor is required"),
+  appointmentDate: yup
+    .date()
+    .nullable()
+    .required("Appointment date is required")
+    .typeError("Appointment date is required"),
+  Status: dropdownObjectSchema.typeError("Status is required"),
+  ServiceDetails: yup.string().required("Service details are required"),
+  taxDetails: yup.string().nullable(),
+  EncounterStatus: yup.string().nullable(),
+});
+
 function TimeSlotChip({ slot, isSelected, onSelect }) {
   return (
     <button
@@ -62,7 +100,7 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
       onClick={onSelect}
       disabled={!slot.slotStartTime}
       className={`
-        relative px-3 py-2 rounded-xl font-semibold text-xs transition-all duration-200
+        relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
           isSelected
             ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
@@ -71,11 +109,9 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
     >
-      <span className="flex items-center gap-1.5 whitespace-nowrap">
+      <span className="flex items-center space-x-1 whitespace-nowrap">
         <span className="font-bold">{slot.slotStartTime}</span>
-        <svg className={`w-3 h-3 ${isSelected ? 'text-white' : 'text-slate-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
+        <NavigateNextIcon sx={{ fontSize: 14 }} />
         <span className="font-normal opacity-90">{slot.slotEndTime}</span>
       </span>
     </button>
@@ -87,16 +123,21 @@ export default function BookAppointment({ open, handleClose }) {
   const [clinicsOptions, setClinicOptions] = useState([]);
   const [doctorOptions, setDoctorOptions] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
+  const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
   const [servicesOptions, setServicesOptions] = useState([]);
   const [openAddPatientModal, setOpenAddPatientModal] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
   const [doctorSlots, setDoctorSlots] = useState([]);
+  const [ipAddress, setIpAddress] = useState(null);
+  const [finalSaveObj, setFinalSaveObj] = useState(null);
+  const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
 
   const {
     handleSubmit,
     control,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -105,14 +146,13 @@ export default function BookAppointment({ open, handleClose }) {
       doctorFid: null,
       serviceFid: null,
       appointmentDate: null,
-      Status: "",
-      SloteEndTime: null,
-      SloteStartTime: null,
+      Status: null,
       ServiceDetails: "",
-      taxDeatils: "",
+      taxDetails: "",
       EncounterStatus: "",
       location: null,
     },
+    resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
 
@@ -120,17 +160,69 @@ export default function BookAppointment({ open, handleClose }) {
   const locationValue = watch("location");
   const doctorValue = watch("doctorFid");
   const appointmentDate = watch("appointmentDate");
+  const selectedPatientValue = watch("patientFid");
 
   const userData = localStorage.getItem("user");
+  const { showLoader, hideLoader } = useLoader();
 
   const handleReset = () => {
+    reset();
     setSelectedTimeSlot(null);
-    document.querySelectorAll("select, input").forEach((input) => {
-      input.value = "";
-    });
+    setSlotError("");
+    setDoctorSlots([]);
+    setClinicOptions([]);
+    setDoctorOptions([]);
+    setServicesOptions([]);
+    setPatientOptions([]);
   };
 
-  const handleBookAppointment = (dataObj) => {};
+  const handleBookAppointment = (dataObj) => {
+    if (!selectedTimeSlot) {
+      setSlotError("Please select a time slot");
+      return;
+    }
+    setSlotError("");
+    const saveObj = {
+      macId: "",
+      macIp: ipAddress,
+      clinicFid: dataObj.clinicFid.id,
+      doctorFid: dataObj?.doctorFid.id,
+      serviceFid: String(dataObj.serviceFid.id),
+      appoinmentDate: format(new Date(dataObj.appointmentDate), "yyyy-MM-dd"),
+      Status: dataObj.Status.label,
+      SloteEndTime: selectedTimeSlot?.slotEndTime,
+      SloteStartTime: selectedTimeSlot?.slotStartTime,
+      ServiceDetails: dataObj.ServiceDetails,
+      taxDeatils: dataObj.taxDetails,
+      EncounterStatus: dataObj?.EncounterStatus,
+    };
+    setFinalSaveObj(saveObj);
+    setOpenConfirmationModal(true);
+  };
+
+  const handleUserSignup = async () => {
+    try {
+      setOpenConfirmationModal(false);
+      showLoader();
+      const response = await bookAppointment(
+        finalSaveObj,
+        selectedPatientValue?.userId || selectedPatientValue?.userId,
+      );
+      const apiData = response?.data;
+      if (response.data.status === 200 && apiData) {
+        successAlert(apiData.message);
+        handleClose();
+        reset();
+      } else {
+        errorAlert("Booking failed!");
+      }
+    } catch (error) {
+      const errorMessage = error?.response?.data?.message || error?.message;
+      errorAlert(errorMessage);
+    } finally {
+      hideLoader();
+    }
+  };
 
   useEffect(() => {
     getLocationList()
@@ -169,8 +261,6 @@ export default function BookAppointment({ open, handleClose }) {
         .catch((err) => console.log(err.message));
     }
   }, [locationValue]);
-
-  console.log("doctorSlots", doctorSlots);
 
   useEffect(() => {
     if (clinicFidValue?.id > 0) {
@@ -217,9 +307,9 @@ export default function BookAppointment({ open, handleClose }) {
               setPatientOptions(
                 data.map((item) => ({
                   ...item,
-                  id: item.serviceFid,
-                  value: item.serviceFid,
-                  label: `${item.serviceName}`,
+                  id: item.userId,
+                  value: item.userId,
+                  label: `${item.firstName} ${item.lastName}`,
                 })),
               );
             }
@@ -229,13 +319,13 @@ export default function BookAppointment({ open, handleClose }) {
     }
   }, [clinicFidValue, userData]);
 
-  console.log("doctorValue", doctorValue, appointmentDate);
   useEffect(() => {
     if (
       doctorValue !== null &&
       appointmentDate !== null &&
       clinicFidValue !== null
     ) {
+      setLoading(true);
       getDoctorAvailableSlots(
         doctorValue?.id,
         format(new Date(appointmentDate), "yyyy-MM-dd"),
@@ -245,11 +335,23 @@ export default function BookAppointment({ open, handleClose }) {
           const data = res?.data?.data;
           if (data?.length) {
             setDoctorSlots(data);
+            setLoading(false);
+          } else {
+            setDoctorSlots([]);
+            setLoading(false);
           }
+          setLoading(false);
         })
-        .catch((err) => console.log(err.message));
+        .catch(() => setLoading(false));
     }
   }, [doctorValue, appointmentDate, clinicFidValue]);
+
+  useEffect(() => {
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => setIpAddress(data.ip))
+      .catch((error) => console.error("Error:", error));
+  }, []);
 
   return (
     <>
@@ -330,35 +432,37 @@ export default function BookAppointment({ open, handleClose }) {
                               <div className="flex justify-end col-span-2">
                                 <CommonButton
                                   label="+ Add Patient"
-                                  className="
-                                      border border-emerald-500 hover:bg-emerald-50
-                                      text-emerald-500"
+                                  className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500"
                                   onClick={() => setOpenAddPatientModal(true)}
                                 />
                               </div>
                               <DropdownField
                                 control={control}
                                 name="location"
-                                placeholder="Select Location"
+                                placeholder="Select Location *"
                                 dataArray={locationListOptions}
+                                error={errors.location}
                               />
                               <DropdownField
                                 control={control}
                                 name="clinicFid"
-                                placeholder="Select Clinic"
+                                placeholder="Select Clinic *"
                                 dataArray={clinicsOptions}
+                                error={errors.clinicFid}
                               />
                               <DropdownField
                                 control={control}
                                 name="serviceFid"
-                                placeholder="Select Service"
+                                placeholder="Select Service *"
                                 dataArray={servicesOptions}
+                                error={errors.serviceFid}
                               />
                               <DropdownField
                                 control={control}
                                 name="patientFid"
-                                placeholder="Select Patient"
+                                placeholder="Select Patient *"
                                 dataArray={patientOptions}
+                                error={errors.patientFid}
                               />
                             </div>
                           </div>
@@ -374,26 +478,30 @@ export default function BookAppointment({ open, handleClose }) {
                             </h2>
                           </div>
                           <div className="p-4 sm:p-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2  gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-2">
                                 <DropdownField
                                   control={control}
                                   name="doctorFid"
-                                  placeholder="Select Doctor"
+                                  placeholder="Select Doctor *"
                                   dataArray={doctorOptions}
+                                  error={errors.doctorFid}
                                 />
                               </div>
                               <DatePickerField
                                 control={control}
                                 name="appointmentDate"
-                                label="Appointment Date"
+                                label="Appointment Date *"
                                 inputFormat="dd-MM-yyyy"
                                 disablePast={true}
+                                error={errors.appointmentDate}
                               />
                               <DropdownField
                                 control={control}
                                 name="Status"
-                                placeholder="Select Status"
+                                placeholder="Select Status *"
+                                dataArray={statusData}
+                                error={errors.Status}
                               />
                             </div>
                           </div>
@@ -409,12 +517,13 @@ export default function BookAppointment({ open, handleClose }) {
                             </h2>
                           </div>
                           <div className="p-4 sm:p-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2  gap-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-2">
                                 <InputField
                                   control={control}
                                   name="ServiceDetails"
-                                  label="Service Details"
+                                  label="Service Details *"
+                                  error={errors.ServiceDetails}
                                 />
                               </div>
                               <InputField
@@ -507,7 +616,7 @@ export default function BookAppointment({ open, handleClose }) {
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  className="space-y-4 max-h-[450px] overflow-y-auto pr-1 custom-scrollbar"
+                                  className="space-y-4 max-h-[450px] overflow-y-auto overflow-x-hidden pr-1 custom-scrollbar"
                                 >
                                   <div>
                                     <div className="grid grid-cols-2 gap-2">
@@ -519,13 +628,20 @@ export default function BookAppointment({ open, handleClose }) {
                                             selectedTimeSlot?.slotStartTime ===
                                             slot.slotStartTime
                                           }
-                                          onSelect={() =>
-                                            setSelectedTimeSlot(slot)
-                                          }
+                                          onSelect={() => {
+                                            setSelectedTimeSlot(slot);
+                                            setSlotError("");
+                                          }}
                                         />
                                       ))}
                                     </div>
                                   </div>
+
+                                  {slotError && (
+                                    <p className="text-red-500 text-xs mt-1">
+                                      {slotError}
+                                    </p>
+                                  )}
 
                                   {selectedTimeSlot && (
                                     <motion.div
@@ -542,8 +658,9 @@ export default function BookAppointment({ open, handleClose }) {
                                           <p className="text-xs text-emerald-600 font-semibold mb-1 uppercase tracking-wide">
                                             Selected Time
                                           </p>
-                                          <p className="text-lg font-bold text-emerald-900">
-                                            {selectedTimeSlot.slotStartTime}
+                                          <p className="text-base font-bold text-emerald-900">
+                                            {selectedTimeSlot.slotStartTime} To{" "}
+                                            {selectedTimeSlot.slotEndTime}
                                           </p>
                                         </div>
                                         <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center">
@@ -565,6 +682,12 @@ export default function BookAppointment({ open, handleClose }) {
                                 </motion.div>
                               )}
                             </AnimatePresence>
+
+                            {slotError && doctorSlots.length === 0 && (
+                              <p className="text-red-500 text-xs mt-2 text-center">
+                                {slotError}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -578,12 +701,12 @@ export default function BookAppointment({ open, handleClose }) {
                         type="button"
                         label="Reset"
                         onClick={handleReset}
-                        className=" bg-white border px-5 border-red-500 text-red-600 hover:bg-red-50 transition-all duration-200"
+                        className="bg-white border px-5 border-red-500 text-red-600 hover:bg-red-50 transition-all duration-200"
                       />
                       <CommonButton
                         type="submit"
                         label="Book Appointment"
-                        className="bg-gradient-to-r from-emerald-500 to-green-500  text-white  transition-all duration-200"
+                        className="bg-gradient-to-r from-emerald-500 to-green-500 text-white transition-all duration-200"
                       />
                     </motion.div>
                   </form>
@@ -593,12 +716,22 @@ export default function BookAppointment({ open, handleClose }) {
           </AnimatePresence>
         </Box>
       </Modal>
+
       {openAddPatientModal && (
         <AddPatientModal
           open={openAddPatientModal}
           handleClose={() => setOpenAddPatientModal(false)}
         />
       )}
+
+      <ConfirmationModal
+        confirmationOpen={openConfirmationModal}
+        confirmationHandleClose={() => setOpenConfirmationModal(false)}
+        confirmationSubmitFunc={handleUserSignup}
+        confirmationLabel="Confirm Registration"
+        confirmationMsg="Are you sure you want to create this account?"
+        confirmationButtonMsg="Confirm"
+      />
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {

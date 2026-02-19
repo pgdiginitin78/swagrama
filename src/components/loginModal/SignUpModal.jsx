@@ -21,7 +21,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import DatePickerField from "../common/formFields/DatePickerField";
 import InputArea from "../common/formFields/InputArea";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import InputField from "../common/formFields/InputField";
 import RadioField from "../common/formFields/RadioField";
 import axios from "axios";

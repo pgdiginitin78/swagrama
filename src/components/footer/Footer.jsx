@@ -8,7 +8,7 @@ import {
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.png";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 
 const Footer = () => {
   const footerRef = useRef(null);

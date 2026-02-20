@@ -7,7 +7,7 @@ export const userLogin = (postObj) => {
 
 
 export const signupJYA = (postObj) => {
-  return API_BASE_URL.post(`/signupJYA`, postObj);
+  return API.post(`/signupJYA`, postObj);
 };
 
 export const DeleteLoggedAccount = (password) => {

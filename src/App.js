@@ -10,6 +10,7 @@ import CommonLoader from "./components/common/commonLoader/CommonLoader";
 import { useLoader } from "./components/common/commonLoader/LoaderContext";
 import NewDomain from "./components/pages/newDomain/NewDomain";
 import ManagingHostingDashboard from "./components/pages/newDomain/ManagingHostingDashboard";
+import SharedHosting from "./components/pages/newDomain/RegisterdHosting";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -64,7 +65,7 @@ export default function App() {
             <Route path="/calendar" element={<EventCalander />} />
             <Route path="/aboutUs" element={<AboutUs />} />
             {/* <Route path="/newDomain" element={<NewDomain />} /> */}
-            <Route path="/newDomain" element={<ManagingHostingDashboard />} />
+            <Route path="/newDomain" element={<SharedHosting />} />
 
             
 

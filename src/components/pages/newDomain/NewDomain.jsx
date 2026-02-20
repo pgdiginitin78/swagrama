@@ -405,11 +405,11 @@ function NewDomain() {
               </button>
               <div className="space-y-3 text-gray-700">
                 <p>
-                  <span className="text-gray-500">First & Last Name :</span>{" "}
+                  <span className="text-gray-500">First & Last Name :</span>
                   <span className="font-semibold">INTRONEXUS WEB SERVICES</span>
                 </p>
                 <p>
-                  <span className="text-gray-500">Email :</span>{" "}
+                  <span className="text-gray-500">Email :</span>
                   aakashchaudhri@gmail.com
                 </p>
                 <p>
@@ -650,14 +650,14 @@ function NewDomain() {
                   <span>DNS Management</span>
                   <div className="flex gap-2 items-center">
                     <span className="text-sm">(FREE!) 1 Year/s</span>
-                    <Trash2 size={16} className="text-red-500" />
+                    <DeleteIcon size={16} className="text-red-500" />
                   </div>
                 </div>
                 <div className="bg-white border shadow rounded-lg p-3 flex justify-between mb-2 text-sm">
                   <span>ID Protection</span>
                   <div className="flex gap-2 items-center">
                     <span className="text-sm">(Rs.299.00) 1 Year/s</span>
-                    <Trash2 size={16} className="text-red-500" />
+                    <DeleteIcon size={16} className="text-red-500" />
                   </div>
                 </div>
                 <div>
@@ -682,14 +682,14 @@ function NewDomain() {
                   <span>DNS Management</span>
                   <div className="flex gap-2 items-center">
                     <span className="text-sm">(FREE!) 1 Year/s</span>
-                    <Trash2 size={16} className="text-red-500" />
+                    <DeleteIcon size={16} className="text-red-500" />
                   </div>
                 </div>
                 <div className="bg-white border shadow rounded-lg p-3 flex justify-between mb-2 text-sm">
                   <span>ID Protection</span>
                   <div className="flex gap-2 items-center">
                     <span className="text-sm">(Rs.299.00) 1 Year/s</span>
-                    <Trash2 size={16} className="text-red-500" />
+                    <DeleteIcon size={16} className="text-red-500" />
                   </div>
                 </div>
                 <div>
@@ -728,7 +728,7 @@ function NewDomain() {
               </p>
 
               <label className="flex items-center gap-2 text-sm mb-4 mx-auto justify-center">
-                <input type="checkbox" />I have read and agree to the{" "}
+                <input type="checkbox" />I have read and agree to the
                 <span className="underline">Terms of Service</span>
               </label>
 

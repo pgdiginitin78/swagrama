@@ -1,54 +1,46 @@
 import {
   ArrowBackIos as BackIcon,
-  Circle as CircleIcon,
-  Web as WebIcon,
+  Circle as CircleIcon
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import {
+  AutorespondersIcon,
+  AwstatsIcon,
+  BackupIcon,
   CDNIcon,
-  ChangePasswordIcon,
-  DowngradeIcon,
-  LogInIcon,
-  RenewDomainIcon,
-  UpgradeDomainIcon,
   ChangeDomainIcon,
+  ChangePasswordIcon,
+  ContentCopyIcon,
+  CronJobsIcon,
   DeleteIcon,
+  DomainNameIcon,
+  DowngradeIcon,
   EditIcon,
   EmailAccountIcon,
-  ForwardersIcon,
-  AutorespondersIcon,
   FileManagerIcon,
-  BackupIcon,
-  CronJobsIcon,
+  ForwardersIcon,
+  Imunify360ProtectIcon,
+  LogInIcon,
+  MemoryOutlinedIcon,
   MySqlDataBaseIcon,
   PhpMyAdminIcon,
-  AwstatsIcon,
-  ContentCopyIcon,
-  DomainNameIcon,
   PortIcon,
-  SpeedOutlinedIcon,
-  MemoryOutlinedIcon,
-  StorageOutlinedIcon,
-  Imunify360ProtectIcon,
-  TechnologiesCDNIcon,
+  RenewDomainIcon,
   SharedHostingIcon,
+  SpeedOutlinedIcon,
+  StorageOutlinedIcon,
+  TechnologiesCDNIcon,
+  UpgradeDomainIcon,
 } from "../../common/assets/CommonAssets";
 
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
 import { Divider } from "@mui/material";
+import { useState } from "react";
 
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import SecurityIcon from "@mui/icons-material/Security";
-import BoltIcon from "@mui/icons-material/Bolt";
-import StorageIcon from "@mui/icons-material/Storage";
-import DesktopWindowsIcon from "@mui/icons-material/DesktopWindows";
-import SpeedIcon from "@mui/icons-material/Speed";
-import MemoryIcon from "@mui/icons-material/Memory";
-import DnsIcon from "@mui/icons-material/Dns";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useNavigate } from "react-router-dom";
 
 const shortcuts = [

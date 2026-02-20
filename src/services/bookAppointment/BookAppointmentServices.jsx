@@ -24,9 +24,6 @@ export const bookAppointment = (saveObj, userId) => {
   return AxiosInstance.post(`bookAppointment?userId=${userId}`, saveObj);
 };
 
-
-
-//http://115.124.123.180:8095/api/DoctorAvailableSlots?doctorId=3&appointmentDate=2026-02-16&ClinicFid=1
 export const getDoctorAvailableSlots = (doctorId, appointmentDate,ClinicFid) => {
   return AxiosInstance.get(
     `DoctorAvailableSlots?doctorId=${doctorId}&appointmentDate=${appointmentDate}&ClinicFid=${ClinicFid}`,

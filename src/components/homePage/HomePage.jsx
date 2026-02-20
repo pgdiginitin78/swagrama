@@ -29,6 +29,8 @@ import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawa
 import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
 import selfWila from "../assets/landing-page/self-wila.png";
+import SwagarmaMainImg from "../assets/landing-page/swagramaMain.jpg";
+
 import Connecting from "../assets/landing-page/topStories/Connecting.svg";
 import Empowering from "../assets/landing-page/topStories/Empowering.svg";
 import StoryImg from "../assets/landing-page/topStories/Story-2.png";
@@ -487,7 +489,7 @@ export default function AyurvedaLanding() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
             {[
               {
-                img: selfWila,
+                img: SwagarmaMainImg,
                 title: "स्वग्राम Community Self-Dependence Village Intro",
                 text: "स्वग्राम Community is Ayurveda, Yoga, Nature, Agro, Tourism, Natural Lifestyle & Biodiversity hub. Ayurveda & Yoga Natural agriculture...",
                 action: () => setModal1(true),
@@ -511,7 +513,7 @@ export default function AyurvedaLanding() {
                 <div className="relative h-48 sm:h-64 overflow-hidden">
                   <motion.img
                     src={story.img}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-center bg-top"
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.6 }}
                     alt={story.title}

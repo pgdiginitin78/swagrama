@@ -1,16 +1,13 @@
-import { Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
 import Skeleton from "@mui/material/Skeleton";
-import Navbar from "./components/navbar/Navbar";
-import Footer from "./components/footer/Footer";
-import ScrollToTopButton from "./ScrollToTopButton";
+import { Suspense, lazy } from "react";
+import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import Footer from "./components/footer/Footer";
+import Navbar from "./components/navbar/Navbar";
 import AboutUs from "./components/pages/aboutUs/AboutUs";
-import CommonLoader from "./components/common/commonLoader/CommonLoader";
-import { useLoader } from "./components/common/commonLoader/LoaderContext";
-import NewDomain from "./components/pages/newDomain/NewDomain";
-import ManagingHostingDashboard from "./components/pages/newDomain/ManagingHostingDashboard";
 import SharedHosting from "./components/pages/newDomain/RegisterdHosting";
+import ScrollToTopButton from "./ScrollToTopButton";
+import ViewInvoices from "./components/pages/newDomain/myInvoices/ViewInvoices";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -46,7 +43,6 @@ function PageSkeleton() {
 }
 
 export default function App() {
-  const { loading } = useLoader();
   return (
     <>
       <Navbar />
@@ -65,7 +61,7 @@ export default function App() {
             <Route path="/calendar" element={<EventCalander />} />
             <Route path="/aboutUs" element={<AboutUs />} />
             {/* <Route path="/newDomain" element={<NewDomain />} /> */}
-            <Route path="/newDomain" element={<SharedHosting />} />
+            <Route path="/newDomain" element={<ViewInvoices />} />
 
             
 
@@ -85,7 +81,7 @@ export default function App() {
         />
         <ScrollToTopButton />
       </div>
-      {loading && <CommonLoader />}
+
       <Footer />
     </>
   );

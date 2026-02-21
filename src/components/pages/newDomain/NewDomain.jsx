@@ -1,9 +1,10 @@
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import { Divider } from "@mui/material";
-import { ArrowRight, Trash2 } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   AddToCartIcon,
   AIWebsiteBuilderIcon,
@@ -26,7 +27,6 @@ import CommonButton from "../../common/button/CommonButton";
 import DropdownField from "../../common/formFields/DropdownField";
 import InputField from "../../common/formFields/InputField";
 import SearchDropdown from "../../common/formFields/SearchDropdown";
-import { useNavigate } from "react-router-dom";
 
 const sugestedDomainData = [
   { id: 1, domainName: "xyz.com", price: "Rs.800.00" },

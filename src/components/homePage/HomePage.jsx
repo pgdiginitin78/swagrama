@@ -29,11 +29,10 @@ import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawa
 import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
 import selfWila from "../assets/landing-page/self-wila.png";
-import SwagarmaMainImg from "../assets/landing-page/swagramaMain.jpg";
-
+import SwagarmaMainImg from "../assets/landing-page/swagramaMain.png";
 import Connecting from "../assets/landing-page/topStories/Connecting.svg";
 import Empowering from "../assets/landing-page/topStories/Empowering.svg";
-import StoryImg from "../assets/landing-page/topStories/Story-2.png";
+import StoryImg from "../assets/landing-page/topStories/Self-Dependence Village.png";
 import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
@@ -503,22 +502,18 @@ export default function AyurvedaLanding() {
             ].map((story, idx) => (
               <motion.div
                 key={idx}
-                className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-green-100"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.2, duration: 0.6 }}
-                whileHover={{ y: -5 }}
+                className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-green-100"
               >
-                <div className="relative h-48 sm:h-64 overflow-hidden">
-                  <motion.img
+                <div className="w-full h-[260px] overflow-hidden rounded-t-3xl">
+                  <img
                     src={story.img}
-                    className="w-full h-full object-center bg-top"
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
                     alt={story.title}
+                    className="w-full h-full object-cover object-center"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                 </div>
 
                 <div className="p-5 sm:p-6">

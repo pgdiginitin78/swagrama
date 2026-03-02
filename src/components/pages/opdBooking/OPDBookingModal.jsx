@@ -19,6 +19,7 @@ import {
   getLocationList,
   getPatientDataByMobileNo,
   getServicesByClinicId,
+  InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
 import { format } from "date-fns";
 import AddPatientModal from "./AddPatientModal";
@@ -26,6 +27,7 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
+import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
 
 const style = {
   position: "absolute",
@@ -161,6 +163,8 @@ export default function BookAppointment({ open, handleClose }) {
   const doctorValue = watch("doctorFid");
   const appointmentDate = watch("appointmentDate");
   const selectedPatientValue = watch("patientFid");
+  const selectedServiceValue = watch("serviceFid");
+
 
   const userData = localStorage.getItem("user");
   const { showLoader, hideLoader } = useLoader();
@@ -223,6 +227,31 @@ export default function BookAppointment({ open, handleClose }) {
       hideLoader();
     }
   };
+  console.log("selectedServiceValue", selectedServiceValue);
+
+const initiatePayment = async () => {
+  try {
+    let tempObj = {
+      amount: selectedServiceValue?.charges || 0,
+    };
+
+    const res = await InitiatePayment(
+      clinicFidValue?.id,
+      JSON.parse(userData)?.userId,
+      tempObj
+    );
+
+    const data = res.data;
+
+    console.log("paymentStatus", data);
+
+    if (data.status === 200) {
+      RedirectToSabPaisa(data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
 
   useEffect(() => {
     getLocationList()
@@ -727,7 +756,7 @@ export default function BookAppointment({ open, handleClose }) {
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationHandleClose={() => setOpenConfirmationModal(false)}
-        confirmationSubmitFunc={handleUserSignup}
+        confirmationSubmitFunc={initiatePayment}
         confirmationLabel="Confirm Registration"
         confirmationMsg="Are you sure you want to create this account?"
         confirmationButtonMsg="Confirm"

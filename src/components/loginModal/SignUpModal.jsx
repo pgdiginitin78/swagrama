@@ -211,6 +211,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
     const formattedData = {
       ...data,
       dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
+      macIp: ipAddress,
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);

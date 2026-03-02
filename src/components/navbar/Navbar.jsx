@@ -10,15 +10,16 @@ import { Link, useLocation } from "react-router-dom";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import LoginModal from "../loginModal/LoginModal";
 import ShopCart from "../pages/eShop/ShopCart";
+import { successAlert } from "../common/toast/CustomToast";
 
-const Navbar = () => {
+const Navbar = ({ userData, setUserData }) => {
   const [open, setOpen] = useState(false);
   const [openStore, setOpenStore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [user, setUser] = useState(null);
 
-  const userData = localStorage.getItem("user");
+  const userLocalData = JSON.parse(localStorage.getItem("user"));
   const location = useLocation();
   const cart = useSelector((s) => s.cart.items);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
@@ -32,21 +33,21 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, [userData]);
+    setUser(userLocalData);
+    setUserData(userLocalData);
+  }, [openLoginModal]);
 
   const handleLoginSuccess = () => {
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    setUser(userLocalData);
+    setUserData(userLocalData);
     setOpenLoginModal(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.clear();
+    successAlert("User logged out successfully");
     setUser(null);
+    setUserData(null);
   };
 
   const navLinks = [
@@ -314,8 +315,8 @@ const Navbar = () => {
                       fontSize: "0.75rem",
                     }}
                   >
-                    {user.userName?.charAt(0).toUpperCase() ||
-                      user.firstName?.charAt(0).toUpperCase() ||
+                    {user?.userName?.charAt(0).toUpperCase() ||
+                      user?.firstName?.charAt(0).toUpperCase() ||
                       "U"}
                   </Avatar>
                   <button
@@ -440,6 +441,7 @@ const Navbar = () => {
           open={openLoginModal}
           handleClose={() => setOpenLoginModal(false)}
           onLoginSuccess={handleLoginSuccess}
+          setUserData={setUserData}
         />
       )}
     </>

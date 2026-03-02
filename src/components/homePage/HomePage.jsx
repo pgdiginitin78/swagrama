@@ -28,7 +28,6 @@ import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.jpg";
 import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
 import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
-import selfWila from "../assets/landing-page/self-wila.png";
 import SwagarmaMainImg from "../assets/landing-page/swagramaMain.png";
 import Connecting from "../assets/landing-page/topStories/Connecting.svg";
 import Empowering from "../assets/landing-page/topStories/Empowering.svg";
@@ -37,6 +36,40 @@ import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
 import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
+import EmpoweringWellnessImg from "../assets/landing-page/empoweringWellness.png";
+import ConnectingExpertImg from "../assets/landing-page/ConnectingExpert.jpg";
+import CancelIcon from "@mui/icons-material/Cancel";
+import StarIcon from "@mui/icons-material/Star";
+import {
+  Box,
+  Divider,
+  Grid,
+  IconButton,
+  Modal,
+  Paper,
+  Typography,
+} from "@mui/material";
+
+const features = [
+  "Certified Therapists",
+  "In-depth Consultations",
+  "24/7 Assistance",
+  "Customized Solutions",
+];
+
+const modalBoxStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "95%", sm: "90%", md: "760px", lg: "900px" },
+  maxHeight: { xs: "92dvh", sm: "90vh" },
+  overflowY: "auto",
+  bgcolor: "background.paper",
+  borderRadius: 4,
+  boxShadow: 24,
+  outline: "none",
+};
 
 const healers = [
   {
@@ -178,6 +211,7 @@ const eventsArray = [
     text: "Begin your journey to holistic healing with personalized Ayurvedic treatments. Book your consultation and restore balance naturally.",
     btn: "Book An Appointment",
     icon: <Schedule />,
+    img: EmpoweringWellnessImg,
   },
   {
     img: Connecting,
@@ -185,6 +219,7 @@ const eventsArray = [
     text: "Gain insights from top wellness and Ayurveda experts worldwide. Join hands with specialists and explore transformative healing solutions.",
     btn: "Sign Up",
     icon: <Person />,
+    img: ConnectingExpertImg,
   },
   {
     img: null,
@@ -234,15 +269,13 @@ const getIcon = (specialty) => {
   }
 };
 
-export default function AyurvedaLanding() {
+export default function AyurvedaLanding({ userData }) {
   const [modal1, setModal1] = useState(false);
   const [modal2, setModal2] = useState(false);
   const [openEventRegisterModal, setOpenRegisterModal] = useState(false);
   const [selectedEvents, setSelectedEvents] = useState(null);
   const [openAppointementModal, setOpenAppointmentModal] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
-
-  const userData = JSON.parse(localStorage.getItem("user"));
 
   const navigate = useNavigate();
   const foundersRef = useRef(null);
@@ -316,8 +349,6 @@ export default function AyurvedaLanding() {
     return eventsArray;
   }, [upcommingEvent]);
 
-  console.log("userData", new Date());
-
   return (
     <div className="w-full overflow-x-hidden bg-gradient-to-br from-lime-50 via-green-50 to-amber-50">
       <motion.section
@@ -385,7 +416,7 @@ export default function AyurvedaLanding() {
               whileHover={{ scale: 1.06 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => {
-                if (userData !== null) {
+                if (userData && userData !== null) {
                   setOpenAppointmentModal(true);
                 } else {
                   errorAlert("Please login to proceed.");
@@ -586,20 +617,19 @@ export default function AyurvedaLanding() {
               >
                 {event.img ? (
                   <>
-                    <div className="flex justify-center items-center py-6 bg-gradient-to-br from-lime-100 to-green-100">
-                      <div className="relative">
-                        <motion.img
-                          src={event.img}
-                          className="h-20 sm:h-24 w-20 sm:w-24 rounded-full object-cover shadow-lg ring-4 ring-white"
-                          alt={event.title}
-                          // whileHover={{ rotate: 360 }}
-                          transition={{ duration: 0.6 }}
-                        />
-                        <div className="absolute -bottom-2 -right-2 bg-green-600 text-white p-2 rounded-full">
+                    <div className="relative">
+                      <motion.img
+                        src={event.img}
+                        className="h-36 w-full object-cover"
+                        alt={event.title}
+                        // whileHover={{ rotate: 360 }}
+                        transition={{ duration: 0.6 }}
+                      />
+                      {/* <div className="absolute -bottom-2 -right-2 bg-green-600 text-white p-2 rounded-full">
                           {event.icon}
-                        </div>
-                      </div>
+                        </div> */}
                     </div>
+
                     <div className="p-5 sm:p-6">
                       <h5 className="font-semibold text-green-900 text-center mb-3 text-sm sm:text-base">
                         {event.title}
@@ -637,19 +667,15 @@ export default function AyurvedaLanding() {
                       >
                         <div className="relative w-full h-[145px] bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 rounded-t-xl  border border-lime-200">
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <svg
-                              className="w-14 h-14 text-lime-600/30"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
-                            </svg>
+                            <motion.img
+                              src={event.image}
+                              className="h-36 w-full object-cover"
+                              alt={event.title}
+                              // whileHover={{ rotate: 360 }}
+                              transition={{ duration: 0.6 }}
+                            />
                           </div>
-                          <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full">
-                            <span className="text-[12px] font-bold text-lime-700">
-                              {event.date}
-                            </span>
-                          </div>
+
                           <div className="absolute top-2 right-2 bg-gradient-to-r from-lime-600 flex justify-center items-center to-green-700 px-2 text-center rounded-full">
                             <span className="text-[10px] font-bold text-white py-1">
                               {event?.month}
@@ -657,7 +683,12 @@ export default function AyurvedaLanding() {
                           </div>
                         </div>
 
-                        <div key={i} className="grid gap-y-3 px-2 py-5 w-full">
+                        <div className=" bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex justify-end">
+                          <span className="text-[12px] font-bold text-lime-700">
+                            Date : {event.date}
+                          </span>
+                        </div>
+                        <div key={i} className="grid gap-y-2 px-2 w-full">
                           <div className="flex items-start gap-1.5 mb-1.5">
                             <div className="w-5 h-5 rounded-full bg-gradient-to-br from-lime-600 to-green-700 flex items-center justify-center flex-shrink-0">
                               <span className="text-white text-[10px] font-bold">
@@ -986,20 +1017,15 @@ export default function AyurvedaLanding() {
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                      {/* Qualification Badge - Top Right */}
                       <motion.div
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="absolute top-3 right-3 z-10"
+                        className="absolute top-1 right-1 z-10"
                       >
-                        <div
-                          className="px-3 py-1.5 rounded-full text-xs font-semibold text-white backdrop-blur-sm shadow-lg"
-                          style={{
-                            backgroundColor: `${healer.color}dd`,
-                            border: `1px solid ${healer.color}`,
-                          }}
-                        >
+                        <div className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
+                        text-xs  px-2 py-1 text-ayuDark font-semibold
+                        shadow-2xl">
                           {healer.qualification}
                         </div>
                       </motion.div>
@@ -1061,69 +1087,95 @@ export default function AyurvedaLanding() {
         </Container>
       </div>
 
-      <AnimatePresence>
-        {modal1 && (
-          <motion.div
-            className="
-        fixed inset-0 z-50 flex items-center justify-center
-        px-3 sm:px-4
-        bg-black/60 backdrop-blur-sm
-      "
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setModal1(false)}
+      {modal1 && (
+        <AnimatePresence>
+          <Modal
+            open={modal1}
+            slotProps={{
+              backdrop: {
+                sx: {
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  backdropFilter: "blur(4px)",
+                },
+              },
+            }}
           >
-            <motion.div
-              className="
-          bg-white rounded-2xl w-full
-          max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl
-          max-h-[92dvh] sm:max-h-[90vh]
-          overflow-y-auto shadow-2xl
-        "
-              initial={{ scale: 0.8, opacity: 0, y: 50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 50 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className="
-          bg-gradient-to-r from-green-700 to-lime-600
-          px-4 sm:px-6 py-4 sm:py-5
-          text-white relative sticky top-0 z-10
-        "
+            <Box sx={modalBoxStyle}>
+              <Box
+                sx={{
+                  background: "linear-gradient(to right, #15803d, #65a30d)",
+                  px: { xs: 2 },
+                  py: { xs: 2 },
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 10,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                }}
               >
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
-                  स्वग्राम Community
-                </h2>
-                <p className="text-xs sm:text-sm opacity-90 mt-1">
-                  Natural Lifestyle & Self-Dependent Village
-                </p>
-                <motion.button
-                  onClick={() => setModal1(false)}
-                  className="
-              absolute right-3 top-3 sm:right-4 sm:top-4
-              bg-red-500 text-white
-              w-9 h-9 sm:w-8 sm:h-8
-              flex items-center justify-center
-              rounded-full hover:bg-red-600 transition-all
-            "
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Cancel fontSize="small" />
-                </motion.button>
-              </div>
+                <Box>
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="white"
+                    sx={{
+                      fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+                    }}
+                  >
+                    स्वग्राम Community
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "rgba(255,255,255,0.88)",
+                      mt: 0.5,
+                      display: "block",
+                    }}
+                  >
+                    Natural Lifestyle & Self-Dependent Village
+                  </Typography>
+                </Box>
 
-              <div
-                className="
-          p-4 sm:p-6 sm:p-8
-          space-y-5
-          text-gray-700
-          leading-relaxed
-        "
+                <IconButton
+                  onClick={() => setModal1(false)}
+                  size="small"
+                  sx={{
+                    bgcolor: "error.main",
+                    color: "white",
+                    width: { xs: 36, sm: 32 },
+                    height: { xs: 36, sm: 32 },
+                    "&:hover": {
+                      bgcolor: "error.dark",
+                      transform: "rotate(90deg)",
+                    },
+                    transition: "all 0.2s ease",
+                  }}
+                >
+                  <CancelIcon fontSize="small" />
+                </IconButton>
+              </Box>
+
+              {/* ── Body ── */}
+              <Box
+                sx={{
+                  px: { xs: 2, sm: 3, md: 4 },
+                  py: { xs: 2.5, sm: 3 },
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 2.5,
+                  color: "text.secondary",
+                }}
               >
-                <p className="text-sm sm:text-base font-medium text-green-900">
+                <Typography
+                  variant="body2"
+                  fontWeight={500}
+                  sx={{
+                    color: "#14532d",
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    lineHeight: 1.75,
+                  }}
+                >
                   "स्वग्राम Community is Ayurveda, Yoga, Nature, Agro, Tourism,
                   Natural Lifestyle & Biodiversity hub." Ayurveda, Yoga &
                   Natural Agriculture is the first Natural Lifestyle practically
@@ -1133,31 +1185,48 @@ export default function AyurvedaLanding() {
                   more than 5000 years ago. It is a knowledge of life contains
                   applied Science & Technology which is regularly used in daily
                   work-Activity.
-                </p>
+                </Typography>
 
-                <p className="text-sm sm:text-base">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    lineHeight: 1.75,
+                  }}
+                >
                   Ultimately it Played in the Artistic way to Celebrate each &
                   every moment of life.
-                </p>
+                </Typography>
 
-                <div
-                  className="
-            border-l-4 border-green-700
-            bg-lime-50 rounded-xl
-            px-4 sm:px-5 py-4
-            italic text-sm sm:text-base
-          "
+                {/* ── Quote block ── */}
+                <Box
+                  sx={{
+                    borderLeft: "4px solid #15803d",
+                    bgcolor: "#f7fee7",
+                    borderRadius: 2,
+                    px: { xs: 2, sm: 2.5 },
+                    py: 2,
+                    fontStyle: "italic",
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    lineHeight: 1.75,
+                    color: "text.primary",
+                  }}
                 >
-                  "Ayurveda, Yoga & Natural Agriculture is an Evolution of
-                  ज्ञानKnowledge, शास्त्रScience, तंत्रTechnology,
-                  कर्मActivity-Work, क्रीडाPlay, कलाArt, उत्सवCeremony.
-                  Evolution of 7 Steps or ways of Life means सप्तपदी7Steps. All
-                  natives have such 7 steps to complete way of Life. It's a
-                  systematic working methodology called as
-                  सुविनिमयBarterSystem."
-                </div>
+                  "Ayurveda, Yoga & Natural Agriculture is an Evolution of ज्ञान
+                  Knowledge, शास्त्र Science, तंत्रT echnology, कर्म
+                  Activity-Work, क्रीडा Play, कला Art, उत्सव Ceremony. Evolution
+                  of 7 Steps or ways of Life means सप्तपदी 7 Steps. All natives
+                  have such 7 steps to complete way of Life. It's a systematic
+                  working methodology called as सुविनिमयBarterSystem."
+                </Box>
 
-                <p className="text-sm sm:text-base">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    lineHeight: 1.75,
+                  }}
+                >
                   This is a pure trading system stand on strong pillar of
                   वर्षिष्ठकृषिसंस्कृतिUppermostAgriCulture means Natural
                   Agriculture is not a business or job. It's purely inequality
@@ -1169,46 +1238,58 @@ export default function AyurvedaLanding() {
                   स्वग्रामCommunity_Self-Dependent Village. Simply It's a
                   journey of life creates पर्यटनTourism of
                   नैसर्गविधानNaturalLifestyle.
-                </p>
+                </Typography>
 
-                <p className="text-sm sm:text-base">
+                <Typography
+                  variant="body2"
+                  sx={{
+                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                    lineHeight: 1.75,
+                  }}
+                >
                   "Our शरीरमनात्मBodyMindSoul is naturally evolved with natural
                   habituate. Our Natural Lifestyle means grow & eat food in
                   natural style. Stay, activity & work in natural places with
                   natural style. Treat ourselves with natural ways. Always
                   behave naturally."
-                </p>
+                </Typography>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
-                  {[
-                    "Certified Therapists",
-                    "In-depth Consultations",
-                    "24/7 Assistance",
-                    "Customized Solutions",
-                  ].map((t, i) => (
-                    <motion.div
-                      key={i}
-                      className="
-                  flex items-center gap-3
-                  p-3 border rounded-xl
-                  shadow-sm bg-white
-                  text-sm sm:text-base
-                "
-                      whileHover={{ scale: 1.05 }}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.1 }}
-                    >
-                      <span>⭐</span>
-                      <span>{t}</span>
-                    </motion.div>
+                <Divider sx={{ mt: 1 }} />
+
+                {/* ── Feature cards ── */}
+                <Grid container spacing={2} sx={{ pt: 1 }}>
+                  {features.map((label, i) => (
+                    <Grid item xs={12} sm={6} key={i}>
+                      <Paper
+                        elevation={1}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1.5,
+                          px: 2,
+                          py: 1.5,
+                          borderRadius: 3,
+                          fontSize: { xs: "0.85rem", sm: "0.95rem" },
+                          transition: "transform 0.2s, box-shadow 0.2s",
+                          "&:hover": {
+                            transform: "scale(1.04)",
+                            boxShadow: 4,
+                          },
+                        }}
+                      >
+                        <StarIcon sx={{ color: "#eab308", fontSize: 20 }} />
+                        <Typography variant="body2" fontWeight={500}>
+                          {label}
+                        </Typography>
+                      </Paper>
+                    </Grid>
                   ))}
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                </Grid>
+              </Box>
+            </Box>
+          </Modal>
+        </AnimatePresence>
+      )}
 
       <AnimatePresence>
         {modal2 && (

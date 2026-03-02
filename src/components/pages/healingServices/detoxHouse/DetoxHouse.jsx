@@ -51,20 +51,17 @@ import ContinuousPouringImg from "../../../assets/healingServices/detoxTherapy/C
 import DailyUnguentImg from "../../../assets/healingServices/detoxTherapy/DailyUnguent.png";
 import footMassageImg from "../../../assets/healingServices/detoxTherapy/footMassage.png";
 import bodyMassageImg from "../../../assets/healingServices/detoxTherapy/FullBodyMassage.png";
-import fullBodyMassageTherapy from "../../../assets/healingServices/detoxTherapy/fullBodySteam.png";
 import HerbalVaporInhalationImg from "../../../assets/healingServices/detoxTherapy/HerbalVaporInhalation.png";
-import IncensingImg from "../../../assets/healingServices/detoxTherapy/Incensing.png";
-import InstantHoneyOilEnema from "../../../assets/healingServices/detoxTherapy/InstantHoneyOilEnema.png";
-import InstantPurgingImg from "../../../assets/healingServices/detoxTherapy/InstantPurging.png";
-import InstantWealthEnema from "../../../assets/healingServices/detoxTherapy/InstantWealthEnema.png";
-import LocalizedDFluidImg from "../../../assets/healingServices/detoxTherapy/LocalizedFluid.png";
-import MixedFomentationImg from "../../../assets/healingServices/detoxTherapy/MixedFomentation.png";
-import NectorVaporInhalationImg from "../../../assets/healingServices/detoxTherapy/NectorVaporInhalation.png";
-import BodyOilPowderMassageImg from "../../../assets/healingServices/detoxTherapy/oil&PowderMassage.png";
-import BodyPowderMasaageImg from "../../../assets/healingServices/detoxTherapy/powderMassage.png";
-import SteamTherapyImg from "../../../assets/healingServices/detoxTherapy/targetAllBodySteam.png";
-import traditionalMethodsImg from "../../../assets/healingServices/detoxTherapy/warmHerbal.png";
-import WealthEnemaImg from "../../../assets/healingServices/detoxTherapy/WealthEnema.png";
+import FullBodyMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगमर्दनFullBddyMassage.png";
+import FullBodyPowderMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगउद्वर्तन Full Body Powder Massage.png";
+import FullBodyOilPowderMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगउत्सादन Full Body Oil Powder Massage.png";
+import FullBodyAnointingImg from "../../../assets/healingServices/detoxTherapy/सर्वांगलेपन Full Body Anointing.png";
+import SingleOrganAnointingImg from "../../../assets/healingServices/detoxTherapy/एकांगलेपण Single Organ Anointing.png";
+import MainEmeticDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानवमनकर्म Main Emetic Detox.png";
+import MainLaxativeDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानविरेचनकर्म Main Laxative Detox.png";
+import MainEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानबस्तिकर्म Main Enema Detox.png";
+import MainNasalDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानशिरोविरेचननस्य Main Nasal Detox.png";
+
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
@@ -194,8 +191,7 @@ const detoxServicesData = [
       "Reduces muscular tension, improves circulation, detoxifies tissues, and enhances flexibility.",
     price: 1500,
     icon: Hand,
-    image:
-      "https://www.freepik.com/search?format=search&query=deep%20tissue%20massage%20full%20body",
+    image: FullBodyMassageImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -205,8 +201,7 @@ const detoxServicesData = [
       "Exfoliates skin, improves blood circulation, detoxifies, and revitalizes the body.",
     price: 1500,
     icon: Leaf,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20powder%20massage%20udvartana",
+    image: FullBodyPowderMassageImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -216,8 +211,7 @@ const detoxServicesData = [
       "Deeply nourishes skin, relaxes muscles, detoxifies, and restores vitality.",
     price: 1500,
     icon: Droplets,
-    image:
-      "https://www.freepik.com/search?format=search&query=oil%20powder%20massage%20ayurveda",
+    image: FullBodyOilPowderMassageImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -228,8 +222,7 @@ const detoxServicesData = [
       "Nourishes skin, detoxifies, enhances healing, and improves skin texture.",
     price: 1500,
     icon: Sparkles,
-    image:
-      "https://www.freepik.com/search?format=search&query=herbal%20body%20paste%20ayurveda%20therapy",
+    image: FullBodyAnointingImg,
   },
   {
     filterName: "Massage & Anointing",
@@ -240,8 +233,7 @@ const detoxServicesData = [
       "Nourishes skin, detoxifies, enhances healing, and improves skin texture.",
     price: 500,
     icon: Sparkles,
-    image:
-      "https://www.freepik.com/search?format=search&query=herbal%20paste%20application%20therapy",
+    image: SingleOrganAnointingImg,
   },
   //
   {
@@ -253,8 +245,7 @@ const detoxServicesData = [
       "Eliminates excess Kapha, cleanses stomach, enhances digestion, strengthens metabolism, and prepares body for detoxification.",
     price: "7 days - ₹13,000 Package",
     icon: Droplets,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurveda%20detox%20therapy%20clinic",
+    image: MainEmeticDetoxImg,
   },
   {
     filterName: "Steam & Incensing Therapy",
@@ -265,8 +256,7 @@ const detoxServicesData = [
       "Cleanses intestines, removes Pitta-related toxins, improves bowel function, balances digestive fire, and detoxifies the body.",
     price: "7 days - ₹13,000 Package",
     icon: Sparkles,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20digestive%20detox%20treatment",
+    image: MainLaxativeDetoxImg,
   },
   {
     filterName: "Steam & Incensing Therapy",
@@ -277,8 +267,7 @@ const detoxServicesData = [
       "Deeply cleanses the colon, pacifies Vata Dosha, improves digestion, strengthens the lower back, and nourishes the body tissues.",
     price: "7 days - ₹14,000 Package",
     icon: ShieldPlus,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurveda%20therapy%20treatment%20wellness%20center",
+    image: MainEnemaDetoxImg,
   },
   {
     filterName: "Steam & Incensing Therapy",
@@ -289,8 +278,7 @@ const detoxServicesData = [
       "Clears nasal passages, reduces sinus congestion, improves smell and respiratory health.",
     price: "7 days - ₹12,000",
     icon: Wind,
-    image:
-      "https://www.freepik.com/search?format=search&query=nasal%20therapy%20ayurveda%20treatment",
+    image: MainNasalDetoxImg,
   },
   {
     filterName: "Steam & Incensing Therapy",
@@ -1425,8 +1413,7 @@ function ServiceCard({ item, index }) {
                   <img
                     src={item.image}
                     alt={item.serviceName}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
+className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"                  />
                   <div className="absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent"></div>
                 </div>
               ) : (
@@ -1481,7 +1468,7 @@ function ServiceCard({ item, index }) {
 }
 
 export default function DetoxHouse() {
-  const [visibleCount, setVisibleCount] = useState(8);
+  const [visibleCount, setVisibleCount] = useState(12);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState({
     id: "all",
@@ -1507,7 +1494,7 @@ export default function DetoxHouse() {
   const loadMore = () => {
     setIsLoading(true);
     setTimeout(() => {
-      setVisibleCount((prev) => Math.min(prev + 8, filteredServices.length));
+      setVisibleCount((prev) => Math.min(prev + 12, filteredServices.length));
       setIsLoading(false);
     }, 500);
   };

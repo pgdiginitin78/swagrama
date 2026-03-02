@@ -2,6 +2,9 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import BookEventForm from "../bookEventForm/BookEventForm";
+import HoliDahanImg from "../../assets/calendarEvent/HoliDahan.png"
+import HoliFestivalImg from "../../assets/calendarEvent/HoliFestival.png"
+
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -621,6 +624,7 @@ export const eventsData2026 = [
     description: "Celebration of Holika Dahan",
     benefits: "Cultural",
     value: 2000,
+    image:HoliDahanImg
   },
   {
     month: "March",
@@ -629,6 +633,7 @@ export const eventsData2026 = [
     description: "Ash worship and Holi rituals",
     benefits: "Cultural, Spiritual",
     value: 2000,
+    image:HoliFestivalImg
   },
   {
     month: "March",

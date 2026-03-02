@@ -12,8 +12,10 @@ export const getDoctorsByClinicId = (clinicId) => {
   return AxiosInstance.get(`Doctors?ClinicFid=${clinicId}`);
 };
 
-export const getPatientDataByMobileNo = (contactNumber,ClinicId) => {
-  return AxiosInstance.get(`Patients?contactNumber=${contactNumber}&ClinicId=${ClinicId}`);
+export const getPatientDataByMobileNo = (contactNumber, ClinicId) => {
+  return AxiosInstance.get(
+    `Patients?contactNumber=${contactNumber}&ClinicId=${ClinicId}`,
+  );
 };
 
 export const getServicesByClinicId = (clinicId) => {
@@ -24,7 +26,11 @@ export const bookAppointment = (saveObj, userId) => {
   return AxiosInstance.post(`bookAppointment?userId=${userId}`, saveObj);
 };
 
-export const getDoctorAvailableSlots = (doctorId, appointmentDate,ClinicFid) => {
+export const getDoctorAvailableSlots = (
+  doctorId,
+  appointmentDate,
+  ClinicFid,
+) => {
   return AxiosInstance.get(
     `DoctorAvailableSlots?doctorId=${doctorId}&appointmentDate=${appointmentDate}&ClinicFid=${ClinicFid}`,
   );
@@ -41,4 +47,13 @@ export const getDoctorsProfile = (DoctorFid) => {
 
 export const AddPatient = (saveObj) => {
   return AxiosInstance.post(`AddPatient`, saveObj);
+};
+
+//https://ayurmitra.in/WellnessAPILive/InitiatePayment?ClinicId=5&userId=12
+
+export const InitiatePayment = (ClinicId, userId, postObj) => {
+  return AxiosInstance.post(
+    `InitiatePayment?ClinicId=${ClinicId}&userId=${userId}`,
+    postObj,
+  );
 };

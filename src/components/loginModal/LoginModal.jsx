@@ -63,7 +63,7 @@ const itemVariants = {
   },
 };
 
-export default function LoginModal({ open, handleClose }) {
+export default function LoginModal({ open, handleClose,setUserData }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
@@ -95,14 +95,13 @@ export default function LoginModal({ open, handleClose }) {
 
       const response = await userLogin(formData);
       const { data, status } = response;
-      console.log("loginResponse", data);
-
       if (status === 200 && data?.accessToken) {
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("expiresIn", data.expiresIn);
         localStorage.setItem("tokenSetTime", Date.now());
+        setUserData(JSON.stringify(data.user))
         successAlert(data.message || "Login successful");
         handleClose();
         reset();

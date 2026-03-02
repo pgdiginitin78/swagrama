@@ -384,7 +384,10 @@ const AboutUs = () => {
         </motion.div>
       </section>
 
-      <section ref={missionRef} className="relative px-4 md:px-12 py-12  bg-background">
+      <section
+        ref={missionRef}
+        className="relative px-4 md:px-12 py-12  bg-background"
+      >
         <div className="w-full mx-auto">
           <motion.div
             variants={staggerContainer}
@@ -496,7 +499,7 @@ const AboutUs = () => {
                   >
                     <span className="text-white font-medium">{item}</span>
                   </motion.div>
-                )
+                ),
               )}
             </motion.div>
           </motion.div>
@@ -587,7 +590,10 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section ref={healersRef} className="pb-5 px-4 md:px-12 xl:px-20 bg-white">
+      <section
+        ref={healersRef}
+        className="pb-5 px-4 md:px-12 xl:px-20 bg-white"
+      >
         <div className="w-full mx-auto">
           <motion.div
             variants={staggerContainer}
@@ -595,9 +601,16 @@ const AboutUs = () => {
             animate={isHealersInView ? "visible" : "hidden"}
             className="text-center mb-5 pt-5"
           >
+            <motion.span
+              variants={fadeInUp}
+              className="text-[#C65A3A] tracking-[0.2em] uppercase text-sm font-medium"
+            >
+              Our Founders &
+            </motion.span>
+
             <motion.h2
               variants={fadeInUp}
-              className="font-serif text-2xl md:text-3xl text-[#C65A3A] mt-2"
+              className="font-serif text-3xl md:text-4xl text-[#111827] mt-4 mb-6"
             >
               Pillars of SwaGrama
             </motion.h2>
@@ -685,7 +698,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-blue-50 to-purple-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
         <Container maxWidth="lg">
           <motion.div
             initial={{ opacity: 0, y: -30 }}
@@ -751,6 +764,20 @@ const AboutUs = () => {
                       />
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="absolute top-1 right-1 z-10"
+                      >
+                        <div
+                          className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
+                                         text-xs  px-2 py-1 text-ayuDark font-semibold
+                                         shadow-2xl"
+                        >
+                          {healer.qualification}
+                        </div>
+                      </motion.div>
 
                       <div className="relative w-full">
                         <motion.div
@@ -789,7 +816,7 @@ const AboutUs = () => {
                         className="text-gray-600 font-medium"
                         sx={{ fontSize: "0.9rem" }}
                       >
-                        {healer.qualification}
+                        {healer.specialty}
                       </Typography>
                       <motion.div
                         initial={{ width: 0 }}
@@ -809,7 +836,7 @@ const AboutUs = () => {
         </Container>
       </div>
 
-      <section className="relative w-full  bg-[#1E8E7A] overflow-hidden flex items-center justify-center px-4 sm:px-10 py-10">
+      <section className="relative w-full  bg-[#1e8e49] overflow-hidden flex items-center justify-center px-4 sm:px-10 py-10">
         <div className="absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full border blur-sm"></div>
         <div className="absolute -bottom-52 -left-52 w-[520px] h-[520px] rounded-full border  blur-sm"></div>
         <div className="w-full mx-auto">

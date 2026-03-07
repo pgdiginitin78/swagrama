@@ -31,6 +31,7 @@ import ConfirmationModal from "../common/ConfirmationModal";
 import { signupJYA } from "../../services/login/LoginServices";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { useLoader } from "../common/commonLoader/LoaderContext";
 const MotionBox = motion.create(Box);
 
 const modalVariants = {
@@ -166,7 +167,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
   const [ipAddress, setIpAddress] = useState(null);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
-
+  const { setIsLoading } = useLoader();
   const {
     control,
     handleSubmit,
@@ -220,21 +221,23 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
   const handleUserSignup = async () => {
     try {
       setOpenConfirmationModal(false);
-      // showLoader();
+      setIsLoading(true);
       const response = await signupJYA(formData);
       const apiData = response?.data;
       if (response.status === 200 && apiData) {
         successAlert(apiData);
         handleClose();
         reset();
+        setIsLoading(false);
       } else {
         errorAlert("Registration failed");
+        setIsLoading(false);
       }
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       errorAlert(errorMessage);
     } finally {
-      // hideLoader();
+      setIsLoading(false);
     }
   };
 

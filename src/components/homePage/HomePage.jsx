@@ -204,32 +204,6 @@ const services = [
   },
 ];
 
-const eventsArray = [
-  {
-    img: Empowering,
-    title: "Empowering Wellness",
-    text: "Begin your journey to holistic healing with personalized Ayurvedic treatments. Book your consultation and restore balance naturally.",
-    btn: "Book An Appointment",
-    icon: <Schedule />,
-    img: EmpoweringWellnessImg,
-  },
-  {
-    img: Connecting,
-    title: "Connecting Experts Across The Globe",
-    text: "Gain insights from top wellness and Ayurveda experts worldwide. Join hands with specialists and explore transformative healing solutions.",
-    btn: "Sign Up",
-    icon: <Person />,
-    img: ConnectingExpertImg,
-  },
-  {
-    img: null,
-    title: "Coming Soon",
-    text: "Stay tuned for exciting new events and workshops...",
-    btn: null,
-    icon: <Event />,
-  },
-];
-
 const staggerContainer = {
   hidden: { opacity: 0 },
   visible: {
@@ -334,7 +308,7 @@ export default function AyurvedaLanding({ userData }) {
       }))
       .filter((event) => event.startDate >= today)
       .sort((a, b) => a.startDate - b.startDate)
-      .slice(0, 2);
+      .slice(0, 4);
   };
 
   const upcommingEvent = useMemo(
@@ -344,9 +318,9 @@ export default function AyurvedaLanding({ userData }) {
 
   const eventsDataUpdated = useMemo(() => {
     if (upcommingEvent.length > 0) {
-      return [...eventsArray.slice(0, 2), ...upcommingEvent];
+      return [...upcommingEvent];
     }
-    return eventsArray;
+    return upcommingEvent;
   }, [upcommingEvent]);
 
   return (
@@ -400,8 +374,8 @@ export default function AyurvedaLanding({ userData }) {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7, duration: 0.8 }}
             >
-              Experience the transformative power of Ayurveda and natural
-              healing at Swagrama Wellness Center
+              Experience the transformative power of Ayurveda and Natural
+              Healing at Swagrama Wellness Center
             </motion.p>
           </motion.div>
 
@@ -448,7 +422,7 @@ export default function AyurvedaLanding({ userData }) {
             Our Healing Services
           </motion.h2>
           <p className="text-base sm:text-lg text-green-700 max-w-2xl mx-auto px-4">
-            Traditional Ayurvedic treatments for modern wellness
+            Traditional Ayurvedic Treatments For Modern Wellness
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 mt-8">
@@ -520,13 +494,13 @@ export default function AyurvedaLanding({ userData }) {
             {[
               {
                 img: SwagarmaMainImg,
-                title: "स्वग्राम Community Self-Dependence Village Intro",
+                title: "स्वग्राम Community Self-Dependent Village Intro",
                 text: "स्वग्राम Community is Ayurveda, Yoga, Nature, Agro, Tourism, Natural Lifestyle & Biodiversity hub. Ayurveda & Yoga Natural agriculture...",
                 action: () => setModal1(true),
               },
               {
                 img: StoryImg,
-                title: "स्वग्राम Community Self-Dependence Village Pillars",
+                title: "स्वग्राम Community Self-Dependent Village Pillars",
                 text: "स्वग्राम Community is status of a complete science of life with solid philosophy & research-backed methodology...",
                 action: () => setModal2(true),
               },
@@ -594,185 +568,121 @@ export default function AyurvedaLanding({ userData }) {
             />
           </motion.h2>
 
-          <div
-            className={
-              eventsDataUpdated?.length > 3
-                ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-4"
-                : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-4"
-            }
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-4">
             {eventsDataUpdated.map((event, i) => (
               <motion.div
                 key={i}
-                className={`bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden ${
-                  !event.img
-                    ? "flex items-center justify-center min-h-[300px] sm:min-h-[250px]"
-                    : ""
-                }`}
+                className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden h-full"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.5 }}
                 whileHover={{ y: -8 }}
               >
-                {event.img ? (
-                  <>
-                    <div className="relative">
-                      <motion.img
-                        src={event.img}
-                        className="h-36 w-full object-cover"
-                        alt={event.title}
-                        // whileHover={{ rotate: 360 }}
-                        transition={{ duration: 0.6 }}
-                      />
-                      {/* <div className="absolute -bottom-2 -right-2 bg-green-600 text-white p-2 rounded-full">
-                          {event.icon}
-                        </div> */}
-                    </div>
+                <div className="bg-white/80 backdrop-blur-sm rounded-t-2xl border flex flex-col h-full w-full">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      className="flex flex-col flex-1"
+                    >
+                      <div className="relative w-full h-[145px] bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 rounded-t-xl border border-lime-200 flex-shrink-0">
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.img
+                            src={event.image}
+                            className="h-36 w-full object-cover"
+                            alt={event.title}
+                            transition={{ duration: 0.6 }}
+                          />
+                        </div>
+                        <div className="absolute top-2 right-2 bg-gradient-to-r from-lime-600 flex justify-center items-center to-green-700 px-2 text-center rounded-full">
+                          <span className="text-[10px] font-bold text-white py-1">
+                            {event?.month}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col flex-1 px-2 pt-1 pb-3 gap-y-2">
+                        <div className="bg-white/90 backdrop-blur-sm py-0.5 rounded-full flex justify-end">
+                          <span className="text-[12px] font-bold text-lime-700">
+                            Date : {event.date}
+                          </span>
+                        </div>
 
-                    <div className="p-5 sm:p-6">
-                      <h5 className="font-semibold text-green-900 text-center mb-3 text-sm sm:text-base">
-                        {event.title}
-                      </h5>
-                      <p className="text-xs  text-gray-600 text-start leading-relaxed mb-5">
-                        {event.text}
-                      </p>
-                      {event.btn && (
-                        <div className="flex justify-center">
+                        <div className="flex items-start gap-1.5">
+                          <h3 className="text-[12px] md:text-xs font-bold text-stone-800 leading-tight flex-1">
+                            {event.serviceName}
+                          </h3>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <svg
+                            className="w-5 h-5 text-green-600 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <p className="text-stone-600 text-[12px] leading-snug">
+                            {event.description}
+                          </p>
+                        </div>
+
+                        <div className="flex items-start gap-1">
+                          <svg
+                            className="w-5 h-5 text-green-700 flex-shrink-0"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                          </svg>
+                          <p className="text-[12px] text-stone-600 leading-snug">
+                            <span className="font-bold">Benefits :&nbsp;</span>
+                            {event.benefits}
+                          </p>
+                        </div>
+
+                        <div className="flex justify-between items-center w-full mt-auto pt-2">
+                          <motion.button
+                            className="border border-lime-600 flex items-center space-x-2 text-lime-600 px-4 sm:px-5 py-1.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() =>
+                              navigate("/calendar", { state: event })
+                            }
+                          >
+                            <ReadMoreIcon /> <span>Events</span>
+                          </motion.button>
+
                           <motion.button
                             className="bg-gradient-to-r from-green-700 to-lime-600 text-white px-4 sm:px-5 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => {
-                              if (event.title === "Empowering Wellness") {
-                                setOpenAppointmentModal(true);
-                              }
+                              setOpenRegisterModal(true);
+                              setSelectedEvents(event);
                             }}
                           >
-                            {event.btn}
+                            Book Event
                           </motion.button>
                         </div>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <div className="bg-white/80 backdrop-blur-sm rounded-t-2xl  h-full w-full  overflow-y-auto">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        className="space-y-2"
-                      >
-                        <div className="relative w-full h-[145px] bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 rounded-t-xl  border border-lime-200">
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <motion.img
-                              src={event.image}
-                              className="h-36 w-full object-cover"
-                              alt={event.title}
-                              // whileHover={{ rotate: 360 }}
-                              transition={{ duration: 0.6 }}
-                            />
-                          </div>
-
-                          <div className="absolute top-2 right-2 bg-gradient-to-r from-lime-600 flex justify-center items-center to-green-700 px-2 text-center rounded-full">
-                            <span className="text-[10px] font-bold text-white py-1">
-                              {event?.month}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className=" bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full flex justify-end">
-                          <span className="text-[12px] font-bold text-lime-700">
-                            Date : {event.date}
-                          </span>
-                        </div>
-                        <div key={i} className="grid gap-y-2 px-2 w-full">
-                          <div className="flex items-start gap-1.5 mb-1.5">
-                            <div className="w-5 h-5 rounded-full bg-gradient-to-br from-lime-600 to-green-700 flex items-center justify-center flex-shrink-0">
-                              <span className="text-white text-[10px] font-bold">
-                                {i - 2 + 1}
-                              </span>
-                            </div>
-                            <h3 className="text-[12px] md:text-xs font-bold text-stone-800 leading-tight flex-1">
-                              {event.serviceName}
-                            </h3>
-                          </div>
-
-                          <div className="flex items-start gap-1 mb-1.5 ">
-                            <svg
-                              className="w-5 h-5 text-green-600  flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            <p className="text-stone-600 text-[12px] leading-snug">
-                              {event.description}
-                            </p>
-                          </div>
-                          <div className="flex items-start gap-1 mb-1.5 ">
-                            <svg
-                              className="w-5 h-5 text-green-700  flex-shrink-0"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            <p className="text-[12px] text-stone-600 leading-snug">
-                              <span className="font-bold">
-                                Benefits :&nbsp;
-                              </span>
-                              {event.benefits}
-                            </p>
-                          </div>
-
-                          <div className="flex justify-between items-center w-full">
-                            <div>
-                              <motion.button
-                                className="border border-lime-600 flex items-center space-x-2 text-lime-600 px-4 sm:px-5 py-1.5 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => {
-                                  navigate("/calendar", { state: event });
-                                }}
-                              >
-                                <ReadMoreIcon /> <span>Events</span>
-                              </motion.button>
-                            </div>
-                            <div
-                              onClick={() => {
-                                setOpenRegisterModal(true);
-                                setSelectedEvents(event);
-                              }}
-                            >
-                              <motion.button
-                                className="bg-gradient-to-r from-green-700 to-lime-600 text-white px-4 sm:px-5 py-2 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all text-xs sm:text-sm"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                              >
-                                Book Event
-                              </motion.button>
-                            </div>
-                          </div>
-                        </div>
-                      </motion.div>
-                    </AnimatePresence>
-                  </div>
-                )}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -1023,9 +933,11 @@ export default function AyurvedaLanding({ userData }) {
                         transition={{ delay: 0.2 }}
                         className="absolute top-1 right-1 z-10"
                       >
-                        <div className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
+                        <div
+                          className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
                         text-xs  px-2 py-1 text-ayuDark font-semibold
-                        shadow-2xl">
+                        shadow-2xl"
+                        >
                           {healer.qualification}
                         </div>
                       </motion.div>
@@ -1197,8 +1109,6 @@ export default function AyurvedaLanding({ userData }) {
                   Ultimately it Played in the Artistic way to Celebrate each &
                   every moment of life.
                 </Typography>
-
-                {/* ── Quote block ── */}
                 <Box
                   sx={{
                     borderLeft: "4px solid #15803d",

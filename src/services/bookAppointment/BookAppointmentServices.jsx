@@ -49,11 +49,15 @@ export const AddPatient = (saveObj) => {
   return AxiosInstance.post(`AddPatient`, saveObj);
 };
 
-//https://ayurmitra.in/WellnessAPILive/InitiatePayment?ClinicId=5&userId=12
-
 export const InitiatePayment = (ClinicId, userId, postObj) => {
   return AxiosInstance.post(
     `InitiatePayment?ClinicId=${ClinicId}&userId=${userId}`,
     postObj,
+  );
+};
+
+export const CheckPaymentStatus = (clinicId, clientTxnId) => {
+  return AxiosInstance.get(
+    `CheckPaymentStatus?clinicId=${clinicId}&clientTxnId=${clientTxnId}`,
   );
 };

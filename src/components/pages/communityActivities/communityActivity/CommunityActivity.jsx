@@ -141,7 +141,7 @@ const CommunityActivities = () => {
                   <SelfImprovementOutlined className="text-[#7cb518] text-lg sm:text-xl md:text-2xl mt-1 flex-shrink-0" />
                   <div>
                     <p className="font-semibold text-[#2d6a4f] mb-1 sm:mb-2 text-xs sm:text-sm md:text-base">
-                      स्वसुसंस्कृतिजीवनविधान Well Consecrate Life Style
+                      स्वसुसंस्कृतिजीवनविधान Well Consecrate Life Style&nbsp;
                     </p>
                     <p className="text-xs sm:text-sm md:text-base">
                       is a Pure & special Rituals of LIFESTYLE = On Date = The
@@ -154,7 +154,7 @@ const CommunityActivities = () => {
                       style then will get direct benefit from mother nature or
                       supernatural powers. It's a different fun to stay in
                       <span className="font-semibold text-[#2d6a4f]">
-                        स्वग्राम
+                        &nbsp;स्वग्राम&nbsp;
                       </span>
                       for all such festivals. The easiest way to achieve
                       spirituality. Each time there will be a special event.
@@ -209,8 +209,8 @@ const CommunityActivities = () => {
                     Details of visit :&nbsp;
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm md:text-base">
-                  Full Day session: 06.45 AM to 07.15 PM with two Meal +
+                <p className="text-xs sm:text-sm md:text-base font-semibold">
+                  Full Day session : 06.45 AM to 07.15 PM with two Meal +
                   Aromatic Green Tea / Energy Drink / Wholesome Offerings /
                   Wholesome Bites = Min 10 Persons.
                 </p>

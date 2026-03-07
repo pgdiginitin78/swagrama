@@ -61,6 +61,7 @@ import MainEmeticDetoxImg from "../../../assets/healingServices/detoxTherapy/प
 import MainLaxativeDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानविरेचनकर्म Main Laxative Detox.png";
 import MainEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानबस्तिकर्म Main Enema Detox.png";
 import MainNasalDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानशिरोविरेचननस्य Main Nasal Detox.png";
+import प्रधानविरेचनकर्मMainLaxativeDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानविरेचकर्मMainLaxativeDetox.png";
 
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -292,19 +293,7 @@ const detoxServicesData = [
     image:
       "https://www.freepik.com/search?format=search&query=holistic%20health%20therapy%20clinic%20wellness",
   },
-  //
-  {
-    filterName: "5 Main Detox Therapy",
-    serviceName: "प्रधानवमनकर्म Main Emetic Detox",
-    description:
-      "Therapeutic vomiting under physician supervision using ghee and medicine. (10-day program includes preparatory therapies: digestive medicines, internal oleation, 3 sessions of external oleation, steam fomentation; main therapy; post-therapy & extra hospital stay/meal charges)",
-    benefits:
-      "Eliminates excess Kapha, cleanses stomach, enhances digestion, strengthens metabolism, and prepares body for detoxification.",
-    price: "7 days - ₹13,000 Package",
-    icon: Droplets,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurveda%20detox%20therapy%20clinic",
-  },
+
   {
     filterName: "5 Main Detox Therapy",
     serviceName: "प्रधानविरेचकर्म Main Laxative Detox",
@@ -314,8 +303,7 @@ const detoxServicesData = [
       "Cleanses intestines, removes Pitta-related toxins, improves bowel function, balances digestive fire, and detoxifies the body.",
     price: "7 days - ₹13,000 Package",
     icon: Flame,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20digestive%20detox%20treatment",
+    image:प्रधानविरेचनकर्मMainLaxativeDetoxImg,
   },
   {
     filterName: "5 Main Detox Therapy",

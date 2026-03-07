@@ -2,9 +2,83 @@ import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 import BookEventForm from "../bookEventForm/BookEventForm";
-import HoliDahanImg from "../../assets/calendarEvent/HoliDahan.png"
-import HoliFestivalImg from "../../assets/calendarEvent/HoliFestival.png"
-
+import NewYearImg from "../../assets/calendarEvent/NewYear.png";
+import SwamiVivekAnnandImg from "../../assets/calendarEvent/स्वामी विवेकानंद जयंती & राष्ट्रीय युवा दिन.png";
+import LoahariImg from "../../assets/calendarEvent/Lohari.png";
+import MakarSankrantiImg from "../../assets/calendarEvent/MakarSankranti.png";
+import SarvastiJayanti from "../../assets/calendarEvent/saraswatiMaaPooja.jpg";
+import BalakPalakImg from "../../assets/calendarEvent/BalakPalak.png";
+import RepublicDayImg from "../../assets/calendarEvent/RepublicDay.png";
+import GandhiPunyatithiImg from "../../assets/calendarEvent/गांधी पुण्यतिथि.png";
+import GuruRavidasJayanti from "../../assets/calendarEvent/GuruRavidasJayanti.png";
+import CancerAwernessImg from "../../assets/calendarEvent/CancerDay.png";
+import MaharshiDayanandImg from "../../assets/calendarEvent/महर्षि दयानंद सरस्वती जयंती.png";
+import MahashivratriImg from "../../assets/calendarEvent/Mahashivaratri.png";
+import ShivajiMaharajJayanti from "../../assets/calendarEvent/Shivaji Maharaj Jayanti.png";
+import HoliDahanImg from "../../assets/calendarEvent/HoliDahan.png";
+import HoliFestivalImg from "../../assets/calendarEvent/HoliFestival.png";
+import InternationalWomensDay from "../../assets/calendarEvent/Colour Festival & International Women’s Day.png";
+import GudiPadwaImg from "../../assets/calendarEvent/GudiPadwa.png";
+import ChaitraGauriGangauriImg from "../../assets/calendarEvent/ChaitraGauriGangauri.png";
+import RamNavamiImg from "../../assets/calendarEvent/RamNavami.png";
+import BankingDetoxImg from "../../assets/calendarEvent/BankingDetox.png";
+import HanumanJayantiImg from "../../assets/calendarEvent/HanumanJayanti.png";
+import AmbedakarJayantiImg from "../../assets/calendarEvent/Solar New Year आंबेडकर जयंती बैसाखी.png";
+import ShankracharyaSurdasJayantiImg from "../../assets/calendarEvent/शंकराचार्य सूरदास जयंती.png";
+import EarthDayImg from "../../assets/calendarEvent/Earth Day.png";
+import SitaNavamiImg from "../../assets/calendarEvent/Sita Navami.png";
+import WorkersDayImg from "../../assets/calendarEvent/Buddha Purnima Workers Day.png";
+import WorldLaughterDayImg from "../../assets/calendarEvent/विश्व हास्य दिवस.png";
+import MothersDayImg from "../../assets/calendarEvent/Mothersday.png";
+import BakariEidImg from "../../assets/calendarEvent/बकरी ईद.png";
+import WorldNoTobaccoDayImg from "../../assets/calendarEvent/विश्व तंबाखू निषेध दिन.jpg";
+import WorldEnvironmentDayImg from "../../assets/calendarEvent/विश्व पर्यावरण दिन.png";
+import MaharanaPratapJayantiImg from "../../assets/calendarEvent/महाराणा प्रताप जयंती, इस्लामी नव वर्ष अल हिज्रा.png";
+import FathersDayImg from "../../assets/calendarEvent/पितृ दिन आंतरराष्ट्रीय योग दिन  मोठा दिवस.png";
+import MohramImg from "../../assets/calendarEvent/मुहर्रम.png";
+import VatPurnimaKabirDasJayantiImg from "../../assets/calendarEvent/वट पोर्णिमा, कबीरदास जयंती.png";
+import RathYatraImg from "../../assets/calendarEvent/जगन्नाथ रथयात्रा.png";
+import GuruPurnimaImg from "../../assets/calendarEvent/गुरु पोर्णिमा.png";
+import FridshipDayImg from "../../assets/calendarEvent/friendshipDay.png";
+import IndependenceDayImg from "../../assets/calendarEvent/Independence Day.png";
+import NagpanchamiImg from "../../assets/calendarEvent/नागपंचमी.png";
+import TulsidasJayanti from "../../assets/calendarEvent/तुलसीदास जयंती.png";
+import OnamImg from "../../assets/calendarEvent/ओणम , ईद ए मिलाद.png";
+import RakshaBandhanImg from "../../assets/calendarEvent/रक्षाबंधन.png";
+import LordKrishanaBirthdayImg from "../../assets/calendarEvent/LordKrishnaBirthCelebration.png";
+import GopalKalaDahiHandiImg from "../../assets/calendarEvent/Dahi Handi and Teacher's Day.png";
+import BailPolaImg from "../../assets/calendarEvent/BailPola.png";
+import HartalikaImg from "../../assets/calendarEvent/हरतालिका गौरी, मंगळा, मंगळा गौर, गणेश स्थापना, हिन्दी दिवस.png";
+import HrushiPanchamiImg from "../../assets/calendarEvent/ऋषि पंचमी.png";
+import RadhaAshtamiImg from "../../assets/calendarEvent/गौरी आवाहन, राधाष्टमी.png";
+import GouriPoojaImg from "../../assets/calendarEvent/जेष्ठ गौरी पूजा.png";
+import GouriVisarjanImg from "../../assets/calendarEvent/जेष्ठ गौरी विसर्जन.png";
+import SwagramGaneshVisarjanImg from "../../assets/calendarEvent/स्वग्राम गणेश विसर्जन.png";
+import AnantChaturthiImg from "../../assets/calendarEvent/अनंत चतुर्थी गणेश विसर्जन.png";
+import AncestorWeekImg from "../../assets/calendarEvent/AncestorWeek.png";
+import GandhiJayantiImg from "../../assets/calendarEvent/GandhiJayanti.png";
+import AncestorObservanceImg from "../../assets/calendarEvent/Ancestor observance.png";
+import NavratriCelebration from "../../assets/calendarEvent/Navratri celebration.png";
+import MaaSarasvatiPoojanImg from "../../assets/calendarEvent/SaraswatiPoojan.png";
+import DurgaAshtamiImg from "../../assets/calendarEvent/दुर्गाष्टमी.png";
+import LordRavanaDeathImg from "../../assets/calendarEvent/Lord Ravana.png";
+import MadhavacharyaJayantiImg from "../../assets/calendarEvent/मध्वाचार्य जयंती.png";
+import KojagiriPornimaImg from "../../assets/calendarEvent/Kojagiri Pornima.png";
+import ValmikiMirabaiJayntiImg from "../../assets/calendarEvent/वाल्मीकी मीराबाई जयंती.png";
+import KarvaChauthImg from "../../assets/calendarEvent/KarvaChauth.png";
+import SwagramaFortConstructionImg from "../../assets/calendarEvent/Swagrama Fort Construction.png";
+import VasuBarasImg from "../../assets/calendarEvent/VasuBaras.png";
+import DhantreyodashiImg from "../../assets/calendarEvent/Dhanotrayodashi.png";
+import LaxshamiPoojanImg from "../../assets/calendarEvent/LakshamiMaaPooja.png";
+import GovardhanPoojaImg from "../../assets/calendarEvent/Dipavali-Padwa-Govardhan-Puja.png";
+import BhaiDoojImg from "../../assets/calendarEvent/Bhaidooj.png";
+import NeharuJayantiImg from "../../assets/calendarEvent/Nehru Jayanti.png";
+import TulasiVivahImg from "../../assets/calendarEvent/Tulasi Vivah.png";
+import GuruNanakJayantiImg from "../../assets/calendarEvent/Guru Nanak Jayanti.png";
+import WorldAidsDayImg from "../../assets/calendarEvent/World AIDS Day.png";
+import VivahPanchamiImg from "../../assets/calendarEvent/विवाह पंचमी.png";
+import GeetaJayantiImg from "../../assets/calendarEvent/GeetaJayanti.png";
+import DattatreyaJayantiImg from "../../assets/calendarEvent/दत्तात्रय जयंती.png";
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -193,7 +267,14 @@ const EventCalendar = () => {
         setSelectedEvents(todayEvents);
       }
     }
-  }, [currentMonth,currentDay,selectedDate,currentMonthNum,currentYear,getEventsForDate]);
+  }, [
+    currentMonth,
+    currentDay,
+    selectedDate,
+    currentMonthNum,
+    currentYear,
+    getEventsForDate,
+  ]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-lime-50 to-green-50 p-2 sm:p-4 md:p-6 lg:px-16 lg:py-8">
@@ -202,7 +283,7 @@ const EventCalendar = () => {
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-green-300 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="w-full mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -343,7 +424,7 @@ const EventCalendar = () => {
                     exit={{ opacity: 0, y: -20 }}
                     className="space-y-2 mb-2"
                   >
-                    <div className="relative w-full h-24 sm:h-28 md:h-32 lg:h-40 bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 overflow-hidden border border-lime-200">
+                    <div className="relative w-full h-24 sm:h-28 md:h-32 lg:h-48 bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 overflow-hidden border border-lime-200">
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                         {selectedEvents?.[0]?.image ? (
                           <img
@@ -514,6 +595,7 @@ export const eventsData2026 = [
     description: "New Year celebrations",
     benefits: "Joy, wellness, community bonding",
     value: 2000,
+    image: NewYearImg,
   },
   {
     month: "January",
@@ -523,6 +605,7 @@ export const eventsData2026 = [
       "Celebrations of Swami Vivekananda Jayanti & National Youth Day",
     benefits: "Youth empowerment, cultural learning",
     value: 2000,
+    image: SwamiVivekAnnandImg,
   },
   {
     month: "January",
@@ -531,6 +614,7 @@ export const eventsData2026 = [
     description: "Lohri festival celebration",
     benefits: "Cultural awareness, community bonding",
     value: 2000,
+    image: LoahariImg,
   },
   {
     month: "January",
@@ -539,8 +623,8 @@ export const eventsData2026 = [
     description: "Harvest festival celebrations",
     benefits: "Cultural learning, seasonal wellness",
     value: 2000,
+    image: MakarSankrantiImg,
   },
-
   {
     month: "January",
     date: "23/01/2026",
@@ -548,6 +632,7 @@ export const eventsData2026 = [
     description: "Vasant Panchami & Saraswati Puja",
     benefits: "Education, cultural learning",
     value: 2000,
+    image: SarvastiJayanti,
   },
   {
     month: "January",
@@ -556,6 +641,7 @@ export const eventsData2026 = [
     description: "Family camp + Sun Bath festival",
     benefits: "Wellness, cultural awareness",
     value: 2000,
+    image: BalakPalakImg,
   },
   {
     month: "January",
@@ -564,6 +650,7 @@ export const eventsData2026 = [
     description: "National Republic Day celebrations",
     benefits: "Civic awareness, cultural pride",
     value: 2000,
+    image: RepublicDayImg,
   },
   {
     month: "January",
@@ -572,6 +659,7 @@ export const eventsData2026 = [
     description: "Mahatma Gandhi remembrance",
     benefits: "Cultural learning, reflection",
     value: 2000,
+    image: GandhiPunyatithiImg,
   },
   {
     month: "February",
@@ -580,8 +668,8 @@ export const eventsData2026 = [
     description: "Celebration of Guru Ravidas Jayanti",
     benefits: "Cultural, Spiritual",
     value: null,
+    image: GuruRavidasJayanti,
   },
-
   {
     month: "February",
     date: "04/02/2026",
@@ -589,8 +677,8 @@ export const eventsData2026 = [
     description: "Awareness and health-focused activities",
     benefits: "Educational, Wellness",
     value: 2000,
+    image: CancerAwernessImg,
   },
-
   {
     month: "February",
     date: "12/02/2026",
@@ -598,8 +686,8 @@ export const eventsData2026 = [
     description: "Commemoration of Maharshi Dayanand Saraswati",
     benefits: "Cultural",
     value: null,
+    image:MaharshiDayanandImg
   },
-
   {
     month: "February",
     date: "15/02/2026",
@@ -607,6 +695,7 @@ export const eventsData2026 = [
     description: "Spiritual celebration of Lord Shiva",
     benefits: "Spiritual",
     value: 2000,
+    image:MahashivratriImg
   },
   {
     month: "February",
@@ -615,8 +704,8 @@ export const eventsData2026 = [
     description: "Celebration of Shivaji Maharaj Jayanti",
     benefits: "Cultural",
     value: 2000,
+    image:ShivajiMaharajJayanti
   },
-
   {
     month: "March",
     date: "03/03/2026",
@@ -624,7 +713,7 @@ export const eventsData2026 = [
     description: "Celebration of Holika Dahan",
     benefits: "Cultural",
     value: 2000,
-    image:HoliDahanImg
+    image: HoliDahanImg,
   },
   {
     month: "March",
@@ -633,7 +722,7 @@ export const eventsData2026 = [
     description: "Ash worship and Holi rituals",
     benefits: "Cultural, Spiritual",
     value: 2000,
-    image:HoliFestivalImg
+    image: HoliFestivalImg,
   },
   {
     month: "March",
@@ -642,8 +731,8 @@ export const eventsData2026 = [
     description: "Traditional healing commune & Shivaji Jayanti ",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image: ShivajiMaharajJayanti,
   },
-
   {
     month: "March",
     date: "08/03/2026",
@@ -651,6 +740,7 @@ export const eventsData2026 = [
     description: "Healing commune with festivals and awareness.",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image:InternationalWomensDay
   },
   {
     month: "March",
@@ -659,6 +749,7 @@ export const eventsData2026 = [
     description: "New Year celebrations with traditional rituals",
     benefits: "Cultural, Wellness",
     value: 2000,
+    image:GudiPadwaImg
   },
   {
     month: "March",
@@ -667,6 +758,7 @@ export const eventsData2026 = [
     description: "Traditional festival celebration",
     benefits: "Cultural",
     value: 2000,
+    image:ChaitraGauriGangauriImg
   },
   {
     month: "March",
@@ -675,6 +767,7 @@ export const eventsData2026 = [
     description: "Celebration of Ram Navami",
     benefits: "Cultural, Spiritual",
     value: 2000,
+    image:RamNavamiImg
   },
   {
     month: "April",
@@ -683,6 +776,7 @@ export const eventsData2026 = [
     description: "Financial year start with wellness",
     benefits: "Wellness, Educational",
     value: 2000,
+    image:BankingDetoxImg
   },
   {
     month: "April",
@@ -691,6 +785,7 @@ export const eventsData2026 = [
     description: "Hanuman Jayanti celebrations",
     benefits: "Cultural, Spiritual",
     value: 2000,
+    image:HanumanJayantiImg
   },
   {
     month: "April",
@@ -699,8 +794,8 @@ export const eventsData2026 = [
     description: "Celebration of Solar New Year and Ambedkar Jayanti ",
     benefits: "Cultural, Educational",
     value: null,
+    image:AmbedakarJayantiImg
   },
-
   {
     month: "April",
     date: "21/04/2026",
@@ -708,6 +803,7 @@ export const eventsData2026 = [
     description: "Commemoration of Shankaracharya and Surdas Jayanti.",
     benefits: "Cultural, Spiritual",
     value: null,
+    image:ShankracharyaSurdasJayantiImg
   },
   {
     month: "April",
@@ -716,6 +812,7 @@ export const eventsData2026 = [
     description: "Celebration and awareness of Earth Day",
     benefits: "Educational, Wellness",
     value: 2000,
+    image:EarthDayImg
   },
   {
     month: "April",
@@ -724,6 +821,7 @@ export const eventsData2026 = [
     description: "Celebration of Sita Navami",
     benefits: "Cultural, Spiritual",
     value: 2000,
+    image:SitaNavamiImg
   },
   {
     month: "May",
@@ -733,8 +831,8 @@ export const eventsData2026 = [
       "Observance of Buddha Poornima and International Workers' Day ",
     benefits: "Cultural, Educational",
     value: 2000,
+    image:WorkersDayImg
   },
-
   {
     month: "May",
     date: "03/05/2026",
@@ -742,6 +840,7 @@ export const eventsData2026 = [
     description: "Healing commune combined with International Humor Day.",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image:WorldLaughterDayImg
   },
   {
     month: "May",
@@ -751,6 +850,7 @@ export const eventsData2026 = [
       "Physician wellness program and life knowledge sessions on Ayurveda with Mother's Day celebration.",
     benefits: "Wellness, Educational",
     value: 2000,
+    image:MothersDayImg
   },
   {
     month: "May",
@@ -759,6 +859,7 @@ export const eventsData2026 = [
     description: "Celebration of Bakri Eid",
     benefits: "Cultural",
     value: null,
+    image:BakariEidImg
   },
   {
     month: "May",
@@ -767,6 +868,7 @@ export const eventsData2026 = [
     description: "World No Tobacco Day observance.",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image:WorldNoTobaccoDayImg
   },
   {
     month: "June",
@@ -775,8 +877,8 @@ export const eventsData2026 = [
     description: "Healing commune and World Environment Day",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image:WorldEnvironmentDayImg
   },
-
   {
     month: "June",
     date: "17/06/2026",
@@ -784,8 +886,8 @@ export const eventsData2026 = [
     description: "Commemorative celebrations.",
     benefits: "Cultural",
     value: null,
+    image:MaharanaPratapJayantiImg
   },
-
   {
     month: "June",
     date: "21/06/2026",
@@ -793,6 +895,7 @@ export const eventsData2026 = [
     description: "Observance of ancestors and International Yoga Day ",
     benefits: "Wellness, Cultural",
     value: 2000,
+    image:FathersDayImg
   },
   {
     month: "June",
@@ -801,6 +904,7 @@ export const eventsData2026 = [
     description: "Religious observance",
     benefits: "Cultural",
     value: null,
+    image:MohramImg
   },
   {
     month: "June",
@@ -809,8 +913,8 @@ export const eventsData2026 = [
     description: "Religious and cultural celebration ",
     benefits: "Cultural",
     value: null,
+    image:VatPurnimaKabirDasJayantiImg
   },
-
   {
     month: "July",
     date: "16/07/2026",
@@ -818,6 +922,7 @@ export const eventsData2026 = [
     description: "Rath Yatra festival",
     benefits: "Cultural",
     value: null,
+    image:RathYatraImg
   },
   {
     month: "July",
@@ -826,6 +931,7 @@ export const eventsData2026 = [
     description: "Guru Purnima observance",
     benefits: "Cultural, Spiritual",
     value: null,
+    image:GuruPurnimaImg
   },
   {
     month: "August",
@@ -834,6 +940,7 @@ export const eventsData2026 = [
     description: "Friendship/Compassion Day",
     benefits: "Cultural, Wellness",
     value: null,
+    image:FridshipDayImg
   },
   {
     month: "August",
@@ -842,6 +949,7 @@ export const eventsData2026 = [
     description: "National celebration",
     benefits: "Cultural",
     value: null,
+    image:IndependenceDayImg
   },
   {
     month: "August",
@@ -850,6 +958,7 @@ export const eventsData2026 = [
     description: "Religious festival",
     benefits: "Cultural",
     value: null,
+    image:NagpanchamiImg
   },
   {
     month: "August",
@@ -858,6 +967,7 @@ export const eventsData2026 = [
     description: "Birth anniversary celebration",
     benefits: "Cultural",
     value: null,
+    image:TulsidasJayanti
   },
   {
     month: "August",
@@ -866,6 +976,7 @@ export const eventsData2026 = [
     description: "Religious and cultural celebration",
     benefits: "Cultural",
     value: null,
+    image:OnamImg
   },
   {
     month: "August",
@@ -874,6 +985,7 @@ export const eventsData2026 = [
     description: "Sibling bonding festival",
     benefits: "Cultural",
     value: null,
+    image:RakshaBandhanImg
   },
   {
     month: "September",
@@ -882,6 +994,7 @@ export const eventsData2026 = [
     description: "Birth of Lord Krishna celebration",
     benefits: "Cultural",
     value: null,
+    image:LordKrishanaBirthdayImg
   },
   {
     month: "September",
@@ -890,6 +1003,7 @@ export const eventsData2026 = [
     description: "Dahi Handi and Teacher's Day",
     benefits: "Cultural, Educational",
     value: 2000,
+    image:GopalKalaDahiHandiImg
   },
   {
     month: "September",
@@ -898,6 +1012,7 @@ export const eventsData2026 = [
     description: "Traditional bull festival",
     benefits: "Cultural",
     value: 2000,
+    image:BailPolaImg
   },
   {
     month: "September",
@@ -906,6 +1021,7 @@ export const eventsData2026 = [
     description: "Religious and national celebrations",
     benefits: "Cultural",
     value: 2000,
+    image: HartalikaImg
   },
   {
     month: "September",
@@ -914,6 +1030,7 @@ export const eventsData2026 = [
     description: "Observances of Rishi Panchami and Engineers' Day",
     benefits: "Cultural, Educational",
     value: 2000,
+    image:HrushiPanchamiImg
   },
   {
     month: "September",
@@ -922,6 +1039,7 @@ export const eventsData2026 = [
     description: "Religious festival",
     benefits: "Cultural",
     value: 2000,
+    image:RadhaAshtamiImg
   },
   {
     month: "September",
@@ -930,6 +1048,7 @@ export const eventsData2026 = [
     description: "Religious festival",
     benefits: "Cultural",
     value: 2000,
+    image:GouriPoojaImg
   },
   {
     month: "September",
@@ -938,6 +1057,7 @@ export const eventsData2026 = [
     description: "Festival conclusion",
     benefits: "Cultural",
     value: 2000,
+    image:GouriVisarjanImg
   },
   {
     month: "September",
@@ -946,6 +1066,7 @@ export const eventsData2026 = [
     description: "Ganesh Visarjan",
     benefits: "Cultural",
     value: null,
+    image:SwagramGaneshVisarjanImg
   },
   {
     month: "September",
@@ -954,6 +1075,7 @@ export const eventsData2026 = [
     description: "Ganesh festival",
     benefits: "Cultural",
     value: null,
+    image:AnantChaturthiImg
   },
   {
     month: "September",
@@ -962,6 +1084,7 @@ export const eventsData2026 = [
     description: "Ancestor observance",
     benefits: "Cultural",
     value: null,
+    image:AncestorWeekImg
   },
   {
     month: "October",
@@ -970,6 +1093,7 @@ export const eventsData2026 = [
     description: "National celebration",
     benefits: "Cultural",
     value: null,
+    image:GandhiJayantiImg
   },
   {
     month: "October",
@@ -978,6 +1102,7 @@ export const eventsData2026 = [
     description: "Ancestor observance",
     benefits: "Cultural",
     value: null,
+    image:AncestorObservanceImg
   },
   {
     month: "October",
@@ -987,6 +1112,7 @@ export const eventsData2026 = [
     description: "Navratri festival start",
     benefits: "Cultural, Spiritual",
     value: 2000,
+    image:NavratriCelebration
   },
   {
     month: "October",
@@ -995,6 +1121,7 @@ export const eventsData2026 = [
     description: "Worship of Goddess Saraswati",
     benefits: "Cultural, Educational",
     value: null,
+    image:MaaSarasvatiPoojanImg
   },
   {
     month: "October",
@@ -1003,6 +1130,7 @@ export const eventsData2026 = [
     description: "Navratri festival celebration",
     benefits: "Cultural",
     value: 2000,
+    image:DurgaAshtamiImg
   },
   {
     month: "October",
@@ -1011,6 +1139,7 @@ export const eventsData2026 = [
     description: "Festival and scholar observance",
     benefits: "Cultural, Educational",
     value: 2000,
+    image:LordRavanaDeathImg
   },
   {
     month: "October",
@@ -1019,6 +1148,7 @@ export const eventsData2026 = [
     description: "Scholar observance",
     benefits: "Educational",
     value: 2000,
+    image:MadhavacharyaJayantiImg
   },
   {
     month: "October",
@@ -1027,6 +1157,7 @@ export const eventsData2026 = [
     description: "Full moon observance",
     benefits: "Cultural",
     value: 2000,
+    image:KojagiriPornimaImg
   },
   {
     month: "October",
@@ -1035,6 +1166,7 @@ export const eventsData2026 = [
     description: "Saints' birth anniversaries",
     benefits: "Cultural, Spiritual",
     value: null,
+    image:ValmikiMirabaiJayntiImg
   },
   {
     month: "October",
@@ -1043,6 +1175,7 @@ export const eventsData2026 = [
     description: "Couple fasting and rituals",
     benefits: "Cultural, Wellness",
     value: null,
+    image:KarvaChauthImg
   },
   {
     month: "November",
@@ -1051,6 +1184,7 @@ export const eventsData2026 = [
     description: "Traditional fort construction activity at Swagrama",
     benefits: "Cultural engagement, teamwork, historical learning ",
     value: 2000,
+    image:SwagramaFortConstructionImg
   },
   {
     month: "November",
@@ -1059,6 +1193,7 @@ export const eventsData2026 = [
     description: "Ritual celebrating cow and calf; auspicious ceremonies ",
     benefits: "Strengthens connection with cows, cultural learning",
     value: 2000,
+    image:VasuBarasImg
   },
   {
     month: "November",
@@ -1067,6 +1202,7 @@ export const eventsData2026 = [
     description: "Observance of Dhanteras / festival rituals",
     benefits: "Spiritual benefits, prosperity rituals",
     value: 2000,
+    image:DhantreyodashiImg
   },
   {
     month: "November",
@@ -1075,6 +1211,7 @@ export const eventsData2026 = [
     description: "Diwali – Lakshmi Puja and rituals ",
     benefits: "Spiritual cleansing, prosperity, wellness ",
     value: 2000,
+    image:LaxshamiPoojanImg
   },
 
   {
@@ -1084,6 +1221,7 @@ export const eventsData2026 = [
     description: "Diwali festival rituals and Govardhan celebration ",
     benefits: "Spiritual benefits, prosperity",
     value: 2000,
+    image:GovardhanPoojaImg
   },
   {
     month: "November",
@@ -1092,6 +1230,7 @@ export const eventsData2026 = [
     description: "Festival of brothers and sisters",
     benefits: "Family bonding, cultural tradition",
     value: 2000,
+    image:BhaiDoojImg
   },
 
   {
@@ -1101,6 +1240,7 @@ export const eventsData2026 = [
     description: "Children's Day & Nehru Jayanti celebrations",
     benefits: "Educational, fun, cultural awareness",
     value: 2000,
+    image:NeharuJayantiImg
   },
   {
     month: "November",
@@ -1109,6 +1249,7 @@ export const eventsData2026 = [
     description: "Holy ceremonial marriage of Tulasi plant ",
     benefits: "Spiritual merit, cultural immersion",
     value: 2000,
+    image:TulasiVivahImg
   },
   {
     month: "November",
@@ -1117,6 +1258,7 @@ export const eventsData2026 = [
     description: "Celebration of Guru Nanak's birth anniversary ",
     benefits: "Spiritual inspiration, cultural enrichment ",
     value: 2000,
+    image:GuruNanakJayantiImg
   },
 
   {
@@ -1126,6 +1268,7 @@ export const eventsData2026 = [
     description: "Health & spiritual observances ",
     benefits: "Awareness, wellness, spiritual merit",
     value: 2000,
+    image:WorldAidsDayImg
   },
 
   {
@@ -1135,6 +1278,7 @@ export const eventsData2026 = [
     description: "Wedding-related ceremony ",
     benefits: "Spiritual & cultural benefit ",
     value: 2000,
+    image:VivahPanchamiImg
   },
 
   {
@@ -1144,6 +1288,7 @@ export const eventsData2026 = [
     description: "Health & spiritual observances ",
     benefits: "Awareness, wellness, spiritual merit ",
     value: 2000,
+    image:GeetaJayantiImg
   },
 
   {
@@ -1153,5 +1298,6 @@ export const eventsData2026 = [
     description: "Celebration of Dattatreya Jayanti ",
     benefits: "Spiritual growth, cultural learning ",
     value: 2000,
+    image:DattatreyaJayantiImg
   },
 ];

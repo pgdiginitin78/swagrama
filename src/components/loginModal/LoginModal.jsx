@@ -69,7 +69,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   
-  const { showLoader, hideLoader } = useLoader();
+   const { setIsLoading } = useLoader();
 
   const {
     control,
@@ -90,7 +90,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
 
   const handleUserLogin = async () => {
     try {
-      showLoader();
+      setIsLoading(true);
       setOpenConfirmationModal(false);
 
       const response = await userLogin(formData);
@@ -105,6 +105,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
         successAlert(data.message || "Login successful");
         handleClose();
         reset();
+        setIsLoading(false);
       } else {
         throw new Error(data?.message || "Invalid login credentials");
       }
@@ -112,8 +113,9 @@ export default function LoginModal({ open, handleClose,setUserData }) {
       errorAlert(
         error?.response?.data?.message || "Invalid username or password",
       );
+      setIsLoading(false);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 

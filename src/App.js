@@ -7,6 +7,7 @@ import Navbar from "./components/navbar/Navbar";
 import AboutUs from "./components/pages/aboutUs/AboutUs";
 import { API } from "./http-common";
 import ScrollToTopButton from "./ScrollToTopButton";
+import TermsAndConditon from "./components/pages/terms&conditon/TermsAndConditon";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -112,6 +113,7 @@ export default function App() {
       }
     };
   }, []);
+  
   return (
     <>
       <Navbar userData={userData} setUserData={setUserData} />
@@ -129,6 +131,8 @@ export default function App() {
             <Route path="/eShop" element={<EShop userData={userData} />} />
             <Route path="/calendar" element={<EventCalander userData={userData}/>} />
             <Route path="/aboutUs" element={<AboutUs />} />
+            <Route path="/termsAndConditions" element={<TermsAndConditon />} />
+
        
           </Routes>
         </Suspense>

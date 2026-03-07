@@ -28,6 +28,7 @@ import ConfirmationModal from "../../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
+import { useNavigate } from "react-router-dom";
 
 const style = {
   position: "absolute",
@@ -37,6 +38,7 @@ const style = {
   bgcolor: "background.paper",
   boxShadow: 24,
   outline: "none",
+  zIndex: 100,
 };
 
 const containerVariants = {
@@ -165,9 +167,9 @@ export default function BookAppointment({ open, handleClose }) {
   const selectedPatientValue = watch("patientFid");
   const selectedServiceValue = watch("serviceFid");
 
-
   const userData = localStorage.getItem("user");
-  const { showLoader, hideLoader } = useLoader();
+  const { setIsLoading } = useLoader();
+
 
   const handleReset = () => {
     reset();
@@ -204,54 +206,50 @@ export default function BookAppointment({ open, handleClose }) {
     setOpenConfirmationModal(true);
   };
 
-  const handleUserSignup = async () => {
-    try {
-      setOpenConfirmationModal(false);
-      showLoader();
-      const response = await bookAppointment(
-        finalSaveObj,
-        selectedPatientValue?.userId || selectedPatientValue?.userId,
-      );
-      const apiData = response?.data;
-      if (response.data.status === 200 && apiData) {
-        successAlert(apiData.message);
-        handleClose();
-        reset();
-      } else {
-        errorAlert("Booking failed!");
-      }
-    } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message;
-      errorAlert(errorMessage);
-    } finally {
-      hideLoader();
-    }
-  };
   console.log("selectedServiceValue", selectedServiceValue);
 
-const initiatePayment = async () => {
-  try {
-    let tempObj = {
-      amount: selectedServiceValue?.charges || 0,
-    };
+  const initiatePayment = async () => {
+    try {
+      const userId = JSON.parse(userData)?.userId;
 
-    const res = await InitiatePayment(
-      clinicFidValue?.id,
-      JSON.parse(userData)?.userId,
-      tempObj
-    );
+      const tempObj = {
+        amount: selectedServiceValue?.charges || 0,
+        SloteEndTime: selectedTimeSlot?.slotEndTime,
+        SloteStartTime: selectedTimeSlot?.slotStartTime,
+        appointmentDate: format(new Date(appointmentDate), "yyyy-MM-dd"),
+        userId: userId,
+      };
+      setIsLoading(true);
+      const res = await InitiatePayment(clinicFidValue?.id, userId, tempObj);
+      const data = res.data;
 
-    const data = res.data;
-
-    console.log("paymentStatus", data);
-
-    if (data.status === 200) {
-      RedirectToSabPaisa(data);
+      if (data?.status === 200) {
+        RedirectToSabPaisa(
+          data,
+          clinicFidValue?.id,
+          data.clientTxnId,
+          async () => {
+            const res = await bookAppointment(finalSaveObj, userId);
+            console.log("bookAppointemntResponse", res);
+            if (res.data.status === 200) {
+              successAlert(res.data.message);
+              setOpenConfirmationModal(false);
+              handleClose();
+              reset();
+              setIsLoading(false);
+            }
+          },
+          () => {
+            errorAlert("Payment failed or cancelled. Please try again.");
+            setOpenConfirmationModal(false);
+            setIsLoading(false);
+          },
+        );
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log(error);
-  }
-};
+  };
 
   useEffect(() => {
     getLocationList()

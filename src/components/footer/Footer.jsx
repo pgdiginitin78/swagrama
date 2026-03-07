@@ -111,7 +111,7 @@ const Footer = () => {
                   { label: "About Us", href: "/aboutUs" },
                   { label: "Refund Policy", href: "/" },
                   { label: "Privacy Policy", href: "/" },
-                  { label: "Terms & Conditions", href: "/" },
+                  { label: "Terms & Conditions", href: "/termsAndConditions" },
                   {
                     label: "गाईत्वग्राम Cow Village",
                     href: "https://gaitvafarms.com/dashboard",

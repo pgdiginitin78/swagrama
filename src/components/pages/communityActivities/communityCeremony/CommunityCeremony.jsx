@@ -483,7 +483,7 @@ const EventCard = ({
         whileHover={{ y: -8, scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <div className="relative h-44 overflow-hidden">
+        <div className="relative h-44 2xl:h-60 overflow-hidden">
           <motion.img
             src={event.image}
             alt={event.serviceName}

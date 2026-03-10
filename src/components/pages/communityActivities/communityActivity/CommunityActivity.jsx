@@ -74,9 +74,12 @@ const CommunityActivities = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f8f7f3] to-[#e8e8e0]" style={{
-      backgroundImage: `radial-gradient(circle at 25% 25%, rgba(124, 181, 24, 0.08) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(45, 106, 79, 0.08) 0%, transparent 50%)`
-    }}>
+    <div
+      className="min-h-screen bg-gradient-to-b from-[#f8f7f3] to-[#e8e8e0]"
+      style={{
+        backgroundImage: `radial-gradient(circle at 25% 25%, rgba(124, 181, 24, 0.08) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(45, 106, 79, 0.08) 0%, transparent 50%)`,
+      }}
+    >
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -116,21 +119,37 @@ const CommunityActivities = () => {
                 <GroupsOutlined className="text-[#f8f7f3] text-xl sm:text-2xl md:text-3xl" />
               </div>
               <h2 className="font-playfair text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-[#2d2a26]">
-                स्वमहभावउत्सव Community Ceremony :
+                स्वमहाभाव उत्सव Community Ceremony :
               </h2>
             </div>
 
             <div className="flex flex-col gap-3 sm:gap-4 md:gap-5 text-[#2d2a26]/90 leading-relaxed">
               <p className="text-xs sm:text-sm md:text-base">
                 <span className="font-semibold text-[#2d6a4f]">
-                  celebrating festivals scientifically, healthfully, and
-                  naturally.
+                  भारतीय, ऋतुजन्य आणि पारंपरिक सणांचे&nbsp;
+                  <strong>
+                    वैज्ञानिक, आरोग्यदायी आणि नैसर्गिक पद्धतीने उत्सवमय साजरे
+                    करणारे विशेष सामुदायिक आयोजन.
+                  </strong>
                 </span>
-                Full Day with meal: Once in year ceremony Date wise: 10 Guests
-                (ज्यावेळी इतर पूर्वनियोजित कार्यक्रम म्हणजे उत्सव, conference,
-                etc. असेल त्यादिवशी या दिवशीचे बुकिंग बंद ठेवणे.) Visitors /
-                Guests for 46 Days / Year = full Day celebration of Indian or
-                Seasonal or Traditional festivals, Rituals.
+                या उत्सवात सहभागी होणाऱ्या अतिथींना&nbsp;
+                <strong>पूर्ण दिवसाचा अनुभव व भोजनाची व्यवस्था</strong> उपलब्ध
+                असते. वर्षातून निवडक दिवशी आयोजित होणाऱ्या या कार्यक्रमात&nbsp;
+                प्रत्येक वेळी <strong>१० अतिथींचा मर्यादित सहभाग</strong> ठेवला
+                जातो, जेणेकरून प्रत्येकाला शांत, अर्थपूर्ण आणि समृद्ध अनुभव मिळू
+                शकेल.
+              </p>
+              <p>
+                संपूर्ण वर्षात <strong>एकूण ४६ दिवस</strong> भारतीय सण,
+                ऋतुचक्राशी संबंधित परंपरा, विधी आणि सांस्कृतिक उपक्रमांचा&nbsp;
+                <strong>पूर्ण दिवसाचा उत्सव</strong>
+                &nbsp;म्हणून साजरा केला जातो.
+              </p>
+              <p>
+                पूर्वनियोजित कार्यक्रम जसे की&nbsp;
+                <strong>उत्सव, परिषद (conference) किंवा इतर विशेष आयोजन</strong>
+                &nbsp;असलेल्या दिवशी या समारंभासाठी स्वतंत्र बुकिंग उपलब्ध
+                राहणार नाही.
               </p>
 
               <motion.div
@@ -144,20 +163,32 @@ const CommunityActivities = () => {
                       स्वसुसंस्कृतिजीवनविधान Well Consecrate Life Style&nbsp;
                     </p>
                     <p className="text-xs sm:text-sm md:text-base">
-                      is a Pure & special Rituals of LIFESTYLE = On Date = The
-                      scientific method of celebrating festivals throughout the
-                      year with natural way to make it complementary for health.
-                      Every native or especially Indian festivals have been
-                      established according to the season. Every festival is
-                      full of energy and health. If every festival is done in a
-                      pure form, free of poison & adulteration with natural
-                      style then will get direct benefit from mother nature or
-                      supernatural powers. It's a different fun to stay in
-                      <span className="font-semibold text-[#2d6a4f]">
-                        &nbsp;स्वग्राम&nbsp;
-                      </span>
-                      for all such festivals. The easiest way to achieve
-                      spirituality. Each time there will be a special event.
+                      स्वसुसंस्कृतिजीवनविधान is a
+                      <strong>
+                        natural and scientific way of celebrating life through
+                        traditional rituals and festivals
+                      </strong>
+                      . Rooted in seasonal wisdom, Indian festivals are designed
+                      to&nbsp;
+                      <strong>
+                        enhance health, energy, and spiritual balance
+                      </strong>
+                      .<br />
+                      At <strong>स्वग्राम</strong>, these celebrations are
+                      observed in their&nbsp;
+                      <strong>                        
+                        pure, natural form, free from toxins and artificiality
+                      </strong>
+                      , allowing individuals to experience the&nbsp;
+                      <strong>
+                        true harmony of nature, culture, and spirituality
+                      </strong>
+                      . Each occasion becomes a&nbsp;
+                      <strong>
+                        meaningful community experience that nurtures well-being
+                        and inner connection
+                      </strong>
+                      .
                     </p>
                   </div>
                 </div>
@@ -186,7 +217,7 @@ const CommunityActivities = () => {
                 </span>
                 /&nbsp;
                 <span className="font-semibold text-[#7cb518]">
-                  सात्म्यग्रास  Wholesome Bites&nbsp;
+                  सात्म्यग्रास Wholesome Bites&nbsp;
                 </span>
                 &&nbsp;
                 <span className="font-semibold text-[#7cb518]">
@@ -387,7 +418,10 @@ const CommunityActivities = () => {
             </div>
           </motion.section>
 
-          <motion.section variants={itemVariants} className="flex flex-col gap-4 sm:gap-6">
+          <motion.section
+            variants={itemVariants}
+            className="flex flex-col gap-4 sm:gap-6"
+          >
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div className="bg-gradient-to-br from-[#2d6a4f] to-[#7cb518] p-2 sm:p-3 rounded-lg sm:rounded-xl shadow-md flex-shrink-0">
                 <CalendarTodayOutlined className="text-[#f8f7f3] text-xl sm:text-2xl md:text-3xl" />
@@ -482,9 +516,7 @@ const CommunityActivities = () => {
               className="bg-[#f8f7f3]/80 backdrop-blur-md border border-[#7cb518]/30 p-2.5 sm:p-3 md:p-4 rounded-lg sm:rounded-xl"
             >
               <p className="text-xs sm:text-sm md:text-base text-center text-[#2d2a26]/80">
-                <span className="font-semibold text-[#2d6a4f]">
-                  Note:
-                </span>
+                <span className="font-semibold text-[#2d6a4f]">Note:</span>
                 Bookings available every day throughout the year. For group
                 bookings, ask for customized packages to get more benefits &
                 discount.

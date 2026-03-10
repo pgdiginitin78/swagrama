@@ -1,5 +1,4 @@
 import {
-  Cancel,
   Event,
   Healing,
   LocalFlorist,
@@ -7,12 +6,21 @@ import {
   MedicalServices,
   Nature,
   Person,
-  Schedule,
   Spa,
   WbSunny,
 } from "@mui/icons-material";
 import ReadMoreIcon from "@mui/icons-material/ReadMore";
-import { Avatar, Card, Container } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Card,
+  Chip,
+  Container,
+  Divider,
+  IconButton,
+  Modal,
+  Typography,
+} from "@mui/material";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -29,33 +37,22 @@ import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawa
 import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
 import SwagarmaMainImg from "../assets/landing-page/swagramaMain.png";
-import Connecting from "../assets/landing-page/topStories/Connecting.svg";
-import Empowering from "../assets/landing-page/topStories/Empowering.svg";
 import StoryImg from "../assets/landing-page/topStories/Self-Dependence Village.png";
+import CancelButtonModal from "../common/button/CancelButtonModal";
 import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
 import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
-import EmpoweringWellnessImg from "../assets/landing-page/empoweringWellness.png";
-import ConnectingExpertImg from "../assets/landing-page/ConnectingExpert.jpg";
-import CancelIcon from "@mui/icons-material/Cancel";
-import StarIcon from "@mui/icons-material/Star";
-import {
-  Box,
-  Divider,
-  Grid,
-  IconButton,
-  Modal,
-  Paper,
-  Typography,
-} from "@mui/material";
-
-const features = [
-  "Certified Therapists",
-  "In-depth Consultations",
-  "24/7 Assistance",
-  "Customized Solutions",
-];
+import SchoolIcon from "@mui/icons-material/School";
+import AgricultureIcon from "@mui/icons-material/Agriculture";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import ParkIcon from "@mui/icons-material/Park";
+import ScienceIcon from "@mui/icons-material/Science";
+import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SpaIcon from "@mui/icons-material/Spa";
+import CloseIcon from "@mui/icons-material/Close";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 const modalBoxStyle = {
   position: "absolute",
@@ -1026,7 +1023,7 @@ export default function AyurvedaLanding({ userData }) {
                   justifyContent: "space-between",
                 }}
               >
-                <Box>
+                <div className="flex items-center gap-2 ">
                   <Typography
                     variant="h6"
                     fontWeight="bold"
@@ -1035,40 +1032,11 @@ export default function AyurvedaLanding({ userData }) {
                       fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
                     }}
                   >
-                    स्वग्राम Community
+                    स्वग्राम Community Self-Dependent Village Intro
                   </Typography>
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "rgba(255,255,255,0.88)",
-                      mt: 0.5,
-                      display: "block",
-                    }}
-                  >
-                    Natural Lifestyle & Self-Dependent Village
-                  </Typography>
-                </Box>
-
-                <IconButton
-                  onClick={() => setModal1(false)}
-                  size="small"
-                  sx={{
-                    bgcolor: "error.main",
-                    color: "white",
-                    width: { xs: 36, sm: 32 },
-                    height: { xs: 36, sm: 32 },
-                    "&:hover": {
-                      bgcolor: "error.dark",
-                      transform: "rotate(90deg)",
-                    },
-                    transition: "all 0.2s ease",
-                  }}
-                >
-                  <CancelIcon fontSize="small" />
-                </IconButton>
+                  <CancelButtonModal onClick={() => setModal1(false)} />
+                </div>
               </Box>
-
-              {/* ── Body ── */}
               <Box
                 sx={{
                   px: { xs: 2, sm: 3, md: 4 },
@@ -1088,15 +1056,11 @@ export default function AyurvedaLanding({ userData }) {
                     lineHeight: 1.75,
                   }}
                 >
-                  "स्वग्राम Community is Ayurveda, Yoga, Nature, Agro, Tourism,
-                  Natural Lifestyle & Biodiversity hub." Ayurveda, Yoga &
-                  Natural Agriculture is the first Natural Lifestyle practically
-                  applied knowledge in the world to live 100 years includes
-                  natural medical system to diseased one along with
-                  environmental balance. Working continuously with changes for
-                  more than 5000 years ago. It is a knowledge of life contains
-                  applied Science & Technology which is regularly used in daily
-                  work-Activity.
+                  <strong>Swagram Community</strong> is a hub dedicated to&nbsp;
+                  <strong>
+                    Ayurveda, Yoga, Nature, Agro-tourism, Natural Living, and
+                    Biodiversity.
+                  </strong>
                 </Typography>
 
                 <Typography
@@ -1106,8 +1070,12 @@ export default function AyurvedaLanding({ userData }) {
                     lineHeight: 1.75,
                   }}
                 >
-                  Ultimately it Played in the Artistic way to Celebrate each &
-                  every moment of life.
+                  Rooted in ancient wisdom, Ayurveda, Yoga, and Natural
+                  Agriculture together represent one of the world’s earliest and
+                  most holistic approaches to a natural lifestyle. This
+                  integrated knowledge system promotes healthy living,
+                  environmental balance, and the potential for a long and
+                  fulfilling life.
                 </Typography>
                 <Box
                   sx={{
@@ -1122,12 +1090,12 @@ export default function AyurvedaLanding({ userData }) {
                     color: "text.primary",
                   }}
                 >
-                  "Ayurveda, Yoga & Natural Agriculture is an Evolution of ज्ञान
-                  Knowledge, शास्त्र Science, तंत्रT echnology, कर्म
-                  Activity-Work, क्रीडा Play, कला Art, उत्सव Ceremony. Evolution
-                  of 7 Steps or ways of Life means सप्तपदी 7 Steps. All natives
-                  have such 7 steps to complete way of Life. It's a systematic
-                  working methodology called as सुविनिमयBarterSystem."
+                  Developed and refined over more than{" "}
+                  <strong>5,000 years</strong>, it combines traditional wisdom
+                  with applied science and practical techniques that can be
+                  integrated into everyday life. It also includes natural
+                  healing practices that support well-being while maintaining
+                  harmony with nature.
                 </Box>
 
                 <Typography
@@ -1137,273 +1105,448 @@ export default function AyurvedaLanding({ userData }) {
                     lineHeight: 1.75,
                   }}
                 >
-                  This is a pure trading system stand on strong pillar of
-                  वर्षिष्ठकृषिसंस्कृतिUppermostAgriCulture means Natural
-                  Agriculture is not a business or job. It's purely inequality
-                  less huge diversity of living organism strongly stand on
-                  equality, brotherhood & independence. Barter System depends on
-                  12बलुतेदारDisciplinary which is nothing but a द्रव्यGoods,
-                  यंत्रInstruments & सेवाService Providers. All these come
-                  together to build complete & Self-dependent Commune called
-                  स्वग्रामCommunity_Self-Dependent Village. Simply It's a
-                  journey of life creates पर्यटनTourism of
-                  नैसर्गविधानNaturalLifestyle.
+                  Swagram seeks to preserve and promote this timeless knowledge
+                  by making it accessible, practical, and relevant for modern
+                  living.
                 </Typography>
-
-                <Typography
-                  variant="body2"
-                  sx={{
-                    fontSize: { xs: "0.85rem", sm: "0.95rem" },
-                    lineHeight: 1.75,
-                  }}
-                >
-                  "Our शरीरमनात्मBodyMindSoul is naturally evolved with natural
-                  habituate. Our Natural Lifestyle means grow & eat food in
-                  natural style. Stay, activity & work in natural places with
-                  natural style. Treat ourselves with natural ways. Always
-                  behave naturally."
-                </Typography>
-
-                <Divider sx={{ mt: 1 }} />
-
-                {/* ── Feature cards ── */}
-                <Grid container spacing={2} sx={{ pt: 1 }}>
-                  {features.map((label, i) => (
-                    <Grid item xs={12} sm={6} key={i}>
-                      <Paper
-                        elevation={1}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 1.5,
-                          px: 2,
-                          py: 1.5,
-                          borderRadius: 3,
-                          fontSize: { xs: "0.85rem", sm: "0.95rem" },
-                          transition: "transform 0.2s, box-shadow 0.2s",
-                          "&:hover": {
-                            transform: "scale(1.04)",
-                            boxShadow: 4,
-                          },
-                        }}
-                      >
-                        <StarIcon sx={{ color: "#eab308", fontSize: 20 }} />
-                        <Typography variant="body2" fontWeight={500}>
-                          {label}
-                        </Typography>
-                      </Paper>
-                    </Grid>
-                  ))}
-                </Grid>
               </Box>
             </Box>
           </Modal>
         </AnimatePresence>
       )}
 
-      <AnimatePresence>
-        {modal2 && (
-          <motion.div
-            className="
-        fixed inset-0 z-50 flex items-center justify-center
-        px-3 sm:px-4
-        bg-black/60 backdrop-blur-sm
-      "
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setModal2(false)}
+      {modal2 && (
+        <AnimatePresence>
+          <Modal
+            open={modal2}
+            slotProps={{
+              backdrop: {
+                sx: {
+                  backgroundColor: "rgba(0,0,0,0.6)",
+                  backdropFilter: "blur(4px)",
+                },
+              },
+            }}
           >
-            <motion.div
-              className="
-          bg-white rounded-2xl w-full
-          max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl
-          max-h-[92dvh] sm:max-h-[90vh]
-          overflow-y-auto shadow-2xl
-        "
-              initial={{ scale: 0.8, opacity: 0, y: 50 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.8, opacity: 0, y: 50 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div
-                className="
-          bg-gradient-to-r from-green-700 to-lime-600
-          px-4 sm:px-6 py-4 sm:py-5
-          text-white relative sticky top-0 z-10
-        "
+            <Box sx={modalBoxStyle}>
+              <Box
+                sx={{
+                  background: "linear-gradient(to right, #15803d, #65a30d)",
+                  px: { xs: 2 },
+                  py: { xs: 2 },
+                  position: "sticky",
+                  top: 0,
+                  zIndex: 10,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  justifyContent: "space-between",
+                }}
               >
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold">
-                  स्वग्राम Community
-                </h2>
-                <p className="text-xs sm:text-sm opacity-90 mt-1">
-                  Natural Lifestyle & Self-Dependent Pillars
-                </p>
-                <motion.button
-                  onClick={() => setModal2(false)}
-                  className="
-              absolute right-3 top-3 sm:right-4 sm:top-4
-              bg-red-500 text-white
-              w-9 h-9 sm:w-8 sm:h-8
-              flex items-center justify-center
-              rounded-full hover:bg-red-600 transition-all
-            "
-                  whileHover={{ scale: 1.1, rotate: 90 }}
-                  whileTap={{ scale: 0.9 }}
-                >
-                  <Cancel fontSize="small" />
-                </motion.button>
-              </div>
-
-              <div
-                className="
-          p-4 sm:p-6 md:p-8
-          space-y-5
-          leading-relaxed
-          text-gray-700
-          text-sm sm:text-base
-        "
+                <div className="flex items-center gap-2 ">
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    color="white"
+                    sx={{
+                      fontSize: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+                    }}
+                  >
+                    स्वग्राम — Community Self-Dependent Village Pillars
+                  </Typography>
+                  <CancelButtonModal onClick={() => setModal2(false)} />
+                </div>
+              </Box>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 40 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 40 }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
               >
-                <section>
-                  <p className="font-medium text-green-900">
-                    स्वग्राम Community is status of a complete science of life.
-                    It has strong philosophical foundations, unquestionable
-                    scientific veracity, everlasting practical methodology and
-                    eternally vibrant innovativeness for modifications into
-                    allied health care systems. All these proven track record of
-                    success through the ages.
-                  </p>
-                  <p className="mt-3">
-                    Destination of स्वग्राम Community is to prevent – to care –
-                    to cure. To maintain well being of whole society includes
-                    biodiversity.
-                  </p>
-                </section>
-
-                <section
-                  className="
-            border-l-4 border-green-700
-            bg-lime-50 p-4
-            font-semibold rounded-xl
-            text-sm sm:text-base
-          "
-                >
-                  स्वगुरुकुल Commune_InnocenceOfLife: "स्वस्थस्य स्वास्थ्य
-                  रक्षणम्" Protect, preserve, enhance strengthen & improve
-                  health of healthy one with सुसंस्कृतिजीवनविधान Well Consecrate
-                  Life Style
-                </section>
-
-                <section>
-                  <ul className="list-disc space-y-2 ml-4 text-sm sm:text-base">
-                    <li>
-                      is वर्षिष्ठकृषिसंस्कृति Uppermost AgriCulture + सुविनिमय
-                      Barter System + नैसर्गविधान Natural LifeStyle.
-                    </li>
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:gap-1">
-                      <li className="">
-                        <span className="font-semibold whitespace-nowrap">
-                          स्वआतुरालय Hospital IPD :
-                        </span>
-                      </li>
-                      <span>
-                        Treat, Cure, Care diseases through आयुर्वेद Ayurveda +
-                        योग Yoga + नैसर्ग Nature + कृषि Agro + पर्यटन Tourism +
-                        जैवविविधता Biodiversity. As required, Allopathy &
-                        Homoeopathy considered.
-                      </span>
-                    </div>
-                  </ul>
-                </section>
-
-                <section className="text-sm sm:text-base">
-                  <ul
-                    className="
-              grid gap-3 mt-2
-              list-disc ml-4
-              grid-cols-1 sm:grid-cols-2
-            "
+                <div className="overflow-y-auto flex-1 px-3 sm:px-5 py-4 flex flex-col gap-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.05 }}
+                    className="bg-gradient-to-r from-green-50 to-lime-50 border border-green-200 rounded-xl px-4 py-3"
                   >
-                    {[
-                      "It is our privilege and duty to safeguard, nurture and propagate this unique scientific tradition and put into the maximum use for the benefit of the entire world.",
-                      "Current global resurgence of interest in traditional healthcare has brought Ayurveda, Yoga, Natural Agriculture & Tourism into limelight.",
-                      "To compete globally, Government of India established the AYUSH Ministry and cluster-based approaches to enhance micro and small enterprises.",
-                      "Cluster approach enables collaboration while competing, building sustainability and social capital for collective initiatives.",
-                      "SwaGrama is developing protocols for such clusters, industries and enterprises.",
-                      "India is labelled as 'HERBAL, SPICE & LOCAL VARIETY FOOD GARDEN OF THE WORLD'. It is one of the top biodiversity hotspots with unique medicinal heritage.",
-                      "Indian applied lifestyle philosophy is the future of world health. Ayurveda, Yoga and Agriculture together offer unmatched research and leadership.",
-                      "Sanskrit is a scientific code language. Each sutra itself is a scientific statement.",
-                    ].map((text, i) => (
-                      <motion.li
-                        key={i}
-                        className="border p-3 bg-white shadow rounded-lg"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.05 }}
-                      >
-                        {text}
-                      </motion.li>
-                    ))}
-                  </ul>
-                </section>
-
-                <section
-                  className="
-            border-l-4 border-green-700 rounded-xl
-            bg-gradient-to-r from-lime-50 to-green-50
-            p-4 font-semibold text-green-900
-            text-sm sm:text-base
-          "
-                >
-                  "योगेन चित्तस्य पदेन वाचां, मलं शरीरस्य च वैद्यकेन। योऽपाकरोत्
-                  तं प्रवरं मुनीनां, पतंजलि प्रांजलिरानतोऽस्मि।।"
-                  <p className="mt-2 font-normal">
-                    Yoga – Mind Purification · Sanskrit – Speech Purification ·
-                    Ayurveda – Body Purification.
-                  </p>
-                </section>
-
-                <section>
-                  <h3 className="text-base sm:text-lg font-semibold text-green-900 mb-4">
-                    Objectives & Scope
-                  </h3>
-                  <ul
-                    className="
-              grid gap-3 mt-2
-              list-disc ml-4
-              text-sm sm:text-base
-              grid-cols-1 sm:grid-cols-2
-            "
-                  >
-                    {[
-                      /* unchanged list */
-                    ].map((text, i) => (
-                      <motion.li
-                        key={i}
-                        className="border p-3 bg-white shadow rounded-lg"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.03 }}
-                      >
-                        {text}
-                      </motion.li>
-                    ))}
-                    <motion.li
-                      className="border p-3 bg-white shadow rounded-lg col-span-1 sm:col-span-2"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.5 }}
+                    <Typography
+                      variant="body2"
+                      className="!text-green-900 !text-xs sm:!text-sm !leading-relaxed"
                     >
-                      Insurance, finance, real estate and legal services for
-                      communities.
-                    </motion.li>
-                  </ul>
-                </section>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                      <span className="font-bold">Swagram Community</span>{" "}
+                      represents an integrated{" "}
+                      <span className="font-bold">science of life</span>,
+                      combining traditional wisdom with practical systems to
+                      create a sustainable and self-reliant village ecosystem.
+                      Its vision is to{" "}
+                      <span className="font-bold">prevent</span>,{" "}
+                      <span className="font-bold">care</span>, and{" "}
+                      <span className="font-bold">cure</span>, while preserving
+                      biodiversity and ensuring the well-being of society.
+                    </Typography>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      delay: 0.1,
+                      ease: "easeOut",
+                    }}
+                    className="rounded-xl border border-emerald-200 bg-emerald-50 overflow-hidden"
+                  >
+                    <div className="flex flex-row">
+                      <div className="bg-gradient-to-b from-emerald-600 to-green-500 flex flex-col items-center justify-center gap-2 px-3 py-4 min-w-[56px] sm:min-w-[68px]">
+                        <SchoolIcon className="!text-white !text-xl sm:!text-2xl" />
+                        <span className="text-white font-black text-[10px] sm:text-xs tracking-widest opacity-80 font-mono">
+                          01
+                        </span>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <Typography
+                            variant="subtitle2"
+                            className="!text-green-900 !font-bold !text-xs sm:!text-sm !leading-tight"
+                          >
+                            Swagurukul Commune
+                          </Typography>
+                          <Chip
+                            label="Holistic Living & Knowledge"
+                            size="small"
+                            className="!text-[10px] sm:!text-xs !h-5 !font-medium !bg-emerald-100 !text-emerald-800 !border-0"
+                          />
+                        </div>
+                        <div className="mb-2 bg-white/70 border border-emerald-200 rounded-lg px-3 py-2">
+                          <Typography
+                            variant="caption"
+                            className="!text-emerald-800 !font-semibold !italic !block !text-xs sm:!text-sm"
+                          >
+                            "स्वस्थस्य स्वास्थ्य रक्षणम् — रक्षणम्"
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            className="!text-emerald-700 !text-[10px] sm:!text-xs !mt-0.5 !block"
+                          >
+                            Protecting and strengthening the health of the
+                            healthy.
+                          </Typography>
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed"
+                        >
+                          This pillar promotes a well-consecrated lifestyle{" "}
+                          <span className="font-semibold">
+                            (सुसंस्कृतिजीवनविधान)
+                          </span>{" "}
+                          through traditional knowledge, ethical living, and
+                          natural lifestyle practices that nurture balanced and
+                          conscious communities.
+                        </Typography>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      delay: 0.17,
+                      ease: "easeOut",
+                    }}
+                    className="rounded-xl border border-lime-200 bg-lime-50 overflow-hidden"
+                  >
+                    <div className="flex flex-row">
+                      <div className="bg-gradient-to-b from-lime-600 to-green-500 flex flex-col items-center justify-center gap-2 px-3 py-4 min-w-[56px] sm:min-w-[68px]">
+                        <AgricultureIcon className="!text-white !text-xl sm:!text-2xl" />
+                        <span className="text-white font-black text-[10px] sm:text-xs tracking-widest opacity-80 font-mono">
+                          02
+                        </span>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <Typography
+                            variant="subtitle2"
+                            className="!text-green-900 !font-bold !text-xs sm:!text-sm !leading-tight"
+                          >
+                            Natural Agriculture & Local Economy
+                          </Typography>
+                          <Chip
+                            label="Biodiversity & Self-Reliance"
+                            size="small"
+                            className="!text-[10px] sm:!text-xs !h-5 !font-medium !bg-lime-100 !text-lime-800 !border-0"
+                          />
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed"
+                        >
+                          Swagram promotes natural farming and
+                          biodiversity-based agriculture as the foundation of
+                          self-reliance. This includes indigenous crops, herbal
+                          cultivation, and community exchange systems such as
+                          barter{" "}
+                          <span className="font-semibold">(सुविनिमय)</span> to
+                          support local livelihoods and sustainable food
+                          systems.
+                        </Typography>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      delay: 0.24,
+                      ease: "easeOut",
+                    }}
+                    className="rounded-xl border border-teal-200 bg-teal-50 overflow-hidden"
+                  >
+                    <div className="flex flex-row">
+                      <div className="bg-gradient-to-b from-teal-600 to-emerald-500 flex flex-col items-center justify-center gap-2 px-3 py-4 min-w-[56px] sm:min-w-[68px]">
+                        <LocalHospitalIcon className="!text-white !text-xl sm:!text-2xl" />
+                        <span className="text-white font-black text-[10px] sm:text-xs tracking-widest opacity-80 font-mono">
+                          03
+                        </span>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <Typography
+                            variant="subtitle2"
+                            className="!text-green-900 !font-bold !text-xs sm:!text-sm !leading-tight"
+                          >
+                            Integrated Natural Healthcare
+                          </Typography>
+                          <Chip
+                            label="Swa Aturalaya System"
+                            size="small"
+                            className="!text-[10px] sm:!text-xs !h-5 !font-medium !bg-teal-100 !text-teal-800 !border-0"
+                          />
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed mb-2"
+                        >
+                          The Swa Aturalaya healthcare system focuses on
+                          preventive and holistic healing through:
+                        </Typography>
+                        <div className="flex flex-col gap-1 mb-2 pl-1">
+                          {["Ayurveda", "Yoga", "Nature-based therapies"].map(
+                            (item) => (
+                              <div
+                                key={item}
+                                className="flex items-center gap-2"
+                              >
+                                <FiberManualRecordIcon className="!text-teal-600 !text-[8px]" />
+                                <Typography
+                                  variant="body2"
+                                  className="!text-green-800 !text-xs sm:!text-sm !font-medium"
+                                >
+                                  {item}
+                                </Typography>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed"
+                        >
+                          When required, Allopathy and Homoeopathy are also
+                          integrated for comprehensive care.
+                        </Typography>
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {[
+                            "Ayurveda",
+                            "Yoga",
+                            "Nature Therapy",
+                            "Allopathy",
+                            "Homoeopathy",
+                          ].map((tag) => (
+                            <Chip
+                              key={tag}
+                              label={tag}
+                              size="small"
+                              className="!text-[10px] !h-5 !font-medium !bg-teal-100 !text-teal-800 !border-0"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      delay: 0.31,
+                      ease: "easeOut",
+                    }}
+                    className="rounded-xl border border-green-200 bg-green-50 overflow-hidden"
+                  >
+                    <div className="flex flex-row">
+                      <div className="bg-gradient-to-b from-green-700 to-teal-500 flex flex-col items-center justify-center gap-2 px-3 py-4 min-w-[56px] sm:min-w-[68px]">
+                        <ParkIcon className="!text-white !text-xl sm:!text-2xl" />
+                        <span className="text-white font-black text-[10px] sm:text-xs tracking-widest opacity-80 font-mono">
+                          04
+                        </span>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <Typography
+                            variant="subtitle2"
+                            className="!text-green-900 !font-bold !text-xs sm:!text-sm !leading-tight"
+                          >
+                            Biodiversity & Environmental Balance
+                          </Typography>
+                          <Chip
+                            label="Ecosystem & Heritage Protection"
+                            size="small"
+                            className="!text-[10px] sm:!text-xs !h-5 !font-medium !bg-green-100 !text-green-800 !border-0"
+                          />
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed"
+                        >
+                          Swagram works to protect medicinal plants, local
+                          crops, and natural ecosystems, supporting India's rich
+                          biodiversity and promoting sustainable agro-tourism
+                          and herbal heritage.
+                        </Typography>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{
+                      duration: 0.38,
+                      delay: 0.38,
+                      ease: "easeOut",
+                    }}
+                    className="rounded-xl border border-lime-200 bg-lime-50 overflow-hidden"
+                  >
+                    <div className="flex flex-row">
+                      <div className="bg-gradient-to-b from-lime-700 to-emerald-500 flex flex-col items-center justify-center gap-2 px-3 py-4 min-w-[56px] sm:min-w-[68px]">
+                        <ScienceIcon className="!text-white !text-xl sm:!text-2xl" />
+                        <span className="text-white font-black text-[10px] sm:text-xs tracking-widest opacity-80 font-mono">
+                          05
+                        </span>
+                      </div>
+                      <div className="flex-1 px-3 sm:px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                          <Typography
+                            variant="subtitle2"
+                            className="!text-green-900 !font-bold !text-xs sm:!text-sm !leading-tight"
+                          >
+                            Research, Innovation & Community Development
+                          </Typography>
+                          <Chip
+                            label="Knowledge Exchange & Enterprise"
+                            size="small"
+                            className="!text-[10px] sm:!text-xs !h-5 !font-medium !bg-lime-100 !text-lime-800 !border-0"
+                          />
+                        </div>
+                        <Typography
+                          variant="body2"
+                          className="!text-green-800 !text-xs sm:!text-sm !leading-relaxed"
+                        >
+                          Swagram encourages research, knowledge exchange, and
+                          community-based enterprise to strengthen traditional
+                          systems like Ayurveda, Yoga, and Natural Agriculture
+                          for global health and sustainability.
+                        </Typography>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.5 }}
+                    className="bg-gradient-to-r from-green-800 to-lime-700 rounded-xl px-4 py-4"
+                  >
+                    <Typography
+                      variant="overline"
+                      className="!text-white/80 !font-bold !text-[10px] sm:!text-xs !tracking-widest !block !text-center !mb-3"
+                    >
+                      Foundational Philosophy
+                    </Typography>
+
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-3">
+                      {[
+                        {
+                          icon: (
+                            <SelfImprovementIcon className="!text-white !text-xl sm:!text-2xl" />
+                          ),
+                          label: "Yoga",
+                          desc: "Purifies the mind",
+                        },
+                        {
+                          icon: (
+                            <MenuBookIcon className="!text-white !text-xl sm:!text-2xl" />
+                          ),
+                          label: "Sanskrit",
+                          desc: "Refines knowledge and expression",
+                        },
+                        {
+                          icon: (
+                            <SpaIcon className="!text-white !text-xl sm:!text-2xl" />
+                          ),
+                          label: "Ayurveda",
+                          desc: "Heals and balances the body",
+                        },
+                      ].map((item, i) => (
+                        <motion.div
+                          key={item.label}
+                          initial={{ opacity: 0, scale: 0.88 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            duration: 0.3,
+                            delay: 0.6 + i * 0.07,
+                          }}
+                          className="bg-white/15 border border-white/20 rounded-lg px-2 py-3 flex flex-col items-center gap-1 text-center"
+                        >
+                          {item.icon}
+                          <Typography
+                            variant="caption"
+                            className="!text-white !font-bold !text-[11px] sm:!text-xs !leading-tight"
+                          >
+                            {item.label}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            className="!text-green-100 !text-[9px] sm:!text-[10px] !leading-snug"
+                          >
+                            {item.desc}
+                          </Typography>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    <Divider className="!border-white/20 !mb-3" />
+
+                    <Typography
+                      variant="caption"
+                      className="!text-green-100 !text-[10px] sm:!text-xs !text-center !block !italic !leading-relaxed"
+                    >
+                      Together, they guide a natural, balanced, and sustainable
+                      way of life.
+                    </Typography>
+                  </motion.div>
+                </div>
+              </motion.div>
+            </Box>
+          </Modal>
+        </AnimatePresence>
+      )}
 
       {openEventRegisterModal && (
         <BookEventForm

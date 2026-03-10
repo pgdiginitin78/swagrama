@@ -11,7 +11,7 @@ function CancelButtonModal({ onClick }) {
       whileTap={{ scale: 0.9 }}
       transition={{ duration: 0.2 }}
       className="absolute top-4 right-4 lg:top-3 lg:right-3 z-50
-      w-9 h-9 rounded-full 
+      w-8 h-8 rounded-full 
       bg-gray-100 hover:bg-red-50
       border border-gray-200 hover:border-red-200
       flex items-center justify-center

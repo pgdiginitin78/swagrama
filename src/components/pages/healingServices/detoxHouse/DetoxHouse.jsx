@@ -61,7 +61,33 @@ import MainEmeticDetoxImg from "../../../assets/healingServices/detoxTherapy/प
 import MainLaxativeDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानविरेचनकर्म Main Laxative Detox.png";
 import MainEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानबस्तिकर्म Main Enema Detox.png";
 import MainNasalDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानशिरोविरेचननस्य Main Nasal Detox.png";
+import MainBloodlettingImg from "../../../assets/healingServices/detoxTherapy/SystemicBloodlettingTherapy.png";
+import MainLaxativeDetox5MinImg from "../../../assets/healingServices/detoxTherapy/प्रधानशिरोविरेचननस्य Main Nasal Detox 5min.png";
+import SystemicBloodletting5MinImg from "../../../assets/healingServices/detoxTherapy/प्रधानरक्तमोक्षण Systemic Bloodletting 5min.png";
 import प्रधानविरेचनकर्मMainLaxativeDetoxImg from "../../../assets/healingServices/detoxTherapy/प्रधानविरेचकर्मMainLaxativeDetox.png";
+import  FemaleGenitalEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/स्त्रीउत्तरबस्ति - Female Genital Enema Detox.jpg"
+import सद्यअनुलोमनInstantPurging from "../../../assets/healingServices/detoxTherapy/सद्यअनुलोमन - InstantPurging.png"
+import InstantWealthEnemaImg from "../../../assets/healingServices/detoxTherapy/Instant Wealth Enema.png"
+import InstantHoneyOilEnemaImg from "../../../assets/healingServices/detoxTherapy/Instant Honey Oil Enema.png"
+import FemaleGenitalCareImg from "../../../assets/healingServices/detoxTherapy/Female Genital Cleansing.png" 
+import SatiatingImg from "../../../assets/healingServices/detoxTherapy/तर्पण Satiating.png"
+import WashGentleCleansingImg from "../../../assets/healingServices/detoxTherapy/Wash Gentle cleansing.png"
+import UnguentImg from "../../../assets/healingServices/detoxTherapy/अभ्यङ्ग Unguent.png"
+import ConductionMassageImg from "../../../assets/healingServices/detoxTherapy/संवाहन Conduction Massage.png"
+import MardanMassageImg from  "../../../assets/healingServices/detoxTherapy/मर्दन Massage.png"
+import DeepTissueFootMassageImg  from "../../../assets/healingServices/detoxTherapy/Deep Tissue Foot Massage.png" 
+import उद्वर्तनPowderMassage from "../../../assets/healingServices/detoxTherapy/उद्वर्तन Powder Massage.png"
+import उत्सादनOilPowderMassageImg from "../../../assets/healingServices/detoxTherapy/उत्सादन Oil Powder Massage.png"
+import ऊन्मर्दनFragranceMassageImg from "../../../assets/healingServices/detoxTherapy/ऊन्मर्दन Fragrance Massage.png"
+import DryBrushingImg from "../../../assets/healingServices/detoxTherapy/Dry Brushing.jpg"
+import TubeSteamFomentation from "../../../assets/healingServices/detoxTherapy/Tube Steam Fomentation.png"
+import HerbalBolusFomentation from "../../../assets/healingServices/detoxTherapy/Herbal Bolus Fomentation.png"
+import पिझिच्चिलPouringTherapy from "../../../assets/healingServices/detoxTherapy/पिझिच्चिल Pouring Therapy.png"
+import परिषेकस्वेदनContinuousPouring from "../../../assets/healingServices/detoxTherapy/परिषेकस्वेदन Continuous Pouring.png"
+import BathingSweaterTherapy from "../../../assets/healingServices/detoxTherapy/अवगाहस्वेदक Bathing Sweater Therapy.png"
+import WetClothFomentation from "../../../assets/healingServices/detoxTherapy/उपनाहस्वेद Wet Cloth Fomentation.png"
+import धाराOilStreamTherapy from "../../../assets/healingServices/detoxTherapy/धारा Oil Stream Therapy.png"
+import पिचुOilCottonApplication from "../../../assets/healingServices/detoxTherapy/पिचु Oil Cotton Application.png"
 
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -126,8 +152,6 @@ const detoxServicesData = [
     icon: ShowerHead,
     image: BathingSweaterTherapyImg,
   },
-  //
-
   {
     filterName: "Dry Hot Hut Fire Fomentation Room",
     serviceName: "जेलवाकुट्टिवेद Dry Hot Hut Fire Fomentation",
@@ -142,7 +166,6 @@ const detoxServicesData = [
     icon: Wind,
     image: HerbalVaporInhalationImg,
   },
-  //
   {
     filterName: "Massage & Anointing",
     serviceName: "सर्वगात्रअभ्यङ्ग Full Body Unguent",
@@ -236,7 +259,6 @@ const detoxServicesData = [
     icon: Sparkles,
     image: SingleOrganAnointingImg,
   },
-  //
   {
     filterName: "Steam & Incensing Therapy",
     serviceName: "प्रधानवमनकर्म Main Emetic Detox",
@@ -290,10 +312,8 @@ const detoxServicesData = [
       "Detoxifies blood, improves circulation, balances Doshas, reduces inflammation, and promotes overall vitality.",
     price: "7 days - ₹12,000 Package",
     icon: HeartPulse,
-    image:
-      "https://www.freepik.com/search?format=search&query=holistic%20health%20therapy%20clinic%20wellness",
+    image:MainBloodlettingImg,
   },
-
   {
     filterName: "5 Main Detox Therapy",
     serviceName: "प्रधानविरेचकर्म Main Laxative Detox",
@@ -307,18 +327,6 @@ const detoxServicesData = [
   },
   {
     filterName: "5 Main Detox Therapy",
-    serviceName: "प्रधानवस्तिकर्म Main Enema Detox",
-    description:
-      "Under physician supervision, a sequence of medicated enemas is administered for several days as part of a 7-day detox program. Includes Deepan-Pachan (digestive preparation), Snehana (oleation), Swedana (steam therapy), followed by main Basti course and post-care phase. (Additional inpatients stay and food charges apply.)",
-    benefits:
-      "Deeply cleanses the colon, pacifies Vata Dosha, improves digestion, strengthens the lower back, and nourishes the body tissues.",
-    price: "7 days - ₹14,000 Package",
-    icon: Syringe,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurveda%20basti%20therapy%20enema%20treatment",
-  },
-  {
-    filterName: "5 Main Detox Therapy",
     serviceName: "प्रधानशिरोविरेचननस्य Main Nasal Detox",
     description:
       "Guided nasal cleansing using medicated oils or decoctions under supervision.",
@@ -326,8 +334,7 @@ const detoxServicesData = [
       "Clears nasal passages, reduces sinus congestion, improves smell and respiratory health.",
     price: "7 days - ₹12,000",
     icon: Wind,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20nasal%20therapy%20treatment",
+    image:MainLaxativeDetox5MinImg,
   },
   {
     filterName: "5 Main Detox Therapy",
@@ -338,10 +345,8 @@ const detoxServicesData = [
       "Detoxifies blood, improves circulation, balances Doshas, reduces inflammation, and promotes overall vitality.",
     price: "7 days - ₹12,000 Package",
     icon: HeartPulse,
-    image:
-      "https://www.freepik.com/search?format=search&query=ayurvedic%20bloodletting%20therapy",
+    image:SystemicBloodletting5MinImg,
   },
-  //
   {
     filterName: "Female Care",
     serviceName: "स्त्रीउत्तरबस्ति - Female Genital Enema Detox",
@@ -351,7 +356,7 @@ const detoxServicesData = [
       "Enhances reproductive health, improves fertility, balances hormones, supports uterine health, and detoxifies the genito-urinary system.",
     price: "14,000 Package",
     icon: "",
-    image: "",
+    image: FemaleGenitalEnemaDetoxImg,
   },
   {
     filterName: "Female Care",
@@ -363,9 +368,8 @@ const detoxServicesData = [
       "Maintains hygiene, prevents infections, promotes local circulation, and supports overall reproductive wellness. Reduces infection risk, enhances healing, balances Doshas, and promotes rejuvenation. Nourishes tissues, strengthens local organs, and supports fertility. Lubricates channels, strengthens reproductive tissues, and balances local energy.",
     price: "1900",
     icon: "",
-    image: "",
+    image: FemaleGenitalCareImg,
   },
-  //
   {
     filterName: "Abdominal Purification",
     serviceName: "सद्यअनुलोमन - InstantPurging",
@@ -375,7 +379,7 @@ const detoxServicesData = [
       "Quick relief from constipation, clears bowel obstruction, balances Pitta and Vata, improves elimination, and restores digestive harmony.",
     price: "1000",
     icon: "",
-    image: "",
+    image: सद्यअनुलोमनInstantPurging,
   },
   {
     filterName: "Abdominal Purification",
@@ -385,7 +389,7 @@ const detoxServicesData = [
     benefits: "Gives instant bowel clearance and comfort.",
     price: "1500",
     icon: "",
-    image: "",
+    image: InstantWealthEnemaImg,
   },
   {
     filterName: "Abdominal Purification",
@@ -394,9 +398,8 @@ const detoxServicesData = [
     benefits: "Quick cleansing and lubrication of colon.",
     price: "1700",
     icon: "",
-    image: "",
+    image: InstantHoneyOilEnemaImg,
   },
-  //
   {
     filterName: "Organ Care",
     serviceName: "तर्पण Satiating",
@@ -405,8 +408,7 @@ const detoxServicesData = [
       "Nourishes tissues, improves functions and health of organ, relaxes muscles.",
     price: "1500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/spa-oil-massage-therapy_23-2149330906.jpg",
+    image:SatiatingImg,
   },
   {
     filterName: "Organ Care",
@@ -415,8 +417,7 @@ const detoxServicesData = [
     benefits: "Detoxifies, prepares for main therapy, refreshes skin.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/woman-getting-spa-treatment_23-2149330862.jpg",
+    image:WashGentleCleansingImg,
   },
   {
     filterName: "Organ Care",
@@ -425,8 +426,7 @@ const detoxServicesData = [
     benefits: "Improves circulation, eases stiffness, relieves tension.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/spa-therapist-doing-massage-treatment_23-2149330894.jpg",
+    image:UnguentImg,
   },
   {
     filterName: "Organ Care",
@@ -435,8 +435,7 @@ const detoxServicesData = [
     benefits: "Stimulates energy channels, improves blood flow.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/massage-therapy-relaxation-spa-treatment_23-2149330872.jpg",
+    image:ConductionMassageImg,
   },
   {
     filterName: "Organ Care",
@@ -445,8 +444,7 @@ const detoxServicesData = [
     benefits: "Relieves muscular tension, improves mobility.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/deep-tissue-massage-therapy_23-2149330888.jpg",
+    image:MardanMassageImg,
   },
   {
     filterName: "Organ Care",
@@ -455,8 +453,7 @@ const detoxServicesData = [
     benefits: "Improves circulation, relaxes muscles, reduces fatigue.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/foot-massage-spa-treatment_23-2149330878.jpg",
+    image:DeepTissueFootMassageImg,
   },
   {
     filterName: "Organ Care",
@@ -465,8 +462,7 @@ const detoxServicesData = [
     benefits: "Refreshes skin, relieves tension, enhances energy flow.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-powder-massage-treatment_23-2149330884.jpg",
+    image:उद्वर्तनPowderMassage,
   },
   {
     filterName: "Organ Care",
@@ -475,8 +471,7 @@ const detoxServicesData = [
     benefits: "Nourishes tissues, eases stiffness, improves flexibility.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/oil-powder-massage-therapy_23-2149330890.jpg",
+    image:उत्सादनOilPowderMassageImg,
   },
   {
     filterName: "Organ Care",
@@ -485,8 +480,7 @@ const detoxServicesData = [
     benefits: "Reduces stress, relaxes muscles, enhances well-being.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/aromatherapy-massage-spa-treatment_23-2149330896.jpg",
+    image:ऊन्मर्दनFragranceMassageImg,
   },
   {
     filterName: "Organ Care",
@@ -495,8 +489,7 @@ const detoxServicesData = [
     benefits: "Exfoliates skin, stimulates circulation, relaxes muscles.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/dry-brushing-spa-treatment_23-2149330876.jpg",
+    image:DryBrushingImg,
   },
   {
     filterName: "Organ Care",
@@ -505,8 +498,7 @@ const detoxServicesData = [
     benefits: "Detoxifies tissues, opens energy pathways, reduces stiffness.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/steam-therapy-spa-treatment_23-2149330892.jpg",
+    image:TubeSteamFomentation,
   },
   {
     filterName: "Organ Care",
@@ -516,8 +508,7 @@ const detoxServicesData = [
       "Relieves deep fatigue, reduces muscular pain, improves flexibility.",
     price: "750",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-bolus-massage-therapy_23-2149330886.jpg",
+    image:HerbalBolusFomentation,
   },
   {
     filterName: "Organ Care",
@@ -526,8 +517,7 @@ const detoxServicesData = [
     benefits: "Soothes muscles, relieves stiffness, improves circulation.",
     price: "750",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/pouring-oil-therapy-treatment_23-2149330898.jpg",
+    image:पिझिच्चिलPouringTherapy,
   },
   {
     filterName: "Organ Care",
@@ -536,8 +526,7 @@ const detoxServicesData = [
     benefits: "Deep relaxation, nourishes tissues, improves energy flow.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/continuous-pouring-therapy-spa_23-2149330900.jpg",
+    image:परिषेकस्वेदनContinuousPouring,
   },
   {
     filterName: "Organ Care",
@@ -546,8 +535,7 @@ const detoxServicesData = [
     benefits: "Detoxifies, relaxes muscles, improves circulation.",
     price: "750",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/warm-bath-therapy-treatment_23-2149330874.jpg",
+    image:BathingSweaterTherapy,
   },
   {
     filterName: "Organ Care",
@@ -556,8 +544,7 @@ const detoxServicesData = [
     benefits: "Reduces inflammation, soothes muscles.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/wet-cloth-compress-therapy_23-2149330880.jpg",
+    image:WetClothFomentation,
   },
   {
     filterName: "Organ Care",
@@ -566,8 +553,7 @@ const detoxServicesData = [
     benefits: "Nourishes tissues, relieves pain, and improves flexibility.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/oil-stream-therapy-treatment_23-2149330902.jpg",
+    image:धाराOilStreamTherapy,
   },
   {
     filterName: "Organ Care",
@@ -576,8 +562,7 @@ const detoxServicesData = [
     benefits: "Localized relief alleviates tension and stiffness.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/cotton-oil-application-therapy_23-2149330882.jpg",
+    image:पिचुOilCottonApplication,
   },
   {
     filterName: "Organ Care",

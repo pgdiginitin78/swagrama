@@ -29,7 +29,6 @@ const academyData = [
     bgGlow: "rgba(251, 146, 60, 0.2)",
   },
   {
- 
     season: "पावसाळा / Rainy",
     dates: "18/06/2026 – 23/10/2026",
     serviceName: "स्ववर्ष्यजाविहार / Rainy Academy",
@@ -164,7 +163,7 @@ export default function CommuneTabs() {
         <div className="w-full">
           <h1 className="text-xl md:text-3xl  font-black text-center mb-2 animate-fade-in-up">
             <span className="text-xl md:text-4xl inline-block bg-gradient-to-r py-1 from-green-500 via-emerald-600 to-teal-500 bg-clip-text text-transparent animate-gradient-x">
-             स्वगुरुकुल 
+              स्वगुरुकुल
             </span>
             <br />
             <span className="inline-block bg-gradient-to-r py-1 from-amber-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-gradient-x">
@@ -175,16 +174,13 @@ export default function CommuneTabs() {
             <div className="absolute inset-0 bg-gradient-to-br from-green-100/50 to-amber-100/50 rounded-2xl"></div>
             <div className="relative space-y-4 text-sm leading-relaxed text-gray-700">
               <p className="first-letter:text-4xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-2 first-letter:float-left">
-                Today, everyone wants to be healthy for 100 years. Want to do
-                natural farming. Want to practice a natural lifestyle. Needs
-                toxin-adulteration free pure natural food, panchgavya, herbs and
-                medicines. Want to turn cities to villages. Want to revive the
-                forgotten tradition of the village. Want to go to villages & to
-                do it all in our own home. Can anyone provide a perfect
-                representation of the local traditions, especially the Indian
-                traditions and centuries-old way of life, in the soil of the
-                undivided universe as a whole? Today, everyone is looking for
-                it. That search has been completed by&nbsp;
+                Today, more people are seeking a healthier and more natural way
+                of living — embracing natural farming, toxin-free food,
+                traditional herbs, and a lifestyle rooted in nature. At the same
+                time, there is a growing desire to reconnect with the wisdom of
+                village life — to revive traditional practices, community
+                living, and a self-sustaining way of life that has defined India
+                for centuries.
                 <strong className="text-green-600 font-bold">
                   स्वग्राम Community
                 </strong>
@@ -194,18 +190,19 @@ export default function CommuneTabs() {
                 <strong className="text-green-600 font-bold">
                   स्वग्राम Community &nbsp;
                 </strong>
-                <strong className="text-amber-600 font-bold">
-                  स्वगृहकुल Commune &nbsp;
-                </strong>
-                will give everyone the strength and training to build their
-                dream village or part of the village. This means that India will
-                again become a complete and self-sufficient village's country.
-                That is why we are coming up with &nbsp;
-                <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg text-white font-bold text-base shadow-lg">
+                was created to answer this search. Through the&nbsp;
+                <strong>स्वगृहकुल Commune</strong>, we empower individuals with
+                the knowledge, training, and guidance to build sustainable
+                village-based ecosystems rooted in Indian traditions. Our vision
+                is to help revive India’s strength as a nation of self-reliant
+                villages.
+                <p>With this purpose, we have launched the   <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg text-white font-bold text-base shadow-lg">
                   'हर ग्राम स्वग्राम'
                 </span>
-                &nbsp; campaign. To complete this campaign or reality we started
-                academy.
+                &nbsp; campaign. To support this movement and turn the vision
+                into reality, we have established the<br/>
+                <strong> Swagram Academy.</strong></p>
+              
               </p>
             </div>
           </div>
@@ -379,7 +376,6 @@ export default function CommuneTabs() {
                         </div>
                       </div>
                     </div>
-               
                   </div>
                 </div>
                 <div className="p-4 space-y-3">
@@ -610,7 +606,7 @@ export default function CommuneTabs() {
                             Total Amount
                           </p>
                           <p className="text-xs text-gray-500 font-medium">
-                            कुल शुल्क • {programme.selectedDays}{" "}
+                            कुल शुल्क • {programme.selectedDays}
                             {programme.selectedDays === 1 ? "day" : "days"}
                           </p>
                         </div>
@@ -632,13 +628,13 @@ export default function CommuneTabs() {
                       setOpenAppointmentModal(true);
                     }}
                     className={`relative w-full py-3 bg-gradient-to-r ${programme.gradient} rounded-xl text-white font-black text-sm shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden group/cta`}
-                  >                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-1000"></div>
-
+                  >
+                    
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-1000"></div>
                     <div
                       className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500 blur-xl"
                       style={{ backgroundColor: programme.accentColor }}
                     ></div>
-
                     <span className="relative flex items-center justify-center gap-2 uppercase tracking-wider">
                       Book Programme Now
                       <Sparkles className="w-4 h-4 animate-pulse" />

@@ -88,6 +88,32 @@ import BathingSweaterTherapy from "../../../assets/healingServices/detoxTherapy/
 import WetClothFomentation from "../../../assets/healingServices/detoxTherapy/उपनाहस्वेद Wet Cloth Fomentation.png"
 import धाराOilStreamTherapy from "../../../assets/healingServices/detoxTherapy/धारा Oil Stream Therapy.png"
 import पिचुOilCottonApplication from "../../../assets/healingServices/detoxTherapy/पिचु Oil Cotton Application.png"
+import बस्तिOilPoolTherapyImg from "../../../assets/healingServices/detoxTherapy/बस्ति Oil Pool Therapy.png"
+import लेपनHerbalAnointingImg from "../../../assets/healingServices/detoxTherapy/लेपन Herbal Anointing.png"
+import आर्द्रवस्त्रस्वेदनWetClothFomentationImg from "../../../assets/healingServices/detoxTherapy/आर्द्रवस्त्रस्वेदन Wet Cloth Fomentation.png"
+import रुक्षवस्त्रस्वेदनDryClothFomentationImg from "../../../assets/healingServices/detoxTherapy/रुक्षवस्त्रस्वेदन Dry Cloth Fomentation.png"
+import विद्युतोषधिपोट्टलीस्वेदElectricHerbsFomenting from "../../../assets/healingServices/detoxTherapy/विद्युतोषधिपोट्टलीस्वेद Electric Herbs Fomenting.png"
+import धूपनIncensingTherepy from "../../../assets/healingServices/detoxTherapy/धूपन Incensing therepy.png"
+import संपूर्णनेत्रक्षाTotalEyeCaretherapy from "../../../assets/healingServices/detoxTherapy/संपूर्ण नेत्रक्षा Total Eye Care therapy .png"
+import अक्षिघृततर्पणEyeGheeSatiating from "../../../assets/healingServices/detoxTherapy/अक्षिघृततर्पण Eye Ghee Satiating.png"
+import नेत्रतैलतर्पणEyeOilSatiating from "../../../assets/healingServices/detoxTherapy/नेत्रतैलतर्पण Eye Oil Satiating.png"
+import नेत्राभ्यङ्गHeadUnguent from "../../../assets/healingServices/detoxTherapy/नेत्राभ्यङ्ग HeadUnguent.png"
+import नेत्रधाराNetraDharatherapy from "../../../assets/healingServices/detoxTherapy/नेत्रधारा NetraDhara therapy.png"
+import नेत्रपिचुNetraPichu from "../../../assets/healingServices/detoxTherapy/नेत्रपिचु NetraPichu.png"
+import नेत्रबस्तिNetraBasti from "../../../assets/healingServices/detoxTherapy/नेत्रबस्ति NetraBasti.png"
+import नेत्रधावनNetraDhavan from "../../../assets/healingServices/detoxTherapy/नेत्रधावन NetraDhavan.png"
+import नेत्रांजनNetraAnjana from "../../../assets/healingServices/detoxTherapy/नेत्रांजन NetraAnjana.png"
+import आश्योतनSprinkling from "../../../assets/healingServices/detoxTherapy/आश्योतन Sprinkling.png"
+import बिडालकBidalak from "../../../assets/healingServices/detoxTherapy/बिडालक Bidalak.png"
+import पुटपाकPutapak from "../../../assets/healingServices/detoxTherapy/पुटपाक Putapak.png"
+import कर्णतर्पणEarSatiating from "../../../assets/healingServices/detoxTherapy/कर्णतर्पण Ear Satiating.png"
+import कर्णपूरणEarFulfilling from "../../../assets/healingServices/detoxTherapy/कर्णपूरण Ear Fulfilling.png"
+import कर्णशूलEarache from "../../../assets/healingServices/detoxTherapy/कर्णशूल Earache.png"
+import कर्णस्त्रावEarDischarge from "../../../assets/healingServices/detoxTherapy/कर्णस्त्राव Ear Discharge.png"
+import कर्णमलEarWaxDescription from "../../../assets/healingServices/detoxTherapy/कर्णमल Ear Wax Description.png"
+import बृंहणतर्पणनस्यNourishingNasalTherapy from "../../../assets/healingServices/detoxTherapy/बृंहणतर्पणनस्य Nourishing Nasal Therapy.png"
+import शमनतर्पणनस्यAlleviationSatiating from "../../../assets/healingServices/detoxTherapy/शमनतर्पणनस्य Alleviation Satiating.png"
+import  SernutatoryNasalTherapy from "../../../assets/healingServices/detoxTherapy/Sernutatory Nasal Therapy.png"
 
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -571,8 +597,7 @@ const detoxServicesData = [
     benefits: "Deep tissue nourishment, relieves stiffness.",
     price: "750",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/oil-pooling-therapy-treatment_23-2149330904.jpg",
+    image:बस्तिOilPoolTherapyImg,
   },
   {
     filterName: "Organ Care",
@@ -581,8 +606,7 @@ const detoxServicesData = [
     benefits: "Improves tissue health, alleviating soreness.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-paste-application-spa_23-2149330870.jpg",
+    image:लेपनHerbalAnointingImg,
   },
   {
     filterName: "Organ Care",
@@ -591,8 +615,7 @@ const detoxServicesData = [
     benefits: "Reduces inflammation, eases stiffness.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/wet-fomentation-therapy_23-2149330868.jpg",
+    image:आर्द्रवस्त्रस्वेदनWetClothFomentationImg,
   },
   {
     filterName: "Organ Care",
@@ -601,8 +624,7 @@ const detoxServicesData = [
     benefits: "Stimulates circulation, relaxes muscles.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/dry-fomentation-therapy_23-2149330866.jpg",
+    image:रुक्षवस्त्रस्वेदनDryClothFomentationImg,
   },
   {
     filterName: "Organ Care",
@@ -611,8 +633,7 @@ const detoxServicesData = [
     benefits: "Deep relaxation, pain relief, improves circulation.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/electric-heat-therapy-treatment_23-2149330864.jpg",
+    image:विद्युतोषधिपोट्टलीस्वेदElectricHerbsFomenting,
   },
   {
     filterName: "Organ Care",
@@ -621,10 +642,8 @@ const detoxServicesData = [
     benefits: "Refreshes mind and body, relieves tension.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-smoke-therapy-incense_23-2149330908.jpg",
+    image:धूपनIncensingTherepy,
   },
-  //
   {
     filterName: "Eye Care",
     serviceName: "संपूर्णनेत्रक्षा Total Eye Care",
@@ -632,8 +651,7 @@ const detoxServicesData = [
     benefits: "",
     price: "1500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/eye-care-treatment-spa_23-2149330910.jpg",
+    image:संपूर्णनेत्रक्षाTotalEyeCaretherapy,
   },
   {
     filterName: "Eye Care",
@@ -643,8 +661,7 @@ const detoxServicesData = [
       "Nourishes eyes, improves vision clarity, reduces eye strain and dryness.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ayurvedic-eye-treatment-ghee_23-2149330912.jpg",
+    image:अक्षिघृततर्पणEyeGheeSatiating,
   },
   {
     filterName: "Eye Care",
@@ -653,8 +670,7 @@ const detoxServicesData = [
     benefits: "Strengthens ocular tissues, improves eyesight, reduces fatigue.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/eye-oil-treatment-therapy_23-2149330914.jpg",
+    image:नेत्रतैलतर्पणEyeOilSatiating,
   },
   {
     filterName: "Eye Care",
@@ -663,8 +679,7 @@ const detoxServicesData = [
     benefits: "Relieves tension, improves circulation, reduces eye strain.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/head-massage-eye-area_23-2149330916.jpg",
+    image:नेत्राभ्यङ्गHeadUnguent,
   },
   {
     filterName: "Eye Care",
@@ -673,31 +688,25 @@ const detoxServicesData = [
     benefits: "Improves tear secretion, relieves dryness, and reduces redness.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/eye-treatment-liquid-flow_23-2149330918.jpg",
+    image:नेत्रधाराNetraDharatherapy,
   },
   {
     filterName: "Eye Care",
     serviceName: "नेत्रपिचु NetraPichu",
     description: "Medicated cotton placed on eyes.",
-    benefits:
-      "Reduces inflammation, soothes irritation, and improves eye health.",
+    benefits:"Reduces inflammation, soothes irritation, and improves eye health.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/cotton-compress-eye-treatment_23-2149330920.jpg",
+    image:नेत्रपिचुNetraPichu,
   },
   {
     filterName: "Eye Care",
     serviceName: "नेत्रबस्ति NetraBasti",
-    description:
-      "Medicated liquid retained around eyes in a well-made boundary.",
-    benefits:
-      "Nourishes cornea, relieves chronic eye conditions, improves vision.",
+    description:"Medicated liquid retained around eyes in a well-made boundary.",
+    benefits:"Nourishes cornea, relieves chronic eye conditions, improves vision.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/netra-basti-eye-treatment_23-2149330922.jpg",
+    image:नेत्रबस्तिNetraBasti,
   },
   {
     filterName: "Eye Care",
@@ -706,8 +715,7 @@ const detoxServicesData = [
     benefits: "Cleanses eyes, reduces infections, refreshes eyes.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/eye-washing-herbal-treatment_23-2149330924.jpg",
+    image:नेत्रधावनNetraDhavan,
   },
   {
     filterName: "Eye Care",
@@ -716,8 +724,7 @@ const detoxServicesData = [
     benefits: "Strengthens eyesight, reduces eye strain, prevents infections.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-collyrium-eye-application_23-2149330926.jpg",
+    image:नेत्रांजनNetraAnjana,
   },
   {
     filterName: "Eye Care",
@@ -726,8 +733,7 @@ const detoxServicesData = [
     benefits: "Refreshes eyes, relieves fatigue, promotes ocular health.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/herbal-water-eye-splash_23-2149330928.jpg",
+    image:आश्योतनSprinkling,
   },
   {
     filterName: "Eye Care",
@@ -736,31 +742,25 @@ const detoxServicesData = [
     benefits: "Reduces redness, eye irritation, improves vision.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/specialized-eye-treatment-therapy_23-2149330930.jpg",
+    image:बिडालकBidalak,
   },
   {
     filterName: "Eye Care",
     serviceName: "पुटपाक Putapak",
     description: "Warm herbal compress over eyes.",
-    benefits:
-      "Relieves eye strain, improves blood circulation, reduces puffiness.",
+    benefits:"Relieves eye strain, improves blood circulation, reduces puffiness.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/warm-compress-eye-treatment_23-2149330932.jpg",
+    image:पुटपाकPutapak,
   },
-  //
   {
     filterName: "Ear Care",
     serviceName: "कर्णतर्पण Ear Satiating",
     description: "Medicated oil retention over the ears.",
-    benefits:
-      "Nourishes ear tissues, reduces earache, improves hearing and ear health.",
+    benefits:"Nourishes ear tissues, reduces earache, improves hearing and ear health.",
     price: "750",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ear-oil-treatment-therapy_23-2149330934.jpg",
+    image:कर्णतर्पणEarSatiating,
   },
   {
     filterName: "Ear Care",
@@ -770,8 +770,7 @@ const detoxServicesData = [
       "Treats ear dryness, prevents infections, strengthens auditory function.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ear-filling-oil-treatment_23-2149330936.jpg",
+    image:कर्णपूरणEarFulfilling,
   },
   {
     filterName: "Ear Care",
@@ -780,19 +779,16 @@ const detoxServicesData = [
     benefits: "Relieves earache, reduces inflammation, soothes ear discomfort.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ear-pain-relief-treatment_23-2149330938.jpg",
+    image:कर्णशूलEarache,
   },
   {
     filterName: "Ear Care",
     serviceName: "कर्णस्त्राव Ear Discharge",
     description: "Treatment for ear discharge.",
-    benefits:
-      "Reduces excessive discharge, treats infections, maintains ear hygiene.",
+    benefits:"Reduces excessive discharge, treats infections, maintains ear hygiene.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ear-discharge-treatment-therapy_23-2149330940.jpg",
+    image:कर्णस्त्रावEarDischarge,
   },
   {
     filterName: "Ear Care",
@@ -802,31 +798,25 @@ const detoxServicesData = [
       "Removes wax, prevents blockages, improves ear hygiene and comfort.",
     price: "300",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/ear-wax-cleaning-procedure_23-2149330942.jpg",
+    image:कर्णमलEarWaxDescription,
   },
-  //
   {
     filterName: "Nasal Care",
     serviceName: "बृंहणतर्पणनस्य Nourishing Nasal Therapy",
     description: "Nourishing nasal therapy with medicated oils.",
-    benefits:
-      "Strengthens nasal tissues, reduces dryness, enhances olfactory function.",
+    benefits:"Strengthens nasal tissues, reduces dryness, enhances olfactory function.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/nasal-oil-therapy-treatment_23-2149330944.jpg",
+    image:बृंहणतर्पणनस्यNourishingNasalTherapy,
   },
   {
     filterName: "Nasal Care",
     serviceName: "शमनतर्पणनस्य Alleviation Satiating",
     description: "Soothing nasal therapy using herbal oils.",
-    benefits:
-      "Reduces inflammation, eases nasal irritation, supports respiratory wellness.",
+    benefits:"Reduces inflammation, eases nasal irritation, supports respiratory wellness.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/soothing-nasal-therapy-oil_23-2149330946.jpg",
+    image:शमनतर्पणनस्यAlleviationSatiating,
   },
   {
     filterName: "Nasal Care",
@@ -838,8 +828,7 @@ const detoxServicesData = [
       "Maintains nasal hygiene, prevents recurrent congestion, supports overall nasal health. Reduces sinus pressure, enhances nasal circulation, relieves headache. Relieves sinus pressure, detoxifies nasal passages, improves airflow. Thorough detoxification, clears mucus accumulation, supports respiratory immunity.",
     price: "500",
     icon: "",
-    image:
-      "https://img.freepik.com/free-photo/nasal-cleansing-therapy-treatment_23-2149330948.jpg",
+    image:SernutatoryNasalTherapy,
   },
   {
     filterName: "Nasal Care",

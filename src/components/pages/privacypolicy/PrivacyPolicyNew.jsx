@@ -1,34 +1,25 @@
 import {
-    CalendarMonthOutlined as CalendarMonthOutlinedIcon,
-    CheckCircleOutline as CheckCircleOutlineIcon,
-    ChildCareOutlined as ChildCareOutlinedIcon,
-    CollectionsBookmarkOutlined as CollectionsBookmarkOutlinedIcon,
-    CookieOutlined as CookieOutlinedIcon,
-    EditNoteOutlined as EditNoteOutlinedIcon,
-    EmailOutlined as EmailOutlinedIcon,
-    GppGoodOutlined as GppGoodOutlinedIcon,
-    InfoOutlined as InfoOutlinedIcon,
-    LinkOutlined as LinkOutlinedIcon,
-    LocalFloristOutlined as LocalFloristOutlinedIcon,
-    LocationOnOutlined as LocationOnOutlinedIcon,
-    MarkEmailUnreadOutlined as MarkEmailUnreadOutlinedIcon,
-    ScheduleOutlined as ScheduleOutlinedIcon,
-    ShareOutlined as ShareOutlinedIcon,
-    Spa as SpaIcon,
-    StorefrontOutlined as StorefrontOutlinedIcon,
-    TuneOutlined as TuneOutlinedIcon,
-    VerifiedUserOutlined as VerifiedUserOutlinedIcon
+  CalendarMonthOutlined as CalendarMonthOutlinedIcon,
+  CheckCircleOutline as CheckCircleOutlineIcon,
+  ChildCareOutlined as ChildCareOutlinedIcon,
+  CollectionsBookmarkOutlined as CollectionsBookmarkOutlinedIcon,
+  CookieOutlined as CookieOutlinedIcon,
+  EditNoteOutlined as EditNoteOutlinedIcon,
+  EmailOutlined as EmailOutlinedIcon,
+  GppGoodOutlined as GppGoodOutlinedIcon,
+  InfoOutlined as InfoOutlinedIcon,
+  LinkOutlined as LinkOutlinedIcon,
+  LocalFloristOutlined as LocalFloristOutlinedIcon,
+  LocationOnOutlined as LocationOnOutlinedIcon,
+  MarkEmailUnreadOutlined as MarkEmailUnreadOutlinedIcon,
+  ShareOutlined as ShareOutlinedIcon,
+  Spa as SpaIcon,
+  StorefrontOutlined as StorefrontOutlinedIcon,
+  TuneOutlined as TuneOutlinedIcon,
+  VerifiedUserOutlined as VerifiedUserOutlinedIcon,
 } from "@mui/icons-material";
-import {
-    motion,
-    useScroll,
-    useTransform
-} from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { MdEco } from "react-icons/md";
-
-import heroImg from "../../../assets/images/ayurveda_hero_bg.png";
-import pathImg from "../../../assets/images/ayurveda_nature_path.png";
-import securityImg from "../../../assets/images/ayurveda_security.png";
 
 const p = {
   sage: "#4a7c59",
@@ -378,16 +369,10 @@ const sections = [
             value: "swagrama.lavale@gmail.com",
             ContactIcon: EmailOutlinedIcon,
           },
-
           {
             label: "Location",
             value: "India",
             ContactIcon: LocationOnOutlinedIcon,
-          },
-          {
-            label: "Response Time",
-            value: "Within 30 business days",
-            ContactIcon: ScheduleOutlinedIcon,
           },
         ],
       },
@@ -418,34 +403,8 @@ const staggerContainer = {
   },
 };
 
-
-function ImageReveal({ src, alt }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.8 }}
-      className="my-10 rounded-[32px] overflow-hidden shadow-2xl relative"
-    >
-      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10" />
-      <img
-        src={src}
-        alt={alt}
-        className="w-full h-[400px] md:h-[500px] object-cover hover:scale-105 transition-transform duration-[20s] ease-linear"
-      />
-      <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-20 flex items-center gap-2">
-        <MdEco className="text-white text-2xl drop-shadow-md" />
-        <span className="text-white font-['Cormorant_Garamond'] text-lg md:text-xl font-medium tracking-wide drop-shadow-md">
-          Swagrama Wellness
-        </span>
-      </div>
-    </motion.div>
-  );
-}
-
-function SectionContent({ section, index }) {
-  const Icon = section.MuiIcon || section.IconComponent;
+function SectionContent({ section }) {
+  const Icon = section.MuiIcon;
   return (
     <motion.div
       id={section.id}
@@ -603,9 +562,6 @@ function SectionContent({ section, index }) {
 
 export default function SwagramaPrivacyPolicy() {
   const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
-
   const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   const scrollTo = (e, id) => {
@@ -626,50 +582,54 @@ export default function SwagramaPrivacyPolicy() {
         animate={{ backgroundColor: p.sage }}
       />
 
-      <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
-        <motion.div style={{ y: heroY }} className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/40 z-10" />
-          <img
-            src={heroImg}
-            alt="Ayurveda Wellness"
-            className="w-full h-full object-cover"
-          />
-        </motion.div>
-
-        <motion.div
-          style={{ opacity: heroOpacity }}
-          className="relative z-20 text-center px-4 max-w-4xl mx-auto "
-        >
+      <div
+        className="w-full border-b"
+        style={{ background: p.parchment, borderColor: p.border }}
+      >
+        <div className="w-full max-w-6xl 2xl:max-w-[1540px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <span className="w-12 h-[1px] bg-white/60" />
-              <MdEco className="text-white/90 text-2xl" />
-              <span className="text-white/90 text-sm tracking-[0.3em] uppercase font-semibold">
+            <div className="flex items-center gap-3 mb-6">
+              <MdEco style={{ color: p.sage, fontSize: 22 }} />
+              <span
+                className="text-xs font-bold tracking-[0.3em] uppercase"
+                style={{ color: p.sage }}
+              >
                 Swagrama Community
               </span>
-              <span className="w-12 h-[1px] bg-white/60" />
             </div>
-            <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg leading-tight">
-              Privacy & Trust
+            <h1
+              className="font-['Playfair_Display'] text-5xl md:text-6xl font-bold mb-4 leading-tight"
+              style={{ color: p.td }}
+            >
+              Privacy Policy
             </h1>
-            <p className="font-['Cormorant_Garamond'] text-2xl md:text-3xl text-white/90 max-w-2xl mx-auto font-light leading-relaxed">
-              Rooted in transparency and the healing{" "}
-              <br className="hidden md:block" /> traditions of Ayurveda.
+            <p
+              className="font-['Cormorant_Garamond'] text-2xl font-light leading-relaxed max-w-2xl"
+              style={{ color: p.tl }}
+            >
+              Rooted in transparency and the healing traditions of Ayurveda.
             </p>
+            <div
+              className="mt-6 inline-flex items-center gap-2 text-sm px-4 py-2 rounded-full border"
+              style={{
+                borderColor: p.border,
+                color: p.tl,
+                background: p.cream,
+              }}
+            >
+              <CalendarMonthOutlinedIcon style={{ fontSize: 16 }} />
+              Last Updated: March 2025
+            </div>
           </motion.div>
-        </motion.div>
-
-     
+        </div>
       </div>
-
 
       <div className="w-full max-w-6xl 2xl:max-w-[1540px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-30">
         <div className="flex flex-col lg:flex-row gap-16">
-
           <div className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-32 space-y-4">
               <div className="flex items-center gap-2 mb-8">
@@ -700,18 +660,9 @@ export default function SwagramaPrivacyPolicy() {
             </div>
           </div>
 
-       
           <div className="flex-1 max-w-3xl 2xl:max-w-5xl">
-            {sections.map((section, index) => (
-              <div key={section.id}>
-                <SectionContent section={section} index={index} />
-                {index === 1 && (
-                  <ImageReveal src={pathImg} alt="Ayurvedic Garden Path" />
-                )}
-                {index === 5 && (
-                  <ImageReveal src={securityImg} alt="Trust and Security" />
-                )}
-              </div>
+            {sections.map((section) => (
+              <SectionContent key={section.id} section={section} />
             ))}
           </div>
         </div>

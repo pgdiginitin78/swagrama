@@ -428,7 +428,7 @@ const Navbar = ({ userData, setUserData }) => {
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             <Link to="/" className="flex-shrink-0 z-10">
-              <div className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-20 2xl:h-24">
+              <div className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-[70px] 2xl:h-24">
                 <img
                   src={SwagramaLogo}
                   className="h-full w-auto object-contain cursor-pointer outline-none ring-0 "

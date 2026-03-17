@@ -19,9 +19,6 @@ import LoginModal from "../loginModal/LoginModal";
 import ShopCart from "../pages/eShop/ShopCart";
 import { successAlert } from "../common/toast/CustomToast";
 
-/* ─────────────────────────────────────────────────────────────
-   Manage Profile Modal
-───────────────────────────────────────────────────────────── */
 const ManageProfileModal = ({ open, onClose, user, onSave }) => {
   const [editing, setEditing] = useState(false);
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || null);
@@ -431,10 +428,10 @@ const Navbar = ({ userData, setUserData }) => {
         <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             <Link to="/" className="flex-shrink-0 z-10">
-              <div className="h-10 sm:h-12 md:h-14 lg:h-16">
+              <div className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-20 2xl:h-24">
                 <img
                   src={SwagramaLogo}
-                  className="h-full w-auto object-contain cursor-pointer"
+                  className="h-full w-auto object-contain cursor-pointer outline-none ring-0 "
                   alt="Swagrama Logo"
                 />
               </div>
@@ -452,12 +449,12 @@ const Navbar = ({ userData, setUserData }) => {
                       className={`nav-link group font-semibold transition-all leading-tight ${active ? "active" : ""}`}
                     >
                       <span
-                        className={`block text-[10px] xl:text-[11px] 2xl:text-xs transition-colors ${active ? "text-green-600 font-bold" : "text-green-800 group-hover:text-green-600"}`}
+                        className={`block text-[10px] xl:text-[11px] 2xl:text-sm transition-colors ${active ? "text-green-600 font-bold" : "text-green-800 group-hover:text-green-600"}`}
                       >
                         {hi}
                       </span>
                       <span
-                        className={`block text-[10px] xl:text-[11px] 2xl:text-xs ${active ? "text-green-600 font-semibold" : "text-green-700"}`}
+                        className={`block text-[10px] xl:text-[11px] 2xl:text-sm ${active ? "text-green-600 font-semibold" : "text-green-700"}`}
                       >
                         {en}
                       </span>

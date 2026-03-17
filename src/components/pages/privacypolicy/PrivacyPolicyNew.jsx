@@ -667,7 +667,7 @@ export default function SwagramaPrivacyPolicy() {
       </div>
 
 
-      <div className="w-full max-w-[1540px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-30">
+      <div className="w-full max-w-6xl 2xl:max-w-[1540px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-30">
         <div className="flex flex-col lg:flex-row gap-16">
 
           <div className="hidden lg:block w-72 shrink-0">
@@ -701,7 +701,7 @@ export default function SwagramaPrivacyPolicy() {
           </div>
 
        
-          <div className="flex-1 max-w-5xl">
+          <div className="flex-1 max-w-3xl 2xl:max-w-5xl">
             {sections.map((section, index) => (
               <div key={section.id}>
                 <SectionContent section={section} index={index} />

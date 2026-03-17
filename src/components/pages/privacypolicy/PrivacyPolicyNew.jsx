@@ -1,33 +1,34 @@
-import { useState, useRef, useEffect, Suspense } from "react";
-import { motion, useInView, AnimatePresence, useScroll, useTransform } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, Sphere, MeshDistortMaterial, Environment } from "@react-three/drei";
 import {
-  Spa as SpaIcon,
-  InfoOutlined as InfoOutlinedIcon,
-  CollectionsBookmarkOutlined as CollectionsBookmarkOutlinedIcon,
-  TuneOutlined as TuneOutlinedIcon,
-  CookieOutlined as CookieOutlinedIcon,
-  ShareOutlined as ShareOutlinedIcon,
-  VerifiedUserOutlined as VerifiedUserOutlinedIcon,
-  GppGoodOutlined as GppGoodOutlinedIcon,
-  CalendarMonthOutlined as CalendarMonthOutlinedIcon,
-  LinkOutlined as LinkOutlinedIcon,
-  ChildCareOutlined as ChildCareOutlinedIcon,
-  EditNoteOutlined as EditNoteOutlinedIcon,
-  MarkEmailUnreadOutlined as MarkEmailUnreadOutlinedIcon,
-  KeyboardArrowUp as KeyboardArrowUpIcon,
-  FormatListBulleted as FormatListBulletedIcon,
-  Close as CloseIcon,
-  FiberManualRecord as FiberManualRecordIcon,
-  LocalFloristOutlined as LocalFloristOutlinedIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  EmailOutlined as EmailOutlinedIcon,
-  LocationOnOutlined as LocationOnOutlinedIcon,
-  ScheduleOutlined as ScheduleOutlinedIcon,
-  StorefrontOutlined as StorefrontOutlinedIcon,
+    CalendarMonthOutlined as CalendarMonthOutlinedIcon,
+    CheckCircleOutline as CheckCircleOutlineIcon,
+    ChildCareOutlined as ChildCareOutlinedIcon,
+    CollectionsBookmarkOutlined as CollectionsBookmarkOutlinedIcon,
+    CookieOutlined as CookieOutlinedIcon,
+    EditNoteOutlined as EditNoteOutlinedIcon,
+    EmailOutlined as EmailOutlinedIcon,
+    GppGoodOutlined as GppGoodOutlinedIcon,
+    InfoOutlined as InfoOutlinedIcon,
+    LinkOutlined as LinkOutlinedIcon,
+    LocalFloristOutlined as LocalFloristOutlinedIcon,
+    LocationOnOutlined as LocationOnOutlinedIcon,
+    MarkEmailUnreadOutlined as MarkEmailUnreadOutlinedIcon,
+    ScheduleOutlined as ScheduleOutlinedIcon,
+    ShareOutlined as ShareOutlinedIcon,
+    Spa as SpaIcon,
+    StorefrontOutlined as StorefrontOutlinedIcon,
+    TuneOutlined as TuneOutlinedIcon,
+    VerifiedUserOutlined as VerifiedUserOutlinedIcon
 } from "@mui/icons-material";
+import {
+    motion,
+    useScroll,
+    useTransform
+} from "framer-motion";
 import { MdEco } from "react-icons/md";
+
+import heroImg from "../../../assets/images/ayurveda_hero_bg.png";
+import pathImg from "../../../assets/images/ayurveda_nature_path.png";
+import securityImg from "../../../assets/images/ayurveda_security.png";
 
 const p = {
   sage: "#4a7c59",
@@ -55,7 +56,7 @@ const sections = [
     id: "introduction",
     number: "01",
     title: "Introduction",
-    IconComponent: InfoOutlinedIcon,
+    MuiIcon: InfoOutlinedIcon,
     color: p.sageMist,
     accent: p.sage,
     tagline: "Who we are & what we stand for",
@@ -78,7 +79,7 @@ const sections = [
     id: "information-collected",
     number: "02",
     title: "Information We Collect",
-    IconComponent: CollectionsBookmarkOutlinedIcon,
+    MuiIcon: CollectionsBookmarkOutlinedIcon,
     color: p.limeMist,
     accent: p.lime,
     tagline: "What data we gather from you",
@@ -117,7 +118,7 @@ const sections = [
     id: "how-we-use",
     number: "03",
     title: "How We Use Your Information",
-    IconComponent: TuneOutlinedIcon,
+    MuiIcon: TuneOutlinedIcon,
     color: p.goldMist,
     accent: p.gold,
     tagline: "How your data serves your experience",
@@ -148,7 +149,7 @@ const sections = [
     id: "cookies",
     number: "04",
     title: "Cookies & Tracking",
-    IconComponent: CookieOutlinedIcon,
+    MuiIcon: CookieOutlinedIcon,
     color: p.brownMist,
     accent: p.brownLight,
     tagline: "Small files, big transparency",
@@ -177,7 +178,7 @@ const sections = [
     id: "sharing",
     number: "05",
     title: "Sharing of Information",
-    IconComponent: ShareOutlinedIcon,
+    MuiIcon: ShareOutlinedIcon,
     color: p.sageMist,
     accent: p.sage,
     tagline: "When and with whom we share",
@@ -205,7 +206,7 @@ const sections = [
     id: "data-security",
     number: "06",
     title: "Data Security",
-    IconComponent: VerifiedUserOutlinedIcon,
+    MuiIcon: VerifiedUserOutlinedIcon,
     color: p.limeMist,
     accent: p.lime,
     tagline: "How we protect what you share",
@@ -233,7 +234,7 @@ const sections = [
     id: "user-rights",
     number: "07",
     title: "Your Rights",
-    IconComponent: GppGoodOutlinedIcon,
+    MuiIcon: GppGoodOutlinedIcon,
     color: p.goldMist,
     accent: p.gold,
     tagline: "Control over your personal data",
@@ -262,7 +263,7 @@ const sections = [
     id: "data-retention",
     number: "08",
     title: "Data Retention",
-    IconComponent: CalendarMonthOutlinedIcon,
+    MuiIcon: CalendarMonthOutlinedIcon,
     color: p.brownMist,
     accent: p.brown,
     tagline: "How long we keep your information",
@@ -290,7 +291,7 @@ const sections = [
     id: "third-party-links",
     number: "09",
     title: "Third-Party Links",
-    IconComponent: LinkOutlinedIcon,
+    MuiIcon: LinkOutlinedIcon,
     color: p.sageMist,
     accent: p.sageLight,
     tagline: "External sites and our responsibility",
@@ -309,7 +310,7 @@ const sections = [
     id: "childrens-privacy",
     number: "10",
     title: "Children's Privacy",
-    IconComponent: ChildCareOutlinedIcon,
+    MuiIcon: ChildCareOutlinedIcon,
     color: p.limeMist,
     accent: p.lime,
     tagline: "Protecting younger members of our community",
@@ -332,7 +333,7 @@ const sections = [
     id: "policy-changes",
     number: "11",
     title: "Changes to This Policy",
-    IconComponent: EditNoteOutlinedIcon,
+    MuiIcon: EditNoteOutlinedIcon,
     color: p.goldMist,
     accent: p.gold,
     tagline: "How we communicate updates",
@@ -355,7 +356,7 @@ const sections = [
     id: "contact",
     number: "12",
     title: "Contact Us",
-    IconComponent: MarkEmailUnreadOutlinedIcon,
+    MuiIcon: MarkEmailUnreadOutlinedIcon,
     color: p.brownMist,
     accent: p.brownLight,
     tagline: "Reach out — we're here for you",
@@ -377,7 +378,7 @@ const sections = [
             value: "swagrama.lavale@gmail.com",
             ContactIcon: EmailOutlinedIcon,
           },
-     
+
           {
             label: "Location",
             value: "India",
@@ -398,669 +399,323 @@ const sections = [
   },
 ];
 
-// --- 3D Background Objects ---
-const BackgroundScene = () => {
-  const { scrollYProgress } = useScroll();
-  
-  // Create a ref to spin the sphere based on scroll
-  const sphereRef = useRef(null);
-  
-  useFrame((state, delta) => {
-    if (sphereRef.current) {
-      sphereRef.current.rotation.x += delta * 0.1;
-      sphereRef.current.rotation.y += delta * 0.15;
-      
-      // Add subtle scroll-based movement
-      const scrollVal = scrollYProgress.get();
-      sphereRef.current.position.y = Math.sin(scrollVal * Math.PI * 2) * 2;
-    }
-  });
-
-  return (
-    <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[10, 10, 5]} intensity={1} color={p.sageLight} />
-      <directionalLight position={[-10, -10, -5]} intensity={0.5} color={p.gold} />
-      
-      <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-        <mesh ref={sphereRef} position={[2, 0, -5]} scale={1.8}>
-          <Sphere args={[1, 64, 64]}>
-            <MeshDistortMaterial
-              color={p.sageMist}
-              attach="material"
-              distort={0.4}
-              speed={1.5}
-              roughness={0.2}
-              metalness={0.1}
-              transparent
-              opacity={0.6}
-            />
-          </Sphere>
-        </mesh>
-      </Float>
-      
-      <Float speed={1.5} rotationIntensity={1} floatIntensity={2}>
-        <mesh position={[-3, 2, -10]} scale={1.2}>
-          <Sphere args={[1, 32, 32]}>
-            <MeshDistortMaterial
-              color={p.limeLight}
-              attach="material"
-              distort={0.3}
-              speed={2}
-              roughness={0.4}
-              transparent
-              opacity={0.4}
-            />
-          </Sphere>
-        </mesh>
-      </Float>
-
-      <Float speed={2.5} rotationIntensity={0.8} floatIntensity={1.5}>
-        <mesh position={[4, -3, -8]} scale={0.9}>
-          <Sphere args={[1, 32, 32]}>
-            <MeshDistortMaterial
-              color={p.goldMist}
-              attach="material"
-              distort={0.5}
-              speed={1.2}
-              roughness={0.1}
-              transparent
-              opacity={0.5}
-            />
-          </Sphere>
-        </mesh>
-      </Float>
-    </>
-  );
+const hexToRgba = (hex, alpha) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-// --- Components ---
+const fadeInUp = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
 
-function ReadingProgress() {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
-  
+const staggerContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.1 },
+  },
+};
+
+
+function ImageReveal({ src, alt }) {
   return (
     <motion.div
-      style={{ scaleX }}
-      className="fixed top-0 left-0 right-0 h-1 z-[1300] origin-left bg-gradient-to-r from-[#4a7c59] via-[#7aad35] to-[#c9961a]"
-    />
-  );
-}
-
-function SectionCard({ section }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const [expanded, setExpanded] = useState(true);
-  const Icon = section.IconComponent;
-
-  // Add hex opacity helper
-  const hexToRgba = (hex, alpha) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 50, scale: 0.98 }}
-      animate={inView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="mb-8"
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.8 }}
+      className="my-10 rounded-[32px] overflow-hidden shadow-2xl relative"
     >
-      <div 
-        className="rounded-[24px] overflow-hidden transition-all duration-300 hover:-translate-y-1 relative z-10"
-        style={{
-          background: hexToRgba(section.color, 0.7),
-          border: `1.5px solid ${hexToRgba(section.accent, 0.2)}`,
-          boxShadow: "0 8px 32px rgba(0, 0, 0, 0.05)",
-          backdropFilter: "blur(12px)",
-        }}
-      >
-        <div
-          onClick={() => setExpanded(!expanded)}
-          className="px-6 md:px-10 pt-6 md:pt-8 pb-5 md:pb-6 cursor-pointer select-none"
-          style={{
-            background: `linear-gradient(135deg, ${hexToRgba(section.accent, 0.08)} 0%, ${hexToRgba(section.accent, 0.02)} 100%)`,
-          }}
-        >
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-4 flex-1 min-w-0">
-              <motion.div
-                whileHover={{ rotate: [0, -12, 12, 0], scale: 1.05 }}
-                transition={{ duration: 0.4 }}
-                className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0"
-                style={{
-                  background: `linear-gradient(135deg, ${hexToRgba(section.accent, 0.15)}, ${hexToRgba(section.accent, 0.05)})`,
-                  border: `1px solid ${hexToRgba(section.accent, 0.25)}`,
-                  boxShadow: `0 4px 15px ${hexToRgba(section.accent, 0.15)}`,
-                }}
-              >
-                <Icon style={{ fontSize: 28, color: section.accent }} />
-              </motion.div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <span 
-                    className="px-2 py-0.5 text-xs font-bold rounded-full font-mono"
-                    style={{
-                      background: hexToRgba(section.accent, 0.12),
-                      color: section.accent,
-                      border: `1px solid ${hexToRgba(section.accent, 0.2)}`,
-                    }}
-                  >
-                    {section.number}
-                  </span>
-                  <span 
-                    className="hidden sm:flex px-2 py-0.5 text-xs rounded-full font-['Cormorant_Garamond']"
-                    style={{
-                      background: "rgba(255,255,255,0.6)",
-                      color: p.tl,
-                      border: `1px solid ${p.border}`,
-                    }}
-                  >
-                    {section.tagline}
-                  </span>
-                </div>
-                <h2 
-                  className="font-['Playfair_Display'] text-xl md:text-2xl font-bold leading-tight"
-                  style={{ color: p.td }}
-                >
-                  {section.title}
-                </h2>
-              </div>
-            </div>
-            
-            <button
-              className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors"
-              style={{
-                background: hexToRgba(section.accent, 0.08),
-                border: `1px solid ${hexToRgba(section.accent, 0.2)}`,
-                color: section.accent,
-              }}
-              title={expanded ? "Collapse" : "Expand"}
-            >
-              <motion.div animate={{ rotate: expanded ? 0 : 180 }} transition={{ duration: 0.3 }}>
-                <KeyboardArrowUpIcon fontSize="small" />
-              </motion.div>
-            </button>
-          </div>
-        </div>
-
-        <AnimatePresence initial={false}>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="overflow-hidden"
-            >
-              <div className="mx-6 md:mx-10 h-px" style={{ background: hexToRgba(section.accent, 0.1) }} />
-              <div className="px-6 md:px-10 py-6 md:py-8">
-                {section.content.map((block, i) => {
-                  if (block.type === "para")
-                    return (
-                      <motion.p
-                        key={i}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + i * 0.05 }}
-                        className="font-['Cormorant_Garamond'] text-base md:text-lg mb-4 leading-[1.8]"
-                        style={{ color: p.tm }}
-                      >
-                        {block.text}
-                      </motion.p>
-                    );
-                  if (block.type === "subtitle")
-                    return (
-                      <div key={i} className="flex items-center gap-2 mt-6 mb-2">
-                        <LocalFloristOutlinedIcon style={{ fontSize: 16, color: section.accent, opacity: 0.8 }} />
-                        <h3 
-                          className="font-['Playfair_Display'] text-base md:text-lg font-semibold"
-                          style={{ color: section.accent }}
-                        >
-                          {block.text}
-                        </h3>
-                      </div>
-                    );
-                  if (block.type === "list")
-                    return (
-                      <div key={i} className="mb-4">
-                        {block.items.map((item, j) => (
-                          <motion.div
-                            key={j}
-                            initial={{ opacity: 0, x: -15 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.15 + j * 0.05 }}
-                            className="flex items-start gap-3 py-2 px-4 mb-2 rounded-xl transition-all duration-200 hover:translate-x-1"
-                            style={{
-                              background: "rgba(255,255,255,0.4)",
-                              border: `1px solid ${hexToRgba(section.accent, 0.08)}`,
-                            }}
-                          >
-                            <CheckCircleOutlineIcon 
-                              style={{ fontSize: 18, color: section.accent, marginTop: "2px", opacity: 0.8 }} 
-                              className="shrink-0"
-                            />
-                            <p 
-                              className="font-['Cormorant_Garamond'] text-[15px] md:text-base leading-relaxed"
-                              style={{ color: p.tm }}
-                            >
-                              {item}
-                            </p>
-                          </motion.div>
-                        ))}
-                      </div>
-                    );
-                  if (block.type === "contact")
-                    return (
-                      <div
-                        key={i}
-                        className="rounded-2xl overflow-hidden mb-4 border relative"
-                        style={{
-                          borderColor: hexToRgba(section.accent, 0.2),
-                          background: "rgba(255,255,255,0.45)",
-                        }}
-                      >
-                        {block.items.map((item, j) => {
-                          const CIcon = item.ContactIcon;
-                          return (
-                            <motion.div
-                              key={j}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.1 + j * 0.08 }}
-                              className="flex items-center gap-3 px-5 md:px-6 py-3 border-b last:border-b-0 hover:bg-white/20 transition-colors"
-                              style={{ borderColor: `${p.border}40` }}
-                            >
-                              <div
-                                className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
-                                style={{ background: hexToRgba(section.accent, 0.1) }}
-                              >
-                                <CIcon style={{ fontSize: 18, color: section.accent }} />
-                              </div>
-                              <span 
-                                className="font-['Playfair_Display'] text-sm font-semibold min-w-[100px] shrink-0"
-                                style={{ color: section.accent }}
-                              >
-                                {item.label}
-                              </span>
-                              <span 
-                                className="font-['Cormorant_Garamond'] text-base flex-1"
-                                style={{ color: p.tm }}
-                              >
-                                {item.value}
-                              </span>
-                            </motion.div>
-                          );
-                        })}
-                      </div>
-                    );
-                  return null;
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-10" />
+      <img
+        src={src}
+        alt={alt}
+        className="w-full h-[400px] md:h-[500px] object-cover hover:scale-105 transition-transform duration-[20s] ease-linear"
+      />
+      <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 z-20 flex items-center gap-2">
+        <MdEco className="text-white text-2xl drop-shadow-md" />
+        <span className="text-white font-['Cormorant_Garamond'] text-lg md:text-xl font-medium tracking-wide drop-shadow-md">
+          Swagrama Wellness
+        </span>
       </div>
     </motion.div>
   );
 }
 
-function TableOfContents({ activeSection, onSelect }) {
-  const [openMobileTOC, setOpenMobileTOC] = useState(false);
-  
-  // Custom hook replacement for useMediaQuery
-  const [isMobile, setIsMobile] = useState(false);
-  useEffect(() => {
-    const checkIsMobile = () => setIsMobile(window.innerWidth < 1024);
-    checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    return () => window.removeEventListener('resize', checkIsMobile);
-  }, []);
-
-  const hexToRgba = (hex, alpha) => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
-
-  if (isMobile) {
-    return (
-      <div className="fixed bottom-6 right-5 z-[1200]">
-        <AnimatePresence>
-          {openMobileTOC && (
-            <motion.div
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 300, damping: 25 }}
-              className="absolute bottom-[70px] right-0 rounded-[20px] p-2.5 w-[240px] max-h-[60vh] overflow-y-auto shadow-2xl backdrop-blur-md border border-white/40"
-              style={{ background: hexToRgba(p.cream, 0.95) }}
+function SectionContent({ section, index }) {
+  const Icon = section.MuiIcon || section.IconComponent;
+  return (
+    <motion.div
+      id={section.id}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      variants={staggerContainer}
+      className="mb-24 scroll-mt-32"
+    >
+      <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6 mb-8">
+        <motion.div
+          variants={fadeInUp}
+          className="w-16 h-16 rounded-full flex items-center justify-center shrink-0"
+          style={{ background: hexToRgba(section.accent, 0.1) }}
+        >
+          <Icon style={{ fontSize: 32, color: section.accent }} />
+        </motion.div>
+        <div>
+          <motion.h2
+            variants={fadeInUp}
+            className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold mb-3"
+            style={{ color: p.td }}
+          >
+            {section.title}
+          </motion.h2>
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-wrap items-center gap-3"
+          >
+            <span
+              className="text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+              style={{
+                background: hexToRgba(section.accent, 0.1),
+                color: section.accent,
+              }}
             >
-              <div className="px-2 pb-2 mb-1 border-b" style={{ borderColor: p.border }}>
-                <span className="font-['Playfair_Display'] text-xs font-bold uppercase tracking-widest" style={{ color: p.tl }}>
-                  Contents
-                </span>
-              </div>
-              {sections.map((s) => {
-                const Icon = s.IconComponent;
-                return (
-                  <div
-                    key={s.id}
-                    onClick={() => {
-                      onSelect(s.id);
-                      setOpenMobileTOC(false);
-                    }}
-                    className="flex items-center gap-3 py-2 px-3 rounded-xl cursor-pointer transition-colors"
-                    style={{
-                      background: activeSection === s.id ? hexToRgba(p.sage, 0.1) : "transparent",
-                    }}
-                  >
-                    <Icon style={{ fontSize: 16, color: activeSection === s.id ? s.accent : p.tl }} />
-                    <span 
-                      className="font-['Cormorant_Garamond'] text-[15px]"
-                      style={{ 
-                        color: activeSection === s.id ? s.accent : p.tm,
-                        fontWeight: activeSection === s.id ? 600 : 400
+              {section.number}
+            </span>
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: p.border }}
+            />
+            <span
+              className="font-['Cormorant_Garamond'] text-xl italic opacity-90"
+              style={{ color: p.tl }}
+            >
+              {section.tagline}
+            </span>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="space-y-6">
+        {section.content.map((block, i) => {
+          if (block.type === "para") {
+            return (
+              <motion.p
+                key={i}
+                variants={fadeInUp}
+                className="font-['Cormorant_Garamond'] text-xl leading-relaxed"
+                style={{ color: p.tm }}
+              >
+                {block.text}
+              </motion.p>
+            );
+          }
+          if (block.type === "subtitle") {
+            return (
+              <motion.h3
+                key={i}
+                variants={fadeInUp}
+                className="font-['Playfair_Display'] flex items-center gap-2 text-2xl font-semibold mt-10 mb-4"
+                style={{ color: section.accent }}
+              >
+                <LocalFloristOutlinedIcon fontSize="inherit" />
+                {block.text}
+              </motion.h3>
+            );
+          }
+          if (block.type === "list") {
+            return (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                className="pl-2 space-y-4"
+              >
+                {block.items.map((item, j) => (
+                  <div key={j} className="flex items-start gap-3">
+                    <CheckCircleOutlineIcon
+                      style={{
+                        fontSize: 22,
+                        color: section.accent,
+                        marginTop: "2px",
                       }}
+                      className="shrink-0"
+                    />
+                    <span
+                      className="font-['Cormorant_Garamond'] text-xl leading-relaxed"
+                      style={{ color: p.tm }}
                     >
-                      {s.title}
+                      {item}
                     </span>
                   </div>
-                );
-              })}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.05 }}
-          onClick={() => setOpenMobileTOC(!openMobileTOC)}
-          className="w-14 h-14 rounded-full flex items-center justify-center text-white shadow-xl focus:outline-none z-50 relative"
-          style={{ background: `linear-gradient(135deg, ${p.sage}, ${p.sageLight})` }}
-        >
-          {openMobileTOC ? <CloseIcon /> : <FormatListBulletedIcon />}
-        </motion.button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="sticky top-24 z-10 w-full xl:w-[320px]">
-      <div 
-        className="rounded-[24px] overflow-hidden backdrop-blur-xl border border-white/40 shadow-xl"
-        style={{ background: hexToRgba(p.cream, 0.75) }}
-      >
-        {/* Header */}
-        <div 
-          className="px-6 py-5 border-b"
-          style={{ 
-            background: `linear-gradient(135deg, ${hexToRgba(p.sage, 0.08)}, transparent)`,
-            borderColor: p.border 
-          }}
-        >
-          <div className="flex items-center gap-2 mb-1">
-            <SpaIcon style={{ fontSize: 20, color: p.sage }} />
-            <h3 className="font-['Playfair_Display'] text-base font-bold" style={{ color: p.td }}>
-              Contents
-            </h3>
-          </div>
-          <p className="font-['Cormorant_Garamond'] text-xs uppercase tracking-wide" style={{ color: p.tl }}>
-            12 sections · Privacy Policy
-          </p>
-        </div>
-
-        {/* List */}
-        <div className="p-3">
-          {sections.map((s) => {
-            const Icon = s.IconComponent;
-            const active = activeSection === s.id;
-            return (
-              <motion.div key={s.id} whileHover={{ x: 5 }} transition={{ type: "spring", stiffness: 400 }}>
-                <div
-                  onClick={() => onSelect(s.id)}
-                  className="flex items-center gap-3 py-2 px-3 rounded-xl cursor-pointer transition-all duration-300"
-                  style={{
-                    background: active ? hexToRgba(s.accent, 0.08) : "transparent",
-                  }}
-                >
-                  {/* Indicator Line */}
-                  <div 
-                    className="w-1 h-8 rounded-full transition-all duration-300"
-                    style={{ 
-                      background: active ? s.accent : "transparent",
-                      transform: active ? "scaleY(1)" : "scaleY(0.5)"
-                    }} 
-                  />
-                  <Icon style={{ fontSize: 16, color: active ? s.accent : p.tl }} />
-                  <span 
-                    className="font-['Cormorant_Garamond'] text-[15px] flex-1 truncate"
-                    style={{ 
-                      color: active ? s.accent : p.tm,
-                      fontWeight: active ? 700 : 500
-                    }}
-                  >
-                    {s.title}
-                  </span>
-                  <span className="text-[10px] font-mono opacity-50" style={{ color: p.tl }}>
-                    {s.number}
-                  </span>
-                </div>
+                ))}
               </motion.div>
             );
-          })}
-        </div>
-
-        {/* Footer */}
-        <div 
-          className="px-6 py-4 border-t flex items-center justify-between"
-          style={{ borderColor: p.border, background: hexToRgba(p.sage, 0.03) }}
-        >
-          <div className="flex items-center gap-2">
-            <FiberManualRecordIcon style={{ fontSize: 8, color: p.sage }} className="animate-pulse" />
-            <span className="font-['Cormorant_Garamond'] text-xs font-semibold" style={{ color: p.sage }}>
-              Active Version
-            </span>
-          </div>
-          <span className="font-['Cormorant_Garamond'] text-xs opacity-70" style={{ color: p.tl }}>
-            Updated: June 2025
-          </span>
-        </div>
+          }
+          if (block.type === "contact") {
+            return (
+              <motion.div
+                key={i}
+                variants={fadeInUp}
+                className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8"
+              >
+                {block.items.map((item, j) => {
+                  const CIcon = item.ContactIcon;
+                  return (
+                    <div
+                      key={j}
+                      className="p-6 rounded-[24px] border border-opacity-30 flex items-center gap-4 bg-white/50 backdrop-blur-sm"
+                      style={{ borderColor: p.border }}
+                    >
+                      <div
+                        className="w-12 h-12 rounded-full flex items-center justify-center shrink-0"
+                        style={{ background: hexToRgba(section.accent, 0.1) }}
+                      >
+                        <CIcon style={{ color: section.accent }} />
+                      </div>
+                      <div>
+                        <div
+                          className="text-xs font-bold tracking-widest uppercase mb-1"
+                          style={{ color: section.accent }}
+                        >
+                          {item.label}
+                        </div>
+                        <div
+                          className="font-['Cormorant_Garamond'] text-lg md:text-xl"
+                          style={{ color: p.td }}
+                        >
+                          {item.value}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </motion.div>
+            );
+          }
+          return null;
+        })}
       </div>
-    </div>
+    </motion.div>
   );
 }
 
 export default function SwagramaPrivacyPolicy() {
-  const [activeSection, setActiveSection] = useState(null);
-  
-  // Parallax effects for the hero section
   const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.3], [0, -100]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
 
-  const scrollTo = (id) => {
+  const scaleX = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
+  const scrollTo = (e, id) => {
+    e.preventDefault();
     const el = document.getElementById(id);
     if (el) {
-      // Adjusted offset for the fixed header height if any
       const y = el.getBoundingClientRect().top + window.scrollY - 100;
       window.scrollTo({ top: y, behavior: "smooth" });
-      setActiveSection(id);
     }
   };
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          if (e.isIntersecting) setActiveSection(e.target.id);
-        });
-      },
-      { threshold: 0.3, rootMargin: "-15% 0px -65% 0px" }
-    );
-    
-    sections.forEach((s) => {
-      const el = document.getElementById(s.id);
-      if (el) observer.observe(el);
-    });
-    
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <div className="relative min-h-screen bg-[#faf8f3] text-[#2d2416] selection:bg-[#4a7c59] selection:text-white font-['Cormorant_Garamond']">
-      <ReadingProgress />
+    <div className="min-h-screen relative" style={{ background: p.cream }}>
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-1 z-[2000] origin-left"
+        initial={{ backgroundColor: p.sage }}
+        animate={{ backgroundColor: p.sage }}
+      />
 
-      {/* Fixed 3D Background */}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-60">
-        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-          <Suspense fallback={null}>
-            <Environment preset="city" />
-            <BackgroundScene />
-          </Suspense>
-        </Canvas>
-      </div>
+      <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
+        <motion.div style={{ y: heroY }} className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-black/40 z-10" />
+          <img
+            src={heroImg}
+            alt="Ayurveda Wellness"
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
 
-      {/* Main Content Area - Scrollable */}
-      <main className="relative z-10 w-full overflow-hidden flex flex-col items-center">
-        
-        {/* Modern Hero Section */}
-        <motion.section 
-          style={{ y: heroY, opacity: heroOpacity, scale: heroScale }}
-          className="relative w-[96%] max-w-7xl mx-auto mt-6 md:mt-10 rounded-[40px] overflow-hidden"
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          className="relative z-20 text-center px-4 max-w-4xl mx-auto "
         >
-          {/* Glassmorphic Background for Hero */}
-          <div className="absolute inset-0 bg-white/20 backdrop-blur-[40px] border border-white/60"></div>
-          
-          <div className="absolute inset-0 bg-gradient-to-br from-[#4a7c59]/80 via-[#6a9b74]/60 to-[#7aad35]/40 opacity-90 mix-blend-multiply"></div>
-          
-          {/* Decorative Orbs inside Hero */}
-          <div className="absolute top-[-10%] left-[-5%] w-64 h-64 bg-[#c4e07a] rounded-full mix-blend-screen filter blur-[80px] opacity-40 animate-pulse"></div>
-          <div className="absolute bottom-[-10%] right-[-5%] w-80 h-80 bg-[#c9961a] rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
-
-          <div className="relative z-10 py-24 md:py-32 px-6 lg:px-12 flex flex-col items-center text-center">
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="w-20 h-20 md:w-24 md:h-24 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/30 flex items-center justify-center mb-8 shadow-2xl"
-            >
-              <SpaIcon style={{ fontSize: 40, color: "white" }} />
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.8 }}
-            >
-              <span className="font-['Playfair_Display'] text-xs md:text-sm tracking-[0.3em] text-white/80 uppercase mb-4 block font-bold">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+          >
+            <div className="flex items-center justify-center gap-3 mb-6">
+              <span className="w-12 h-[1px] bg-white/60" />
+              <MdEco className="text-white/90 text-2xl" />
+              <span className="text-white/90 text-sm tracking-[0.3em] uppercase font-semibold">
                 Swagrama Community
               </span>
-            </motion.div>
+              <span className="w-12 h-[1px] bg-white/60" />
+            </div>
+            <h1 className="font-['Playfair_Display'] text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg leading-tight">
+              Privacy & Trust
+            </h1>
+            <p className="font-['Cormorant_Garamond'] text-2xl md:text-3xl text-white/90 max-w-2xl mx-auto font-light leading-relaxed">
+              Rooted in transparency and the healing{" "}
+              <br className="hidden md:block" /> traditions of Ayurveda.
+            </p>
+          </motion.div>
+        </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 1 }}
-              className="font-['Playfair_Display'] text-5xl md:text-7xl lg:text-[5.5rem] font-bold text-white leading-[1.1] tracking-tight mb-8"
-              style={{ textShadow: "0 10px 30px rgba(0,0,0,0.15)" }}
-            >
-              Privacy Policy
-            </motion.h1>
+     
+      </div>
 
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7, duration: 1 }}
-              className="max-w-2xl text-xl md:text-2xl text-white/90 italic font-medium leading-relaxed"
-            >
-              "Rooted in transparency, nourished by trust — how we honour your personal journey with us."
-            </motion.p>
+
+      <div className="w-full max-w-[1540px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-30">
+        <div className="flex flex-col lg:flex-row gap-16">
+
+          <div className="hidden lg:block w-72 shrink-0">
+            <div className="sticky top-32 space-y-4">
+              <div className="flex items-center gap-2 mb-8">
+                <SpaIcon style={{ color: p.sage }} />
+                <span
+                  className="font-['Playfair_Display'] text-xl font-bold"
+                  style={{ color: p.td }}
+                >
+                  Contents
+                </span>
+              </div>
+              {sections.map((s) => (
+                <div key={s.id} className="group flex items-center gap-3 mb-2">
+                  <div
+                    className="w-6 h-px transition-all duration-300 group-hover:w-10 group-hover:bg-opacity-100"
+                    style={{ background: p.sage, opacity: 0.3 }}
+                  />
+                  <a
+                    href={`#${s.id}`}
+                    onClick={(e) => scrollTo(e, s.id)}
+                    className="font-['Cormorant_Garamond'] text-xl transition-all duration-300 hover:font-bold"
+                    style={{ color: p.tm }}
+                  >
+                    {s.title}
+                  </a>
+                </div>
+              ))}
+            </div>
           </div>
-        </motion.section>
 
-        {/* Content Section */}
-        <section className="w-full max-w-7xl mx-auto px-4 md:px-8 py-16 md:py-24 flex flex-col lg:flex-row gap-8 lg:gap-12 relative z-20">
-          
-          {/* Desktop Table of Contents Sidebar */}
-          <div className="hidden lg:block lg:w-1/4 shrink-0 mt-2">
-            <TableOfContents activeSection={activeSection} onSelect={scrollTo} />
-          </div>
-
-          {/* Main Content Sections */}
-          <div className="w-full lg:w-3/4 flex flex-col gap-2">
-            {sections.map((section) => (
-              <div key={section.id} id={section.id} className="scroll-mt-28">
-                <SectionCard section={section} />
+       
+          <div className="flex-1 max-w-5xl">
+            {sections.map((section, index) => (
+              <div key={section.id}>
+                <SectionContent section={section} index={index} />
+                {index === 1 && (
+                  <ImageReveal src={pathImg} alt="Ayurvedic Garden Path" />
+                )}
+                {index === 5 && (
+                  <ImageReveal src={securityImg} alt="Trust and Security" />
+                )}
               </div>
             ))}
-
-            {/* Footer Trust Card */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8 }}
-              className="mt-12 rounded-[32px] overflow-hidden p-[2px] bg-gradient-to-br from-[#4a7c59] via-[#7aad35] to-[#c9961a]"
-            >
-              <div className="bg-[#faf8f3] rounded-[30px] p-8 md:p-14 text-center relative overflow-hidden h-full w-full">
-                
-                {/* Decorative BG spots */}
-                <div className="absolute top-[-20%] left-[-10%] w-60 h-60 bg-[#e8f0e9] rounded-full blur-[60px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-60 h-60 bg-[#f0f8e2] rounded-full blur-[60px]" />
-
-                <div className="relative z-10 relative flex flex-col items-center">
-                  <motion.div
-                    animate={{ rotate: [0, 8, -8, 0], scale: [1, 1.05, 1] }}
-                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                    className="mb-6 flex justify-center"
-                  >
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-[#4a7c59]/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-[#4a7c59]/10">
-                      <SpaIcon style={{ fontSize: 44, color: p.sage }} />
-                    </div>
-                  </motion.div>
-
-                  <h2 className="font-['Playfair_Display'] text-3xl md:text-4xl font-bold text-[#2d2416] mb-4">
-                    Your Trust is Our Foundation
-                  </h2>
-                  
-                  <p className="font-['Cormorant_Garamond'] text-lg md:text-xl text-[#5a4a35] max-w-2xl mx-auto mb-10 leading-relaxed font-medium">
-                    At Swagrama Community, every decision we make — from the
-                    programmes we offer to the data we collect — is guided by
-                    the Ayurvedic principle of <span className="italic font-bold text-[#4a7c59]">ahimsa</span>: do no harm.
-                    Thank you for placing your trust in us.
-                  </p>
-
-                  <div className="flex flex-wrap justify-center gap-4">
-                    {[
-                      { Icon: VerifiedUserOutlinedIcon, label: "Secure & Encrypted" },
-                      { Icon: GppGoodOutlinedIcon, label: "Your Rights Protected" },
-                      { Icon: MdEco, label: "Ethically Conscious" },
-                    ].map(({ Icon, label }) => (
-                      <div 
-                        key={label}
-                        className="flex items-center gap-2 py-2 px-5 rounded-full bg-white border border-[#d8cdb8] shadow-sm transform transition hover:-translate-y-1 hover:shadow-md"
-                      >
-                        <Icon style={{ fontSize: 18, color: p.sage }} />
-                        <span className="font-['Cormorant_Garamond'] text-[15px] md:text-base font-semibold text-[#5a4a35]">
-                          {label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-
           </div>
-        </section>
-      </main>
+        </div>
+      </div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { API } from "./http-common";
 import ScrollToTopButton from "./ScrollToTopButton";
 import TermsAndConditon from "./components/pages/terms&conditon/TermsAndConditon";
 import PrivacyPolicy from "./components/pages/privacypolicy/PrivacyPolicy";
+import SwagramaPrivacyPolicy from "./components/pages/privacypolicy/PrivacyPolicyNew";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -118,7 +119,7 @@ export default function App() {
   return (
     <>
       <Navbar userData={userData} setUserData={setUserData} />
-      <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#D8EEFF]/60 outline-none mb-3">
+      <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#D8EEFF]/60 outline-none">
         <Suspense fallback={<PageSkeleton />}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<HomePage userData={userData} />} />
@@ -133,7 +134,7 @@ export default function App() {
             <Route path="/calendar" element={<EventCalander userData={userData}/>} />
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/termsAndConditions" element={<TermsAndConditon />} />
-            <Route path="/privacyPolicy" element={<PrivacyPolicy />} />
+            <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
           </Routes>
         </Suspense>
         <ToastContainer

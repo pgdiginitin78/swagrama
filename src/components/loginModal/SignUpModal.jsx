@@ -32,57 +32,19 @@ import { signupJYA } from "../../services/login/LoginServices";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoader } from "../common/commonLoader/LoaderContext";
-const MotionBox = motion.create(Box);
 
 const modalVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.8,
-    y: -50,
-  },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
-    scale: 1,
     y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
-      staggerChildren: 0.08,
-    },
+    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
   },
   exit: {
     opacity: 0,
-    scale: 0.8,
-    y: -50,
-    transition: {
-      duration: 0.3,
-    },
+    y: 24,
+    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
   },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 5 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
-const sectionVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: (custom) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      delay: custom * 0.1,
-      duration: 0.4,
-      ease: "easeOut",
-    },
-  }),
 };
 
 const signupValidationSchema = yup.object().shape({
@@ -90,76 +52,74 @@ const signupValidationSchema = yup.object().shape({
     .string()
     .required("First name is required")
     .matches(/^[a-zA-Z\s]+$/, "Only letters allowed"),
-
   lastName: yup
     .string()
     .required("Last name is required")
     .matches(/^[a-zA-Z\s]+$/, "Only letters allowed"),
-
   dob: yup
     .date()
     .required("Date of birth is required")
     .max(new Date(), "Cannot be in future"),
   age: yup
     .number()
+    .typeError("Age is required")
     .required("Age is required")
     .positive("Must be positive")
-    .integer("Must be integer"),
-
+    .integer("Must be integer")
+    .min(1, "Age must be at least 1")
+    .max(120, "Age cannot exceed 120"),
   mobileNo: yup
     .string()
     .required("Mobile required")
     .matches(/^[0-9]{10}$/, "Must be 10 digits"),
-
-  whatsappNo: yup
-    .string()
-    .required("WhatsApp required")
-    .matches(/^[0-9]{10}$/, "Must be 10 digits"),
-
   emailId: yup
     .string()
     .required("Email is required")
     .email("Invalid email format")
     .matches(/^[^\s@]+@[^\s@]+\.(com|in)$/i, "Email must end with .com or .in"),
-
   pinCode: yup
     .string()
     .required("Pin code required")
     .matches(/^[0-9]{6}$/, "Must be 6 digits"),
-
   address: yup.string().required("Address required"),
   locality: yup
     .string()
     .required("Locality required")
     .min(2, "Min 2 characters"),
-
   city: yup.string().required("City required").min(2, "Min 2 characters"),
-
   state: yup.string().required("State required").min(2, "Min 2 characters"),
-
   country: yup.string().required("Country required").min(2, "Min 2 characters"),
-
-  landmark: yup.string().optional().min(2, "Min 2 characters"),
-
   userName: yup
     .string()
     .required("Username required")
-    .matches(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, underscore"),
-
+    .matches(/^[a-zA-Z0-9_]+$/, "Only letters, numbers, underscore")
+    .max(50, "Maximum 50 characters required"),
   passWord: yup
     .string()
     .required("Password required")
     .min(4, "Minimum 4 characters required"),
-
   confirmPassword: yup
     .string()
     .required("Confirm password")
     .oneOf([yup.ref("passWord"), null], "Passwords must match"),
-
   agreeToTerms: yup
     .boolean()
     .oneOf([true], "You must accept the terms and conditions"),
 });
+
+const calculateDOBFromAge = (age) => {
+  const ageNum = Number(age);
+  if (
+    !age ||
+    isNaN(ageNum) ||
+    !Number.isInteger(ageNum) ||
+    ageNum < 1 ||
+    ageNum > 120
+  )
+    return null;
+  const birthYear = new Date().getFullYear() - ageNum;
+  return new Date(birthYear, 0, 1);
+};
 
 export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
   const [showPassword, setShowPassword] = useState(false);
@@ -167,6 +127,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
   const [ipAddress, setIpAddress] = useState(null);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+
   const { setIsLoading } = useLoader();
   const {
     control,
@@ -207,6 +168,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
   const dob = watch("dob");
   const pinCodeValue = watch("pinCode");
   const agreeToTerms = watch("agreeToTerms");
+  const watchedAge = watch("age");
 
   const onSubmit = (data) => {
     const formattedData = {
@@ -247,19 +209,33 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
       const monthDiff = today.getMonth() - birthDate.getMonth();
-
       if (
         monthDiff < 0 ||
         (monthDiff === 0 && today.getDate() < birthDate.getDate())
       ) {
         calculatedAge--;
       }
-
-      if (calculatedAge >= 0) {
+      if (calculatedAge >= 1 && calculatedAge <= 120) {
         setValue("age", calculatedAge);
       }
     }
   }, [dob, setValue]);
+
+  useEffect(() => {
+    const ageNum = Number(watchedAge);
+    if (
+      watchedAge &&
+      !isNaN(ageNum) &&
+      Number.isInteger(ageNum) &&
+      ageNum >= 1 &&
+      ageNum <= 120
+    ) {
+      const calculatedDOB = calculateDOBFromAge(watchedAge);
+      if (calculatedDOB) {
+        setValue("dob", calculatedDOB, { shouldValidate: true });
+      }
+    }
+  }, [watchedAge, setValue]);
 
   useEffect(() => {
     const fetchPinData = async () => {
@@ -278,25 +254,30 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
         console.log(error);
       }
     };
-
     fetchPinData();
   }, [pinCodeValue, setValue]);
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
-      .then((data) => {
-        setIpAddress(data.ip);
-      })
+      .then((data) => setIpAddress(data.ip))
       .catch((error) => console.error("Error:", error));
   }, []);
+
+  const textFieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: 2,
+      bgcolor: "#ffffff",
+    },
+  };
 
   return (
     <>
       <Modal
         open={open}
         onClose={handleClose}
-        closeAfterTransition
+        closeAfterTransition={false}
+        disableScrollLock
         sx={{
           display: "flex",
           alignItems: "center",
@@ -304,64 +285,65 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
           backdropFilter: "blur(4px)",
         }}
       >
-        <AnimatePresence mode="wait">
-          {open && (
-            <MotionBox
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              sx={{
-                width: "100%",
-                maxWidth: 680,
-                maxHeight: "90vh",
-                mx: 2,
-                outline: "none",
-                overflowY: "auto",
-                "&::-webkit-scrollbar": {
-                  width: "8px",
-                },
-                "&::-webkit-scrollbar-track": {
-                  background: "transparent",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  backgroundColor: "#ffffff",
-                  borderRadius: 3,
-                  boxShadow: "0 24px 48px rgba(0,0,0,0.2)",
-                  position: "relative",
-                  overflow: "hidden",
+        <Box
+          sx={{
+            width: "100%",
+            maxWidth: 680,
+            maxHeight: "90vh",
+            mx: 2,
+            outline: "none",
+          }}
+        >
+          <AnimatePresence mode="wait">
+            {open && (
+              <motion.div
+                key="signup-modal"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                style={{
+                  willChange: "transform, opacity",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
+                  borderRadius: 12,
                 }}
               >
                 <Box
                   sx={{
-                    height: 6,
-                    background:
-                      "linear-gradient(90deg, #22c55e 0%, #84cc16 100%)",
-                  }}
-                />
-
-                <IconButton
-                  onClick={handleClose}
-                  sx={{
-                    position: "absolute",
-                    top: 16,
-                    right: 16,
-                    color: "#718096",
-                    zIndex: 1,
-                    "&:hover": {
-                      backgroundColor: "rgba(0,0,0,0.04)",
-                      color: "#2d3748",
-                    },
+                    backgroundColor: "#ffffff",
+                    borderRadius: 3,
+                    boxShadow: "0 24px 48px rgba(0,0,0,0.2)",
+                    position: "relative",
+                    overflow: "hidden",
                   }}
                 >
-                  <Close />
-                </IconButton>
+                  <Box
+                    sx={{
+                      height: 6,
+                      background:
+                        "linear-gradient(90deg, #22c55e 0%, #84cc16 100%)",
+                    }}
+                  />
 
-                <Box sx={{ p: 4, pt: 3 }}>
-                  <MotionBox variants={itemVariants} sx={{ mb: 1 }}>
+                  <IconButton
+                    onClick={handleClose}
+                    sx={{
+                      position: "absolute",
+                      top: 16,
+                      right: 16,
+                      color: "#718096",
+                      zIndex: 1,
+                      "&:hover": {
+                        backgroundColor: "rgba(0,0,0,0.04)",
+                        color: "#2d3748",
+                      },
+                    }}
+                  >
+                    <Close />
+                  </IconButton>
+
+                  <Box sx={{ p: 4, pt: 3 }}>
                     <div className="flex justify-center">
                       <img
                         src={SwagramaLogo}
@@ -376,17 +358,12 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                       Manage your Ayurveda therapy and events, services by
                       booking through the Swagrama.
                     </p>
-                  </MotionBox>
 
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
-                    <motion.div
-                      custom={0}
-                      variants={sectionVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="group"
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="space-y-2 mt-2"
                     >
-                      <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-[#e6efe3]">
+                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-[#22c55e] to-[#84cc16] px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -416,6 +393,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               disableFuture={true}
                               inputFormat="dd-MM-yyyy"
                               error={errors.dob}
+                              dob={true}
                             />
                             <InputField
                               control={control}
@@ -429,11 +407,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                 name="gender"
                                 label="Gender *"
                                 dataArray={[
-                                  {
-                                    id: "Male",
-                                    value: "Male",
-                                    label: "Male",
-                                  },
+                                  { id: "Male", value: "Male", label: "Male" },
                                   {
                                     id: "Female",
                                     value: "Female",
@@ -450,15 +424,8 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                    <motion.div
-                      custom={1}
-                      variants={sectionVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="group"
-                    >
-                      <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-[#e6efe3]">
+
+                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-amber-200 to-amber-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -480,21 +447,18 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                 control={
                                   <Switch
                                     onChange={(e) => {
-                                      if (e.target.checked) {
+                                      if (e.target.checked)
                                         setValue(
                                           "whatsappNo",
                                           watch("mobileNo"),
                                         );
-                                      }
                                     }}
                                     sx={{
                                       "& .MuiSwitch-switchBase.Mui-checked": {
                                         color: "#16a34a",
                                       },
                                       "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                        {
-                                          backgroundColor: "lightgreen",
-                                        },
+                                        { backgroundColor: "lightgreen" },
                                     }}
                                   />
                                 }
@@ -510,8 +474,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                             <InputField
                               control={control}
                               name="whatsappNo"
-                              label="WhatsApp Number *"
-                              error={errors.whatsappNo}
+                              label="WhatsApp Number"
                             />
                             <div className="sm:col-span-2">
                               <InputField
@@ -525,15 +488,8 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                    <motion.div
-                      custom={2}
-                      variants={sectionVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="group"
-                    >
-                      <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-[#e6efe3]">
+
+                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-teal-200 to-teal-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -578,13 +534,12 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               control={control}
                               name="landmark"
                               label="Landmark"
-                              error={errors.landmark}
                             />
                             <div className="sm:col-span-2">
                               <InputArea
                                 control={control}
                                 name="address"
-                                label="Address *"
+                                label="Address"
                                 error={errors.address}
                                 minRows={2}
                                 maxRows={3}
@@ -593,15 +548,8 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                    <motion.div
-                      custom={3}
-                      variants={sectionVariants}
-                      initial="hidden"
-                      animate="visible"
-                      className="group"
-                    >
-                      <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-[#e6efe3]">
+
+                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-green-200 to-green-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -636,22 +584,11 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                         </InputAdornment>
                                       ),
                                     }}
-                                    sx={{
-                                      "& .MuiOutlinedInput-root": {
-                                        borderRadius: 2,
-                                        bgcolor: "#ffffff",
-                                        transition: "all 0.3s",
-                                        "&:hover": {
-                                          boxShadow:
-                                            "0 2px 8px rgba(122, 168, 116, 0.15)",
-                                        },
-                                      },
-                                    }}
+                                    sx={textFieldSx}
                                   />
                                 )}
                               />
                             </div>
-
                             <Controller
                               name="passWord"
                               control={control}
@@ -697,21 +634,10 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                       </InputAdornment>
                                     ),
                                   }}
-                                  sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                      borderRadius: 2,
-                                      bgcolor: "#ffffff",
-                                      transition: "all 0.3s",
-                                      "&:hover": {
-                                        boxShadow:
-                                          "0 2px 8px rgba(122, 168, 116, 0.15)",
-                                      },
-                                    },
-                                  }}
+                                  sx={textFieldSx}
                                 />
                               )}
                             />
-
                             <Controller
                               name="confirmPassword"
                               control={control}
@@ -761,30 +687,14 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                       </InputAdornment>
                                     ),
                                   }}
-                                  sx={{
-                                    "& .MuiOutlinedInput-root": {
-                                      borderRadius: 2,
-                                      bgcolor: "#ffffff",
-                                      transition: "all 0.3s",
-                                      "&:hover": {
-                                        boxShadow:
-                                          "0 2px 8px rgba(122, 168, 116, 0.15)",
-                                      },
-                                    },
-                                  }}
+                                  sx={textFieldSx}
                                 />
                               )}
                             />
                           </div>
                         </div>
                       </div>
-                    </motion.div>
-                    <motion.div
-                      custom={4}
-                      variants={sectionVariants}
-                      initial="hidden"
-                      animate="visible"
-                    >
+
                       <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="p-4 sm:p-6">
                           <h4 className="text-base sm:text-lg font-bold text-[#2f3e2e] mb-3">
@@ -802,10 +712,9 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               you do not agree with any part of these terms,
                               please do not register.
                             </p>
-
                             <p className="mb-3">
                               <strong>
-                                2. Wellness Services & Consultation
+                                2. Wellness Services &amp; Consultation
                               </strong>
                             </p>
                             <p className="mb-4">
@@ -817,9 +726,10 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               care. Always consult qualified healthcare
                               professionals for medical conditions.
                             </p>
-
                             <p className="mb-3">
-                              <strong>3. Health Information & Privacy</strong>
+                              <strong>
+                                3. Health Information &amp; Privacy
+                              </strong>
                             </p>
                             <p className="mb-4">
                               We collect your health information, dosha profile,
@@ -829,7 +739,6 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               accordance with our Privacy Policy and applicable
                               health data protection regulations.
                             </p>
-
                             <p className="mb-3">
                               <strong>4. Accurate Health Information</strong>
                             </p>
@@ -841,9 +750,10 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               effective Ayurvedic recommendations. Update your
                               health profile whenever your condition changes.
                             </p>
-
                             <p className="mb-3">
-                              <strong>5. Product Usage & Responsibility</strong>
+                              <strong>
+                                5. Product Usage &amp; Responsibility
+                              </strong>
                             </p>
                             <p className="mb-4">
                               Ayurvedic products and remedies recommended
@@ -855,9 +765,8 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               should seek medical advice before using any herbal
                               products.
                             </p>
-
                             <p className="mb-3">
-                              <strong>6. Account Security & Usage</strong>
+                              <strong>6. Account Security &amp; Usage</strong>
                             </p>
                             <p className="mb-4">
                               You are responsible for maintaining the
@@ -867,7 +776,6 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               to suspend accounts that violate our community
                               guidelines or misuse our wellness services.
                             </p>
-
                             <p className="mb-3">
                               <strong>7. Limitation of Liability</strong>
                             </p>
@@ -880,7 +788,6 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               nature, not a substitute for professional medical
                               diagnosis or treatment.
                             </p>
-
                             <p className="mb-3">
                               <strong>8. Intellectual Property</strong>
                             </p>
@@ -892,7 +799,6 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               reproduce, distribute, or commercialize our
                               content without permission.
                             </p>
-
                             <p className="mb-3">
                               <strong>9. Changes to Terms</strong>
                             </p>
@@ -905,7 +811,6 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                               notifications.
                             </p>
                           </div>
-
                           <Controller
                             name="agreeToTerms"
                             control={control}
@@ -920,9 +825,7 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                                         color: errors.agreeToTerms
                                           ? "#d32f2f"
                                           : "#7aa874",
-                                        "&.Mui-checked": {
-                                          color: "#7aa874",
-                                        },
+                                        "&.Mui-checked": { color: "#7aa874" },
                                       }}
                                     />
                                   }
@@ -952,60 +855,55 @@ export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
                           />
                         </div>
                       </div>
-                    </motion.div>
 
-                    <MotionBox variants={itemVariants}>
-                      <Button
-                        type="submit"
-                        fullWidth
-                        disabled={!agreeToTerms}
-                        sx={{
-                          borderRadius: 3,
-                          py: 1.5,
-                          textTransform: "none",
-                          fontWeight: 700,
-                          fontSize: "1rem",
-                          background: agreeToTerms
-                            ? "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)"
-                            : "#e0e0e0",
-                          color: "white",
-                          boxShadow: agreeToTerms
-                            ? "0 4px 15px rgba(127, 176, 105, 0.3)"
-                            : "none",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            transform: agreeToTerms
-                              ? "translateY(-2px)"
-                              : "none",
+                      <motion.div
+                        whileHover={agreeToTerms ? { y: -2 } : {}}
+                        whileTap={agreeToTerms ? { scale: 0.99 } : {}}
+                        style={{ willChange: "transform" }}
+                      >
+                        <Button
+                          type="submit"
+                          fullWidth
+                          disabled={!agreeToTerms}
+                          sx={{
+                            borderRadius: 3,
+                            py: 1.5,
+                            textTransform: "none",
+                            fontWeight: 700,
+                            fontSize: "1rem",
+                            background: agreeToTerms
+                              ? "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)"
+                              : "#e0e0e0",
+                            color: "white",
                             boxShadow: agreeToTerms
-                              ? "0 6px 20px rgba(127, 176, 105, 0.4)"
+                              ? "0 4px 15px rgba(127, 176, 105, 0.3)"
                               : "none",
-                          },
-                          "&:disabled": {
-                            cursor: "not-allowed",
-                          },
-                        }}
-                      >
-                        Sign Up
-                      </Button>
-                    </MotionBox>
+                            "&:disabled": { cursor: "not-allowed" },
+                          }}
+                        >
+                          Sign Up
+                        </Button>
+                      </motion.div>
 
-                    <div className="flex justify-center items-center space-x-3 mt-5">
-                      <p className="text-ayuBrown">Already have an account?</p>
-                      <button
-                        type="button"
-                        onClick={handleClose}
-                        className="text-green-600 hover:text-green-700 font-medium transition-colors"
-                      >
-                        Login
-                      </button>
-                    </div>
-                  </form>
+                      <div className="flex justify-center items-center space-x-3 mt-5">
+                        <p className="text-ayuBrown">
+                          Already have an account?
+                        </p>
+                        <button
+                          type="button"
+                          onClick={handleClose}
+                          className="text-green-600 hover:text-green-700 font-medium"
+                        >
+                          Login
+                        </button>
+                      </div>
+                    </form>
+                  </Box>
                 </Box>
-              </Box>
-            </MotionBox>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Box>
       </Modal>
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}

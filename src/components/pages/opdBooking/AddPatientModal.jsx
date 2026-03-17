@@ -12,6 +12,8 @@ import {
   Typography,
   IconButton,
   Button,
+  Switch,
+  FormControlLabel,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -22,6 +24,8 @@ import { AddPatient } from "../../../services/bookAppointment/BookAppointmentSer
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../common/ConfirmationModal";
+import { getUserDetails } from "../../../services/login/LoginServices";
+import InputArea from "../../common/formFields/InputArea";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -104,7 +108,6 @@ const formatDateToYYYYMMDD = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// Calculate age from DOB
 const calculateAgeFromDOB = (dob) => {
   if (!dob || isNaN(new Date(dob))) return "";
   const birthDate = new Date(dob);
@@ -120,7 +123,6 @@ const calculateAgeFromDOB = (dob) => {
   return age >= 0 && age <= 120 ? String(age) : "";
 };
 
-// Calculate DOB (Jan 1st of birth year) from age
 const calculateDOBFromAge = (age) => {
   const ageNum = Number(age);
   if (
@@ -132,38 +134,48 @@ const calculateDOBFromAge = (age) => {
   )
     return null;
   const birthYear = new Date().getFullYear() - ageNum;
-  return new Date(birthYear, 0, 1); // Jan 1st of birth year
+  return new Date(birthYear, 0, 1);
 };
 
-function SectionHeader({ icon: Icon, label }) {
+function SectionHeader({ icon: Icon, label, children }) {
   return (
     <Box sx={{ mb: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-        <Box
-          sx={{
-            width: 30,
-            height: 30,
-            borderRadius: 1.5,
-            background: "linear-gradient(135deg, #16a34a, #22c55e)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-          }}
-        >
-          <Icon sx={{ fontSize: 16, color: "#fff" }} />
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          mb: 1,
+        }}
+      >
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Box
+            sx={{
+              width: 30,
+              height: 30,
+              borderRadius: 1.5,
+              background: "linear-gradient(135deg, #16a34a, #22c55e)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexShrink: 0,
+            }}
+          >
+            <Icon sx={{ fontSize: 16, color: "#fff" }} />
+          </Box>
+          <Typography
+            sx={{
+              fontWeight: 700,
+              color: "#166534",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              fontSize: "0.7rem",
+            }}
+          >
+            {label}
+          </Typography>
         </Box>
-        <Typography
-          sx={{
-            fontWeight: 700,
-            color: "#166534",
-            letterSpacing: "0.06em",
-            textTransform: "uppercase",
-            fontSize: "0.7rem",
-          }}
-        >
-          {label}
-        </Typography>
+        {children}
       </Box>
       <Divider sx={{ borderColor: "#bbf7d0" }} />
     </Box>
@@ -176,6 +188,11 @@ export default function AddPatientModal({ open, handleClose }) {
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isUpdatingFromDOB, setIsUpdatingFromDOB] = useState(false);
   const [isUpdatingFromAge, setIsUpdatingFromAge] = useState(false);
+  const [sameAddress, setSameAddress] = useState(true);
+  const [userAddressData, setUserAddressData] = useState({
+    address: "",
+    pinCode: "",
+  });
 
   const userData = JSON.parse(localStorage.getItem("user") || "null");
 
@@ -204,7 +221,6 @@ export default function AddPatientModal({ open, handleClose }) {
   const watchedDOB = useWatch({ control, name: "dob" });
   const watchedAge = useWatch({ control, name: "age" });
 
-  // Auto-calculate Age when DOB changes
   useEffect(() => {
     if (isUpdatingFromAge) return;
     const dob = watchedDOB;
@@ -218,7 +234,6 @@ export default function AddPatientModal({ open, handleClose }) {
     }
   }, [watchedDOB]);
 
-  // Auto-calculate DOB when Age changes
   useEffect(() => {
     if (isUpdatingFromDOB) return;
 
@@ -254,7 +269,6 @@ export default function AddPatientModal({ open, handleClose }) {
       macIp: ipAddress ?? "",
       macId: "",
     };
-    console.log("Save object:", saveObj);
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
@@ -265,7 +279,6 @@ export default function AddPatientModal({ open, handleClose }) {
       showLoader();
       const response = await AddPatient(finalSaveObj);
       const apiData = response?.data;
-      console.log("apiData", response);
 
       if (response?.status === 200 && apiData?.userId) {
         successAlert(apiData.message);
@@ -287,6 +300,29 @@ export default function AddPatientModal({ open, handleClose }) {
     handleClose();
   };
 
+  const handleAgeInput = (e) => {
+    const raw = e.target.value.replace(/[^0-9]/g, "");
+    if (raw === "") {
+      e.target.value = "";
+    } else if (Number(raw) > 120) {
+      e.target.value = "120";
+    } else {
+      e.target.value = raw;
+    }
+  };
+
+  const handleSameAddressToggle = (e) => {
+    const checked = e.target.checked;
+    setSameAddress(checked);
+    if (checked) {
+      setValue("address", userAddressData.address, { shouldValidate: true });
+      setValue("pinCode", userAddressData.pinCode, { shouldValidate: true });
+    } else {
+      setValue("address", "", { shouldValidate: false });
+      setValue("pinCode", "", { shouldValidate: false });
+    }
+  };
+
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
@@ -297,6 +333,19 @@ export default function AddPatientModal({ open, handleClose }) {
       setValue("mobileNO", userData?.mobileNo);
     }
   }, [userData]);
+
+  useEffect(() => {
+    getUserDetails(userData?.userId)
+      .then((res) => {
+        const data = res?.data?.data;
+        const address = data?.address ?? "";
+        const pinCode = data?.pinCode ?? "";
+        setUserAddressData({ address, pinCode });
+        setValue("address", address);
+        setValue("pinCode", pinCode);
+      })
+      .catch((err) => err);
+  }, []);
 
   return (
     <>
@@ -445,12 +494,15 @@ export default function AddPatientModal({ open, handleClose }) {
                   label="Date of Birth"
                   error={errors.dob}
                   maxDate={today}
+                  dob={true}
                 />
                 <InputField
                   name="age"
                   control={control}
                   label="Age"
                   error={errors.age}
+                  inputProps={{ maxLength: 3 }}
+                  onInput={handleAgeInput}
                 />
                 <InputField
                   name="relation"
@@ -465,7 +517,40 @@ export default function AddPatientModal({ open, handleClose }) {
               <SectionHeader
                 icon={HomeOutlinedIcon}
                 label="Address Information"
-              />
+              >
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={sameAddress}
+                      onChange={handleSameAddressToggle}
+                      size="small"
+                      sx={{
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "#16a34a",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          {
+                            backgroundColor: "#16a34a",
+                          },
+                      }}
+                    />
+                  }
+                  label={
+                    <Typography
+                      sx={{
+                        fontSize: "0.7rem",
+                        fontWeight: 600,
+                        color: sameAddress ? "#16a34a" : "#6b7280",
+                        letterSpacing: "0.04em",
+                      }}
+                    >
+                      Same As
+                    </Typography>
+                  }
+                  labelPlacement="start"
+                  sx={{ m: 0, gap: 0.5 }}
+                />
+              </SectionHeader>
               <Box
                 sx={{
                   display: "grid",
@@ -473,20 +558,23 @@ export default function AddPatientModal({ open, handleClose }) {
                   gap: 2,
                 }}
               >
-                <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
-                  <InputField
-                    name="address"
-                    control={control}
-                    label="Address"
-                    error={errors.address}
-                  />
-                </Box>
                 <InputField
                   name="pinCode"
                   control={control}
                   label="Pin Code"
                   error={errors.pinCode}
+                  disabled={sameAddress}
                 />
+                <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
+                  <InputArea
+                    name="address"
+                    control={control}
+                    label="Address"
+                    error={errors.address}
+                    disabled={sameAddress}
+                    rows={3}
+                  />
+                </Box>
               </Box>
             </Box>
           </form>

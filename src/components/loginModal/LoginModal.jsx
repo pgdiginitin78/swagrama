@@ -23,53 +23,27 @@ import SignUpModal from "./SignUpModal";
 import { useLoader } from "../common/commonLoader/LoaderContext";
 import { userLogin } from "../../services/login/LoginServices";
 
-const MotionBox = motion.create(Box);
-
 const modalVariants = {
-  hidden: {
-    opacity: 0,
-    scale: 0.8,
-    y: -50,
-  },
+  hidden: { opacity: 0, y: -30 },
   visible: {
     opacity: 1,
-    scale: 1,
     y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
-      staggerChildren: 0.1,
-    },
+    transition: { duration: 0.3, ease: [0.25, 0.1, 0.25, 1] },
   },
   exit: {
     opacity: 0,
-    scale: 0.8,
-    y: -50,
-    transition: {
-      duration: 0.3,
-    },
+    y: -30,
+    transition: { duration: 0.25, ease: [0.25, 0.1, 0.25, 1] },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
-export default function LoginModal({ open, handleClose,setUserData }) {
+export default function LoginModal({ open, handleClose, setUserData }) {
   const [showPassword, setShowPassword] = useState(false);
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
-  
-   const { setIsLoading } = useLoader();
+
+  const { setIsLoading } = useLoader();
 
   const {
     control,
@@ -101,7 +75,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("expiresIn", data.expiresIn);
         localStorage.setItem("tokenSetTime", Date.now());
-        setUserData(JSON.stringify(data.user))
+        setUserData(JSON.stringify(data.user));
         successAlert(data.message || "Login successful");
         handleClose();
         reset();
@@ -134,18 +108,17 @@ export default function LoginModal({ open, handleClose,setUserData }) {
         >
           <AnimatePresence mode="wait">
             {open && (
-              <MotionBox
+              <motion.div
                 variants={modalVariants}
                 initial="hidden"
                 animate="visible"
                 exit="exit"
+                style={{ willChange: "transform, opacity" }}
                 className="w-full max-w-[440px] mx-4 sm:mx-6 md:mx-8 outline-none max-h-[95vh] sm:max-h-[90vh] flex"
               >
                 <div className="bg-white rounded-3xl shadow-2xl relative w-full flex flex-col max-h-full overflow-hidden">
-                  {/* Top gradient bar */}
                   <div className="h-1.5 bg-gradient-to-r from-green-500 to-lime-500 flex-shrink-0 rounded-t-3xl" />
 
-                  {/* Close button */}
                   <IconButton
                     onClick={handleClose}
                     className="!absolute top-3 sm:top-4 right-3 sm:right-4 !text-gray-600 z-10 hover:!bg-gray-100 hover:!text-gray-800"
@@ -153,7 +126,6 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                     <Close />
                   </IconButton>
 
-                  {/* Content container with scroll */}
                   <div className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar">
                     <style>{`
                       .custom-green-scrollbar {
@@ -175,7 +147,8 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                         background: #16a34a;
                       }
                     `}</style>
-                    <MotionBox variants={itemVariants} className="mb-6">
+
+                    <div className="mb-6">
                       <div className="flex justify-center mb-3">
                         <img
                           src={SwagramaLogo}
@@ -189,19 +162,14 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                       <p className="text-ayuMid text-xs sm:text-sm text-center mt-1">
                         Login To Continue Your Swagrama Journey
                       </p>
-                    </MotionBox>
+                    </div>
 
                     <form onSubmit={handleSubmit(onSubmit)}>
-                      <MotionBox
-                        variants={itemVariants}
-                        className="mb-4 sm:mb-5"
-                      >
+                      <div className="mb-4 sm:mb-5">
                         <Controller
                           name="userName"
                           control={control}
-                          rules={{
-                            required: "userName is required",
-                          }}
+                          rules={{ required: "userName is required" }}
                           render={({ field }) => (
                             <Box
                               sx={{
@@ -210,7 +178,6 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                 borderRadius: 2,
                                 background:
                                   "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
-                                transition: "all 0.3s ease",
                                 "&:hover": {
                                   boxShadow:
                                     "0 4px 12px rgba(34, 197, 94, 0.25)",
@@ -239,12 +206,8 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                   "& .MuiOutlinedInput-root": {
                                     borderRadius: "6px",
                                     backgroundColor: "#ffffff",
-                                    "& fieldset": {
-                                      border: "none",
-                                    },
-                                    "&:hover fieldset": {
-                                      border: "none",
-                                    },
+                                    "& fieldset": { border: "none" },
+                                    "&:hover fieldset": { border: "none" },
                                     "&.Mui-focused fieldset": {
                                       border: "none",
                                     },
@@ -259,9 +222,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                     background: "white",
                                     paddingRight: 1,
                                     paddingLeft: 1,
-                                    "&.Mui-focused": {
-                                      color: "#22c55e",
-                                    },
+                                    "&.Mui-focused": { color: "#22c55e" },
                                   },
                                   "& .MuiFormHelperText-root": {
                                     marginLeft: 0,
@@ -271,12 +232,9 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                             </Box>
                           )}
                         />
-                      </MotionBox>
+                      </div>
 
-                      <MotionBox
-                        variants={itemVariants}
-                        className="mb-5 sm:mb-6"
-                      >
+                      <div className="mb-5 sm:mb-6">
                         <Controller
                           name="password"
                           control={control}
@@ -295,7 +253,6 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                 borderRadius: 2,
                                 background:
                                   "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
-                                transition: "all 0.3s ease",
                                 "&:hover": {
                                   boxShadow:
                                     "0 4px 12px rgba(34, 197, 94, 0.25)",
@@ -347,12 +304,8 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                   "& .MuiOutlinedInput-root": {
                                     borderRadius: "6px",
                                     backgroundColor: "#ffffff",
-                                    "& fieldset": {
-                                      border: "none",
-                                    },
-                                    "&:hover fieldset": {
-                                      border: "none",
-                                    },
+                                    "& fieldset": { border: "none" },
+                                    "&:hover fieldset": { border: "none" },
                                     "&.Mui-focused fieldset": {
                                       border: "none",
                                     },
@@ -367,9 +320,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                                     paddingRight: 1,
                                     paddingLeft: 1,
                                     background: "white",
-                                    "&.Mui-focused": {
-                                      color: "#22c55e",
-                                    },
+                                    "&.Mui-focused": { color: "#22c55e" },
                                   },
                                   "& .MuiFormHelperText-root": {
                                     marginLeft: 0,
@@ -379,41 +330,35 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                             </Box>
                           )}
                         />
-                      </MotionBox>
+                      </div>
 
-                      <MotionBox variants={itemVariants}>
-                        <Button
-                          type="submit"
-                          fullWidth
-                          variant="contained"
-                          component={motion.button}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                          size="small"
-                          sx={{
-                            py: 1,
-                            borderRadius: 2,
+                      <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          py: 1,
+                          borderRadius: 2,
+                          background:
+                            "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
+                          textTransform: "none",
+                          fontSize: "1rem",
+                          fontWeight: 600,
+                          boxShadow: "0 8px 20px rgba(34, 197, 94, 0.35)",
+                          "&:hover": {
+                            boxShadow: "0 12px 28px rgba(34, 197, 94, 0.45)",
                             background:
                               "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
-                            textTransform: "none",
-                            fontSize: "1rem",
-                            fontWeight: 600,
-                            boxShadow: "0 8px 20px rgba(34, 197, 94, 0.35)",
-                            transition: "all 0.3s ease",
-                            "&:hover": {
-                              boxShadow: "0 12px 28px rgba(34, 197, 94, 0.45)",
-                              background:
-                                "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
-                            },
-                            "&:disabled": {
-                              background:
-                                "linear-gradient(135deg, #a0aec0 0%, #718096 100%)",
-                            },
-                          }}
-                        >
-                          Login
-                        </Button>
-                      </MotionBox>
+                          },
+                          "&:disabled": {
+                            background:
+                              "linear-gradient(135deg, #a0aec0 0%, #718096 100%)",
+                          },
+                        }}
+                      >
+                        Login
+                      </Button>
 
                       <div className="flex flex-col sm:flex-row justify-center items-center gap-2 sm:gap-3 mt-5">
                         <p className="text-ayuBrown text-sm sm:text-base">
@@ -421,9 +366,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                         </p>
                         <button
                           type="button"
-                          onClick={() => {
-                            setLoginOpen(false);
-                          }}
+                          onClick={() => setLoginOpen(false)}
                           className="text-green-600 hover:text-green-700 font-medium transition-colors text-sm sm:text-base"
                         >
                           Sign Up
@@ -432,7 +375,7 @@ export default function LoginModal({ open, handleClose,setUserData }) {
                     </form>
                   </div>
                 </div>
-              </MotionBox>
+              </motion.div>
             )}
           </AnimatePresence>
         </Modal>

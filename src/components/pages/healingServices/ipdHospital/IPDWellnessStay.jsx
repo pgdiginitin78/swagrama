@@ -10,13 +10,11 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import BookEventForm from "../../bookEventForm/BookEventForm";
+import ipdDoubleImg from "../../../assets/healingServices/ipd/ipdDouble.jpg";
+import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.jpg";
+import SingleStayImg from "../../../assets/healingServices/ipd/Single Stay.png";
 import { errorAlert } from "../../../common/toast/CustomToast";
-import ipdSingleImg from "../../../assets/healingServices/ipd/ipdSingle.jpg"
-import ipdDoubleImg from "../../../assets/healingServices/ipd/ipdDouble.jpg"
-import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.jpg"
-
-
+import BookingFormModal from "./BookingFormModal";
 
 export const wellnessServices = [
   {
@@ -30,7 +28,7 @@ export const wellnessServices = [
       "Immersion in nature, relaxation, fresh air, mental rejuvenation.",
     price: 3000,
     rooms: [],
-    image:OutdoorLeavingImg,
+    image: OutdoorLeavingImg,
     badge: "Nature Retreat",
   },
   {
@@ -49,7 +47,7 @@ export const wellnessServices = [
       "स्वनैष्ठिककक्ष | Firmness Room",
       "स्वअनन्तकक्ष | Infinite Room",
     ],
-    image:ipdSingleImg,
+    image: SingleStayImg,
     badge: "Premium Stay",
   },
   {
@@ -68,7 +66,7 @@ export const wellnessServices = [
       "स्वनैष्ठिककक्ष | Firmness Room",
       "स्वअनन्तकक्ष | Infinite Room",
     ],
-    image:ipdDoubleImg,
+    image: ipdDoubleImg,
     badge: "Couple's Choice",
   },
   {
@@ -82,8 +80,7 @@ export const wellnessServices = [
       "Full wellness experience with facilities for relaxation and care.",
     price: 4250,
     rooms: [],
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&q=80",
+    image: SingleStayImg,
     badge: "Luxury Wellness",
   },
   {
@@ -97,8 +94,7 @@ export const wellnessServices = [
       "Full wellness experience with facilities for relaxation and care.",
     price: 7000,
     rooms: [],
-    image:
-      "https://images.unsplash.com/photo-1602002418082-a4443e081dd1?w=800&q=80",
+    image: ipdDoubleImg,
     badge: "Elite Experience",
   },
 ];
@@ -138,15 +134,15 @@ const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
       animate="visible"
       className="group relative bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg border border-emerald-900/10 hover:-translate-y-2 transition-transform duration-300 will-change-transform"
     >
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-900/20 via-lime-800/10 to-amber-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      <div className="relative h-40 overflow-hidden">
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-900/20 via-lime-800/10 to-amber-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+      <div className="relative h-52 2xl:h-64 overflow-hidden">
         <img
           src={service.image}
           alt={service.serviceName}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 will-change-transform"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none"></div>
 
         <div className="absolute top-1 right-2 bg-emerald-900/90 backdrop-blur-md px-2 py-1 rounded-lg shadow-lg border border-lime-400/20">
           <div className="flex items-center gap-1">
@@ -208,6 +204,7 @@ const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
             </div>
           </div>
         </div>
+
         {service.rooms.length > 0 && (
           <div className="mb-3 p-3 bg-gradient-to-br from-emerald-900/10 to-lime-900/10 backdrop-blur-md rounded-xl border border-emerald-800/20 shadow-sm">
             <div className="flex items-center gap-1.5 mb-2">
@@ -233,23 +230,25 @@ const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
           <button
             type="button"
             onClick={() => {
-              if (userData !== null) {
-                setOpenModal(true);
-                setSelectedService(service);
-              } else {
-                errorAlert("Please login to proceed.");
+              try {
+                if (userData) {
+                  setSelectedService(service);
+                  setOpenModal(true);
+                } else {
+                  errorAlert("Please login to proceed.");
+                }
+              } catch (err) {
+                console.error("error in handleClick", err);
               }
             }}
-            className="relative px-5 py-2 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 backdrop-blur-md text-white font-bold rounded-xl shadow-lg overflow-hidden border border-lime-400/30 hover:scale-105 active:scale-95 transition-transform duration-200"
+            className="relative z-10 flex items-center space-x-2 px-5 py-2 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-xl shadow-lg border border-lime-400/30 hover:scale-105 active:scale-95 transition-transform duration-200"
           >
-            <span className="relative z-10 flex items-center gap-1.5 text-sm">
-              Book Now
-              <Sparkles size={14} />
-            </span>
+            <span>Book Now</span>
+            <Sparkles size={14} />
           </button>
         </div>
       </div>
-      <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-lime-400/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-lime-400/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
     </motion.div>
   );
 };
@@ -274,7 +273,7 @@ const FilterBar = ({ selectedRoom, setSelectedRoom, roomOptions }) => {
   );
 };
 
-const WellnessSection = () => {
+const IPDWellnessStay = () => {
   const [selectedRoom, setSelectedRoom] = useState("All");
   const [openModal, setOpenModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
@@ -286,11 +285,9 @@ const WellnessSection = () => {
           const matchInRooms = s.rooms?.some((r) =>
             r.toLowerCase().includes(selectedRoom.toLowerCase()),
           );
-
           const matchInServiceName = s.serviceName
             .toLowerCase()
             .includes(selectedRoom.toLowerCase());
-
           return matchInRooms || matchInServiceName;
         });
 
@@ -318,7 +315,6 @@ const WellnessSection = () => {
           <h1 className="text-2xl md:text-3xl font-bold py-2 bg-gradient-to-r from-emerald-900 via-lime-800 to-amber-800 bg-clip-text text-transparent">
             स्वास्थ्य निवास Wellness Stay
           </h1>
-
           <p
             className="text-sm bg-gradient-to-r from-emerald-500 via-lime-600 to-amber-700
                         bg-clip-text text-transparent
@@ -329,11 +325,13 @@ const WellnessSection = () => {
             tranquility
           </p>
         </motion.div>
+
         <FilterBar
           selectedRoom={selectedRoom}
           setSelectedRoom={setSelectedRoom}
           roomOptions={roomOptions}
         />
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredData.map((service, index) => (
             <ServiceCard
@@ -345,6 +343,7 @@ const WellnessSection = () => {
             />
           ))}
         </div>
+
         {filteredData.length === 0 && (
           <div className="text-center py-16">
             <div className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gradient-to-br from-emerald-900/10 to-lime-900/10 backdrop-blur-md rounded-full border border-emerald-900/20">
@@ -359,8 +358,9 @@ const WellnessSection = () => {
           </div>
         )}
       </div>
+
       {openModal && (
-        <BookEventForm
+        <BookingFormModal
           open={openModal}
           handleClose={() => {
             setOpenModal(false);
@@ -373,4 +373,4 @@ const WellnessSection = () => {
   );
 };
 
-export default WellnessSection;
+export default IPDWellnessStay;

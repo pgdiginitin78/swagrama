@@ -9,7 +9,7 @@ import { Box, Button, Card, Stack, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
 import BeautyTherapy from "./beautyTherapy/BeautyTherapy";
 import DetoxHouse from "./detoxHouse/DetoxHouse";
-import IPDHospital from "./ipdHospital/IPDHospital";
+import IPDHospital from "./ipdHospital/IPDWellnessStay";
 import NatureTherapy from "./natureTherapy/NatureTherapy";
 import OPDClinic from "./opdClinic/OPDClinic";
 
@@ -59,9 +59,9 @@ const ServicesTabs = () => {
   const hasChildren = current.children && current.children.length > 0;
 
   return (
-    <div className="md:px-12 py-3">
-      <Box sx={{ maxWidth: 1480, mx: "auto" }}>
-        <h1 className="text-ayuBrown font-semibold text-center text-2xl">
+    <div className="md:px-12 py-3 my-16 lg:my-0">
+      <Box>
+        <h1 className="text-ayuBrown font-semibold text-center text:xl xl:text-2xl">
           <HealingIcon /> स्वउपचारसेवा Healing Services <HealingIcon />
         </h1>
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>

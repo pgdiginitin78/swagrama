@@ -29,6 +29,16 @@ import { useEffect, useState } from "react";
 import ScalpConditionerImg from "../../../assets/healingServices/beuty-therapy/ScalpConditioner.png";
 import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.jpg";
 import BookEventForm from "../../bookEventForm/BookEventForm";
+import वदनअवघर्षणFaceScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनअवघर्षण Face Scrubbing.png";
+import वदनबाष्पकFaceSteamingMaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingMale.png";
+import वदनबाष्पकFaceSteamingFemale from "../../../assets/healingServices/beuty-therapy/वदनबाष्पकFaceSteamingFemale.png";
+import वदनबन्धFacePacFemale from "../../../assets/healingServices/beuty-therapy/वदनबन्ध Face Pack.png";
+import वदनभ्यङ्गFaceUnguentFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनभ्यङ्ग Face Unguent.png";
+import वदनवर्ण्यFacePowderFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनवर्ण्यFacePowderFemale.png";
+import BodySkinCleansingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinCleansingFemale.png";
+import BodySkinScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinScrubbingFemale.png";
+import BodySkinSteamingFemale from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingFemale.png"
+import BodySkinPackFemale from "../../../assets/healingServices/beuty-therapy/BodySkinPackFemale.png"
 
 const beautyData = [
   // Beautiful Hair
@@ -178,8 +188,7 @@ const beautyData = [
     benefits: "Deep cleans pores, removes dead skin",
     icon: Circle,
     price: 2500,
-    image:
-      "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&q=80", // Face scrubbing
+    image: वदनअवघर्षणFaceScrubbingFemaleImg,
   },
   {
     category: "gracefulWomen",
@@ -188,8 +197,7 @@ const beautyData = [
     benefits: "Opens pores, improves circulation",
     icon: Wind,
     price: 2500,
-    image:
-      "https://media.istockphoto.com/id/1143640491/photo/beauty-treatment-of-face-with-ozone-facial-steamer-in-beauty-center-beaultiful-blonde-girl.jpg?s=612x612&w=0&k=20&c=W1pCM8c4zyjkLvVwcsvUpyH3oLO6Eh70vufsoG-ny2A=", // Face steaming
+    image: वदनबाष्पकFaceSteamingFemale,
   },
   {
     category: "gracefulWomen",
@@ -198,8 +206,7 @@ const beautyData = [
     benefits: "Nourishes skin, improves tone",
     icon: Flower2,
     price: 2500,
-    image:
-      "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?w=400&q=80", // Face mask
+    image: वदनबन्धFacePacFemale,
   },
   {
     category: "gracefulWomen",
@@ -208,8 +215,7 @@ const beautyData = [
     benefits: "Relieves tension, promotes healthy skin",
     icon: Sun,
     price: 2500,
-    image:
-      "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=400&q=80", // Face massage
+    image: वदनभ्यङ्गFaceUnguentFemaleImg,
   },
   {
     category: "gracefulWomen",
@@ -218,8 +224,7 @@ const beautyData = [
     benefits: "Enhances complexion, mattifies skin",
     icon: Star,
     price: 2500,
-    image:
-      "https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=400&q=80", // Face powder
+    image: वदनवर्ण्यFacePowderFemaleImg,
   },
   {
     category: "gracefulWomen",
@@ -228,8 +233,7 @@ const beautyData = [
     benefits: "Removes impurities, softens skin",
     icon: ShowerHead,
     price: 3000,
-    image:
-      "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=400&q=80", // Body cleansing
+    image: BodySkinCleansingFemaleImg,
   },
   {
     category: "gracefulWomen",
@@ -238,8 +242,7 @@ const beautyData = [
     benefits: "Exfoliates dead cells, improves texture",
     icon: Feather,
     price: 3000,
-    image:
-      "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=400&q=80", // Body scrub
+    image: BodySkinScrubbingFemaleImg,
   },
   {
     category: "gracefulWomen",
@@ -248,8 +251,7 @@ const beautyData = [
     benefits: "Opens pores, detoxifies, relaxes",
     icon: CloudRain,
     price: 3000,
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=400&q=80", // Steam room
+    image:BodySkinSteamingFemale,
   },
   {
     category: "gracefulWomen",
@@ -258,8 +260,7 @@ const beautyData = [
     benefits: "Rejuvenates skin, hydrates",
     icon: Gift,
     price: 3000,
-    image:
-      "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=400&q=80", // Body treatment
+    image:BodySkinPackFemale, 
   },
   {
     category: "gracefulWomen",
@@ -320,8 +321,7 @@ const beautyData = [
     benefits: "Opens pores, improves circulation",
     icon: Wind,
     price: 2500,
-    image:
-      "https://images.unsplash.com/photo-1485875437342-9b39470b3d95?w=400&q=80", // Men face steam
+    image: वदनबाष्पकFaceSteamingMaleImg,
   },
   {
     category: "gracefulMen",
@@ -430,20 +430,22 @@ const BeautyTherapyCompact = () => {
   const [openModal, setOpenModal] = useState(false);
   const [displayCount, setDisplayCount] = useState(12);
   const [selectedCategory, setSelectedCategory] = useState("All");
-  
+
   const categories = [
     {
       key: "beautifulHair",
       label: "स्त्रीकेशरक्षा Female Hair Care",
       icon: Feather,
     },
-    { key: "beautifulHair", label: "पुंकेशरक्षा Male Hair Care", icon: Flower2 },
+    {
+      key: "beautifulHair",
+      label: "पुंकेशरक्षा Male Hair Care",
+      icon: Flower2,
+    },
     { key: "gracefulWomen", label: "स्त्रीरक्षा Women Care", icon: Flower2 },
     { key: "gracefulMen", label: "पुंस्रक्षा Men Care", icon: User },
     { key: "All", label: "All Services", icon: Sparkles },
   ];
-
-
 
   const filteredServices = beautyData.filter((service) => {
     return selectedCategory === "All" || service.category === selectedCategory;
@@ -470,7 +472,7 @@ const BeautyTherapyCompact = () => {
     },
   };
 
-    useEffect(() => {
+  useEffect(() => {
     setDisplayCount(10);
   }, [selectedCategory]);
 

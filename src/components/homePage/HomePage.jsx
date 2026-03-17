@@ -9,7 +9,16 @@ import {
   Spa,
   WbSunny,
 } from "@mui/icons-material";
+import AgricultureIcon from "@mui/icons-material/Agriculture";
+import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import ParkIcon from "@mui/icons-material/Park";
 import ReadMoreIcon from "@mui/icons-material/ReadMore";
+import SchoolIcon from "@mui/icons-material/School";
+import ScienceIcon from "@mui/icons-material/Science";
+import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
+import SpaIcon from "@mui/icons-material/Spa";
 import {
   Avatar,
   Box,
@@ -17,9 +26,8 @@ import {
   Chip,
   Container,
   Divider,
-  IconButton,
   Modal,
-  Typography,
+  Typography
 } from "@mui/material";
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
@@ -43,16 +51,6 @@ import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
 import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
-import SchoolIcon from "@mui/icons-material/School";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import ParkIcon from "@mui/icons-material/Park";
-import ScienceIcon from "@mui/icons-material/Science";
-import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import SpaIcon from "@mui/icons-material/Spa";
-import CloseIcon from "@mui/icons-material/Close";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 
 const modalBoxStyle = {
   position: "absolute",

@@ -27,9 +27,17 @@ function DatePickerField({
   value,
   onError,
   tableDatePicker,
+  dob,
   ...rest
 }) {
   console.log("error", error);
+
+  const today = new Date();
+  const maxDobDate = new Date(
+    today.getFullYear() - 120,
+    today.getMonth(),
+    today.getDate(),
+  );
 
   return (
     <div className="w-full bg-white">
@@ -44,8 +52,9 @@ function DatePickerField({
               <DesktopDatePicker
                 label={label}
                 value={value}
-                minDate={minDate}
                 onChange={onChange}
+                minDate={dob ? maxDobDate : minDate}
+                maxDate={dob ? today : undefined}
                 format={"dd-MM-yyyy"}
                 onBlur={onBlur}
                 disabled={disabled}
@@ -62,7 +71,7 @@ function DatePickerField({
                   },
                   "& .MuiInputLabel-root": {
                     fontSize: tableDatePicker ? "11px" : "12px",
-                    color: error ? "#DC2626" : "#263d21", 
+                    color: error ? "#DC2626" : "#263d21",
                     transform: tableDatePicker
                       ? "translate(14px, 7px) scale(1)"
                       : "translate(10px, 10px) scale(1)",
@@ -76,7 +85,7 @@ function DatePickerField({
                     padding: "6.5px 14px",
                   },
                   "& fieldset": {
-                    borderColor: error ? "#DC2626" : "", 
+                    borderColor: error ? "#DC2626" : "",
                   },
                   "&:hover fieldset": {
                     borderColor: error ? "#DC2626" : "",

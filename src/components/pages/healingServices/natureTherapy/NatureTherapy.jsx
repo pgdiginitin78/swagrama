@@ -9,8 +9,12 @@ import {
 } from "@mui/icons-material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { GiMountains } from "react-icons/gi";
-import AirTherepayImg from "../../../assets/healingServices/natureTherapy/AirTherapy.png";
+import FertileSoilTherapyImg from "../../../assets/healingServices/natureTherapy/स्वउर्वराचिकित्सा Fertile Soil Therapy.png";
+import SwimmingTherapyImg from "../../../assets/healingServices/natureTherapy/स्वजलतरणचिकित्सा Swimming Therapy.png";
+import MaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वपुंस्मृत्तिकास्नान Male MudBath.png";
+import AthleticTherapyImg from "../../../assets/healingServices/natureTherapy/स्वमल्लचिकित्सा Athletic Therapy.png";
+import WindSunRejuvenationImg from "../../../assets/healingServices/natureTherapy/स्ववातातपिकरसायन Wind Sun Rejuvenation.png";
+import FeMaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वस्त्रीमृत्तिकास्नान Female Mud Bath.png";
 import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 
 const therapiesData = [
@@ -26,8 +30,7 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image:
-      "https://img.freepik.com/free-photo/wellness-practices-self-care-world-health-day_23-2151256765.jpg?t=st=1768284672~exp=1768288272~hmac=38db3e4cbd3d333f5fd94680dc0011dd89579499b4352c2555d9efc2414c2a3a&w=1480",
+    image: MaleMudBathImg,
   },
   {
     id: 2,
@@ -41,8 +44,7 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image:
-      "https://img.freepik.com/free-photo/view-ancient-pottery-vessels-earthenware_23-2151538250.jpg?t=st=1768285083~exp=1768288683~hmac=e714ed7a9837a3d71124aba6e0c4a3568bac1fd511aa3d1a5c3492e76bc337f4&w=1480",
+    image: FeMaleMudBathImg,
   },
   {
     id: 3,
@@ -56,8 +58,7 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image:
-      "https://img.freepik.com/premium-photo/top-view-ultimate-relaxation-man-relaxing-spa-pool-soaked-scents-fresh-flowers_955712-41623.jpg?w=1480",
+    image: SwimmingTherapyImg,
   },
   {
     id: 4,
@@ -72,7 +73,7 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image: AirTherepayImg,
+    image: WindSunRejuvenationImg,
   },
   {
     id: 5,
@@ -86,8 +87,7 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image:
-      "https://img.freepik.com/free-photo/side-view-man-relaxing-spa_23-2150911793.jpg?t=st=1768286560~exp=1768290160~hmac=70132af760bb9266d8de21d1ac305c6bc918590fe8a3614216f8fd978ab13743&w=1480",
+    image: AthleticTherapyImg,
   },
   {
     id: 6,
@@ -101,16 +101,19 @@ const therapiesData = [
     price: "1000/1",
     priceRange: "750/2-5",
     bulkPrice: "500/5 or More",
-    image:
-      "https://img.freepik.com/free-photo/high-angle-hand-holding-gardening-scoop_23-2149412606.jpg?t=st=1768286721~exp=1768290321~hmac=14de49a8a30b9f4d381bb3b03047725ed621b22e89baab75349a7427e6288dd8&w=1480",
+    image: FertileSoilTherapyImg,
   },
 ];
-         
+
 const categories = [
   { name: "मृत्तिकास्नान Mud Therapy", icon: Spa, value: "MudTherapy" },
   { name: "जलचिकित्सा Water Therapy", icon: Pool, value: "WaterTherapy" },
   { name: "वायुचिकित्सा Winds & Air Therapy", icon: Air, value: "AirTherapy" },
-  { name: "व्यायामचिकित्सा Physical Therapy", icon: FitnessCenter, value: "PhysicalTherapy" },
+  {
+    name: "व्यायामचिकित्सा Physical Therapy",
+    icon: FitnessCenter,
+    value: "PhysicalTherapy",
+  },
   { name: "मृदचिकित्सा Soil Therapy", icon: Grass, value: "SoilTherapy" },
   { name: "All", icon: FilterList, value: "All" },
 ];
@@ -140,7 +143,9 @@ export default function NatureTherapy() {
       setFilteredTherapies(therapiesData);
     } else {
       setFilteredTherapies(
-        therapiesData.filter((therapy) => therapy.category === selectedCategory)
+        therapiesData.filter(
+          (therapy) => therapy.category === selectedCategory,
+        ),
       );
     }
   }, [selectedCategory]);
@@ -161,21 +166,7 @@ export default function NatureTherapy() {
           bg-gradient-to-r from-green-600 via-lime-600 to-green-600
           bg-clip-text text-transparent pt-2 "
         >
-          <motion.span
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            className="text-green-700 text-2xl "
-          >
-            <GiMountains />
-          </motion.span>
           &nbsp; नैसर्गचिकित्सा Nature Therapy &nbsp;
-          <motion.span
-            animate={{ rotate: [0, -10, 10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            className="text-green-700 text-2xl"
-          >
-            <GiMountains />
-          </motion.span>
         </motion.h1>
         <motion.p
           initial={{ y: 20, opacity: 0 }}
@@ -185,7 +176,6 @@ export default function NatureTherapy() {
         >
           Nature's Embrace: Grounded Healing, Natural Renewal.
         </motion.p>
-
       </div>
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -308,7 +298,7 @@ export default function NatureTherapy() {
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-100 hover:shadow-2xl transition-all duration-300 group"
                 >
-                  <div className="relative h-44 overflow-hidden">
+                  <div className="relative h-56 2xl:h-64 overflow-hidden">
                     <motion.img
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.4 }}

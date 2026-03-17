@@ -43,7 +43,17 @@ const StyledLabel = styled("label")(({ theme }) => ({
 }));
 
 const InnerTextarea = React.forwardRef(function InnerTextarea(
-  { name, label, placeholder, minRows, maxRows, value, onChange, onBlur },
+  {
+    name,
+    label,
+    placeholder,
+    minRows,
+    maxRows,
+    value,
+    onChange,
+    onBlur,
+    disabled,
+  },
   ref,
 ) {
   const id = React.useId();
@@ -61,6 +71,7 @@ const InnerTextarea = React.forwardRef(function InnerTextarea(
         placeholder={isFilled ? placeholder : ""}
         minRows={minRows}
         maxRows={maxRows}
+        disabled={disabled}
       />
 
       <StyledLabel
@@ -68,6 +79,7 @@ const InnerTextarea = React.forwardRef(function InnerTextarea(
         style={{
           top: "8px",
           fontSize: "12px",
+          color: disabled ? "lightgray" : "#000",
         }}
       >
         {label}
@@ -83,6 +95,7 @@ export default function InputArea({
   defaultValue,
   control,
   minRows,
+  disabled,
   maxRows,
   ...props
 }) {
@@ -100,6 +113,7 @@ export default function InputArea({
           placeholder={placeholder}
           minRows={minRows}
           maxRows={maxRows}
+          disabled={disabled}
         />
       )}
     />

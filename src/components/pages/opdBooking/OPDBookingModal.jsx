@@ -91,10 +91,6 @@ const validationSchema = yup.object().shape({
     .nullable()
     .required("Appointment date is required")
     .typeError("Appointment date is required"),
-  Status: dropdownObjectSchema.typeError("Status is required"),
-  ServiceDetails: yup.string().required("Service details are required"),
-  taxDetails: yup.string().nullable(),
-  EncounterStatus: yup.string().nullable(),
 });
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
@@ -143,6 +139,7 @@ export default function BookAppointment({ open, handleClose }) {
     watch,
     reset,
     formState: { errors },
+    setValue,
   } = useForm({
     defaultValues: {
       clinicFid: null,
@@ -164,12 +161,10 @@ export default function BookAppointment({ open, handleClose }) {
   const locationValue = watch("location");
   const doctorValue = watch("doctorFid");
   const appointmentDate = watch("appointmentDate");
-  const selectedPatientValue = watch("patientFid");
   const selectedServiceValue = watch("serviceFid");
 
   const userData = localStorage.getItem("user");
   const { setIsLoading } = useLoader();
-
 
   const handleReset = () => {
     reset();
@@ -192,10 +187,11 @@ export default function BookAppointment({ open, handleClose }) {
       macId: "",
       macIp: ipAddress,
       clinicFid: dataObj.clinicFid.id,
+      patientFid: dataObj.patientFid.id,
       doctorFid: dataObj?.doctorFid.id,
       serviceFid: String(dataObj.serviceFid.id),
       appoinmentDate: format(new Date(dataObj.appointmentDate), "yyyy-MM-dd"),
-      Status: dataObj.Status.label,
+      Status: dataObj.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
       ServiceDetails: dataObj.ServiceDetails,
@@ -205,8 +201,6 @@ export default function BookAppointment({ open, handleClose }) {
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
-
-  console.log("selectedServiceValue", selectedServiceValue);
 
   const initiatePayment = async () => {
     try {
@@ -230,7 +224,6 @@ export default function BookAppointment({ open, handleClose }) {
           data.clientTxnId,
           async () => {
             const res = await bookAppointment(finalSaveObj, userId);
-            console.log("bookAppointemntResponse", res);
             if (res.data.status === 200) {
               successAlert(res.data.message);
               setOpenConfirmationModal(false);
@@ -256,14 +249,17 @@ export default function BookAppointment({ open, handleClose }) {
       .then((res) => {
         const data = res?.data?.data;
         if (data?.length) {
-          setLocationListOptions(
-            data.map((item) => ({
-              ...item,
-              id: item.fid,
-              value: item.fid,
-              label: item.locationName,
-            })),
+          const formatted = data.map((item) => ({
+            ...item,
+            id: item.fid,
+            value: item.fid,
+            label: item.locationName,
+          }));
+          setLocationListOptions(formatted);
+          const filterLocation = formatted.filter(
+            (item) => item.label === "Lavale",
           );
+          setValue("location", filterLocation[0]);
         }
       })
       .catch((error) => error);
@@ -290,7 +286,21 @@ export default function BookAppointment({ open, handleClose }) {
   }, [locationValue]);
 
   useEffect(() => {
+    if (clinicsOptions?.length > 0) {
+      const filterClinic = clinicsOptions.filter(
+        (item) => item.label === "Swagram Community",
+      );
+      setValue("clinicFid", filterClinic[0]);
+    }
+  }, [clinicsOptions, setValue]);
+
+  useEffect(() => {
     if (clinicFidValue?.id > 0) {
+      setValue("doctorFid", null);
+      setDoctorSlots([]);
+      setSelectedTimeSlot(null);
+      setSlotError("");
+
       getDoctorsByClinicId(clinicFidValue?.id)
         .then((res) => {
           const data = res?.data?.data;
@@ -347,31 +357,39 @@ export default function BookAppointment({ open, handleClose }) {
   }, [clinicFidValue, userData]);
 
   useEffect(() => {
-    if (
-      doctorValue !== null &&
-      appointmentDate !== null &&
-      clinicFidValue !== null
-    ) {
+    if (doctorValue?.id && appointmentDate && clinicFidValue?.id) {
+      setSelectedTimeSlot(null);
+      setSlotError("");
       setLoading(true);
       getDoctorAvailableSlots(
-        doctorValue?.id,
+        doctorValue.id,
         format(new Date(appointmentDate), "yyyy-MM-dd"),
-        clinicFidValue?.id,
+        clinicFidValue.id,
       )
         .then((res) => {
           const data = res?.data?.data;
           if (data?.length) {
             setDoctorSlots(data);
-            setLoading(false);
           } else {
             setDoctorSlots([]);
-            setLoading(false);
           }
           setLoading(false);
         })
         .catch(() => setLoading(false));
+    } else {
+      setDoctorSlots([]);
+      setSelectedTimeSlot(null);
     }
-  }, [doctorValue, appointmentDate, clinicFidValue]);
+  }, [doctorValue?.id, appointmentDate]);
+
+  useEffect(() => {
+    if (patientOptions?.length > 0) {
+      const filterPatient = patientOptions.filter(
+        (item) => item.id === JSON.parse(userData)?.userId,
+      );
+      setValue("patientFid", filterPatient[0] || null);
+    }
+  }, [patientOptions, userData]);
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
@@ -469,6 +487,7 @@ export default function BookAppointment({ open, handleClose }) {
                                 placeholder="Select Location *"
                                 dataArray={locationListOptions}
                                 error={errors.location}
+                                isDisabled={true}
                               />
                               <DropdownField
                                 control={control}
@@ -476,6 +495,7 @@ export default function BookAppointment({ open, handleClose }) {
                                 placeholder="Select Clinic *"
                                 dataArray={clinicsOptions}
                                 error={errors.clinicFid}
+                                isDisabled={true}
                               />
                               <DropdownField
                                 control={control}
@@ -506,6 +526,24 @@ export default function BookAppointment({ open, handleClose }) {
                           </div>
                           <div className="p-4 sm:p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <DatePickerField
+                                  control={control}
+                                  name="appointmentDate"
+                                  label="Appointment Date *"
+                                  inputFormat="dd-MM-yyyy"
+                                  disablePast={true}
+                                  error={errors.appointmentDate}
+                                />
+                              </div>
+                              <div>
+                                <DropdownField
+                                  control={control}
+                                  name="Status"
+                                  placeholder="Select Status"
+                                  dataArray={statusData}
+                                />
+                              </div>
                               <div className="col-span-2">
                                 <DropdownField
                                   control={control}
@@ -515,54 +553,6 @@ export default function BookAppointment({ open, handleClose }) {
                                   error={errors.doctorFid}
                                 />
                               </div>
-                              <DatePickerField
-                                control={control}
-                                name="appointmentDate"
-                                label="Appointment Date *"
-                                inputFormat="dd-MM-yyyy"
-                                disablePast={true}
-                                error={errors.appointmentDate}
-                              />
-                              <DropdownField
-                                control={control}
-                                name="Status"
-                                placeholder="Select Status *"
-                                dataArray={statusData}
-                                error={errors.Status}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-slate-200">
-                          <div className="bg-gradient-to-r from-emerald-500 to-green-500 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                              <FileText className="w-5 h-5 text-white" />
-                            </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
-                              Additional Details
-                            </h2>
-                          </div>
-                          <div className="p-4 sm:p-5">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div className="col-span-2">
-                                <InputField
-                                  control={control}
-                                  name="ServiceDetails"
-                                  label="Service Details *"
-                                  error={errors.ServiceDetails}
-                                />
-                              </div>
-                              <InputField
-                                control={control}
-                                name="taxDetails"
-                                label="Tax Details"
-                              />
-                              <InputField
-                                control={control}
-                                name="EncounterStatus"
-                                label="Encounter Status"
-                              />
                             </div>
                           </div>
                         </div>

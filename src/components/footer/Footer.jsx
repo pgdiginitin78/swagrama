@@ -109,8 +109,8 @@ const Footer = () => {
                 {[
                   { label: "Home", href: "/" },
                   { label: "About Us", href: "/aboutUs" },
-                  { label: "Refund Policy", href: "/" },
-                  { label: "Privacy Policy", href: "/" },
+                  { label: "Refund Policy", href: "/refundPolicy" },
+                  { label: "Privacy Policy", href: "/privacyPolicy" },
                   { label: "Terms & Conditions", href: "/termsAndConditions" },
                   {
                     label: "गाईत्वग्राम Cow Village",

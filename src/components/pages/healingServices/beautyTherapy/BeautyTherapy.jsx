@@ -26,19 +26,19 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import ScalpConditionerImg from "../../../assets/healingServices/beuty-therapy/ScalpConditioner.png";
-import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.jpg";
-import BookEventForm from "../../bookEventForm/BookEventForm";
-import वदनअवघर्षणFaceScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनअवघर्षण Face Scrubbing.png";
+import BodySkinCleansingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinCleansingFemale.png";
+import BodySkinPackFemale from "../../../assets/healingServices/beuty-therapy/BodySkinPackFemale.png";
+import BodySkinScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinScrubbingFemale.png";
+import BodySkinSteamingFemale from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingFemale.png";
 import वदनबाष्पकFaceSteamingMaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingMale.png";
-import वदनबाष्पकFaceSteamingFemale from "../../../assets/healingServices/beuty-therapy/वदनबाष्पकFaceSteamingFemale.png";
+import ScalpConditionerImg from "../../../assets/healingServices/beuty-therapy/ScalpConditioner.png";
+import वदनअवघर्षणFaceScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनअवघर्षण Face Scrubbing.png";
 import वदनबन्धFacePacFemale from "../../../assets/healingServices/beuty-therapy/वदनबन्ध Face Pack.png";
+import वदनबाष्पकFaceSteamingFemale from "../../../assets/healingServices/beuty-therapy/वदनबाष्पकFaceSteamingFemale.png";
 import वदनभ्यङ्गFaceUnguentFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनभ्यङ्ग Face Unguent.png";
 import वदनवर्ण्यFacePowderFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनवर्ण्यFacePowderFemale.png";
-import BodySkinCleansingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinCleansingFemale.png";
-import BodySkinScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinScrubbingFemale.png";
-import BodySkinSteamingFemale from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingFemale.png"
-import BodySkinPackFemale from "../../../assets/healingServices/beuty-therapy/BodySkinPackFemale.png"
+import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.jpg";
+import BeautyTherapyBookingModal from "./BeautyTherapyBookingModal";
 
 const beautyData = [
   // Beautiful Hair
@@ -425,7 +425,7 @@ const beautyData = [
   },
 ];
 
-const BeautyTherapyCompact = () => {
+const BeautyTherapy = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [displayCount, setDisplayCount] = useState(12);
@@ -433,12 +433,12 @@ const BeautyTherapyCompact = () => {
 
   const categories = [
     {
-      key: "beautifulHair",
+      key: "beautifulHairFemale",
       label: "स्त्रीकेशरक्षा Female Hair Care",
       icon: Feather,
     },
     {
-      key: "beautifulHair",
+      key: "beautifulHairMale",
       label: "पुंकेशरक्षा Male Hair Care",
       icon: Flower2,
     },
@@ -448,7 +448,17 @@ const BeautyTherapyCompact = () => {
   ];
 
   const filteredServices = beautyData.filter((service) => {
-    return selectedCategory === "All" || service.category === selectedCategory;
+    if (selectedCategory === "All") return true;
+
+    if (
+      (selectedCategory === "beautifulHairFemale" ||
+        selectedCategory === "beautifulHairMale") &&
+      service.category === "beautifulHair"
+    ) {
+      return true;
+    }
+
+    return service.category === selectedCategory;
   });
 
   const displayedServices = filteredServices.slice(0, displayCount);
@@ -537,8 +547,8 @@ const BeautyTherapyCompact = () => {
                     onClick={() => setSelectedCategory(cat.key)}
                     className={`relative overflow-hidden rounded-xl p-3 transition-all ${
                       isSelected
-                        ? "bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-md border border-emerald-500"
-                        : "backdrop-blur-sm bg-green-800/50 text-emerald-200 hover:bg-green-800/70 border border-emerald-700/50"
+                        ? "bg-white text-green-900 shadow-lg border border-white font-semibold"
+                        : "backdrop-blur-sm bg-green-800/60 text-emerald-100 hover:bg-green-700/60 border border-emerald-600/30"
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -658,11 +668,11 @@ const BeautyTherapyCompact = () => {
         )}
       </div>
       {openModal && (
-        <BookEventForm
+        <BeautyTherapyBookingModal
           open={openModal}
           handleClose={() => {
             setOpenModal(false);
-            setSelectedService(false);
+            setSelectedService(null);
           }}
           eventDetails={selectedService}
         />
@@ -671,4 +681,4 @@ const BeautyTherapyCompact = () => {
   );
 };
 
-export default BeautyTherapyCompact;
+export default BeautyTherapy;

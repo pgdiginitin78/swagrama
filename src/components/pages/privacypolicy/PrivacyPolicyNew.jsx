@@ -622,7 +622,7 @@ export default function SwagramaPrivacyPolicy() {
               }}
             >
               <CalendarMonthOutlinedIcon style={{ fontSize: 16 }} />
-              Last Updated: March 2025
+              Last Updated: March 2026
             </div>
           </motion.div>
         </div>

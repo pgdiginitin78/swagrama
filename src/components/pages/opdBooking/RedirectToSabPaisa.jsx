@@ -5,7 +5,7 @@ const startPaymentStatusPolling = (
   clinicId,
   clientTxnId,
   onSuccess,
-  onFailure
+  onFailure,
 ) => {
   const POLL_INTERVAL = 1000;
 
@@ -45,6 +45,10 @@ const startPaymentStatusPolling = (
 
       if (paymentWindow && paymentWindow.closed) {
         clearInterval(interval);
+        onFailure?.({
+          paymentStatus: "CancelledByUser",
+          message: "Transaction cancelled by user.",
+        });
         return;
       }
     } catch (error) {
@@ -57,6 +61,8 @@ const startPaymentStatusPolling = (
       onFailure?.(error);
     }
   }, POLL_INTERVAL);
+
+  return interval;
 };
 
 export const RedirectToSabPaisa = (
@@ -88,11 +94,18 @@ export const RedirectToSabPaisa = (
   paymentWindow.document.body.appendChild(form);
   form.submit();
 
-  startPaymentStatusPolling(
+  const interval = startPaymentStatusPolling(
     paymentWindow,
     clinicId,
     clientTxnId,
     onSuccess,
     onFailure,
   );
+
+  return () => {
+    if (interval) clearInterval(interval);
+    if (paymentWindow && !paymentWindow.closed) {
+      paymentWindow.close();
+    }
+  };
 };

@@ -22,6 +22,7 @@ import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
 import { useLoader } from "../common/commonLoader/LoaderContext";
 import { userLogin } from "../../services/login/LoginServices";
+import { useAuth } from "../../context/AuthContext";
 
 const modalVariants = {
   hidden: { opacity: 0, y: -30 },
@@ -37,7 +38,8 @@ const modalVariants = {
   },
 };
 
-export default function LoginModal({ open, handleClose, setUserData }) {
+export default function LoginModal({ open, handleClose }) {
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
@@ -75,7 +77,7 @@ export default function LoginModal({ open, handleClose, setUserData }) {
         localStorage.setItem("user", JSON.stringify(data.user));
         localStorage.setItem("expiresIn", data.expiresIn);
         localStorage.setItem("tokenSetTime", Date.now());
-        setUserData(JSON.stringify(data.user));
+        login(data.user);
         successAlert(data.message || "Login successful");
         handleClose();
         reset();

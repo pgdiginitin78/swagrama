@@ -121,6 +121,11 @@ const schema = Yup.object({
       }),
     )
     .default([]),
+  noOfPerson: Yup.number()
+    .min(1, "At least 1 person required")
+    .required("Required"),
+  noOfChild: Yup.number().min(0, "Invalid number").required("Required"),
+  petOption: Yup.boolean().default(false),
   paymentOption: Yup.string().required("Please select a payment option"),
   terms: Yup.boolean().oneOf(
     [true],
@@ -596,6 +601,9 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
       ),
     defaultValues: {
       bookingFor: "myself",
+      noOfPerson: 1,
+      noOfChild: 0,
+      petOption: false,
       roomName: "",
       primaryGuest: {
         title: "",
@@ -617,16 +625,23 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
 
   const { fields, append, remove } = useFieldArray({ control, name: "guests" });
 
-  const [addGST, paymentOption, bookingFor] = watch([
-    "addGST",
-    "paymentOption",
-    "bookingFor",
-  ]);
+  const [addGST, paymentOption, bookingFor, noOfPerson, noOfChild, petOption] =
+    watch([
+      "addGST",
+      "paymentOption",
+      "bookingFor",
+      "noOfPerson",
+      "noOfChild",
+      "petOption",
+    ]);
 
-  const price = service?.price ?? 3760;
-  const origPrice = service?.price ? Math.round(service.price * 1.03) : 3870;
-  const canAddGuest = fields.length < MAX_GUESTS
-
+  const basePrice = service?.price ?? 3760;
+  const adultPrice = basePrice * (noOfPerson > 0 ? noOfPerson : 1);
+  const childPrice = (noOfChild > 0 ? noOfChild : 0) * (basePrice * 0.5);
+  const petPrice = petOption ? 500 : 0;
+  const price = Math.round(adultPrice + childPrice + petPrice);
+  const origPrice = Math.round(price * 1.03);
+  const canAddGuest = fields.length < MAX_GUESTS;
 
   const onClose = () => {
     reset();
@@ -640,6 +655,9 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
     const payload = {
       stayId: service?.serviceName ?? "wellness-stay",
       bookingFor: data.bookingFor,
+      noOfPerson: data.noOfPerson,
+      noOfChild: data.noOfChild,
+      petOption: data.petOption,
       ...(hasRooms ? { roomName: data.roomName } : {}),
       primaryGuest: data.primaryGuest,
       ...(data.addGST ? { gstDetails: data.gstDetails } : {}),
@@ -780,6 +798,56 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                   {errors.bookingFor && (
                     <FieldError message={errors.bookingFor.message} />
                   )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                    <div>
+                      <InputField
+                        control={control}
+                        name="noOfPerson"
+                        label="No of Person"
+                        type="number"
+                        error={errors.noOfPerson}
+                      />
+                    </div>
+                    <div>
+                      <InputField
+                        control={control}
+                        name="noOfChild"
+                        label="No of Child"
+                        type="number"
+                        error={errors.noOfChild}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <Controller
+                      name="petOption"
+                      control={control}
+                      render={({ field }) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={field.value}
+                              onChange={(e) => field.onChange(e.target.checked)}
+                              size="small"
+                              sx={{
+                                color: "#166534",
+                                "&.Mui-checked": { color: "#166534" },
+                                p: "4px",
+                              }}
+                            />
+                          }
+                          label={
+                            <span className="text-sm font-bold text-gray-900">
+                              Bring a Pet (Additional charges apply)
+                            </span>
+                          }
+                          sx={{ m: 0 }}
+                        />
+                      )}
+                    />
+                  </div>
                 </SectionCard>
 
                 <RoomAvailabilitySection

@@ -15,7 +15,7 @@ import MaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्
 import AthleticTherapyImg from "../../../assets/healingServices/natureTherapy/स्वमल्लचिकित्सा Athletic Therapy.png";
 import WindSunRejuvenationImg from "../../../assets/healingServices/natureTherapy/स्ववातातपिकरसायन Wind Sun Rejuvenation.png";
 import FeMaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वस्त्रीमृत्तिकास्नान Female Mud Bath.png";
-import OPDBookingModal from "../../opdBooking/OPDBookingModal";
+import NatureTherapyBookingModal from "./NatureTherapyBookingModal";
 
 const therapiesData = [
   {
@@ -426,7 +426,7 @@ export default function NatureTherapy() {
       )}
 
       {openBookingModal && (
-        <OPDBookingModal
+        <NatureTherapyBookingModal
           open={openBookingModal}
           handleClose={() => setOpenBookingModal(false)}
           therapy={selectedTherapy}

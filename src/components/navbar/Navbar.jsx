@@ -18,6 +18,7 @@ import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import LoginModal from "../loginModal/LoginModal";
 import ShopCart from "../pages/eShop/ShopCart";
 import { successAlert } from "../common/toast/CustomToast";
+import { useAuth } from "../../context/AuthContext";
 
 const ManageProfileModal = ({ open, onClose, user, onSave }) => {
   const [editing, setEditing] = useState(false);
@@ -294,12 +295,12 @@ const AvatarIcon = ({ user, size = 32 }) => (
   </div>
 );
 
-const Navbar = ({ userData, setUserData }) => {
+const Navbar = () => {
+  const { user, login, logout, updateUser } = useAuth();
   const [open, setOpen] = useState(false);
   const [openStore, setOpenStore] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [openLoginModal, setOpenLoginModal] = useState(false);
-  const [user, setUser] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
 
@@ -313,25 +314,16 @@ const Navbar = ({ userData, setUserData }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("user"));
-    setUser(stored);
-    setUserData(stored);
-  }, [openLoginModal]);
-
-  const handleLoginSuccess = () => {
-    const fresh = JSON.parse(localStorage.getItem("user"));
-    setUser(fresh);
-    setUserData(fresh);
+  const handleLoginSuccess = (userData) => {
+    const fresh = userData || JSON.parse(localStorage.getItem("user"));
+    login(fresh);
     setOpenLoginModal(false);
   };
 
   const handleLogout = () => {
     setShowDropdown(false);
-    localStorage.clear();
+    logout();
     successAlert("User logged out successfully");
-    setUser(null);
-    setUserData(null);
   };
 
   const handleManageProfile = () => {
@@ -340,8 +332,7 @@ const Navbar = ({ userData, setUserData }) => {
   };
 
   const handleProfileSave = (updated) => {
-    setUser(updated);
-    setUserData(updated);
+    updateUser(updated);
   };
 
   const navLinks = [
@@ -662,7 +653,6 @@ const Navbar = ({ userData, setUserData }) => {
           open={openLoginModal}
           handleClose={() => setOpenLoginModal(false)}
           onLoginSuccess={handleLoginSuccess}
-          setUserData={setUserData}
         />
       )}
       <ManageProfileModal

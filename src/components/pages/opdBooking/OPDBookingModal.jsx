@@ -1,16 +1,13 @@
+import { yupResolver } from "@hookform/resolvers/yup";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calendar, Clock, FileText, Stethoscope, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Calendar, Clock, Stethoscope, User } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import CancelButtonModal from "../../common/button/CancelButtonModal";
-import CommonButton from "../../common/button/CommonButton";
-import DatePickerField from "../../common/formFields/DatePickerField";
-import DropdownField from "../../common/formFields/DropdownField";
-import InputField from "../../common/formFields/InputField";
 import {
   bookAppointment,
   getClinicList,
@@ -21,14 +18,16 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
-import { format } from "date-fns";
-import AddPatientModal from "./AddPatientModal";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import ConfirmationModal from "../../common/ConfirmationModal";
-import { errorAlert, successAlert } from "../../common/toast/CustomToast";
+import CancelButtonModal from "../../common/button/CancelButtonModal";
+import CommonButton from "../../common/button/CommonButton";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
+import ConfirmationModal from "../../common/ConfirmationModal";
+import DatePickerField from "../../common/formFields/DatePickerField";
+import DropdownField from "../../common/formFields/DropdownField";
+import { errorAlert, successAlert } from "../../common/toast/CustomToast";
+import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../context/AuthContext";
 
 const style = {
   position: "absolute",
@@ -118,7 +117,11 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
   );
 }
 
-export default function BookAppointment({ open, handleClose }) {
+export default function OPDBookingModal({
+  open,
+  handleClose,
+  selectedTherapy,
+}) {
   const [locationListOptions, setLocationListOptions] = useState([]);
   const [clinicsOptions, setClinicOptions] = useState([]);
   const [doctorOptions, setDoctorOptions] = useState([]);
@@ -132,6 +135,8 @@ export default function BookAppointment({ open, handleClose }) {
   const [ipAddress, setIpAddress] = useState(null);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const cancelPaymentRef = useRef(null);
 
   const {
     handleSubmit,
@@ -163,7 +168,7 @@ export default function BookAppointment({ open, handleClose }) {
   const appointmentDate = watch("appointmentDate");
   const selectedServiceValue = watch("serviceFid");
 
-  const userData = localStorage.getItem("user");
+  const { user } = useAuth();
   const { setIsLoading } = useLoader();
 
   const handleReset = () => {
@@ -204,7 +209,7 @@ export default function BookAppointment({ open, handleClose }) {
 
   const initiatePayment = async () => {
     try {
-      const userId = JSON.parse(userData)?.userId;
+      const userId = user?.userId;
 
       const tempObj = {
         amount: selectedServiceValue?.charges || 0,
@@ -215,10 +220,13 @@ export default function BookAppointment({ open, handleClose }) {
       };
       setIsLoading(true);
       const res = await InitiatePayment(clinicFidValue?.id, userId, tempObj);
-      const data = res.data;
+      const data = res?.data;
 
       if (data?.status === 200) {
-        RedirectToSabPaisa(
+        setIsLoading(false); // Stop full screen loading so user can use the modal
+        setIsPaymentPending(true); // Show the waiting mode in the confirmation modal
+
+        cancelPaymentRef.current = RedirectToSabPaisa(
           data,
           clinicFidValue?.id,
           data.clientTxnId,
@@ -227,19 +235,26 @@ export default function BookAppointment({ open, handleClose }) {
             if (res.data.status === 200) {
               successAlert(res.data.message);
               setOpenConfirmationModal(false);
+              setIsPaymentPending(false);
               handleClose();
               reset();
-              setIsLoading(false);
             }
           },
-          () => {
-            errorAlert("Payment failed or cancelled. Please try again.");
+          (errorStatus) => {
+            const msg =
+              errorStatus?.message ||
+              "Payment failed or cancelled. Please try again.";
+            errorAlert(msg);
             setOpenConfirmationModal(false);
-            setIsLoading(false);
+            setIsPaymentPending(false);
           },
         );
+      } else {
+        setIsLoading(false);
+        errorAlert(data?.message || "Failed to initiate payment");
       }
     } catch (error) {
+      setIsLoading(false);
       console.log(error);
     }
   };
@@ -263,7 +278,7 @@ export default function BookAppointment({ open, handleClose }) {
         }
       })
       .catch((error) => error);
-  }, []);
+  }, [setValue]);
 
   useEffect(() => {
     if (locationValue?.id > 0) {
@@ -333,11 +348,8 @@ export default function BookAppointment({ open, handleClose }) {
         })
         .catch((error) => error);
 
-      if (userData !== null) {
-        getPatientDataByMobileNo(
-          JSON.parse(userData)?.mobileNo,
-          clinicFidValue?.id,
-        )
+      if (user !== null) {
+        getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
           .then((res) => {
             const data = res?.data?.data;
             if (data?.length) {
@@ -354,7 +366,7 @@ export default function BookAppointment({ open, handleClose }) {
           .catch((error) => error);
       }
     }
-  }, [clinicFidValue, userData]);
+  }, [clinicFidValue, user, setValue]);
 
   useEffect(() => {
     if (doctorValue?.id && appointmentDate && clinicFidValue?.id) {
@@ -380,16 +392,16 @@ export default function BookAppointment({ open, handleClose }) {
       setDoctorSlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [doctorValue?.id, appointmentDate]);
+  }, [doctorValue?.id, appointmentDate, clinicFidValue]);
 
   useEffect(() => {
     if (patientOptions?.length > 0) {
       const filterPatient = patientOptions.filter(
-        (item) => item.id === JSON.parse(userData)?.userId,
+        (item) => item.id === user?.userId,
       );
       setValue("patientFid", filterPatient[0] || null);
     }
-  }, [patientOptions, userData]);
+  }, [patientOptions, user, setValue]);
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
@@ -397,6 +409,17 @@ export default function BookAppointment({ open, handleClose }) {
       .then((data) => setIpAddress(data.ip))
       .catch((error) => console.error("Error:", error));
   }, []);
+
+  useEffect(() => {
+    if (selectedTherapy !== undefined && doctorOptions?.length > 0) {
+      const filterdDoctor = doctorOptions.filter(
+        (item) => item.id === selectedTherapy?.doctorId,
+      );
+      setValue("doctorFid", filterdDoctor[0] || null);
+    }
+  }, [selectedTherapy, doctorOptions, setValue]);
+
+  console.log("selectedTherapy", selectedTherapy);
 
   return (
     <>
@@ -534,6 +557,7 @@ export default function BookAppointment({ open, handleClose }) {
                                   inputFormat="dd-MM-yyyy"
                                   disablePast={true}
                                   error={errors.appointmentDate}
+                                  weekDays={selectedTherapy?.weekDays}
                                 />
                               </div>
                               <div>
@@ -742,12 +766,26 @@ export default function BookAppointment({ open, handleClose }) {
       )}
 
       <ConfirmationModal
-        confirmationOpen={openConfirmationModal}
-        confirmationHandleClose={() => setOpenConfirmationModal(false)}
-        confirmationSubmitFunc={initiatePayment}
-        confirmationLabel="Confirm Registration"
-        confirmationMsg="Are you sure you want to create this account?"
-        confirmationButtonMsg="Confirm"
+        confirmationOpen={openConfirmationModal || isPaymentPending}
+        confirmationHandleClose={() => {
+          if (isPaymentPending) {
+            cancelPaymentRef.current?.();
+            setIsPaymentPending(false);
+            setOpenConfirmationModal(false);
+          } else {
+            setOpenConfirmationModal(false);
+          }
+        }}
+        confirmationSubmitFunc={isPaymentPending ? () => {} : initiatePayment}
+        confirmationLabel={
+          isPaymentPending ? "Payment in Progress" : "Confirm Registration"
+        }
+        confirmationMsg={
+          isPaymentPending
+            ? "Please complete the transaction in the new tab to book your appointment. Do not close this window."
+            : "Are you sure you want to create this account?"
+        }
+        confirmationButtonMsg={isPaymentPending ? "Waiting..." : "Confirm"}
       />
 
       <style jsx global>{`

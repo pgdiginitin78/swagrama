@@ -7,31 +7,22 @@ import {
   Female,
   FilterVintage,
   Healing,
-  HealthAndSafety,
   Hearing,
   LocalFlorist,
   LocalPharmacy,
   Masks,
   MedicalServices,
   Opacity,
-  Spa,
+  Spa
 } from "@mui/icons-material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Box, Modal } from "@mui/material";
 import { motion } from "framer-motion";
 import {
-  Droplets,
   Filter,
-  Flame,
-  Footprints,
-  Hand,
-  HeartPulse,
   Leaf,
   Shield,
-  ShieldPlus,
-  ShowerHead,
-  Sparkles,
-  Wind,
+  Sparkles
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { MdEco } from "react-icons/md";
@@ -39,6 +30,7 @@ import BathingSweaterTherapyImg from "../../../assets/healingServices/detoxThera
 import BodyAnointingImg from "../../../assets/healingServices/detoxTherapy/BodyAnointing.png";
 import BodyUnguentImg from "../../../assets/healingServices/detoxTherapy/BodyUnguent.png";
 import ContinuousPouringImg from "../../../assets/healingServices/detoxTherapy/ContinuousPouring.png";
+import CuppingTherapy from "../../../assets/healingServices/detoxTherapy/Cupping Therapy.png";
 import DailyUnguentImg from "../../../assets/healingServices/detoxTherapy/DailyUnguent.png";
 import DeepTissueFootMassageImg from "../../../assets/healingServices/detoxTherapy/Deep Tissue Foot Massage.png";
 import DryBrushingImg from "../../../assets/healingServices/detoxTherapy/Dry Brushing.jpg";
@@ -56,6 +48,7 @@ import TubeSteamFomentation from "../../../assets/healingServices/detoxTherapy/T
 import WashGentleCleansingImg from "../../../assets/healingServices/detoxTherapy/Wash Gentle cleansing.png";
 import अक्षिघृततर्पणEyeGheeSatiating from "../../../assets/healingServices/detoxTherapy/अक्षिघृततर्पण Eye Ghee Satiating.png";
 import UnguentImg from "../../../assets/healingServices/detoxTherapy/अभ्यङ्ग Unguent.png";
+import अलाबुविधिCuppingwithFlaskBloodLetting from "../../../assets/healingServices/detoxTherapy/अलाबुविधि Cupping with Flask Blood Letting.png";
 import BathingSweaterTherapy from "../../../assets/healingServices/detoxTherapy/अवगाहस्वेदक Bathing Sweater Therapy.png";
 import आर्द्रवस्त्रस्वेदनWetClothFomentationImg from "../../../assets/healingServices/detoxTherapy/आर्द्रवस्त्रस्वेदन Wet Cloth Fomentation.png";
 import आश्योतनSprinkling from "../../../assets/healingServices/detoxTherapy/आश्योतन Sprinkling.png";
@@ -64,6 +57,7 @@ import उद्वर्तनPowderMassage from "../../../assets/healingServic
 import WetClothFomentation from "../../../assets/healingServices/detoxTherapy/उपनाहस्वेद Wet Cloth Fomentation.png";
 import ऊन्मर्दनFragranceMassageImg from "../../../assets/healingServices/detoxTherapy/ऊन्मर्दन Fragrance Massage.png";
 import SingleOrganAnointingImg from "../../../assets/healingServices/detoxTherapy/एकांगलेपण Single Organ Anointing.png";
+import एकांगव्रणकर्मSingleWoundTreatment from "../../../assets/healingServices/detoxTherapy/एकांगव्रणकर्म Single Wound Treatment.png";
 import कदराग्निकर्मCornCauterization from "../../../assets/healingServices/detoxTherapy/कदराग्निकर्म Corn Cauterization.png";
 import कर्णतर्पणEarSatiating from "../../../assets/healingServices/detoxTherapy/कर्णतर्पण Ear Satiating.png";
 import कर्णपूरणEarFulfilling from "../../../assets/healingServices/detoxTherapy/कर्णपूरण Ear Fulfilling.png";
@@ -73,9 +67,11 @@ import कर्णस्त्रावEarDischarge from "../../../assets/heali
 import कवलKavalaHerbalMouthRinse from "../../../assets/healingServices/detoxTherapy/कवल Kavala Herbal Mouth Rinse.png";
 import क्षीरधूमपानMilkSmokeInhalationtherapy from "../../../assets/healingServices/detoxTherapy/क्षीरधूमपान Milk Smoke Inhalation therapy.png";
 import गण्डुषGandushaOilPulling from "../../../assets/healingServices/detoxTherapy/गण्डुष Gandusha Oil Pulling.png";
+import जलौकाLeechBloodLetting from "../../../assets/healingServices/detoxTherapy/जलौका Leech Blood Letting.png";
 import SatiatingImg from "../../../assets/healingServices/detoxTherapy/तर्पण Satiating.png";
 import ताम्राग्निकर्मCopperCauterization from "../../../assets/healingServices/detoxTherapy/ताम्राग्निकर्म Copper Cauterization.png";
 import दन्तDantaDentalCare from "../../../assets/healingServices/detoxTherapy/दन्त Danta Dental Care.png";
+import दुष्टव्रणकर्मChronicWoundTreatment from "../../../assets/healingServices/detoxTherapy/दुष्टव्रणकर्म Chronic Wound Treatment.png";
 import धाराOilStreamTherapy from "../../../assets/healingServices/detoxTherapy/धारा Oil Stream Therapy.png";
 import धूपनIncensingTherepy from "../../../assets/healingServices/detoxTherapy/धूपन Incensing therepy.png";
 import नासाधावनNasalWash from "../../../assets/healingServices/detoxTherapy/नासाधावन Nasal Wash.png";
@@ -110,12 +106,15 @@ import रौप्याग्निकर्मSilverCauterization from "../..
 import लेपनHerbalAnointingImg from "../../../assets/healingServices/detoxTherapy/लेपन Herbal Anointing.png";
 import लोहाग्निकर्मIronCauterization from "../../../assets/healingServices/detoxTherapy/लोहाग्निकर्म Iron Cauterization.png";
 import HerbalSmokeInhalation from "../../../assets/healingServices/detoxTherapy/वनोषधि धूमपान Herbal Smoke Inhalation.png";
+import विद्धवेधनकर्मPiercingTherapy from "../../../assets/healingServices/detoxTherapy/विद्ध - वेधन कर्म Piercing Therapy.png";
+import विद्धाग्निकर्मPiercingCauterizationTherapy from "../../../assets/healingServices/detoxTherapy/विद्धाग्निकर्म Piercing Cauterization Therapy.png";
 import विद्युतोषधिपोट्टलीस्वेदElectricHerbsFomenting from "../../../assets/healingServices/detoxTherapy/विद्युतोषधिपोट्टलीस्वेद Electric Herbs Fomenting.png";
 import शमनतर्पणनस्यAlleviationSatiating from "../../../assets/healingServices/detoxTherapy/शमनतर्पणनस्य Alleviation Satiating.png";
 import श्रृंगावचारणHornBloodLetting from "../../../assets/healingServices/detoxTherapy/श्रृंगावचारण Horn Blood Letting.png";
 import संपूर्णनेत्रक्षाTotalEyeCaretherapy from "../../../assets/healingServices/detoxTherapy/संपूर्ण नेत्रक्षा Total Eye Care therapy .png";
 import ConductionMassageImg from "../../../assets/healingServices/detoxTherapy/संवाहन Conduction Massage.png";
 import सद्यअनुलोमनInstantPurging from "../../../assets/healingServices/detoxTherapy/सद्यअनुलोमन - InstantPurging.png";
+import सद्योव्रणकर्मImmediateWoundTreatment from "../../../assets/healingServices/detoxTherapy/सद्योव्रणकर्म Immediate Wound Treatment.png";
 import FullBodyOilPowderMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगउत्सादन Full Body Oil Powder Massage.png";
 import FullBodyPowderMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगउद्वर्तन Full Body Powder Massage.png";
 import FullBodyMassageImg from "../../../assets/healingServices/detoxTherapy/सर्वांगमर्दनFullBddyMassage.png";
@@ -123,18 +122,10 @@ import FullBodyAnointingImg from "../../../assets/healingServices/detoxTherapy/�
 import सुवर्णाग्निकर्मGoldCauterization from "../../../assets/healingServices/detoxTherapy/सुवर्णाग्निकर्म Gold Cauterization.png";
 import FemaleGenitalEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/स्त्रीउत्तरबस्ति - Female Genital Enema Detox.jpg";
 import स्नैहिकधूमपानUnctuousSmokeInhalation from "../../../assets/healingServices/detoxTherapy/स्नैहिकधूमपान Unctuous Smoke Inhalation.png";
-import जलौकाLeechBloodLetting from "../../../assets/healingServices/detoxTherapy/जलौका Leech Blood Letting.png";
-import CuppingTherapy from "../../../assets/healingServices/detoxTherapy/Cupping Therapy.png";
-import अलाबुविधिCuppingwithFlaskBloodLetting from "../../../assets/healingServices/detoxTherapy/अलाबुविधि Cupping with Flask Blood Letting.png";
-import विद्धवेधनकर्मPiercingTherapy from "../../../assets/healingServices/detoxTherapy/विद्ध - वेधन कर्म Piercing Therapy.png";
-import विद्धाग्निकर्मPiercingCauterizationTherapy from "../../../assets/healingServices/detoxTherapy/विद्धाग्निकर्म Piercing Cauterization Therapy.png";
-import एकांगव्रणकर्मSingleWoundTreatment from "../../../assets/healingServices/detoxTherapy/एकांगव्रणकर्म Single Wound Treatment.png";
-import सद्योव्रणकर्मImmediateWoundTreatment from "../../../assets/healingServices/detoxTherapy/सद्योव्रणकर्म Immediate Wound Treatment.png";
-import दुष्टव्रणकर्मChronicWoundTreatment from "../../../assets/healingServices/detoxTherapy/दुष्टव्रणकर्म Chronic Wound Treatment.png";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
-import BookEventForm from "./TherapyForm";
+import BookEventForm from "./DetoxBookingModal";
 
 const FILTER = {
   ALL: "All Services",
@@ -1006,7 +997,6 @@ const detoxServicesData = [
   },
 ];
 
-
 const categories = [
   {
     id: "massage",
@@ -1218,7 +1208,7 @@ function ServiceModal({ open, onClose, item }) {
           <div className="flex justify-end mt-4 sm:mt-5">
             <CommonButton
               type="button"
-              label="Book Appointment"
+              label="Book Therapy"
               className="text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 text-sm sm:text-base"
               onClick={() => {
                 setOpenModal(true);
@@ -1281,7 +1271,6 @@ function ServiceCard({ item }) {
             </p>
             <div className="h-px bg-gradient-to-r from-transparent via-green-200 to-transparent mb-2.5" />
             <div className="flex items-center justify-between gap-2">
-           
               <button
                 onClick={() => setModalOpen(true)}
                 className="group/btn flex-shrink-0 flex items-center gap-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium text-white bg-[#4f8f73] rounded-lg transition-all duration-300 hover:bg-[#2a5f46] hover:shadow-md active:scale-95"

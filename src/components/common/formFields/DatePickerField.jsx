@@ -28,9 +28,32 @@ function DatePickerField({
   onError,
   tableDatePicker,
   dob,
+  weekDays,
   ...rest
 }) {
-  console.log("error", error);
+  const DAY_MAP = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+
+  const allowedDayNumbers = weekDays
+    ? weekDays
+        .join(",")
+        .split(",")
+        .map((d) => DAY_MAP[d.trim()])
+        .filter((d) => d !== undefined)
+    : null;
+
+  const shouldDisableDate = (date) => {
+    if (!allowedDayNumbers || allowedDayNumbers.length === 0) return false;
+    const dayOfWeek = new Date(date).getDay();
+    return !allowedDayNumbers.includes(dayOfWeek);
+  };
 
   const today = new Date();
   const maxDobDate = new Date(
@@ -60,6 +83,7 @@ function DatePickerField({
                 disabled={disabled}
                 disablePast={disablePast}
                 disableFuture={disableFuture}
+                shouldDisableDate={shouldDisableDate}
                 sx={{
                   "& .MuiInputBase-root": {
                     height: tableDatePicker ? "28px" : "36px",

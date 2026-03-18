@@ -9,15 +9,18 @@ import { Provider } from "react-redux";
 import { store } from "./components/redux/Store.jsx";
 import { LoaderProvider } from "./components/common/commonLoader/LoaderContext.jsx";
 import CommonLoader from "./components/common/commonLoader/CommonLoader.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <BrowserRouter>
       <ScrollToTop />
-      <LoaderProvider>
-        <CommonLoader />
-        <App />
-      </LoaderProvider>
+      <AuthProvider>
+        <LoaderProvider>
+          <CommonLoader />
+          <App />
+        </LoaderProvider>
+      </AuthProvider>
     </BrowserRouter>
   </Provider>,
 );

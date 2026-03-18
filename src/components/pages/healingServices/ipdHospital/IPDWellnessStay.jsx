@@ -15,6 +15,7 @@ import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeavin
 import SingleStayImg from "../../../assets/healingServices/ipd/Single Stay.png";
 import { errorAlert } from "../../../common/toast/CustomToast";
 import BookingFormModal from "./BookingFormModal";
+import { useAuth } from "../../../../context/AuthContext";
 
 export const wellnessServices = [
   {
@@ -115,9 +116,13 @@ const cardVariants = {
   }),
 };
 
-const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
-  const userData = JSON.parse(localStorage.getItem("user"));
-
+const ServiceCard = ({
+  service,
+  index,
+  setOpenModal,
+  setSelectedService,
+  user,
+}) => {
   const getServiceIcon = () => {
     if (service.serviceName.includes("Outdoor")) return Trees;
     if (service.serviceName.includes("Well House")) return Home;
@@ -231,7 +236,7 @@ const ServiceCard = ({ service, index, setOpenModal, setSelectedService }) => {
             type="button"
             onClick={() => {
               try {
-                if (userData) {
+                if (user) {
                   setSelectedService(service);
                   setOpenModal(true);
                 } else {
@@ -277,6 +282,7 @@ const IPDWellnessStay = () => {
   const [selectedRoom, setSelectedRoom] = useState("All");
   const [openModal, setOpenModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
+  const { user } = useAuth();
 
   const filteredData =
     selectedRoom === "All"
@@ -340,6 +346,7 @@ const IPDWellnessStay = () => {
               index={index}
               setOpenModal={setOpenModal}
               setSelectedService={setSelectedService}
+              user={user}
             />
           ))}
         </div>

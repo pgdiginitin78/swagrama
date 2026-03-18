@@ -1,10 +1,10 @@
 import axios from "axios";
-import { logoutUser } from "./Actions";
 import { API_BASE_URL } from "./http-common";
+import { callAuthLogout } from "./context/AuthContext";
 
 const AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  // withCredentials: true, 
+  // withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -18,22 +18,19 @@ const processQueue = (error, token = null) => {
       prom.resolve(token);
     }
   });
-
   failedQueue = [];
 };
 
 AxiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
-
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 AxiosInstance.interceptors.response.use(
@@ -42,9 +39,18 @@ AxiosInstance.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // If the failing request is itself refresh-token, force logout immediately
+    // to prevent an infinite refresh → 401 → refresh loop.
+    if (originalRequest?.url?.includes("refresh-token")) {
+      processQueue(error, null);
+      callAuthLogout();
+      window.location.href = "/";
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
       if (isRefreshing) {
+        // Queue this request until the ongoing refresh resolves
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -53,9 +59,7 @@ AxiosInstance.interceptors.response.use(
             originalRequest.headers.Authorization = `Bearer ${token}`;
             return AxiosInstance(originalRequest);
           })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+          .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
@@ -66,10 +70,11 @@ AxiosInstance.interceptors.response.use(
         if (!refreshToken) {
           throw new Error("No refresh token available");
         }
-        const res = await axios.post(
-          `${API_BASE_URL}refresh-token`,
-          { refreshToken }
-        );
+
+        const res = await axios.post(`${API_BASE_URL}refresh-token`, {
+          refreshToken,
+        });
+
         const { accessToken, refreshToken: newRefreshToken } = res.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", newRefreshToken);
@@ -79,9 +84,10 @@ AxiosInstance.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return AxiosInstance(originalRequest);
       } catch (err) {
-        processQueue(err, null);        
+        processQueue(err, null);
+        // Clear storage and update React auth state, then redirect
         localStorage.clear();
-        logoutUser();      
+        callAuthLogout();
         window.location.href = "/";
         return Promise.reject(err);
       } finally {
@@ -90,7 +96,7 @@ AxiosInstance.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default AxiosInstance;

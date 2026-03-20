@@ -196,7 +196,7 @@ export default function AddPatientModal({ open, handleClose }) {
 
   const userData = JSON.parse(localStorage.getItem("user") || "null");
 
-  const { showLoader, hideLoader } = useLoader();
+  const { setIsLoading } = useLoader();
 
   const {
     handleSubmit,
@@ -221,41 +221,6 @@ export default function AddPatientModal({ open, handleClose }) {
   const watchedDOB = useWatch({ control, name: "dob" });
   const watchedAge = useWatch({ control, name: "age" });
 
-  useEffect(() => {
-    if (isUpdatingFromAge) return;
-    const dob = watchedDOB;
-    if (dob && !isNaN(new Date(dob))) {
-      const calculatedAge = calculateAgeFromDOB(dob);
-      if (calculatedAge !== "") {
-        setIsUpdatingFromDOB(true);
-        setValue("age", calculatedAge, { shouldValidate: true });
-        setTimeout(() => setIsUpdatingFromDOB(false), 100);
-      }
-    }
-  }, [watchedDOB]);
-
-  useEffect(() => {
-    if (isUpdatingFromDOB) return;
-
-    const age = watchedAge;
-    const ageNum = Number(age);
-
-    if (
-      age &&
-      !isNaN(ageNum) &&
-      Number.isInteger(ageNum) &&
-      ageNum >= 0 &&
-      ageNum <= 120
-    ) {
-      const calculatedDOB = calculateDOBFromAge(age);
-      if (calculatedDOB) {
-        setIsUpdatingFromAge(true);
-        setValue("dob", calculatedDOB, { shouldValidate: true });
-        setTimeout(() => setIsUpdatingFromAge(false), 100);
-      }
-    }
-  }, [watchedAge]);
-
   const onSubmit = (data) => {
     const saveObj = {
       firstName: data.firstName,
@@ -276,7 +241,7 @@ export default function AddPatientModal({ open, handleClose }) {
   const handleUserRegister = async () => {
     try {
       setOpenConfirmationModal(false);
-      showLoader();
+      setIsLoading(true);
       const response = await AddPatient(finalSaveObj);
       const apiData = response?.data;
 
@@ -291,7 +256,7 @@ export default function AddPatientModal({ open, handleClose }) {
       const errorMessage = error?.response?.data?.message || error?.message;
       errorAlert(errorMessage);
     } finally {
-      hideLoader();
+      setIsLoading(false);
     }
   };
 
@@ -324,28 +289,65 @@ export default function AddPatientModal({ open, handleClose }) {
   };
 
   useEffect(() => {
-    fetch("https://api.ipify.org?format=json")
-      .then((res) => res.json())
-      .then((data) => setIpAddress(data.ip))
-      .catch((err) => console.error("IP fetch error:", err));
-
-    if (userData !== null) {
-      setValue("mobileNO", userData?.mobileNo);
+    if (isUpdatingFromAge) return;
+    const dob = watchedDOB;
+    if (dob && !isNaN(new Date(dob))) {
+      const calculatedAge = calculateAgeFromDOB(dob);
+      if (calculatedAge !== "") {
+        setIsUpdatingFromDOB(true);
+        setValue("age", calculatedAge, { shouldValidate: true });
+        setTimeout(() => setIsUpdatingFromDOB(false), 100);
+      }
     }
-  }, [userData]);
+  }, [watchedDOB, setValue, isUpdatingFromAge]);
 
   useEffect(() => {
-    getUserDetails(userData?.userId)
-      .then((res) => {
-        const data = res?.data?.data;
-        const address = data?.address ?? "";
-        const pinCode = data?.pinCode ?? "";
-        setUserAddressData({ address, pinCode });
-        setValue("address", address);
-        setValue("pinCode", pinCode);
-      })
-      .catch((err) => err);
-  }, []);
+    if (isUpdatingFromDOB) return;
+
+    const age = watchedAge;
+    const ageNum = Number(age);
+
+    if (
+      age &&
+      !isNaN(ageNum) &&
+      Number.isInteger(ageNum) &&
+      ageNum >= 0 &&
+      ageNum <= 120
+    ) {
+      const calculatedDOB = calculateDOBFromAge(age);
+      if (calculatedDOB) {
+        setIsUpdatingFromAge(true);
+        setValue("dob", calculatedDOB, { shouldValidate: true });
+        setTimeout(() => setIsUpdatingFromAge(false), 100);
+      }
+    }
+  }, [watchedAge, setValue, isUpdatingFromDOB]);
+
+  useEffect(() => {
+    if (userData !== null) {
+      setValue("mobileNO", userData?.mobileNo);
+    } else {
+      fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => setIpAddress(data.ip))
+        .catch((err) => console.error("IP fetch error:", err));
+    }
+  }, [userData,setValue]);
+
+  useEffect(() => {
+    if (userData) {
+      getUserDetails(userData?.userId)
+        .then((res) => {
+          const data = res?.data?.data;
+          const address = data?.address ?? "";
+          const pinCode = data?.pinCode ?? "";
+          setUserAddressData({ address, pinCode });
+          setValue("address", address);
+          setValue("pinCode", pinCode);
+        })
+        .catch((err) => err);
+    }
+  }, [setValue]);
 
   return (
     <>

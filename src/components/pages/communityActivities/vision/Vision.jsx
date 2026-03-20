@@ -1,579 +1,3 @@
-// import AccessTimeIcon from "@mui/icons-material/AccessTime";
-// import { motion } from "framer-motion";
-// import { BookOpen, Droplets, Heart, Leaf, Sprout, Sun } from "lucide-react";
-// import { useEffect, useRef, useState } from "react";
-// import {
-//   FaArrowRight,
-//   FaCalendarAlt,
-//   FaCheckCircle,
-//   FaLeaf,
-//   FaMapMarkerAlt,
-//   FaMoon,
-//   FaSun,
-//   FaUsers,
-//   FaUtensils,
-// } from "react-icons/fa";
-// import { GiHerbsBundle, GiMeditation } from "react-icons/gi";
-// import { MdEventAvailable } from "react-icons/md";
-// import OPDBookingModal from "../../healingServices/opdClinic/OPDBookingModal";
-
-// const eventsData = [
-//   {
-//     id: 1,
-//     serviceName: "स्वागतदर्शन Morning Vision",
-//     subtitle: "Community Morning Visits Without Meal",
-//     description:
-//       "स्वग्रामCommunity Morning Visits Without Meal: 09.15 AM to 11.30 AM. This is simple activity to introduce स्वग्राम Community & गाईत्वग्राम CowVillage with Wholesome Bite. This is a small introductory tour with an expert guide to explore ideas of our village. ",
-//     dateRange: "Apr 22, 2025 To Nov 28, 2025",
-//     time: "09:15 To 13:30",
-//     price: 750,
-//     schedule: [
-//       {
-//         time: "9:15 AM - 11:15 AM",
-//         activity: "Morning Visit : प्रातःदर्शन Morning Vision",
-//         icon: <FaSun />,
-//       },
-//       {
-//         time: "9:00 AM - 9:15 AM",
-//         activity: "आगमन Check In",
-//         icon: <FaCheckCircle />,
-//       },
-//       {
-//         time: "11:15 AM - 11:30 AM",
-//         activity: "निर्गम Check Out",
-//         icon: <FaCheckCircle />,
-//       },
-//     ],
-//     type: "morning",
-//   },
-//   {
-//     id: 2,
-//     serviceName: "स्वागतदर्शन Evening Vision",
-//     subtitle: "Sunset ritual overview (Agnihotra Demo)",
-//     description:
-//       "Sunset ritual overview (Agnihotra Demo) Natural landscape walk through herbal forest, sacred fire space, and healing circle Visit to Gurukul, Yoga corners, and community farms Betel Chewing (with local herbs) and Seasonal knowledge sharing.",
-//     dateRange: "Apr 22, 2025 To Dec 31, 2025",
-//     time: "14:15 To 17:30",
-//     price: 750,
-//     schedule: [
-//       {
-//         time: "3:15 PM - 3:30 PM",
-//         activity: "आगमन CheckIn",
-//         icon: <FaCheckCircle />,
-//       },
-//       {
-//         time: "3:30 PM - 5:00 PM",
-//         activity: "Evening Visit : स्वागतदर्शन Evening Vision",
-//         icon: <FaMoon />,
-//       },
-//       {
-//         time: "5:00 PM - 5:15 PM",
-//         activity: "Evening Rituals : स्वसम्पन्निति Evening Rituals",
-//         icon: <GiMeditation />,
-//       },
-//       {
-//         time: "5:15 PM - 5:30 PM",
-//         activity: "निर्गम CheckOut",
-//         icon: <FaCheckCircle />,
-//       },
-//     ],
-//     type: "evening",
-//   },
-//   {
-//     id: 3,
-//     serviceName: "स्वागतदर्शन पूर्णाहार Morning Vision Whole Meal",
-//     subtitle: "Sunrise welcome & spiritual chanting",
-//     description:
-//       "Sunrise welcome & spiritual chanting Herbal tea followed by Ayurvedic breakfast (सात्म्यग्रास) Full facility tour including IPD/OPD, Vaidya consultation rooms, Panchakarma unit Herbal medicine garden exploration and seed saving demo Rituals.",
-//     dateRange: "Apr 22, 2025 To Jan 1, 2026",
-//     time: "06:45 To 11:30",
-//     price: 1000,
-//     schedule: [
-//       {
-//         time: "6:45 AM - 7:00 AM",
-//         activity: "आगमन Check In",
-//         icon: <FaCheckCircle />,
-//       },
-//       {
-//         time: "7:00 AM - 7:45 AM",
-//         activity: "Morning Rituals : स्वस्तिश्री Morning Rituals",
-//         icon: <GiMeditation />,
-//       },
-//       {
-//         time: "7:45 AM - 9:00 AM",
-//         activity: "स्वागतपूर्णाहार Morning Whole Meal",
-//         icon: <FaUtensils />,
-//       },
-//       {
-//         time: "9:00 AM - 9:30 AM",
-//         activity: "Post meal Do & Don'ts",
-//         icon: <GiHerbsBundle />,
-//       },
-//     ],
-//     type: "morning",
-//   },
-//   {
-//     id: 4,
-//     serviceName: "स्वागतदर्शन पूर्णाहार Evening Vision Whole Meal",
-//     subtitle: "Welcome with Ayurvedic Drink Evening farming rituals",
-//     description:
-//       "Welcome with Ayurvedic Drink Evening farming rituals, organic harvesting  Gau Raksha : Cow milking and Panchagavya demo WholeMeal dinner experience (Wholesome Bites) Agnihotra & Betel Leaf offering Guided moonlight reflection walk Community prices interaction session.",
-//     dateRange: "Apr 22, 2025 To Dec 31, 2025",
-//     time: "15:15 To 19:30",
-//     price: 1000,
-//     schedule: [
-//       {
-//         time: "3:15 PM - 3:30 PM",
-//         activity: "आगमन Check In",
-//         icon: <FaCheckCircle />,
-//       },
-//       {
-//         time: "3:30 PM - 5:00 PM",
-//         activity: "Evening Visit : स्वागतदर्शन Evening Vision",
-//         icon: <FaMoon />,
-//       },
-//       {
-//         time: "5:00 PM - 5:15 PM",
-//         activity: "Evening Rituals : स्वसम्पन्निति Evening Rituals",
-//         icon: <GiMeditation />,
-//       },
-//       {
-//         time: "5:15 PM - 6:30 PM",
-//         activity: "स्वसम्पूर्णाहार Evening Whole Meal",
-//         icon: <FaUtensils />,
-//       },
-//     ],
-//     type: "evening",
-//   },
-// ];
-
-// const EventCard = ({
-//   event,
-//   index,
-//   setSelectedService,
-//   setOpenAppointmentBookModal,
-// }) => {
-//   const cardRef = useRef(null);
-
-//   useEffect(() => {
-//     const card = cardRef.current;
-//     if (!card) return;
-
-//     const observer = new IntersectionObserver(
-//       (entries) => {
-//         entries.forEach((entry) => {
-//           if (entry.isIntersecting) {
-//             entry.target.style.opacity = "1";
-//             entry.target.style.transform = "translateY(0)";
-//           }
-//         });
-//       },
-//       { threshold: 0.1 }
-//     );
-
-//     observer.observe(card);
-//     return () => observer.disconnect();
-//   }, []);
-
-//   const isMorning = event.type === "morning";
-
-//   return (
-//     <div
-//       ref={cardRef}
-//       className="relative group opacity-0 translate-y-8 transition-all duration-700 ease-out flex flex-col h-full"
-//       style={{
-//         transitionDelay: `${index * 100}ms`,
-//         willChange: "transform, opacity",
-//       }}
-//     >
-//       <div className="absolute -top-2 -left-2 w-10 h-10 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full opacity-20 blur-lg group-hover:opacity-30 transition-opacity duration-500"></div>
-//       <div className="absolute -bottom-2 -right-2 w-12 h-12 bg-gradient-to-br from-orange-400 to-amber-500 rounded-full opacity-20 blur-lg group-hover:opacity-30 transition-opacity duration-500"></div>
-
-//       <div className="relative bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg border border-green-100 hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
-//         <div
-//           className={`absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-700 ${
-//             isMorning
-//               ? "bg-gradient-to-br from-emerald-400 via-lime-400 to-teal-400"
-//               : "bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-600"
-//           }`}
-//         ></div>
-
-//         <div className="relative">
-//           <div
-//             className={`${
-//               isMorning
-//                 ? "bg-gradient-to-r from-emerald-600 via-lime-600 to-teal-600"
-//                 : "bg-gradient-to-r from-yellow-600 to-amber-700"
-//             } p-3 relative`}
-//           >
-//             <div className="absolute inset-0 opacity-10">
-//               <div className="absolute top-0 left-0 w-16 h-16 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-//               <div className="absolute bottom-0 right-0 w-20 h-20 border-2 border-white rounded-full translate-x-1/3 translate-y-1/3"></div>
-//             </div>
-
-//             <div className="relative flex items-start justify-between gap-3">
-//               <div className="flex items-start gap-2 flex-1">
-//                 <div className="text-2xl text-white/90 mt-0.5">
-//                   {isMorning ? <FaSun /> : <FaMoon />}
-//                 </div>
-//                 <div className="flex-1">
-//                   <h2 className="text-sm font-bold text-white mb-0.5 leading-tight">
-//                     {event.serviceName}
-//                   </h2>
-//                   <p className="text-white/90 text-xs">{event.subtitle}</p>
-//                 </div>
-//               </div>
-
-//               <div className="bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/30 shadow-lg shrink-0">
-//                 <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-lg"></div>
-//                 <div className="relative text-center">
-//                   <p className="text-lg font-bold text-white leading-none">
-//                     ₹{event.price}
-//                   </p>
-//                   <p className="text-[9px] text-white/80">per person</p>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-
-//         <div className="p-3 relative flex-1 flex flex-col">
-//           <div className="grid grid-cols-2 gap-2 mb-3">
-//             <div className="relative">
-//               <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-500 rounded-lg opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
-//               <div className="relative flex items-center gap-2 p-2 rounded-lg border border-green-200 bg-white">
-//                 <div className="text-lg text-ayuMysticBlue shrink-0">
-//                   <FaCalendarAlt />
-//                 </div>
-//                 <div className="min-w-0">
-//                   <p className="text-[9px] text-gray-500 font-medium">
-//                     Date Range
-//                   </p>
-//                   <p className="text-[11px] font-bold text-gray-800 truncate">
-//                     {event.dateRange}
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>
-
-//             <div className="relative">
-//               <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-lg opacity-5 group-hover:opacity-10 transition-opacity duration-500"></div>
-//               <div className="relative flex items-center gap-2 p-2 rounded-lg border border-blue-200 bg-white">
-//                 <div className="text-lg text-ayuSaffron shrink-0">
-//                   <AccessTimeIcon />
-//                 </div>
-//                 <div className="min-w-0">
-//                   <p className="text-[9px] text-gray-500 font-medium">
-//                     Duration
-//                   </p>
-//                   <p className="text-[11px] font-bold text-gray-800 truncate">
-//                     {event.time}
-//                   </p>
-//                 </div>
-//               </div>
-//             </div>
-//           </div>
-
-//           <div className="mb-3 p-2.5 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border-l-4 border border-orange-400">
-//             <p className="text-[11px] text-gray-700 leading-relaxed line-clamp-2">
-//               {event.description}
-//             </p>
-//           </div>
-
-//           <div className="mb-3 flex-1">
-//             <div className="flex items-center gap-2 mb-2">
-//               <MdEventAvailable className="text-base text-ayuMysticBlue" />
-//               <h3 className="text-xs font-bold text-gray-800">
-//                 Event Schedule
-//               </h3>
-//             </div>
-
-//             <div className="relative pl-3">
-//               <div
-//                 className={`absolute left-0.5 top-0 bottom-0 w-0.5 ${
-//                   isMorning
-//                     ? "bg-gradient-to-b from-orange-400 to-amber-400"
-//                     : "bg-gradient-to-b from-indigo-400 to-purple-400"
-//                 }`}
-//               ></div>
-
-//               {event.schedule.map((item, idx) => (
-//                 <div key={idx} className="relative mb-2 last:mb-0">
-//                   <div
-//                     className={`absolute -left-[14px] top-5 w-2.5 h-2.5 rounded-full ${
-//                       isMorning ? "bg-orange-500" : "bg-indigo-600"
-//                     } border-2 border-white shadow-sm`}
-//                   ></div>
-
-//                   <div
-//                     className={`bg-white rounded-lg p-2 shadow-sm hover:shadow-md transition-all duration-300 border ${
-//                       isMorning ? "border-orange-200" : "border-blue-200"
-//                     }`}
-//                   >
-//                     <div className="flex items-center gap-2">
-//                       <div
-//                         className={`text-sm shrink-0 ${
-//                           isMorning ? "text-orange-600" : "text-indigo-600"
-//                         }`}
-//                       >
-//                         {item.icon}
-//                       </div>
-//                       <div className="flex-1 min-w-0">
-//                         <p className="text-[10px] font-bold text-gray-800">
-//                           {item.time}
-//                         </p>
-//                         <p className="text-[11px] text-gray-600 truncate">
-//                           {item.activity}
-//                         </p>
-//                       </div>
-//                     </div>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//           <div className="mb-3 p-2.5 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-lg border border-green-200">
-//             <p className="text-[9px] font-bold text-green-800 mb-1.5 flex items-center gap-1">
-//               <GiHerbsBundle className="text-xs" />
-//               WHAT'S INCLUDED
-//             </p>
-//             <div className="flex flex-wrap gap-1.5">
-//               {[
-//                 { icon: <FaUtensils />, text: "Food", color: "orange" },
-//                 { icon: <FaMapMarkerAlt />, text: "Stay", color: "red" },
-//                 { icon: <FaUsers />, text: "Training", color: "blue" },
-//                 { icon: <GiHerbsBundle />, text: "Insurance", color: "green" },
-//               ].map((item, idx) => (
-//                 <div
-//                   key={idx}
-//                   className={`flex items-center gap-1 bg-white px-2 py-1 rounded-full text-[10px] font-medium text-gray-700 shadow-sm hover:shadow transition-all duration-300 border border-${item.color}-200`}
-//                 >
-//                   <span className={`text-${item.color}-600 text-xs`}>
-//                     {item.icon}
-//                   </span>
-//                   {item.text}
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//           <button
-//             type="button"
-//             onClick={() => {
-//               setSelectedService(event);
-//               setOpenAppointmentBookModal(true);
-//             }}
-//             className="relative w-full group/btn overflow-hidden rounded-lg mt-auto"
-//           >
-//             <div className="absolute inset-0 bg-gradient-to-r from-green-600 via-emerald-600 to-green-600 transition-all duration-500"></div>
-//             <div className="relative flex items-center justify-center gap-2 py-2.5 px-4 text-white font-bold text-xs">
-//               <FaLeaf className="group-hover/btn:rotate-12 transition-transform duration-300" />
-//               <span>Book This Experience</span>
-//               <FaArrowRight className="group-hover/btn:translate-x-1 transition-transform duration-300" />
-//             </div>
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// const VisionContent = () => {
-//   const [openAppointmentBookModal, setOpenAppointmentBookModal] =
-//     useState(false);
-//   const [selectedService, setSelectedService] = useState(null);
-
-//   return (
-//     <div className=" relative overflow-hidden bg-gradient-to-b from-green-50/30 to-amber-50/30">
-//       <div className="relative min-h-screen overflow-hidden">
-//         <div className="absolute inset-0">
-//           <div className="absolute inset-0 bg-gradient-to-br from-green-800 via-amber-700 to-orange-800">
-//             <motion.div
-//               animate={{
-//                 scale: [1, 1.05, 1],
-//                 opacity: [0.8, 1, 0.8],
-//               }}
-//               transition={{
-//                 duration: 3,
-//                 repeat: Infinity,
-//               }}
-//               className="absolute top-12 right-12 w-24 h-24 bg-yellow-300 rounded-full blur-lg opacity-80"
-//             />
-//             <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-gradient-to-t from-amber-950/70 to-transparent">
-//               <svg
-//                 viewBox="0 0 400 160"
-//                 className="w-full h-full opacity-70"
-//                 preserveAspectRatio="none"
-//               >
-//                 <path d="M 60 120 L 90 95 L 120 120 Z" fill="#2d1810" />
-//                 <rect x="65" y="120" width="50" height="40" fill="#2d1810" />
-
-//                 <path d="M 170 110 L 210 85 L 250 110 Z" fill="#2d1810" />
-//                 <rect x="180" y="110" width="60" height="50" fill="#2d1810" />
-
-//                 <path d="M 300 125 L 330 105 L 360 125 Z" fill="#2d1810" />
-//                 <rect x="305" y="125" width="50" height="35" fill="#2d1810" />
-
-//                 <ellipse cx="50" cy="130" rx="12" ry="20" fill="#1a3d0f" />
-//                 <ellipse cx="150" cy="120" rx="15" ry="24" fill="#1a3d0f" />
-//                 <ellipse cx="270" cy="125" rx="14" ry="22" fill="#1a3d0f" />
-//                 <ellipse cx="380" cy="135" rx="18" ry="26" fill="#1a3d0f" />
-//               </svg>
-//             </div>
-//           </div>
-//           <div className="absolute inset-0 bg-black/30" />
-//         </div>
-//         <div className="absolute inset-0 opacity-5">
-//           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-//             <defs>
-//               <pattern
-//                 id="pattern"
-//                 x="0"
-//                 y="0"
-//                 width="80"
-//                 height="80"
-//                 patternUnits="userSpaceOnUse"
-//               >
-//                 <circle cx="40" cy="40" r="2" fill="#d97706" />
-//               </pattern>
-//             </defs>
-//             <rect width="100%" height="100%" fill="url(#pattern)" />
-//           </svg>
-//         </div>
-//         {[...Array(4)].map((_, i) => (
-//           <motion.div
-//             key={i}
-//             className="absolute text-amber-400/20 z-10"
-//             initial={{ x: Math.random() * 100 + "%", y: -50 }}
-//             animate={{ y: "110vh", rotate: 360 }}
-//             transition={{
-//               duration: 20 + i * 5,
-//               repeat: Infinity,
-//               delay: i * 3,
-//               ease: "linear",
-//             }}
-//           >
-//             <Leaf size={20} />
-//           </motion.div>
-//         ))}
-//         <div className="relative z-20 min-h-screen flex items-center justify-center px-6 py-12">
-//           <div className="max-w-4xl w-full">
-//             <motion.div
-//               className="space-y-8"
-//               initial={{ opacity: 0, y: 30 }}
-//               animate={{ opacity: 1, y: 0 }}
-//               transition={{ duration: 0.6 }}
-//             >
-//               <motion.div
-//                 className="text-center space-y-4"
-//                 initial={{ opacity: 0, y: 20 }}
-//                 animate={{ opacity: 1, y: 0 }}
-//                 transition={{ delay: 0.2 }}
-//               >
-//                 <h1 className="text-4xl lg:text-5xl font-bold text-white leading-tight">
-//                   स्वग्रामदर्शन
-//                 </h1>
-//                 <h2 className="text-3xl lg:text-4xl font-semibold text-amber-200 italic">
-//                   Community Vision
-//                 </h2>
-//               </motion.div>
-
-//               <motion.div
-//                 initial={{ opacity: 0 }}
-//                 animate={{ opacity: 1 }}
-//                 transition={{ delay: 0.5 }}
-//                 className="bg-white/90 backdrop-blur-md rounded-2xl p-8 border-2 border-amber-300/50 shadow-2xl"
-//               >
-//                 <p className="text-xs lg:text-sm text-amber-900 leading-relaxed text-center">
-//                   स्वग्रामदर्शन is a holistic journey through the essence of
-//                   community living in harmony with nature. Visitors are welcomed
-//                   into a world where knowledge, culture, sustainability, and
-//                   spirituality converge. Each element of the community embodies
-//                   a conscious lifestyle rooted in natural regulation
-//                   <span className="font-semibold">
-//                     &nbsp;(नैसर्गनियमन)&nbsp;
-//                   </span>
-//                   and traditional wisdom.
-//                 </p>
-//               </motion.div>
-//               <motion.div
-//                 initial={{ opacity: 0, y: 20 }}
-//                 animate={{ opacity: 1, y: 0 }}
-//                 transition={{ delay: 0.6 }}
-//                 className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4"
-//               >
-//                 {[
-//                   { icon: BookOpen, label: "Learning" },
-//                   { icon: Heart, label: "Wellness" },
-//                   { icon: Sprout, label: "Agriculture" },
-//                   { icon: Droplets, label: "Resources" },
-//                   { icon: Sun, label: "Spiritual" },
-//                   { icon: Leaf, label: "Natural" },
-//                 ].map((item, i) => (
-//                   <motion.div
-//                     key={i}
-//                     whileHover={{ scale: 1.05, y: -5 }}
-//                     initial={{ opacity: 0, y: 20 }}
-//                     animate={{ opacity: 1, y: 0 }}
-//                     transition={{ delay: 0.7 + i * 0.1 }}
-//                     className="flex flex-col items-center gap-3 p-6 bg-white/80 backdrop-blur-sm rounded-xl border-2 border-amber-300 hover:border-amber-500 hover:bg-white/90 transition-all cursor-pointer shadow-lg"
-//                   >
-//                     <item.icon className="w-8 h-8 text-amber-700" />
-//                     <span className="text-sm font-semibold text-amber-900">
-//                       {item.label}
-//                     </span>
-//                   </motion.div>
-//                 ))}
-//               </motion.div>
-//               <div className="relative">
-//                 <div className="absolute -top-40 -left-4 w-12 h-12 border-l-4 border-t-4 border-amber-400 rounded-tl-xl opacity-60" />
-//                 <div className="absolute bottom-5 -right-4 w-12 h-12 border-r-4 border-b-4 border-amber-400 rounded-br-xl opacity-60" />
-//               </div>
-//             </motion.div>
-//           </div>
-//         </div>
-//       </div>
-//       {/* <div className="relative z-10 pt-6 pb-4">
-//         <div className="flex items-center justify-center gap-2">
-//           <Spa className="text-amber-700 animate-pulse" sx={{ fontSize: 30 }} />
-//           <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-700 via-orange-600 to-rose-700 bg-clip-text text-transparent">
-//             Vision
-//           </h1>
-//           <Spa className="text-amber-700 animate-pulse" sx={{ fontSize: 30 }} />
-//         </div>
-//       </div> */}
-
-//       {/* Events Grid */}
-//       <div className="relative z-10  px-4 pb-8 pt-5">
-//         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3  gap-4 md:gap-6">
-//           {eventsData.map((event, index) => (
-//             <EventCard
-//               key={event.id}
-//               event={event}
-//               index={index}
-//               setSelectedService={setSelectedService}
-//               setOpenAppointmentBookModal={setOpenAppointmentBookModal}
-//             />
-//           ))}
-//         </div>
-//       </div>
-
-//       {/* Booking Modal */}
-//       {openAppointmentBookModal && (
-//         <OPDBookingModal
-//           open={openAppointmentBookModal}
-//           handleClose={() => {
-//             setOpenAppointmentBookModal(false);
-//             setSelectedService(null);
-//           }}
-//           selectedService={selectedService}
-//         />
-//       )}
-//     </div>
-//   );
-// };
-
-// export default VisionContent;
-
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
 import BuildIcon from "@mui/icons-material/Build";
@@ -601,6 +25,11 @@ import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.p
 import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.png";
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
 import BookEventForm from "../../bookEventForm/BookEventForm";
+import MorningVisionImg from "../../../assets/Community Actvities/MorningVision.png"
+import EveningSwagramaImg  from "../../../assets/Community Actvities/EveningSwagrama.png"
+import MorningVisionWholeMealImg from "../../../assets/Community Actvities/Morning Vision Whole Meal.png"
+import EveningVisionWholeMealImg from "../../../assets/Community Actvities/Evening Vision Whole Meal.png"
+
 
 const walkInServices = [
   {
@@ -739,8 +168,7 @@ const visitorServices = [
       "Provides knowledge about therapies, Panchakarma, wellness practices, and site orientation.",
     price: "₹750",
     icon: <SpaIcon />,
-    image:
-      "https://img.freepik.com/free-photo/wellness-practices-self-care-world-health-day_23-2151256685.jpg?t=st=1769149322~exp=1769152922~hmac=0cce31d209f17fb2fdd57aed32936c728bdf2cad8b7606511695f4cab15b97d6&w=1480",
+    image:MorningVisionImg,
   },
   {
     nameHindi: "स्वसायम्दर्शन",
@@ -753,8 +181,7 @@ const visitorServices = [
     benefits:
       "Offers overview of holistic treatments, Q&A, and insight into wellness practices.",
     price: "₹750",
-    image:
-      "https://img.freepik.com/free-photo/full-shot-woman-posing-sunset_23-2150343144.jpg?t=st=1769149415~exp=1769153015~hmac=07de8e0bad60137401eab4748ba4b7b82e029c43d5fa8957b48cf7803e83c1fd&w=1480",
+    image:EveningSwagramaImg,
     icon: <SpaIcon />,
   },
   {
@@ -768,8 +195,7 @@ const visitorServices = [
     benefits:
       "Combines experiential learning with nutritious meal for holistic experience.",
     price: "₹1000",
-    image:
-      "https://i.herbalreality.com/wp-content/uploads/2021/10/04133553/Seasonal-eating-and-fasting-with-Ayurveda.jpg",
+    image:MorningVisionWholeMealImg,
     icon: <RestaurantIcon />,
   },
   {
@@ -783,7 +209,7 @@ const visitorServices = [
     benefits:
       "Knowledge sharing + nourishing meal for comprehensive understanding.",
     price: "₹1000",
-    image: EveningVisionMealImg,
+    image: EveningVisionWholeMealImg,
     icon: <RestaurantIcon />,
   },
 ];
@@ -881,7 +307,7 @@ const OurVision = () => {
       </div>
 
       <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
-        <div className="max-w-screen-xl mx-auto px-4">
+        <div className="max-w-screen-2xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -900,7 +326,7 @@ const OurVision = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 sm:gap-5 md:gap-6">
               {journeyItems.map((item, index) => (
                 <motion.div
                   key={index}
@@ -1021,8 +447,8 @@ const OurVision = () => {
         </div>
       </div>
 
-      <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="py-6 sm:py-8 md:py-7 lg:py-6 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
+        <div className="w-full mx-auto px-4">
           <div className="pb-6 sm:pb-8 md:pb-12">
             <motion.div
               initial={{ opacity: 0, y: -30 }}
@@ -1043,7 +469,7 @@ const OurVision = () => {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6"
             >
               {visitorServices.map((service, index) => (
                 <motion.div
@@ -1144,7 +570,7 @@ const OurVision = () => {
         </div>
       </div>
 
-      <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
+      <div className="py-6 sm:py-8 md:py-7 lg:py-5 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
         <div className="w-full mx-auto px-4">
           <motion.div
             variants={containerVariants}
@@ -1152,7 +578,7 @@ const OurVision = () => {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <div className="py-6 sm:py-8 md:py-10">
+            <div className="py-6 sm:py-5">
               <motion.div
                 initial="hidden"
                 animate="visible"
@@ -1178,7 +604,7 @@ const OurVision = () => {
                   </motion.p>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                   {walkInServices.map((service, index) => {
                     const IconComponent = service.icon;
                     return (

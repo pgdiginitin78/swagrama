@@ -1,12 +1,10 @@
-import {
-  Air,
-  BookOnline,
-  FilterList,
-  FitnessCenter,
-  Grass,
-  Pool,
-  Spa,
-} from "@mui/icons-material";
+import Air from "@mui/icons-material/Air";
+import BookOnline from "@mui/icons-material/BookOnline";
+import FilterList from "@mui/icons-material/FilterList";
+import FitnessCenter from "@mui/icons-material/FitnessCenter";
+import Grass from "@mui/icons-material/Grass";
+import Pool from "@mui/icons-material/Pool";
+import Spa from "@mui/icons-material/Spa";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import FertileSoilTherapyImg from "../../../assets/healingServices/natureTherapy/स्वउर्वराचिकित्सा Fertile Soil Therapy.png";
@@ -183,7 +181,7 @@ export default function NatureTherapy() {
         transition={{ delay: 0.4, duration: 0.6 }}
         className="max-w-5xl mx-auto px-4 pb-8"
       >
-        <div className="bg-white rounded-xl shadow-lg border border-green-100 overflow-hidden">
+        <div className="rounded-xl shadow-lg border border-green-100 overflow-hidden">
           <div className="bg-gradient-to-r from-green-600 to-lime-600 px-4 py-3">
             <h3 className="text-white font-bold text-sm md:text-base text-center">
               Available Time Slots - 1 Hr Sessions
@@ -261,7 +259,7 @@ export default function NatureTherapy() {
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setSelectedCategory(category.value)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-md ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-semibold transition-all duration-300 shadow-md ${
                 selectedCategory === category.value
                   ? "bg-gradient-to-r from-green-600 to-lime-600 text-white shadow-lg"
                   : "bg-white text-green-800 border border-lime-300 hover:bg-green-50 hover:border-green-500"
@@ -274,7 +272,7 @@ export default function NatureTherapy() {
         })}
       </motion.div>
       {filteredTherapies.length > 0 ? (
-        <div className="max-w-7xl mx-auto px-4 pb-8">
+        <div className="w-full mx-auto px-4 pb-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={selectedCategory}

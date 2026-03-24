@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Close as CloseIcon, Event } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
+import Event from "@mui/icons-material/Event";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Box, Modal } from "@mui/material";
 import { differenceInDays, format } from "date-fns";

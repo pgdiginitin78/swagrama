@@ -1,6 +1,4 @@
-import {
-  People
-} from "@mui/icons-material";
+import People from "@mui/icons-material/People";
 import { Box, Button, Card, Stack, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
 import CommunityMembership from "./communityMembership/CommunityMembership";

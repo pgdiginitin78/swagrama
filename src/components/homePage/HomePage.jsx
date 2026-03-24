@@ -37,7 +37,7 @@ import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.png";
 import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.png";
 import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.png";
 import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.png";
-import landigPageS1 from "../assets/landing-page/landigPageS1.mp4";
+import landigPageS1 from "../assets/landing-page/landigPageS1.webm";
 import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
 import PradipTaware from "../assets/landing-page/ourexperts/PradipTaware.jpg";
 import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.jpg";

@@ -311,7 +311,7 @@ const IPDWellnessStay = () => {
   return (
     <div className="min-h-screen py-6 px-3 md:px-6 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-lime-50/50 to-amber-50/30"></div>
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="w-full mx-auto relative z-10">
         <motion.div
           className="text-center mb-6"
           initial={{ opacity: 0, y: -20 }}

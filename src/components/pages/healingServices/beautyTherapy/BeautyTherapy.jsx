@@ -520,7 +520,7 @@ const BeautyTherapy = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-3 py-6">
+      <div className="w-full mx-auto px-3 py-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -573,7 +573,7 @@ const BeautyTherapy = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 mb-6"
+          className="grid md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 mb-6"
         >
           <AnimatePresence mode="popLayout">
             {displayedServices.map((service, index) => {
@@ -586,7 +586,7 @@ const BeautyTherapy = () => {
                   whileHover={{ y: -4, scale: 1.02 }}
                   className="group bg-white border border0 rounded-xl overflow-hidden shadow-md hover:shadow-xl  transition-all"
                 >
-                  <div className="relative h-44 md:h-32 overflow-hidden">
+                  <div className="relative h-44 md:h-32 xl:h-44 overflow-hidden">
                     <img
                       src={service.image}
                       alt={service.serviceName}
@@ -603,16 +603,16 @@ const BeautyTherapy = () => {
                   </div>
 
                   <div className="p-3">
-                    <h3 className="text-sm font-medium text-emerald-800 mb-1 leading-tight line-clamp-2 py-1 ">
+                    <h3 className="text-sm font-semibold 2xl:text-lg text-emerald-800 mb-1 leading-tight line-clamp-2 py-1 ">
                       {service.serviceName}
                     </h3>
 
-                    <p className="text-xs text-emerald-700 mb-1 line-clamp-2">
+                    <p className="text-xs 2xl:text-sm  text-emerald-700 mb-1 line-clamp-2">
                       {service.description}
                     </p>
 
                     <div className="backdrop-blur-sm bg-lime-50 border border-emerald-800/50 rounded-lg p-2 mb-2">
-                      <p className="text-xs text-lime-600 leading-snug line-clamp-2">
+                      <p className="text-xs 2xl:text-sm  text-lime-600 leading-snug line-clamp-2">
                         {service.benefits}
                       </p>
                     </div>

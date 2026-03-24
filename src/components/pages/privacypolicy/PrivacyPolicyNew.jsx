@@ -1,23 +1,21 @@
-import {
-  CalendarMonthOutlined as CalendarMonthOutlinedIcon,
-  CheckCircleOutline as CheckCircleOutlineIcon,
-  ChildCareOutlined as ChildCareOutlinedIcon,
-  CollectionsBookmarkOutlined as CollectionsBookmarkOutlinedIcon,
-  CookieOutlined as CookieOutlinedIcon,
-  EditNoteOutlined as EditNoteOutlinedIcon,
-  EmailOutlined as EmailOutlinedIcon,
-  GppGoodOutlined as GppGoodOutlinedIcon,
-  InfoOutlined as InfoOutlinedIcon,
-  LinkOutlined as LinkOutlinedIcon,
-  LocalFloristOutlined as LocalFloristOutlinedIcon,
-  LocationOnOutlined as LocationOnOutlinedIcon,
-  MarkEmailUnreadOutlined as MarkEmailUnreadOutlinedIcon,
-  ShareOutlined as ShareOutlinedIcon,
-  Spa as SpaIcon,
-  StorefrontOutlined as StorefrontOutlinedIcon,
-  TuneOutlined as TuneOutlinedIcon,
-  VerifiedUserOutlined as VerifiedUserOutlinedIcon,
-} from "@mui/icons-material";
+import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import ChildCareOutlinedIcon from "@mui/icons-material/ChildCareOutlined";
+import CollectionsBookmarkOutlinedIcon from "@mui/icons-material/CollectionsBookmarkOutlined";
+import CookieOutlinedIcon from "@mui/icons-material/CookieOutlined";
+import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
+import GppGoodOutlinedIcon from "@mui/icons-material/GppGoodOutlined";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import LinkOutlinedIcon from "@mui/icons-material/LinkOutlined";
+import LocalFloristOutlinedIcon from "@mui/icons-material/LocalFloristOutlined";
+import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
+import MarkEmailUnreadOutlinedIcon from "@mui/icons-material/MarkEmailUnreadOutlined";
+import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import SpaIcon from "@mui/icons-material/Spa";
+import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import TuneOutlinedIcon from "@mui/icons-material/TuneOutlined";
+import VerifiedUserOutlinedIcon from "@mui/icons-material/VerifiedUserOutlined";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { MdEco } from "react-icons/md";
 

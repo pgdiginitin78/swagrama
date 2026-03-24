@@ -1,4 +1,4 @@
-import { Delete } from "@mui/icons-material";
+import Delete from "@mui/icons-material/Delete";
 import InsertEmoticonIcon from "@mui/icons-material/InsertEmoticon";
 import { Box, Modal } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";

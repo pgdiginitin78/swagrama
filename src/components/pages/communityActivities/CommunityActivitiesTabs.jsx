@@ -1,14 +1,12 @@
-import {
-  Festival,
-  Groups,
-  Handshake,
-  TempleHindu
-} from "@mui/icons-material";
+import Festival from "@mui/icons-material/Festival";
+import Groups from "@mui/icons-material/Groups";
+import Handshake from "@mui/icons-material/Handshake";
+import TempleHindu from "@mui/icons-material/TempleHindu";
 import { Box, Button, Card, Stack, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";
 import CommunityActivity from "./communityActivity/CommunityActivity";
 import CommunityCeremony from "./communityCeremony/CommunityCeremony";
-import JoinActivities from "./joinActvities/JoinActivities";
+import JoinActivities from "./joinActivities/JoinActivities";
 import Vision from "./vision/Vision";
 
 const communityTabs = [

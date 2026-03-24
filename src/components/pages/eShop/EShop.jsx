@@ -1,4 +1,5 @@
-import { AddSharp, RemoveSharp } from "@mui/icons-material";
+import AddSharp from "@mui/icons-material/AddSharp";
+import RemoveSharp from "@mui/icons-material/RemoveSharp";
 import { Skeleton } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Leaf, Menu, Search, ShoppingCart, X } from "lucide-react";

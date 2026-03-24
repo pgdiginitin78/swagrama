@@ -1,13 +1,11 @@
-import {
-  Assignment,
-  CalendarMonth,
-  Check,
-  Close as CloseIcon,
-  Description,
-  MedicalServices,
-  NavigateBefore,
-  NavigateNext,
-} from "@mui/icons-material";
+import Assignment from "@mui/icons-material/Assignment";
+import CalendarMonth from "@mui/icons-material/CalendarMonth";
+import Check from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import Description from "@mui/icons-material/Description";
+import MedicalServices from "@mui/icons-material/MedicalServices";
+import NavigateBefore from "@mui/icons-material/NavigateBefore";
+import NavigateNext from "@mui/icons-material/NavigateNext";
 import {
   Box,
   Chip,

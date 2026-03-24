@@ -1,10 +1,8 @@
-import {
-  Email,
-  Facebook,
-  Instagram,
-  LocationOn,
-  YouTube
-} from "@mui/icons-material";
+import Email from "@mui/icons-material/Email";
+import Facebook from "@mui/icons-material/Facebook";
+import Instagram from "@mui/icons-material/Instagram";
+import LocationOn from "@mui/icons-material/LocationOn";
+import YouTube from "@mui/icons-material/YouTube";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useRef } from "react";
 import { Link } from "react-router-dom";

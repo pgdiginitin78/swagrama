@@ -1,4 +1,6 @@
-import { AddSharp, RemoveSharp, Star } from "@mui/icons-material";
+import AddSharp from "@mui/icons-material/AddSharp";
+import RemoveSharp from "@mui/icons-material/RemoveSharp";
+import Star from "@mui/icons-material/Star";
 import {
   AwardIcon,
   Calendar,

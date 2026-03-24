@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Close as CloseIcon } from "@mui/icons-material";
+import CloseIcon from "@mui/icons-material/Close";
 import { Box, Modal } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -170,10 +170,18 @@ const MembershipRegistrationModal = ({
             setValue("mobileNumber", userData.whatsappNo || "");
             setValue("email", userData.emailId || "");
             if (userData.dob) setValue("dob", new Date(userData.dob));
+            const filterGender = genderOptions.find(
+              (item) =>
+                item.value?.toLowerCase() === userData?.gender?.toLowerCase(),
+            );
+
+            if (filterGender) {
+              setValue("gender", filterGender);
+            }
             setValue("address", userData.address || "");
             setValue("city", userData.city || "");
             setValue("state", userData.state || "");
-            setValue("pincode", userData.pincode || "");
+            setValue("pincode", userData.pinCode || "");
             setValue("occupation", userData.occupation || "");
           }
         })

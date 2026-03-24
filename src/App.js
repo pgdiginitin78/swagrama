@@ -4,9 +4,6 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import Footer from "./components/footer/Footer";
 import Navbar from "./components/navbar/Navbar";
-import AboutUs from "./components/pages/aboutUs/AboutUs";
-import SwagramaPrivacyPolicy from "./components/pages/privacypolicy/PrivacyPolicyNew";
-import TermsAndConditon from "./components/pages/terms&conditon/TermsAndConditon";
 import { useAuth } from "./context/AuthContext";
 import ScrollToTopButton from "./ScrollToTopButton";
 
@@ -27,6 +24,9 @@ const EShop = lazy(() => import("./components/pages/eShop/EShop"));
 const EventCalander = lazy(
   () => import("./components/pages/eventsCalander/EventCalander"),
 );
+const AboutUs = lazy(() => import("./components/pages/aboutUs/AboutUs"));
+const SwagramaPrivacyPolicy = lazy(() => import("./components/pages/privacypolicy/PrivacyPolicyNew"));
+const TermsAndConditon = lazy(() => import("./components/pages/terms&conditon/TermsAndConditon"));
 
 function PageSkeleton() {
   return (

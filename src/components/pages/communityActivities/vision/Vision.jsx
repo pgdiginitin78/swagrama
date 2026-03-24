@@ -1,34 +1,36 @@
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BuildIcon from "@mui/icons-material/Build";
 import GroupsIcon from "@mui/icons-material/Groups";
 import HealingIcon from "@mui/icons-material/Healing";
 import HomeIcon from "@mui/icons-material/Home";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import NatureIcon from "@mui/icons-material/Nature";
 import PetsIcon from "@mui/icons-material/Pets";
 import PublicIcon from "@mui/icons-material/Public";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SchoolIcon from "@mui/icons-material/School";
 import SpaIcon from "@mui/icons-material/Spa";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import TempleBuddhistIcon from "@mui/icons-material/TempleBuddhist";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import { motion } from "framer-motion";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { useState } from "react";
+import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.png";
+import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.png";
+import MorningVisionWholeMealImg from "../../../assets/community-activities/Morning Vision Whole Meal.png";
+import MorningVisionImg from "../../../assets/community-activities/MorningVision.png";
 import DailyBarterImg from "../../../assets/healingServices/vision/DailyBarter.jpg";
 import eveningMealImg from "../../../assets/healingServices/vision/eveningMeal.png";
-import EveningVisionMealImg from "../../../assets/healingServices/vision/EveningVisionMeal.png";
 import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.png";
 import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.png";
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
 import BookEventForm from "../../bookEventForm/BookEventForm";
-import MorningVisionImg from "../../../assets/Community Actvities/MorningVision.png"
-import EveningSwagramaImg  from "../../../assets/Community Actvities/EveningSwagrama.png"
-import MorningVisionWholeMealImg from "../../../assets/Community Actvities/Morning Vision Whole Meal.png"
-import EveningVisionWholeMealImg from "../../../assets/Community Actvities/Evening Vision Whole Meal.png"
+import MainPageImg from "../../../assets/community-activities/mainPage.png"
+
+
 
 
 const walkInServices = [
@@ -168,7 +170,7 @@ const visitorServices = [
       "Provides knowledge about therapies, Panchakarma, wellness practices, and site orientation.",
     price: "₹750",
     icon: <SpaIcon />,
-    image:MorningVisionImg,
+    image: MorningVisionImg,
   },
   {
     nameHindi: "स्वसायम्दर्शन",
@@ -181,7 +183,7 @@ const visitorServices = [
     benefits:
       "Offers overview of holistic treatments, Q&A, and insight into wellness practices.",
     price: "₹750",
-    image:EveningSwagramaImg,
+    image: EveningSwagramaImg,
     icon: <SpaIcon />,
   },
   {
@@ -195,7 +197,7 @@ const visitorServices = [
     benefits:
       "Combines experiential learning with nutritious meal for holistic experience.",
     price: "₹1000",
-    image:MorningVisionWholeMealImg,
+    image: MorningVisionWholeMealImg,
     icon: <RestaurantIcon />,
   },
   {
@@ -250,60 +252,71 @@ const OurVision = () => {
 
   return (
     <div>
-      <div className="md:min-h-screen 2xl:h-auto bg-gradient-to-br from-[#1a3a25] via-[#2d5a3d] to-[#3d6b4f] relative flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `radial-gradient(circle at 20% 50%, #8bc34a 1px, transparent 1px),
-                          radial-gradient(circle at 80% 20%, #c8e6c9 1px, transparent 1px),
-                          radial-gradient(circle at 40% 80%, #8bc34a 1px, transparent 1px)`,
-            backgroundSize: "100px 100px",
-          }}
-        />
+      <div
+        style={{ backgroundImage: `url(${MainPageImg})` }}
+        className="relative w-full min-h-[60vh] sm:min-h-[70vh] md:min-h-[85vh] lg:min-h-screen bg-no-repeat bg-center bg-cover flex items-center justify-center overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-4 sm:py-6 md:py-8">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0d2b18]/60 via-transparent to-[#0d2b18]/40" />
+
+        <div className="relative z-10 w-full max-w-5xl mx-auto px-5 sm:px-8 md:px-12 py-10 sm:py-14 md:py-20 flex flex-col items-center">
+          <motion.h1
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 1, delay: 0.15 }}
+            className="font-playfair text-center mb-5 sm:mb-6 md:mb-8"
+            style={{ textShadow: "0 4px 24px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9)" }}
           >
-            <h1
-              className="font-playfair text-base sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#f7f5f0] text-center mb-4 sm:mb-6 md:mb-8"
-              style={{ textShadow: "2px 4px 8px rgba(0,0,0,0.3)" }}
-            >
-              स्वग्रामदर्शन <br /> Community Vision
-            </h1>
-          </motion.div>
+            <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#f0ede4] leading-tight tracking-wide">
+              स्वग्रामदर्शन
+            </span>
+            <span className="block text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white/90 mt-1 tracking-widest uppercase">
+              Community Vision
+            </span>
+          </motion.h1>
 
           <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="w-24 sm:w-32 h-[2px] bg-gradient-to-r from-transparent via-[#8bc34a] to-transparent mb-6 sm:mb-8"
+          />
+
+          <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.3 }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 text-center max-w-3xl mx-auto leading-relaxed sm:leading-loose mb-8 sm:mb-10 md:mb-14 px-2"
+            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
           >
-            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-[#f7f5f0]/90 text-center max-w-4xl mx-auto leading-relaxed mb-6 sm:mb-8 md:mb-12 px-4">
-              <strong className="text-[#8bc34a]">स्वग्रामदर्शन </strong> is a
-              holistic journey through the essence of community living in
-              harmony with nature. Visitors are welcomed into a world where
-              knowledge, culture, sustainability, and spirituality converge.
-              Each element of the community embodies a conscious lifestyle
-              rooted in natural regulation (ऋत) and traditional wisdom.
-            </p>
-          </motion.div>
+            <strong className="text-[#a8d96c] font-semibold">स्वग्रामदर्शन</strong> is a holistic journey through the essence of community living
+            in harmony with nature. Visitors are welcomed into a world where knowledge, culture,
+            sustainability, and spirituality converge. Each element of the community embodies a
+            conscious lifestyle rooted in natural regulation{" "}
+            <span className="text-[#c8e89a]">(ऋत)</span> and traditional wisdom.
+          </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex justify-center px-4"
+            transition={{ duration: 0.8, delay: 0.75 }}
+            className="flex flex-col sm:flex-row items-center gap-4"
           >
             <button
-              className="bg-gradient-to-br from-[#8bc34a] to-[#689f38] hover:from-[#9ccc65] hover:to-[#7cb342] text-[#1a3a25] font-bold rounded-full text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 lg:px-12 py-2.5 sm:py-3 md:py-4 w-full sm:w-auto max-w-sm hover:-translate-y-1 transition-all duration-300"
-              style={{ boxShadow: "0 8px 32px rgba(139, 195, 74, 0.4)" }}
+              className="group relative bg-gradient-to-br from-[#8bc34a] to-[#5d9e28] text-[#0f2415] font-bold rounded-full text-sm sm:text-base md:text-lg px-8 sm:px-10 md:px-14 py-3 sm:py-3.5 md:py-4 w-full sm:w-auto min-w-[200px] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(139,195,74,0.55)] active:scale-95"
+              style={{ boxShadow: "0 8px 32px rgba(139, 195, 74, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)" }}
             >
-              Begin Your Journey
+              <span className="relative z-10 tracking-wide">Begin Your Journey</span>
+              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9ccc65] to-[#7cb342] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
+
+
           </motion.div>
+
         </div>
+
+
       </div>
 
       <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
@@ -367,13 +380,6 @@ const OurVision = () => {
       </div>
 
       <div className="py-8 sm:py-12 md:py-16 lg:py-20 bg-gradient-to-br from-[#2d5a3d] to-[#1a3a25] relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-5"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='50' r='40' stroke='%238bc34a' stroke-width='1' fill='none'/%3E%3C/svg%3E")`,
-          }}
-        />
-
         <div className="max-w-7xl mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -634,9 +640,9 @@ const OurVision = () => {
                               <h3 className="text-base sm:text-lg md:text-xl font-bold text-green-900 mb-1 line-clamp-1">
                                 {service.serviceName}
                               </h3>
-                                <p className="text-xs sm:text-sm text-green-700 font-medium truncate">
-                                  {service.nameHindi}
-                                </p>
+                              <p className="text-xs sm:text-sm text-green-700 font-medium truncate">
+                                {service.nameHindi}
+                              </p>
                             </div>
 
                             <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 line-clamp-2">
@@ -672,11 +678,10 @@ const OurVision = () => {
                                 setOpenEventBookModal(true);
                                 setSelectedEventDetails(service);
                               }}
-                              className={`${
-                                service.price === "Free"
-                                  ? "bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600"
-                                  : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                              } text-white font-semibold py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl w-full flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 mt-auto text-xs sm:text-sm md:text-base`}
+                              className={`${service.price === "Free"
+                                ? "bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600"
+                                : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                                } text-white font-semibold py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl w-full flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 mt-auto text-xs sm:text-sm md:text-base`}
                             >
                               {service.price === "Free"
                                 ? "Join Now"

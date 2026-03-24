@@ -1,28 +1,5 @@
 // import { useState, useRef, useEffect } from "react";
 // import gsap from "gsap";
-// import {
-//   CalendarMonth,
-//   AccessTime,
-//   CurrencyRupee,
-//   Agriculture,
-//   Spa,
-//   Festival,
-//   EmojiNature,
-//   Grass,
-//   LocalFlorist,
-//   NavigateBefore,
-//   NavigateNext,
-//   Restaurant,
-//   Hotel,
-//   School,
-//   Explore,
-//   LocalHospital,
-//   Cookie,
-//   Inventory,
-//   MenuBook,
-//   TheaterComedy,
-//   EmojiPeople,
-// } from "@mui/icons-material";
 // import { FaLeaf } from "react-icons/fa6";
 // import { GiHerbsBundle } from "react-icons/gi";
 // import OPDBookingModal from "../../healingServices/opdClinic/OPDBookingModal";

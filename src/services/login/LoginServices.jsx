@@ -13,8 +13,6 @@ export const DeleteLoggedAccount = (password) => {
   return AxiosInstance.post(`/DeleteAccount?password=${password}`);
 };
 
-//https://ayurmitra.in/WellnessAPILive/UserDetails?userId=1
-
 export const getUserDetails = (userId) => {
   return AxiosInstance.get(`/UserDetails?userId=${userId}`);
 };

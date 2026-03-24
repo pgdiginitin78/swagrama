@@ -1,10 +1,8 @@
-import {
-  Close,
-  Email,
-  Lock,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
+import Email from "@mui/icons-material/Email";
+import Lock from "@mui/icons-material/Lock";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Box,
   Button,

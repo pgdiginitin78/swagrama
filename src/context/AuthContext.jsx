@@ -8,8 +8,6 @@ import {
 
 export const AuthContext = createContext(null);
 
-// Module-level ref so AxiosInstance (outside React) can trigger logout
-// without needing hooks.
 let _logoutFn = null;
 export const setAuthLogout = (fn) => {
   _logoutFn = fn;
@@ -41,7 +39,6 @@ export const AuthProvider = ({ children }) => {
     setUser(updatedUser);
   }, []);
 
-  // Wire up the module-level ref so AxiosInstance can call logout
   useEffect(() => {
     setAuthLogout(logout);
     return () => setAuthLogout(null);

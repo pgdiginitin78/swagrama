@@ -1,4 +1,4 @@
-import { Close } from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
@@ -121,7 +121,7 @@ const calculateDOBFromAge = (age) => {
   return new Date(birthYear, 0, 1);
 };
 
-export default function SignUpModal({ open, handleClose, onSwitchToLogin }) {
+export default function SignUpModal({ open, handleClose}) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [ipAddress, setIpAddress] = useState(null);

@@ -1,20 +1,18 @@
-import {
-  ArrowForward,
-  AutoAwesome,
-  Bloodtype,
-  CheckCircle,
-  Favorite,
-  Female,
-  FilterVintage,
-  Healing,
-  Hearing,
-  LocalFlorist,
-  LocalPharmacy,
-  Masks,
-  MedicalServices,
-  Opacity,
-  Spa
-} from "@mui/icons-material";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import AutoAwesome from "@mui/icons-material/AutoAwesome";
+import Bloodtype from "@mui/icons-material/Bloodtype";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import Favorite from "@mui/icons-material/Favorite";
+import Female from "@mui/icons-material/Female";
+import FilterVintage from "@mui/icons-material/FilterVintage";
+import Healing from "@mui/icons-material/Healing";
+import Hearing from "@mui/icons-material/Hearing";
+import LocalFlorist from "@mui/icons-material/LocalFlorist";
+import LocalPharmacy from "@mui/icons-material/LocalPharmacy";
+import Masks from "@mui/icons-material/Masks";
+import MedicalServices from "@mui/icons-material/MedicalServices";
+import Opacity from "@mui/icons-material/Opacity";
+import Spa from "@mui/icons-material/Spa";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Box, Modal } from "@mui/material";
 import { motion } from "framer-motion";

@@ -1,10 +1,8 @@
-import {
-  Close,
-  Favorite,
-  FilterVintage,
-  GridView,
-  ViewInAr
-} from "@mui/icons-material";
+import Close from "@mui/icons-material/Close";
+import Favorite from "@mui/icons-material/Favorite";
+import FilterVintage from "@mui/icons-material/FilterVintage";
+import GridView from "@mui/icons-material/GridView";
+import ViewInAr from "@mui/icons-material/ViewInAr";
 import {
   Backdrop,
   Card,

@@ -26,7 +26,7 @@ import CommunityMembershipImg from "../../../assets/membership/communityMembersh
 import MembershipRegistrationModal from "./MembershipRegistrationModal";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import { IconButton, Tooltip } from "@mui/material";
-import { ContentCopy } from "@mui/icons-material";
+import ContentCopy from "@mui/icons-material/ContentCopy";
 
 const benefits = [
   {

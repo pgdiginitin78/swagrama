@@ -27,12 +27,10 @@ import {
   Container,
   Typography,
 } from "@mui/material";
-import {
-  LocalHospital,
-  Spa,
-  Healing,
-  MedicalServices,
-} from "@mui/icons-material";
+import LocalHospital from "@mui/icons-material/LocalHospital";
+import Spa from "@mui/icons-material/Spa";
+import Healing from "@mui/icons-material/Healing";
+import MedicalServices from "@mui/icons-material/MedicalServices";
 
 const partnersData = [
   {

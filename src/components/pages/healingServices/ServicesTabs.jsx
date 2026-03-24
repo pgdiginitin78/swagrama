@@ -1,9 +1,7 @@
-import {
-  EmojiNature,
-  LocalFlorist,
-  SelfImprovement,
-  Spa,
-} from "@mui/icons-material";
+import EmojiNature from "@mui/icons-material/EmojiNature";
+import LocalFlorist from "@mui/icons-material/LocalFlorist";
+import SelfImprovement from "@mui/icons-material/SelfImprovement";
+import Spa from "@mui/icons-material/Spa";
 import HealingIcon from "@mui/icons-material/Healing";
 import { Box, Button, Card, Stack, Tab, Tabs, Typography } from "@mui/material";
 import { useState } from "react";

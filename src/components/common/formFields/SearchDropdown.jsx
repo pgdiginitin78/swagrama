@@ -1,4 +1,4 @@
-import { KeyboardArrowDown } from "@mui/icons-material";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { FormControl } from "@mui/material";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";

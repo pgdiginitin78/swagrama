@@ -1,22 +1,20 @@
-import {
-  AttachMoney,
-  Cancel,
-  Celebration,
-  CheckCircle,
-  ChevronRight,
-  Close as CloseIcon,
-  Event,
-  ExpandMore,
-  Favorite,
-  Info,
-  LocalFlorist,
-  LocationOn,
-  Menu as MenuIcon,
-  Note,
-  Restaurant,
-  Rule,
-  Spa,
-} from "@mui/icons-material";
+import AttachMoney from "@mui/icons-material/AttachMoney";
+import Cancel from "@mui/icons-material/Cancel";
+import Celebration from "@mui/icons-material/Celebration";
+import CheckCircle from "@mui/icons-material/CheckCircle";
+import ChevronRight from "@mui/icons-material/ChevronRight";
+import CloseIcon from "@mui/icons-material/Close";
+import Event from "@mui/icons-material/Event";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Favorite from "@mui/icons-material/Favorite";
+import Info from "@mui/icons-material/Info";
+import LocalFlorist from "@mui/icons-material/LocalFlorist";
+import LocationOn from "@mui/icons-material/LocationOn";
+import MenuIcon from "@mui/icons-material/Menu";
+import Note from "@mui/icons-material/Note";
+import Restaurant from "@mui/icons-material/Restaurant";
+import Rule from "@mui/icons-material/Rule";
+import Spa from "@mui/icons-material/Spa";
 import {
   Accordion,
   AccordionDetails,
@@ -36,18 +34,16 @@ import swagramaServicesImg from "../../../assets/swagramaServices.png";
 import termsconditionsImg from "../../../assets/terms&conditions.jpg";
 import weddingCultureImg from "../../../assets/weddingCulture.jpg";
 
-import {
-  Business as BusinessIcon,
-  ExpandMore as ExpandMoreIcon,
-  FamilyRestroom as FamilyIcon,
-  LocalFlorist as FloristIcon,
-  Group as GroupIcon,
-  HealthAndSafety as HealthIcon,
-  EmojiObjects as IdeaIcon,
-  Palette as PaletteIcon,
-  AutoAwesome as ShineIcon,
-  Star as StarIcon,
-} from "@mui/icons-material";
+import BusinessIcon from "@mui/icons-material/Business";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import FamilyIcon from "@mui/icons-material/FamilyRestroom";
+import FloristIcon from "@mui/icons-material/LocalFlorist";
+import GroupIcon from "@mui/icons-material/Group";
+import HealthIcon from "@mui/icons-material/HealthAndSafety";
+import IdeaIcon from "@mui/icons-material/EmojiObjects";
+import PaletteIcon from "@mui/icons-material/Palette";
+import ShineIcon from "@mui/icons-material/AutoAwesome";
+import StarIcon from "@mui/icons-material/Star";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import CelebrationIcon from "@mui/icons-material/Celebration";
 import EventOutlinedIcon from "@mui/icons-material/EventOutlined";

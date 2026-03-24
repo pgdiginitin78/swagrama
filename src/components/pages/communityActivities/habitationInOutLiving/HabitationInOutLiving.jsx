@@ -1,13 +1,11 @@
 import { motion, useScroll, useTransform } from "framer-motion";
-import {
-  Home,
-  Waves,
-  HolidayVillage,
-  CalendarMonth,
-  AccessTime,
-  ArrowForward,
-  CheckCircle,
-} from "@mui/icons-material";
+import Home from "@mui/icons-material/Home";
+import Waves from "@mui/icons-material/Waves";
+import HolidayVillage from "@mui/icons-material/HolidayVillage";
+import CalendarMonth from "@mui/icons-material/CalendarMonth";
+import AccessTime from "@mui/icons-material/AccessTime";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import CheckCircle from "@mui/icons-material/CheckCircle";
 
 import ipdSinglePng from "../../../assets/membership/community/ipdSingle.jpg";
 import OutDoorLivingPng from "../../../assets/membership/community/outDoor.jpg";

@@ -1,4 +1,6 @@
-import { Alarm, Info, Person } from "@mui/icons-material";
+import Alarm from "@mui/icons-material/Alarm";
+import Info from "@mui/icons-material/Info";
+import Person from "@mui/icons-material/Person";
 import CompostIcon from "@mui/icons-material/Compost";
 import HealingIcon from "@mui/icons-material/Healing";
 import LocationPinIcon from "@mui/icons-material/LocationPin";

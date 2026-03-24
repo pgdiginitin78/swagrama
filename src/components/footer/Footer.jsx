@@ -184,6 +184,7 @@ const Footer = () => {
                       rel="noopener noreferrer"
                       className="hover:underline text-xs leading-relaxed"
                     >
+                      
                       {/* JnanaYogAyu, 81/635, Nandraj Sankul, 1 A - 2, Main Road,
                       Famous Chowk, New Sangavi, Pune, Maharashtra 411027 */}
                       81/1A/2/1, Nandraj Sankul, Flat no B2, New Sangavi, Pune - 411061

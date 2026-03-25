@@ -12,7 +12,7 @@ import Vision from "./vision/Vision";
 const communityTabs = [
   {
     label: "Vision • स्वदर्शन",
-    icon: TempleHindu, 
+    icon: TempleHindu,
     color: "#8b5cf6",
     component: <Vision />,
   },
@@ -49,16 +49,11 @@ const CommunityActivitiesTabs = () => {
   const hasChildren = current.children?.length > 0;
 
   return (
-    <Box className="pb-5 md:px-12">
-      <Box >
+    <Box className="pb-5 md:px-12 ">
+      <Box>
         <h2
-          style={{
-            textAlign: "center",
-            fontSize: 26,
-            fontWeight: "bold",
-            marginBottom: 2,
-          }}
-          className="text-ayuBrown pt-5"
+      
+          className="text-ayuBrown pt-16 md:pt-5 font-semibold text-xl md:text-2xl text-center"
         >
           Community Activities
         </h2>

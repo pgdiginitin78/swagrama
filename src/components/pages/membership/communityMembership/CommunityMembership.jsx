@@ -604,7 +604,7 @@ const CommunityMembership = () => {
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
-                  className="grid grid-cols-2 gap-4"
+                  className="grid md:grid-cols-2 gap-4"
                 >
                   {benefits.map((benefit, index) => (
                     <motion.div

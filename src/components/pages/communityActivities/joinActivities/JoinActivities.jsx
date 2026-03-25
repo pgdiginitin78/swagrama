@@ -27,12 +27,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { MdEco } from "react-icons/md";
 import samaskarasImg from "../../../assets/samaskaras.jpg";
-import swagramaFoodImg from "../../../assets/swagramaFoodMenu.jpg";
-import swagramaMainImg from "../../../assets/swagramaMain.png";
+import swagramaFoodImg from "../../../assets/swagramaFoodMenu.png";
+import swagramaMainImg from "../../../assets/landing-page/swagramaMain.png";
 import swagramaPricingImg from "../../../assets/swagramaPricing.jpg";
 import swagramaServicesImg from "../../../assets/swagramaServices.png";
 import termsconditionsImg from "../../../assets/terms&conditions.jpg";
 import weddingCultureImg from "../../../assets/weddingCulture.jpg";
+import tranditionalWeddingImg from "../../../assets/tranditionalWedding.png"
 
 import BusinessIcon from "@mui/icons-material/Business";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -52,8 +53,7 @@ import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import SpaIcon from "@mui/icons-material/Spa";
-import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
-
+import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
 
 const getServiceIcon = (service) => {
   if (service.includes("Ayurvedic")) return <SpaIcon />;
@@ -100,7 +100,7 @@ const JoinActivities = () => {
   ];
 
   const tabImages = {
-    0: "https://img.freepik.com/free-photo/all-indian-family-women-hold-spices-their-palms_8353-742.jpg?t=st=1768466912~exp=1768470512~hmac=836527ff727db695406159ac5c32706a22557c1d7f477125ed0a2100f140868b&w=1480",
+    0: tranditionalWeddingImg,
     1: swagramaMainImg,
     2: samaskarasImg,
     3: swagramaFoodImg,
@@ -124,13 +124,10 @@ const JoinActivities = () => {
         <img
           src={tabImages[0]}
           alt="Wedding"
-          className="w-full h-full object-cover  bg-top transition-transform duration-700 group-hover:scale-105"
+          className="w-full h-full object-cover transition-transform duration-700"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-green-600/20 to-transparent" />
-
-        <div className="absolute inset-0 flex items-end p-6">
+        <div className="absolute inset-0 flex items-end p-3">
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-1 w-12 rounded-full bg-gradient-to-r from-green-400 to-lime-400" />
@@ -218,7 +215,7 @@ const JoinActivities = () => {
                         </span>
                       </div>
                     </motion.div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -263,7 +260,7 @@ const JoinActivities = () => {
                         </span>
                       </div>
                     </motion.div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -398,7 +395,7 @@ const JoinActivities = () => {
             </div>
           </div>
 
-          <div className="space-y-2.5 pl-14">
+          <div className="space-y-2.5 lg:pl-14">
             <p className="text-sm text-gray-700 leading-relaxed">
               {swagramWeddingData.philosophy.nature_wedding_concept.description}
             </p>
@@ -462,13 +459,9 @@ const JoinActivities = () => {
     >
       <motion.div
         whileHover={{ scale: 1.01 }}
-        className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl group"
+        className="relative rounded-2xl overflow-hidden shadow-2xl group"
       >
-        <img
-          src={tabImages[1]}
-          alt="Concept"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+        <img src={tabImages[1]} alt="Wedding" className="w-full h-auto block" />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-br from-green-600/25 to-transparent" />
@@ -570,7 +563,7 @@ const JoinActivities = () => {
                     </div>
                   </div>
                 </motion.div>
-              )
+              ),
             )}
           </div>
           <motion.div
@@ -643,7 +636,7 @@ const JoinActivities = () => {
                   </div>
                   <p className="text-sm text-white font-medium">{service}</p>
                 </motion.div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -882,7 +875,7 @@ const JoinActivities = () => {
                     </div>
                   </div>
                 </motion.div>
-              )
+              ),
             )}
           </div>
         </div>
@@ -1149,34 +1142,29 @@ const JoinActivities = () => {
     >
       <motion.div
         whileHover={{ scale: 1.01 }}
-        className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl group"
+        className="relative  overflow-hidden shadow-2xl group"
       >
         <img
           src={tabImages[3]}
-          alt="Food"
-          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          alt="Wedding"
+          className="w-full h-[450px] block bg-black"
         />
+      </motion.div>
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-br from-orange-600/20 to-transparent" />
+      <div className="inset-0 flex items-end">
+        <div className="w-full bg-white/10 backdrop-blur-xl border rounded  shadow-xl px-5 py-4 flex items-center gap-4">
+          <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 shadow-xl shadow-orange-500/30 flex-shrink-0">
+            <Restaurant className="text-white text-3xl" />
+          </div>
 
-        <div className="absolute inset-0 flex items-end">
-          <div className="w-full bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl px-5 py-4 flex items-center gap-4">
-            <div className="flex items-center justify-center h-14 w-14 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 shadow-xl shadow-orange-500/30 flex-shrink-0">
-              <Restaurant className="text-white text-3xl" />
-            </div>
-
-            <div className="flex-1">
-              <h2 className="text-lg md:text-2xl font-bold text-white leading-tight">
-                {swagramWeddingData.foodMenu.title}
-              </h2>
-              <div className="h-1 w-40 rounded-full bg-gradient-to-r from-orange-400 to-red-400" />
-            </div>
+          <div className="flex-1">
+            <h2 className="text-lg md:text-2xl font-bold text-green-600 leading-tight">
+              {swagramWeddingData.foodMenu.title}
+            </h2>
+            <div className="h-1 w-40 rounded-full bg-gradient-to-r from-orange-400 to-red-400" />
           </div>
         </div>
-
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-orange-400/30 to-transparent rounded-bl-full" />
-      </motion.div>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -1248,7 +1236,7 @@ const JoinActivities = () => {
                       {feature}
                     </p>
                   </motion.div>
-                )
+                ),
               )}
             </div>
           </div>
@@ -1355,7 +1343,7 @@ const JoinActivities = () => {
             </div>
           </div>
 
-          <div className="space-y-2.5 pl-14">
+          <div className="space-y-2.5  lg:pl-14">
             {swagramWeddingData.foodMenu.importantNotes.map((note, idx) => (
               <motion.div
                 key={idx}
@@ -1464,7 +1452,7 @@ const JoinActivities = () => {
                         </p>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </motion.div>
@@ -1516,7 +1504,7 @@ const JoinActivities = () => {
                         </p>
                       </div>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </motion.div>
@@ -1533,19 +1521,19 @@ const JoinActivities = () => {
       transition={{ duration: 0.3 }}
       className="space-y-4"
     >
-      <div
-        className="relative h-[400px] rounded-lg overflow-hidden 
-                   backdrop-blur-xl
-                   bg-gray-500/25
-                  border border-black/30           
-                  shadow-lg"
-      >
-        <img
-          src={tabImages[4]}
-          alt="Services"
-          className="w-full h-full object-contain"
-        />
-      </div>
+<div
+  className="relative w-full max-h-[400px] rounded-lg overflow-hidden
+             backdrop-blur-xl
+             bg-gray-500/25
+             border border-black/30
+             shadow-lg"
+>
+  <img
+    src={tabImages[4]}
+    alt="Services"
+    className="w-full h-auto block"
+  />
+</div>
 
       <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
         <h2 className="text-lg font-semibold text-green-800 mb-3">
@@ -1721,7 +1709,7 @@ const JoinActivities = () => {
                       {item}
                     </p>
                   </motion.div>
-                )
+                ),
               )}
             </div>
           </div>
@@ -1769,7 +1757,7 @@ const JoinActivities = () => {
                       {item}
                     </p>
                   </motion.div>
-                )
+                ),
               )}
             </div>
 
@@ -1880,7 +1868,7 @@ const JoinActivities = () => {
                   </AccordionDetails>
                 </Accordion>
               </motion.div>
-            )
+            ),
           )}
         </div>
       </div>
@@ -2145,7 +2133,7 @@ const JoinActivities = () => {
                         {prog.description}
                       </p>
                     </motion.div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2215,7 +2203,7 @@ const JoinActivities = () => {
                             {fest.activities}
                           </p>
                         </motion.div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -2241,7 +2229,7 @@ const JoinActivities = () => {
                             {fest.activities}
                           </p>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -2273,7 +2261,7 @@ const JoinActivities = () => {
                             {cer.description}
                           </p>
                         </div>
-                      )
+                      ),
                     )}
                   </div>
                 </div>
@@ -2344,7 +2332,7 @@ const JoinActivities = () => {
                         {prog.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2413,7 +2401,7 @@ const JoinActivities = () => {
                         {act.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2476,7 +2464,7 @@ const JoinActivities = () => {
                         {prog.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2545,7 +2533,7 @@ const JoinActivities = () => {
                         {prog.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2608,7 +2596,7 @@ const JoinActivities = () => {
                         {prog.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2671,7 +2659,7 @@ const JoinActivities = () => {
                         {principle.description}
                       </p>
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </AccordionDetails>
@@ -2964,7 +2952,7 @@ const JoinActivities = () => {
                 </div>
               </AccordionDetails>
             </Accordion>
-          )
+          ),
         )}
       </div>
     </motion.div>
@@ -3185,7 +3173,7 @@ const swagramWeddingData = {
       "यावर एकमेव शाश्वत उपाय म्हणजे आपल्या संस्कृतीने दिलेले \"पाच दिवसांचे लग्न!\" आणि हीच मूळ संकल्पना घेऊन येत आहे 'स्वग्राम'. हे पाच दिवसांचे लग्न आपण आपल्या सोईप्रमाणे कोणताही संस्कार न सोडता कमी दिवसांत टप्प्याटप्प्याने करू शकतो. जिथे खुद्द धन्वंतरि वैद्य आपल्या लग्नकार्यात सहभागी होऊन तुम्हाला आरोग्यपूर्ण वैवाहिक जीवनाची अनमोल भेट देणार आहेत.",
 
     nature_wedding_concept: {
-      title: "निसर्गाचा लग्नसोहळा: एक आदर्श लग्नसंकल्पनेबद्दल जाणून घेऊ...",
+      title: "निसर्गाचा लग्नसोहळा : एक आदर्श लग्नसंकल्पनेबद्दल जाणून घेऊ...",
       description:
         "आपण ज्या निसर्गाचा भाग आहोत, तो निसर्ग किती सुंदर रीतीने आपला वंशवेल वाढवतो, हे पाहण्यासारखे आहे. संपूर्ण जीवसृष्टीची निर्मिती आणि पोषण करण्यासाठी स्वतः वनस्पति फुलांनी बहरतात. शृंगार करुन मोहोरलेल्या फुलांमध्ये एका स्त्रीकेशराभोवती असंख्य पुरुषकेशरांची निर्मिती होऊन परागीकरण म्हणजे स्त्री-पुंकेशरांचे लग्न लावून मधुचंद्र साजरा होतो. वृक्षवेली जेव्हा फुलांनी बहरतात, तेव्हा स्त्रीकेशर आणि पुंकेशरांचा अतिशय देखणा मिलाप घडतो---परागीकरण होते. फुलपाखरे, मधमाश्या, भ्रमर या सगळ्यांची लग्नघरातील वऱ्हाड्यासारखी वर्दळ; आकाशातील शब्द, वाऱ्याचा स्पर्श, तेजाचे रूप, जलाचा रस आणि पृथ्वीचा गंध---पंचतत्त्वांनी सजलेला मधुचंद्र निर्माण होतो.",
       conclusion:
@@ -3193,7 +3181,7 @@ const swagramWeddingData = {
     },
 
     modern_reality: {
-      title: "आजची वास्तविकता: आनंदाचा उत्सव की तणावाचे ओझे?",
+      title: "आजची वास्तविकता : आनंदाचा उत्सव की तणावाचे ओझे?",
       description:
         "माणसाने निसर्गाकडून 'लग्न' ही संकल्पना घेतली खरी, पण आज आपण त्याचे काय केले आहे? आज लग्नसोहळा म्हणजे प्रदूषणाचा आणि तणावाचा अड्डा बनला आहे. मध्यवयापर्यंत करिअरसाठी केलेली कसरत आणि त्यात लग्न ठरवताना होणारी दमछाक जीवघेणी ठरते. साखरपुडा एका ठिकाणी, हळद दुसरीकडे, संगीत तिसरीकडे, विधि चौथीकडे आणि रिसेप्शन भलतीकडेच! प्रत्येक वेळी वेगळी थीम, वेगळा पेहराव आणि मेकअप. या धावपळीत नवरा-नवरी अक्षरशः कोमेजून जातात. ज्या वेळी शरीर आणि मनाला विश्रांतीची गरज असते, त्याच वेळी हे जोडपे थकलेले असताना दूरवर कुठेतरी अनोळखी ठिकाणी 'हनिमून'साठी जाते. अनेकदा तिथून परतताना गोड आठवणींऐवजी आजारपण सोबत येते. खरेतर लग्नाची आणि मधुचंद्राची आठवण आयुष्यभर जिवंत राहण्यासाठी ते राहत्या घरी करावे असे शास्त्र सांगते. लग्न म्हणजे नुसते तांदूळ टाकणे नव्हे. त्यामुळे लग्न ठरविण्यापासून ते हनिमूनपर्यंत आणि तेथून अपत्यप्राप्तीपर्यंतचा एकूण सर्वच प्रवास म्हणजेच लग्नसंस्कार होय. या सर्व समस्यांवर मात करण्यासाठी आणि आपल्या भावी पिढीला निरोगी आयुष्य देण्यासाठी 'स्वग्राम' घेऊन आले आहे नैसर्गिक आणि आरोग्यपूर्ण विवाह संकल्पना.",
     },
@@ -3447,10 +3435,10 @@ const swagramWeddingData = {
 
     smallEventPackages: {
       title: "इतर लहान समारंभांसाठी दर (कमाल ७५ व्यक्तींपर्यंत)",
-      subtitle: "प्रति व्यक्तीसाठी:",
+      subtitle: "प्रति व्यक्तीसाठी :",
       halfDay: {
         title:
-          "अर्धा दिवस: फक्त सकाळी (06.45 Am to 01.45 Pm) किंवा सायंकाळी (02.15 Pm to 07.15 Pm)",
+          "अर्धा दिवस : फक्त सकाळी (06.45 Am to 01.45 Pm) किंवा सायंकाळी (02.15 Pm to 07.15 Pm)",
         packages: [
           {
             description: "स्वग्राम पूर्णाहार + स्वागतपान",
@@ -3467,7 +3455,7 @@ const swagramWeddingData = {
         ],
       },
       fullDay: {
-        title: "पूर्ण दिवस: (06.45 Am to 07.15 Pm)",
+        title: "पूर्ण दिवस : (06.45 Am to 07.15 Pm)",
         packages: [
           {
             description: "स्वग्राम पूर्णाहार + स्वग्राम पूर्णाहार + स्वागतपान",

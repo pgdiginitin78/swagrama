@@ -196,7 +196,7 @@ const Navbar = () => {
               : "bg-white/25 backdrop-blur-lg border-b border-white/20 shadow-md"
           }`}
       >
-        <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
+        <div className="w-full  mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-10 2xl:px-12">
           <div className="flex items-center justify-between h-14 sm:h-16 md:h-18 lg:h-20">
             <Link to="/" className="flex-shrink-0 z-10">
               <div className="h-10 sm:h-12 md:h-14 lg:h-16 xl:h-[70px] 2xl:h-24">
@@ -220,12 +220,12 @@ const Navbar = () => {
                       className={`nav-link group font-semibold transition-all leading-tight ${active ? "active" : ""}`}
                     >
                       <span
-                        className={`block text-[10px] xl:text-[11px] 2xl:text-sm transition-colors ${active ? "text-green-600 font-bold" : "text-green-800 group-hover:text-green-600"}`}
+                        className={`block text-[12px] xl:text-[12px] 2xl:text-[16px] transition-colors ${active ? "text-green-600 font-bold" : "text-green-800 group-hover:text-green-600"}`}
                       >
                         {hi}
                       </span>
                       <span
-                        className={`block text-[10px] xl:text-[11px] 2xl:text-sm ${active ? "text-green-600 font-semibold" : "text-green-700"}`}
+                        className={`block text-[12px] xl:text-[12px] 2xl:text-[16px] ${active ? "text-green-600 font-semibold" : "text-green-700"}`}
                       >
                         {en}
                       </span>

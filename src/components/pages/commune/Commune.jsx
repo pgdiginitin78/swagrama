@@ -162,18 +162,18 @@ export default function CommuneTabs() {
       </div>
 
       <div className="relative z-10 flex items-center justify-center px-4 py-5 ">
-        <div className="w-full">
-          <h1 className="text-xl md:text-3xl  font-black text-center mb-2 animate-fade-in-up">
+        <div className="w-full pt-12 ">
+          <h1 className="text-xl md:text-3xl font-black text-center mb-2 animate-fade-in-up">
             <span className="text-xl md:text-4xl inline-block bg-gradient-to-r py-1 from-green-500 via-emerald-600 to-teal-500 bg-clip-text text-transparent animate-gradient-x">
               स्वगुरुकुल
             </span>
             <br />
-            <span className="inline-block bg-gradient-to-r py-1 from-amber-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-gradient-x">
+            <span className="inline-block bg-gradient-to-r from-amber-500 via-orange-500 to-yellow-500 bg-clip-text text-transparent animate-gradient-x">
               Commune
             </span>
           </h1>
-          <div className="relative backdrop-blur-md bg-white/80 rounded-2xl p-6 border-2 border-green-200 shadow-2xl animate-fade-in-up animation-delay-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-100/50 to-amber-100/50 rounded-2xl"></div>
+          <div className="relative backdrop-blur-md bg-white/80 rounded-[9px] p-3 md:p-6 border-2 border-green-200 shadow-2xl animate-fade-in-up animation-delay-300">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-100/50 to-amber-100/50 rounded-[9px]"></div>
             <div className="relative space-y-4 text-sm leading-relaxed text-gray-700">
               <p className="first-letter:text-4xl first-letter:font-bold first-letter:text-green-600 first-letter:mr-2 first-letter:float-left">
                 Today, more people are seeking a healthier and more natural way
@@ -210,7 +210,7 @@ export default function CommuneTabs() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 px-4 py-2 md:pt-8 pb-4">
+      <div className="relative z-10 md:px-4 py-2 md:pt-8 md:pb-4">
         <div className="text-center mb-3 md:mb-6">
           <h2 className="text-xl md:text-3xl  font-black bg-gradient-to-r from-green-600 to-amber-600 bg-clip-text text-transparent mb-3">
             Seasonal Academy Admission
@@ -218,21 +218,21 @@ export default function CommuneTabs() {
           <div className="h-1 w-24 bg-gradient-to-r from-green-500 to-amber-500 mx-auto rounded-full"></div>
         </div>
 
-        <div className=" p-4 sm:p-6 lg:p-8 ">
+        <div className=" p-2 sm:p-6 lg:p-8 ">
           <div className="w-full mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {academyData.map((item, i) => {
               return (
                 <div key={i} className="group relative">
                   <div
-                    className="absolute -inset-0.5 rounded-2xl opacity-0 group-hover:opacity-100 blur-lg transition-all duration-500"
+                    className="absolute -inset-0.5 rounded-[9px] opacity-0 group-hover:opacity-100 blur-lg transition-all duration-500"
                     style={{ background: item.bgGlow }}
                   ></div>
 
                   <div
-                    className="relative h-full bg-white/90 rounded-2xl border-2 border-white shadow-xl transform transition-all duration-500 group-hover:scale-[1.02]"
+                    className="relative h-full bg-white/90 rounded-[9px] border-2 border-white shadow-xl transform transition-all duration-500 group-hover:scale-[1.02]"
                     style={{ overflow: "visible" }}
                   >
-                    <div className="relative h-[200px] overflow-hidden rounded-t-2xl">
+                    <div className="relative h-[200px] overflow-hidden rounded-t-[9px]">
                       <img
                         src={item.img}
                         alt={item.serviceName}
@@ -309,8 +309,8 @@ export default function CommuneTabs() {
           </div>
         </div>
       </div>
-      <div className="relative z-10 px-6 py-6 ">
-        <div className="mx-auto grid md:grid-cols-2 gap-5 max-w-7xl">
+      <div className="relative z-10 px-2 md:px-6  md:py-6 ">
+        <div className="mx-auto grid md:grid-cols-2 gap-3 max-w-7xl">
           {academyProgrammes.map((programme, index) => (
             <div
               key={programme.programmeId}
@@ -322,12 +322,12 @@ export default function CommuneTabs() {
               }}
             >
               <div
-                className="absolute -inset-1 rounded-3xl blur-2xl opacity-20 group-hover:opacity-40 transition-all duration-700 animate-pulse-slow"
+                className="absolute -inset-1 rounded-[9px] blur-2xl opacity-20 group-hover:opacity-40 transition-all duration-700 animate-pulse-slow"
                 style={{
                   background: `radial-gradient(circle at 30% 50%, ${programme.accentColor}80, ${programme.accentColor}40, transparent 70%)`,
                 }}
               ></div>
-              <div className="relative h-full backdrop-blur-2xl bg-gradient-to-br from-white/95 to-white/85 rounded-3xl overflow-hidden border border-white/60 shadow-2xl transform group-hover:scale-[1.01] transition-all duration-700">
+              <div className="relative h-full backdrop-blur-2xl bg-gradient-to-br from-white/95 to-white/85 rounded-[9px] overflow-hidden border border-white/60 shadow-2xl transform group-hover:scale-[1.01] transition-all duration-700">
                 <div
                   className="absolute top-0 left-0 right-0 h-1 opacity-60"
                   style={{
@@ -337,7 +337,7 @@ export default function CommuneTabs() {
                 ></div>
                 <div className="relative overflow-hidden">
                   <div
-                    className={`relative p-4 bg-gradient-to-br ${programme.gradient} overflow-hidden`}
+                    className={`relative px-4 py-2 md:p-4 bg-gradient-to-br ${programme.gradient} overflow-hidden`}
                     style={{
                       backgroundImage: `${programme.gradient}, repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.03) 10px, rgba(255,255,255,0.03) 20px)`,
                     }}
@@ -366,17 +366,7 @@ export default function CommuneTabs() {
                           </p>
                         </div>
                       </div>
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-white/30 rounded-full blur-sm"></div>
-                        <div className="relative h-7 w-7 flex justify-center text-center items-center bg-white/95 rounded-full shadow-lg transform group-hover:scale-110 transition-all duration-300">
-                          <span
-                            className="font-black text-xs"
-                            style={{ color: programme.accentColor }}
-                          >
-                            #{programme.programmeId}
-                          </span>
-                        </div>
-                      </div>
+                
                     </div>
                   </div>
                 </div>
@@ -395,7 +385,7 @@ export default function CommuneTabs() {
                       </p>
                     </div>
                   )}
-                  <div className="grid grid-cols-2 gap-2.5">
+                  <div className="grid md:grid-cols-2 gap-2.5">
                     <div className="relative group/stat overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-gray-100/50 rounded-xl"></div>
                       <div
@@ -443,7 +433,7 @@ export default function CommuneTabs() {
                         programme.info.length > 0 && (
                           <div className="space-y-2">
                             {typeof programme.info[0] === "object" ? (
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="grid md:grid-cols-2 gap-2">
                                 {programme.info.map((item, i) => (
                                   <div
                                     key={i}
@@ -630,16 +620,14 @@ export default function CommuneTabs() {
                       setOpenAppointmentModal(true);
                     }}
                     className={`relative w-full py-3 bg-gradient-to-r ${programme.gradient} rounded-xl text-white font-black text-sm shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden group/cta`}
-                  >
-                    
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent -translate-x-full group-hover/cta:translate-x-full transition-transform duration-1000"></div>
+                  >                    
                     <div
                       className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500 blur-xl"
                       style={{ backgroundColor: programme.accentColor }}
                     ></div>
                     <span className="relative flex items-center justify-center gap-2 uppercase tracking-wider">
                       Book Programme Now
-                      <Sparkles className="w-4 h-4 animate-pulse" />
+                 
                     </span>
                   </button>
                 </div>

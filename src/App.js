@@ -6,6 +6,7 @@ import Footer from "./components/footer/Footer";
 import Navbar from "./components/navbar/Navbar";
 import { useAuth } from "./context/AuthContext";
 import ScrollToTopButton from "./ScrollToTopButton";
+import SwagramaRefundPolicy from "./components/pages/refund-policy/RefundPolicy";
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -80,6 +81,7 @@ export default function App() {
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/termsAndConditions" element={<TermsAndConditon />} />
             <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
+            <Route path="refundPolicy" element={<SwagramaRefundPolicy/>}  />
           </Routes>
         </Suspense>
         <ToastContainer

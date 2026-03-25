@@ -534,7 +534,7 @@ const BeautyTherapy = () => {
               </h2>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 xl:flex xl:gap-0 xl space-x-3 gap-2">
+            <div className="grid  md:grid-cols-4 xl:flex xl:gap-0 xl space-x-3 gap-2">
               {categories.map((cat) => {
                 const Icon = cat.icon;
                 const isSelected = selectedCategory === cat.key;

@@ -83,7 +83,7 @@ const OPDClinic = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-green-50/30 p-6">
+      <div className="min-h-screen flex items-center justify-center \ p-6">
         <div className="text-center">
           <div className="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
             <Person sx={{ fontSize: 40, color: "#10b981" }} />
@@ -100,7 +100,7 @@ const OPDClinic = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-green-50/30 p-3">
+    <div className="min-h-screen  p-3">
       <style>{`
         @keyframes pulse-scale {
           0%, 100% { transform: scale(1); }
@@ -128,16 +128,10 @@ const OPDClinic = () => {
 
       <div className="relative max-w-6xl mx-auto">
         <div className="text-center mb-4 slide-in">
-          <h1 className="text-2xl sm:text-3xl py-2 font-black bg-gradient-to-r from-green-700 via-emerald-600 to-green-600 bg-clip-text text-transparent drop-shadow-sm">
+          <h1 className="text-xl md:text-2xl py-2 font-black bg-gradient-to-r from-green-700 via-emerald-600 to-green-600 bg-clip-text text-transparent drop-shadow-sm">
             स्वचिचित्सालय OPD Clinic
           </h1>
-          <div className="flex items-center justify-center gap-1 mt-1">
-            <span className="text-sm">💚</span>
-            <p className="text-xs text-green-800 font-semibold">
-              Traditional Wellness &amp; Holistic Healthcare
-            </p>
-            <span className="text-sm">✨</span>
-          </div>
+        
         </div>
 
         {loadingDepts ? (

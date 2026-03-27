@@ -1,17 +1,16 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
-import NatureTwoTone from "@mui/icons-material/NatureTwoTone";
-import SpaOutlined from "@mui/icons-material/SpaOutlined";
-import GroupsOutlined from "@mui/icons-material/GroupsOutlined";
-import EventNoteOutlined from "@mui/icons-material/EventNoteOutlined";
 import AccessTimeOutlined from "@mui/icons-material/AccessTimeOutlined";
+import CalendarTodayOutlined from "@mui/icons-material/CalendarTodayOutlined";
+import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
+import CurrencyRupeeOutlined from "@mui/icons-material/CurrencyRupeeOutlined";
+import EventNoteOutlined from "@mui/icons-material/EventNoteOutlined";
+import GroupsOutlined from "@mui/icons-material/GroupsOutlined";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import LocalFloristOutlined from "@mui/icons-material/LocalFloristOutlined";
 import SelfImprovementOutlined from "@mui/icons-material/SelfImprovementOutlined";
-import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
-import InfoOutlined from "@mui/icons-material/InfoOutlined";
-import CalendarTodayOutlined from "@mui/icons-material/CalendarTodayOutlined";
-import CurrencyRupeeOutlined from "@mui/icons-material/CurrencyRupeeOutlined";
+import SpaOutlined from "@mui/icons-material/SpaOutlined";
 import VolunteerActivismOutlined from "@mui/icons-material/VolunteerActivismOutlined";
+import { motion } from "framer-motion";
+import { useState } from "react";
 import BookEventForm from "../../bookEventForm/BookEventForm";
 
 const containerVariants = {

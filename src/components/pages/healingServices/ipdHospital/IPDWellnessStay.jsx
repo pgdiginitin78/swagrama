@@ -158,28 +158,22 @@ const ServiceCard = ({
           </div>
         </div>
 
-        <div className="absolute bottom-3 left-3 group/icon">
-          <div className="bg-gradient-to-br from-emerald-900 to-emerald-800 backdrop-blur-md p-2 rounded-xl shadow-lg border-2 border-lime-400/30 group-hover/icon:scale-110 group-hover/icon:rotate-6 transition-transform duration-300">
-            <ServiceIcon className="text-lime-300" size={20} />
-          </div>
-        </div>
+   
 
-        <div className="absolute bottom-3 right-3 flex items-center gap-0.5">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={12} className="fill-amber-400 text-amber-400" />
-          ))}
-        </div>
+   
       </div>
 
-      <div className="relative p-4">
+      <div className="relative p-4 w-full">
         <h3 className="font-bold text-gray-900 leading-tight mb-3 text-base">
           {service.serviceName}
         </h3>
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 mb-3 bg-gradient-to-r from-emerald-900/20 to-lime-900/20 backdrop-blur-md rounded-lg border border-emerald-800/30 shadow-sm hover:scale-105 transition-transform duration-200">
+        <div className="flex justify-end">
+        <div className="inline-flex justify-end  items-center gap-1.5 px-3 py-1.5 mb-3 bg-gradient-to-r from-emerald-900/20 to-lime-900/20 backdrop-blur-md rounded-lg border border-emerald-800/30 shadow-sm hover:scale-105 transition-transform duration-200">
           <Clock size={14} className="text-emerald-800" />
           <span className="text-sm font-bold text-gray-900">
             {service.checkIn} - {service.checkOut}
           </span>
+        </div>
         </div>
 
         <div className="space-y-2 mb-3">

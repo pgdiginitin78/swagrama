@@ -740,7 +740,7 @@ export default function OPDBookingModal({
                     >
                       <CommonButton
                         type="button"
-                        label="Reset"
+                        label="Reset1"
                         onClick={handleReset}
                         className="bg-white border px-5 border-red-500 text-red-600 hover:bg-red-50 transition-all duration-200"
                       />
@@ -778,12 +778,12 @@ export default function OPDBookingModal({
         }}
         confirmationSubmitFunc={isPaymentPending ? () => {} : initiatePayment}
         confirmationLabel={
-          isPaymentPending ? "Payment in Progress" : "Confirm Registration"
+          isPaymentPending ? "Payment in Progress" : "Confirm Booking"
         }
         confirmationMsg={
           isPaymentPending
             ? "Please complete the transaction in the new tab to book your appointment. Do not close this window."
-            : "Are you sure you want to create this account?"
+            : "Are you sure you want to book this appointment?"
         }
         confirmationButtonMsg={isPaymentPending ? "Waiting..." : "Confirm"}
       />

@@ -16,12 +16,7 @@ import Spa from "@mui/icons-material/Spa";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Box, Modal } from "@mui/material";
 import { motion } from "framer-motion";
-import {
-  Filter,
-  Leaf,
-  Shield,
-  Sparkles
-} from "lucide-react";
+import { Filter, Leaf, Shield, Sparkles } from "lucide-react";
 import { useRef, useState } from "react";
 import { MdEco } from "react-icons/md";
 import BathingSweaterTherapyImg from "../../../assets/healingServices/detoxTherapy/BathingSweaterTherapyImg.png";
@@ -120,6 +115,7 @@ import FullBodyAnointingImg from "../../../assets/healingServices/detoxTherapy/�
 import सुवर्णाग्निकर्मGoldCauterization from "../../../assets/healingServices/detoxTherapy/सुवर्णाग्निकर्म Gold Cauterization.png";
 import FemaleGenitalEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/स्त्रीउत्तरबस्ति - Female Genital Enema Detox.jpg";
 import स्नैहिकधूमपानUnctuousSmokeInhalation from "../../../assets/healingServices/detoxTherapy/स्नैहिकधूमपान Unctuous Smoke Inhalation.png";
+import DetoxMainImg from "../../../assets/healingServices/detoxTherapy/DetoxMainImg.png";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
@@ -1241,7 +1237,7 @@ function ServiceCard({ item }) {
           <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-transparent to-lime-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
 
           {item.image ? (
-            <div className="w-full h-40 sm:h-44 2xl:h-56 overflow-hidden relative rounded-t-2xl flex-shrink-0">
+            <div className="w-full h-72 md:h-56 2xl:h-56 overflow-hidden relative rounded-t-2xl flex-shrink-0">
               <img
                 src={item.image}
                 alt={item.serviceName}
@@ -1326,75 +1322,68 @@ export default function DetoxHouse() {
 
   return (
     <div className="min-h-screen pb-5 relative">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#2a5f46] via-[#4f8f73] to-[#2a5f46] py-8 sm:py-10">
-        <motion.div
-          animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-10 sm:top-20 left-[5%] sm:left-[10%] text-[#e5c76a]/20 pointer-events-none"
-        >
-          <Leaf className="w-14 h-14 sm:w-24 sm:h-24" />
-        </motion.div>
-        <motion.div
-          animate={{ y: [0, 15, 0], rotate: [0, -5, 0] }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1,
-          }}
-          className="absolute bottom-10 sm:bottom-20 right-[5%] sm:right-[15%] text-[#e5c76a]/15 pointer-events-none"
-        >
-          <Sparkles className="w-12 h-12 sm:w-20 sm:h-20" />
-        </motion.div>
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{
-            duration: 5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2,
-          }}
-          className="absolute top-1/3 right-[8%] text-[#5f806a]/20 hidden sm:block pointer-events-none"
-        >
-          <Shield className="w-16 h-16" />
-        </motion.div>
+      <section
+        className="relative overflow-hidden py-8 sm:py-10"
+        style={{
+          backgroundImage: `url(${DetoxMainImg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/45 backdrop-brightness-75" />
 
         <div className="relative max-w-5xl mx-auto px-4 text-center">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-[#c9a441] font-serif text-xl sm:text-2xl md:text-3xl mb-3"
+          <div
+            className="mx-auto max-w-3xl
+      backdrop-blur-xl
+      bg-white/10
+      border border-white/20
+      shadow-2xl
+      rounded-2xl
+      px-5 sm:px-8 py-6 sm:py-8"
           >
-            पंचकर्म शोधन चिकित्सा सेवा
-          </motion.p>
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#e5c76a] mb-4"
-          >
-            Panchakarma Detox
-            <span className="block mt-1">Therapy Services</span>
-          </motion.h1>
-          <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 1, scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="flex items-center justify-center gap-3 my-5 sm:my-7"
-          >
-            <div className="h-px w-10 sm:w-20 bg-gradient-to-r from-transparent to-[#c9a441]" />
-            <Leaf className="w-5 h-5 text-[#c9a441]" />
-            <div className="h-px w-10 sm:w-20 bg-gradient-to-l from-transparent to-[#c9a441]" />
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-sm sm:text-base md:text-lg text-white/80 max-w-2xl mx-auto leading-relaxed px-2"
-          >
-            <AutoTypingText text="Experience the ancient wisdom of Ayurveda through our authentic Panchakarma treatments, designed to purify, rejuvenate, and restore balance to your body and mind." />
-          </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-[#e6c86e] font-serif text-xl sm:text-2xl md:text-3xl mb-3 drop-shadow-md"
+            >
+              पंचकर्म शोधन चिकित्सा सेवा
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-[#f1d77a] mb-4 drop-shadow-md"
+            >
+              Panchakarma Detox
+              <span className="block mt-1">Therapy Services</span>
+            </motion.h1>
+
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex items-center justify-center gap-3 my-5 sm:my-7"
+            >
+              <div className="h-px w-10 sm:w-20 bg-gradient-to-r from-transparent to-[#e6c86e]" />
+              <Leaf className="w-5 h-5 text-[#e6c86e]" />
+              <div className="h-px w-10 sm:w-20 bg-gradient-to-l from-transparent to-[#e6c86e]" />
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="text-sm sm:text-base md:text-lg text-white/90 max-w-2xl mx-auto leading-relaxed px-2 drop-shadow"
+            >
+              <AutoTypingText text="Experience the ancient wisdom of Ayurveda through our authentic Panchakarma treatments, designed to purify, rejuvenate, and restore balance to your body and mind." />
+            </motion.p>
+          </div>
         </div>
       </section>
 

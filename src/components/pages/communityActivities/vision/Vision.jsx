@@ -27,7 +27,7 @@ import eveningMealImg from "../../../assets/healingServices/vision/eveningMeal.p
 import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.png";
 import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.png";
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
-import BookEventForm from "../../bookEventForm/BookEventForm";
+import VisitorsFormModal from "./VisitorsFormModal";
 import MainPageImg from "../../../assets/community-activities/mainPage.png"
 
 
@@ -703,13 +703,13 @@ const OurVision = () => {
       </div>
 
       {openEventBookModal && (
-        <BookEventForm
+        <VisitorsFormModal
           open={openEventBookModal}
           handleClose={() => {
             setSelectedEventDetails(null);
             setOpenEventBookModal(false);
           }}
-          eventDetails={selectedEventDeatils}
+          serviceDetails={selectedEventDeatils}
         />
       )}
     </div>

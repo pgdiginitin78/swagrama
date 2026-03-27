@@ -198,7 +198,7 @@ function FieldError({ message }) {
     <motion.p
       initial={{ opacity: 0, y: -4 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-[11px] text-red-600 mt-1 flex items-center gap-1"
+      className="text-xs text-red-600 mt-0.5 flex items-center gap-1"
     >
       <span>⚠</span> {message}
     </motion.p>
@@ -212,20 +212,22 @@ function SectionCard({ children, index, icon: Icon, title, subtitle }) {
       variants={sectionVariants}
       initial="hidden"
       animate="visible"
-      className="bg-white/70 backdrop-blur-md rounded-[9px] border border-emerald-900/10 shadow-sm overflow-hidden"
+      className="bg-white/70 backdrop-blur-md rounded-lg border border-emerald-900/10 shadow-sm overflow-hidden"
     >
       {(title || Icon) && (
-        <div className="px-5 pt-5 pb-3 border-b border-emerald-900/8">
-          <div className="flex items-center gap-3">
+        <div className="px-3 sm:px-4 py-3 sm:py-3.5 border-b border-emerald-900/8">
+          <div className="flex items-center gap-2 sm:gap-3">
             {Icon && (
-              <div className="p-2 bg-gradient-to-br from-emerald-900/15 to-lime-900/10 rounded-xl">
-                <Icon size={16} className="text-emerald-900" />
+              <div className="p-1.5 sm:p-2 bg-gradient-to-br from-emerald-900/15 to-lime-900/10 rounded-lg sm:rounded-xl flex-shrink-0">
+                <Icon size={14} className="sm:size-4 text-emerald-900" />
               </div>
             )}
-            <div>
-              <h3 className="text-sm font-bold text-gray-900">{title}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-xs sm:text-sm font-bold text-gray-900 truncate">
+                {title}
+              </h3>
               {subtitle && (
-                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+                <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 leading-tight">
                   {subtitle}
                 </p>
               )}
@@ -233,7 +235,7 @@ function SectionCard({ children, index, icon: Icon, title, subtitle }) {
           </div>
         </div>
       )}
-      <div className="p-5">{children}</div>
+      <div className="p-3 sm:p-4">{children}</div>
     </motion.div>
   );
 }
@@ -252,14 +254,14 @@ function PaymentCard({
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className={`relative cursor-pointer rounded-xl border-2 p-4 transition-all duration-200 ${
+      className={`relative cursor-pointer rounded-lg border-2 p-3 sm:p-4 transition-all duration-200 ${
         selected
           ? "border-emerald-700 bg-gradient-to-br from-emerald-900/8 to-lime-900/5 shadow-md"
           : "border-emerald-900/15 bg-white/60 hover:border-emerald-900/30"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-start gap-3 flex-1">
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="flex items-start gap-2 sm:gap-3 flex-1 min-w-0">
           <div
             className={`mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
               selected ? "border-emerald-700" : "border-gray-300"
@@ -269,23 +271,25 @@ function PaymentCard({
               <div className="w-2 h-2 rounded-full bg-emerald-700" />
             )}
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-sm font-bold text-gray-900">{title}</p>
+              <p className="text-xs sm:text-sm font-bold text-gray-900">
+                {title}
+              </p>
               {badge && (
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-900 text-lime-300 rounded-full">
+                <span className="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 bg-emerald-900 text-lime-300 rounded-full whitespace-nowrap">
                   {badge}
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+            <p className="text-[10px] sm:text-xs text-gray-500 mt-0.5 leading-tight">
               {subtitle}
             </p>
             {children}
           </div>
         </div>
         <div className="text-right flex-shrink-0">
-          <p className="text-lg font-bold text-emerald-900">
+          <p className="text-base sm:text-lg font-bold text-emerald-900">
             ₹{amount?.toLocaleString()}
           </p>
         </div>
@@ -325,9 +329,9 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
       index={1}
       icon={BedDouble}
       title="Room Selection"
-      subtitle="Check live availability and pick your preferred room"
+      subtitle="Check availability and pick your room"
     >
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex justify-end">
           <motion.button
             type="button"
@@ -335,20 +339,28 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
             disabled={checkingRooms}
             whileHover={!checkingRooms ? { scale: 1.02 } : {}}
             whileTap={!checkingRooms ? { scale: 0.98 } : {}}
-            className="flex items-center justify-end gap-2.5 px-4 py-2.5 rounded-xl border-2 border-emerald-700/40 text-emerald-800 text-sm font-bold bg-emerald-900/5 hover:bg-emerald-900/10 hover:border-emerald-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="flex items-center justify-end gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-lg sm:rounded-xl border-2 border-emerald-700/40 text-emerald-800 text-xs sm:text-sm font-bold bg-emerald-900/5 hover:bg-emerald-900/10 hover:border-emerald-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {checkingRooms ? (
               <>
-                <Loader2 size={15} className="animate-spin" />
-                Checking Availability…
+                <Loader2 size={14} className="animate-spin flex-shrink-0" />
+                <span className="hidden sm:inline">Checking Availability…</span>
+                <span className="sm:hidden">Checking…</span>
               </>
             ) : (
               <>
                 <RefreshCw
-                  size={15}
-                  className={checked ? "text-emerald-600" : ""}
+                  size={14}
+                  className={`flex-shrink-0 ${checked ? "text-emerald-600" : ""}`}
                 />
-                {checked ? "Re-check Availability" : "Check Room Availability"}
+                <span className="hidden sm:inline">
+                  {checked
+                    ? "Re-check Availability"
+                    : "Check Room Availability"}
+                </span>
+                <span className="sm:hidden">
+                  {checked ? "Re-check" : "Check"}
+                </span>
               </>
             )}
           </motion.button>
@@ -363,11 +375,11 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
               transition={{ duration: 0.22 }}
               className="overflow-hidden"
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {rooms.map((room) => (
                   <div
                     key={room}
-                    className="h-14 rounded-xl border-2 border-emerald-900/10 bg-white/50 animate-pulse"
+                    className="h-12 sm:h-14 rounded-lg sm:rounded-xl border-2 border-emerald-900/10 bg-white/50 animate-pulse"
                   />
                 ))}
               </div>
@@ -382,25 +394,25 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.3 }}
-              className="space-y-2.5"
+              className="space-y-2"
             >
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-emerald-900/60">
+                <p className="text-[9px] sm:text-[11px] font-bold uppercase tracking-wider text-emerald-900/60">
                   Select a Room
                 </p>
-                <div className="flex items-center gap-3 text-[11px] text-gray-500">
+                <div className="flex items-center gap-2 sm:gap-3 text-[9px] sm:text-[11px] text-gray-500">
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
-                    Available
+                    <span className="hidden sm:inline">Available</span>
                   </span>
                   <span className="flex items-center gap-1">
                     <span className="w-2 h-2 rounded-full bg-gray-300 inline-block" />
-                    Unavailable
+                    <span className="hidden sm:inline">Unavailable</span>
                   </span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {rooms.map((room, i) => {
                   const status = availabilityMap[room] ?? "available";
                   const isAvailable = status === "available";
@@ -413,14 +425,14 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: i * 0.06, duration: 0.25 }}
                       onClick={() => handleRoomSelect(room)}
-                      className={`relative flex items-center gap-3 p-3.5 rounded-xl border-2 transition-all duration-200
+                      className={`relative flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-lg sm:rounded-xl border-2 transition-all duration-200
                         ${!isAvailable ? "cursor-not-allowed opacity-50 border-gray-200 bg-gray-50/60" : "cursor-pointer"}
                         ${isSelected ? "border-emerald-700 bg-gradient-to-br from-emerald-900/10 to-lime-900/6 shadow-md" : ""}
                         ${isAvailable && !isSelected ? "border-emerald-900/15 bg-white/60 hover:border-emerald-700/50 hover:bg-emerald-900/5 hover:shadow-sm" : ""}
                       `}
                     >
                       <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
+                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-all ${
                           isSelected
                             ? "bg-emerald-900 text-lime-300"
                             : isAvailable
@@ -428,12 +440,12 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
                               : "bg-gray-100 text-gray-400"
                         }`}
                       >
-                        <BedDouble size={15} />
+                        <BedDouble size={14} className="sm:size-[15px]" />
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <p
-                          className={`text-xs font-bold leading-snug truncate ${
+                          className={`text-xs sm:text-xs font-bold leading-tight truncate ${
                             isSelected
                               ? "text-emerald-900"
                               : isAvailable
@@ -448,20 +460,20 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
                             isAvailable ? "text-emerald-600" : "text-gray-400"
                           }`}
                         >
-                          {isAvailable ? "Available" : "Not Available"}
+                          {isAvailable ? "Available" : "N/A"}
                         </p>
                       </div>
 
                       <div className="flex-shrink-0">
                         {isSelected ? (
                           <CheckCircle2
-                            size={17}
+                            size={16}
                             className="text-emerald-700"
                           />
                         ) : isAvailable ? (
                           <div className="w-4 h-4 rounded-full border-2 border-emerald-900/20" />
                         ) : (
-                          <XCircle size={17} className="text-gray-300" />
+                          <XCircle size={16} className="text-gray-300" />
                         )}
                       </div>
                     </motion.div>
@@ -480,13 +492,13 @@ function RoomAvailabilitySection({ service, errors, setValue }) {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.96 }}
                     transition={{ duration: 0.2 }}
-                    className="flex items-center gap-2.5 px-3.5 py-2.5 bg-emerald-900/8 border border-emerald-900/15 rounded-xl"
+                    className="flex items-center gap-2 px-3 py-2 bg-emerald-900/8 border border-emerald-900/15 rounded-lg sm:rounded-xl"
                   >
                     <CheckCircle2
-                      size={15}
+                      size={14}
                       className="text-emerald-700 flex-shrink-0"
                     />
-                    <p className="text-xs font-bold text-emerald-900">
+                    <p className="text-xs font-bold text-emerald-900 truncate">
                       Selected:{" "}
                       <span className="font-extrabold">{selectedRoom}</span>
                     </p>
@@ -507,21 +519,21 @@ function SuccessView({ onClose, data, service }) {
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="flex flex-col items-center justify-center py-12 px-6 text-center"
+      className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 sm:px-6 text-center"
     >
       <motion.div
         initial={{ scale: 0, rotate: -20 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ delay: 0.15, type: "spring", stiffness: 200 }}
-        className="w-20 h-20 bg-gradient-to-br from-emerald-900 to-lime-800 rounded-full flex items-center justify-center mb-5 shadow-xl"
+        className="w-16 sm:w-20 h-16 sm:h-20 bg-gradient-to-br from-emerald-900 to-lime-800 rounded-full flex items-center justify-center mb-3 sm:mb-5 shadow-xl flex-shrink-0"
       >
-        <BadgeCheck size={38} className="text-lime-300" />
+        <BadgeCheck size={32} className="sm:size-[38px] text-lime-300" />
       </motion.div>
       <motion.h2
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="text-xl font-bold text-gray-900 mb-2"
+        className="text-lg sm:text-xl font-bold text-gray-900 mb-2"
       >
         Booking Confirmed!
       </motion.h2>
@@ -529,38 +541,38 @@ function SuccessView({ onClose, data, service }) {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.32 }}
-        className="text-sm text-gray-600 mb-6 leading-relaxed max-w-xs"
+        className="text-xs sm:text-sm text-gray-600 mb-4 sm:mb-6 leading-relaxed max-w-xs"
       >
         Your stay at <strong>{service?.serviceName}</strong> has been
-        successfully booked. Voucher sent to your registered email.
+        successfully booked. Voucher sent to your email.
       </motion.p>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="w-full max-w-xs bg-gradient-to-br from-emerald-900/10 to-lime-900/8 border border-emerald-900/20 rounded-[9px] p-4 mb-6"
+        className="w-full max-w-xs bg-gradient-to-br from-emerald-900/10 to-lime-900/8 border border-emerald-900/20 rounded-lg sm:rounded-[9px] p-3 sm:p-4 mb-4 sm:mb-6 text-xs sm:text-sm"
       >
-        <div className="flex justify-between items-center text-sm mb-2">
+        <div className="flex justify-between items-center mb-2">
           <span className="text-gray-600">Booking ID</span>
-          <span className="font-mono font-bold text-emerald-900">
+          <span className="font-mono font-bold text-emerald-900 text-[11px] sm:text-sm">
             SWG-{Math.random().toString(36).slice(2, 8).toUpperCase()}
           </span>
         </div>
-        <div className="flex justify-between items-center text-sm mb-2">
+        <div className="flex justify-between items-center mb-2">
           <span className="text-gray-600">Guest</span>
           <span className="font-bold text-gray-900">
             {data?.primaryGuest?.firstName} {data?.primaryGuest?.lastName}
           </span>
         </div>
         {data?.roomName && (
-          <div className="flex justify-between items-center text-sm mb-2">
+          <div className="flex justify-between items-center mb-2">
             <span className="text-gray-600">Room</span>
-            <span className="font-bold text-gray-900 text-right max-w-[160px] leading-snug">
+            <span className="font-bold text-gray-900 text-right max-w-[140px] leading-tight text-[11px] sm:text-sm">
               {data.roomName}
             </span>
           </div>
         )}
-        <div className="flex justify-between items-center text-sm">
+        <div className="flex justify-between items-center">
           <span className="text-gray-600">Check-in</span>
           <span className="font-bold text-gray-900">{service?.checkIn}</span>
         </div>
@@ -570,7 +582,7 @@ function SuccessView({ onClose, data, service }) {
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
         onClick={onClose}
-        className="px-8 py-2.5 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-xl text-sm shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200 border border-lime-400/30"
+        className="px-6 sm:px-8 py-2 sm:py-2.5 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200 border border-lime-400/30"
       >
         Done
       </motion.button>
@@ -672,7 +684,6 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
     getUserDetails(userData?.userId)
       .then((res) => {
         const data = res?.data?.data;
-
         setValue("primaryGuest.firstName", data.firstName);
         setValue("primaryGuest.lastName", data.lastName);
         setValue("primaryGuest.email", data.emailId);
@@ -687,28 +698,28 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
       onClose={onClose}
       TransitionComponent={Transition}
       fullWidth
-      maxWidth="md"
+      maxWidth="sm"
       scroll="paper"
       PaperProps={{
         sx: {
-          borderRadius: "9px",
+          borderRadius: "12px",
           background:
             "linear-gradient(135deg, #f0fdf4 0%, #f7fee7 40%, #fffbeb 100%)",
-          m: { xs: 1, sm: 2 },
-          maxHeight: { xs: "calc(100vh - 16px)", sm: "calc(100vh - 32px)" },
+          m: { xs: 0.5, sm: 1 },
+          maxHeight: { xs: "calc(100vh - 4px)", sm: "calc(100vh - 32px)" },
         },
       }}
     >
-      <div className="sticky top-0 z-20 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 px-5 py-4 flex items-center justify-between border-b border-lime-400/20">
-        <div className="flex items-center gap-3">
-          <div className="p-1.5 bg-white/15 rounded-xl">
-            <Leaf size={16} className="text-lime-300" />
+      <div className="sticky top-0 z-20 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 px-3 sm:px-5 py-3 sm:py-4 flex items-center justify-between border-b border-lime-400/20">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="p-1 sm:p-1.5 bg-white/15 rounded-lg sm:rounded-xl flex-shrink-0">
+            <Leaf size={14} className="sm:size-4 text-lime-300" />
           </div>
-          <div>
-            <p className="text-white font-bold text-sm leading-tight">
+          <div className="min-w-0">
+            <p className="text-white font-bold text-xs sm:text-sm leading-tight truncate">
               {service?.serviceName ?? "Wellness Stay"}
             </p>
-            <p className="text-lime-300/80 text-xs">
+            <p className="text-lime-300/80 text-[10px] sm:text-xs">
               {service?.person} · ₹{price.toLocaleString()}
             </p>
           </div>
@@ -718,7 +729,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
           size="small"
           sx={{ color: "#fff", bgcolor: "rgba(255,255,255,0.1)" }}
         >
-          <X size={18} />
+          <X size={16} className="sm:size-[18px]" />
         </IconButton>
       </div>
 
@@ -739,13 +750,13 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
             service={service}
           />
         ) : (
-          <div className="p-4 md:p-5 space-y-3">
+          <div className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
             <form
               id="booking-form"
               onSubmit={handleSubmit(onSubmit)}
               noValidate
             >
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 <SectionCard
                   index={0}
                   icon={UserCheck}
@@ -760,7 +771,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                         row
                         value={field.value}
                         onChange={field.onChange}
-                        sx={{ gap: 1.5 }}
+                        sx={{ gap: 1 }}
                       >
                         {[
                           { value: "myself", label: "Myself" },
@@ -771,7 +782,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             onClick={() => field.onChange(opt.value)}
-                            className={`flex-1 min-w-[130px] flex items-center gap-2.5 px-4 py-3 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
+                            className={`flex-1 min-w-0 md:min-w-[130px] flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-200 ${
                               field.value === opt.value
                                 ? "border-emerald-700 bg-gradient-to-br from-emerald-900/10 to-lime-900/5 shadow-sm"
                                 : "border-emerald-900/15 bg-white/60 hover:border-emerald-900/30"
@@ -787,7 +798,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                                 "&.Mui-checked": { color: "#166534" },
                               }}
                             />
-                            <span className="text-sm font-bold text-gray-900">
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">
                               {opt.label}
                             </span>
                           </motion.div>
@@ -799,7 +810,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                     <FieldError message={errors.bookingFor.message} />
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 sm:mt-4">
                     <div>
                       <InputField
                         control={control}
@@ -839,7 +850,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                             />
                           }
                           label={
-                            <span className="text-sm font-bold text-gray-900">
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">
                               Bring a Pet (Additional charges apply)
                             </span>
                           }
@@ -866,8 +877,8 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                       : "Your details for the booking confirmation"
                   }
                 >
-                  <div className="space-y-3.5">
-                    <div className="grid grid-cols-[100px_1fr] gap-3">
+                  <div className="space-y-2.5 sm:space-y-3.5">
+                    <div className="grid grid-cols-[80px_1fr] md:grid-cols-[100px_1fr] gap-2 sm:gap-3">
                       <div>
                         <DropdownField
                           control={control}
@@ -900,7 +911,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                       />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
                         <InputField
                           control={control}
@@ -965,7 +976,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                             />
                           }
                           label={
-                            <span className="text-sm font-bold text-gray-900">
+                            <span className="text-xs sm:text-sm font-bold text-gray-900">
                               Add GST Details for Business Travel
                             </span>
                           }
@@ -983,11 +994,11 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                           transition={{ duration: 0.28 }}
                           className="overflow-hidden"
                         >
-                          <div className="pt-4 mt-3 border-t border-emerald-900/10 space-y-3 mb-3">
-                            <p className="text-[11px] font-bold tracking-widest uppercase text-emerald-900/60">
+                          <div className="pt-3 sm:pt-4 mt-3 border-t border-emerald-900/10 space-y-2 sm:space-y-3 mb-3">
+                            <p className="text-[9px] sm:text-[11px] font-bold tracking-widest uppercase text-emerald-900/60">
                               GST Information
                             </p>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 sm:gap-3">
                               <div>
                                 <InputField
                                   control={control}
@@ -1024,9 +1035,9 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                   index={4}
                   icon={UserPlus}
                   title="Add Guests"
-                  subtitle="Name should be as per official Govt. ID. Travellers below 18 years cannot travel alone."
+                  subtitle="Name as per official ID. Minors cannot travel alone."
                 >
-                  <div className="space-y-3">
+                  <div className="space-y-2.5 sm:space-y-3">
                     <AnimatePresence>
                       {fields.map((f, idx) => (
                         <motion.div
@@ -1035,14 +1046,14 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                           initial="hidden"
                           animate="visible"
                           exit="exit"
-                          className="bg-gradient-to-br from-emerald-900/5 to-lime-900/5 border border-emerald-900/15 rounded-xl p-4"
+                          className="bg-gradient-to-br from-emerald-900/5 to-lime-900/5 border border-emerald-900/15 rounded-lg sm:rounded-xl p-3 sm:p-4"
                         >
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-900 to-lime-900 flex items-center justify-center text-[11px] font-bold text-lime-300">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3">
+                            <div className="flex items-center gap-1.5 sm:gap-2">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-emerald-900 to-lime-900 flex items-center justify-center text-[10px] sm:text-[11px] font-bold text-lime-300 flex-shrink-0">
                                 {idx + 1}
                               </div>
-                              <span className="text-sm font-bold text-emerald-900">
+                              <span className="text-xs sm:text-sm font-bold text-emerald-900">
                                 Guest {idx + 1}
                               </span>
                             </div>
@@ -1054,7 +1065,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                               <DeleteIcon />
                             </button>
                           </div>
-                          <div className="grid grid-cols-[95px_1fr] gap-3 mb-3">
+                          <div className="grid grid-cols-[80px_1fr] md:grid-cols-[95px_1fr] gap-2 sm:gap-3 mb-2 sm:mb-3">
                             <div>
                               <DropdownField
                                 control={control}
@@ -1073,7 +1084,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                               />
                             </div>
                           </div>
-                          <div className="flex flex-wrap gap-4">
+                          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                             <Controller
                               name={`guests.${idx}.below12`}
                               control={control}
@@ -1095,7 +1106,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                                   }
                                   label={
                                     <span className="text-xs font-medium text-gray-700">
-                                      Below 12 years of age
+                                      Below 12 years
                                     </span>
                                   }
                                   sx={{ m: 0 }}
@@ -1123,7 +1134,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                                   }
                                   label={
                                     <span className="text-xs font-medium text-gray-700">
-                                      Add to Saved Guests
+                                      Save Guest
                                     </span>
                                   }
                                   sx={{ m: 0 }}
@@ -1149,16 +1160,16 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                         })
                       }
                       disabled={!canAddGuest}
-                      className={`w-full py-3 rounded-xl border-2 border-dashed text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${
+                      className={`w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl border-2 border-dashed text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 ${
                         canAddGuest
                           ? "border-emerald-700/40 text-emerald-800 hover:bg-emerald-900/5 hover:border-emerald-700/70"
                           : "border-gray-200 text-gray-400 cursor-not-allowed"
                       }`}
                     >
-                      <UserPlus size={15} />
+                      <UserPlus size={14} className="sm:size-4" />
                       {canAddGuest
                         ? `Add Guest (${fields.length} / ${MAX_GUESTS})`
-                        : `Max ${MAX_GUESTS} Additional Guests Reached`}
+                        : `Max ${MAX_GUESTS} Guests`}
                     </motion.button>
                   </div>
                 </SectionCard>
@@ -1167,25 +1178,28 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                   index={5}
                   icon={CreditCard}
                   title="Payment Options"
-                  subtitle="Choose your preferred payment method"
+                  subtitle="Choose your preferred method"
                 >
                   <Controller
                     name="paymentOption"
                     control={control}
                     render={({ field }) => (
-                      <div className="space-y-2.5">
+                      <div className="space-y-2">
                         <PaymentCard
                           selected={field.value === "pay_now"}
                           onClick={() => field.onChange("pay_now")}
                           title="Pay Full Amount Now"
                           badge="Save ₹110"
-                          subtitle="Cancel for free any time before 20 Mar"
+                          subtitle="Cancel free any time before 20 Mar"
                           amount={price}
                         >
-                          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-emerald-900/8 rounded-lg">
-                            <Shield size={11} className="text-emerald-800" />
-                            <span className="text-[11px] font-bold text-emerald-800">
-                              Free cancellation included
+                          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-900/8 rounded-lg whitespace-nowrap">
+                            <Shield
+                              size={10}
+                              className="sm:size-[11px] text-emerald-800"
+                            />
+                            <span className="text-[9px] sm:text-[11px] font-bold text-emerald-800">
+                              Free cancellation
                             </span>
                           </div>
                         </PaymentCard>
@@ -1194,14 +1208,16 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                           selected={field.value === "pay_later"}
                           onClick={() => field.onChange("pay_later")}
                           title="Pay Later"
-                          subtitle="Pay later by 18 Mar 2026 11:59 PM"
+                          subtitle="Pay by 18 Mar 2026 11:59 PM"
                           amount={origPrice}
                         >
-                          <div className="mt-2 inline-flex items-center gap-1.5 px-2 py-1 bg-amber-800/8 rounded-lg">
-                            <Wallet size={11} className="text-amber-800" />
-                            <span className="text-[11px] font-bold text-amber-800">
-                              Book @₹0 now · Pay later to avoid
-                              auto-cancellation
+                          <div className="mt-1.5 sm:mt-2 inline-flex items-center gap-1 px-2 py-0.5 bg-amber-800/8 rounded-lg whitespace-nowrap">
+                            <Wallet
+                              size={10}
+                              className="sm:size-[11px] text-amber-800"
+                            />
+                            <span className="text-[9px] sm:text-[11px] font-bold text-amber-800">
+                              Book @₹0 now
                             </span>
                           </div>
                         </PaymentCard>
@@ -1214,7 +1230,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                 </SectionCard>
 
                 <SectionCard index={6} icon={CalendarDays} title="Stay Summary">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+                  <div className="grid md:grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
                     {[
                       { label: "Check-in", value: service?.checkIn ?? "—" },
                       { label: "Check-out", value: service?.checkOut ?? "—" },
@@ -1226,12 +1242,12 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                     ].map((item) => (
                       <div
                         key={item.label}
-                        className="bg-gradient-to-br from-emerald-900/8 to-lime-900/5 rounded-xl p-3 border border-emerald-900/10"
+                        className="bg-gradient-to-br from-emerald-900/8 to-lime-900/5 rounded-lg sm:rounded-xl p-2 sm:p-3 border border-emerald-900/10"
                       >
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-emerald-900/60 mb-1">
+                        <p className="text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-emerald-900/60 mb-0.5 sm:mb-1">
                           {item.label}
                         </p>
-                        <p className="text-sm font-bold text-gray-900">
+                        <p className="text-xs sm:text-sm font-bold text-gray-900">
                           {item.value}
                         </p>
                       </div>
@@ -1244,7 +1260,7 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                   variants={sectionVariants}
                   initial="hidden"
                   animate="visible"
-                  className="px-1 space-y-4"
+                  className="px-0.5 sm:px-1 space-y-3 sm:space-y-4"
                 >
                   <Controller
                     name="terms"
@@ -1267,12 +1283,12 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                             />
                           }
                           label={
-                            <span className="text-xs text-gray-700 leading-relaxed">
+                            <span className="text-xs text-gray-700 leading-tight">
                               By proceeding, you agree to the{" "}
                               <span className="font-bold text-emerald-800 underline underline-offset-2 cursor-pointer">
                                 Swagrama terms
                               </span>{" "}
-                              and booking policies for your stay.
+                              and booking policies.
                             </span>
                           }
                           sx={{ m: 0, alignItems: "flex-start" }}
@@ -1290,17 +1306,20 @@ const BookingFormModal = ({ open, handleClose, eventDetails: service }) => {
                     disabled={isSubmitting}
                     whileHover={!isSubmitting ? { scale: 1.01, y: -1 } : {}}
                     whileTap={!isSubmitting ? { scale: 0.99 } : {}}
-                    className="w-full py-3.5 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-xl text-sm shadow-lg border border-lime-400/30 flex items-center justify-center gap-2.5 disabled:opacity-60 disabled:cursor-not-allowed transition-shadow duration-200 hover:shadow-xl"
+                    className="w-full py-3 sm:py-3.5 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-lg sm:rounded-xl text-xs sm:text-sm shadow-lg border border-lime-400/30 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed transition-shadow duration-200 hover:shadow-xl"
                   >
                     {isSubmitting ? (
                       <>
-                        <Loader2 size={16} className="animate-spin" />
-                        Confirming Booking…
+                        <Loader2 size={14} className="sm:size-4 animate-spin" />
+                        <span className="hidden sm:inline">
+                          Confirming Booking…
+                        </span>
+                        <span className="sm:hidden">Confirming…</span>
                       </>
                     ) : (
                       <>
                         Confirm Booking
-                        <ChevronRight size={16} />
+                        <ChevronRight size={14} className="sm:size-4" />
                       </>
                     )}
                   </motion.button>

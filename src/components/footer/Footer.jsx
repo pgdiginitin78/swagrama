@@ -7,6 +7,8 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
+import VillaIcon from '@mui/icons-material/Villa';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const Footer = () => {
   const footerRef = useRef(null);
@@ -152,7 +154,7 @@ const Footer = () => {
                 </div>
 
                 <div className="flex gap-2 items-start text-white/90">
-                  <LocationOn className="flex-shrink-0 text-white mt-0.5 text-base" />
+                  <VillaIcon className="flex-shrink-0 text-white mt-0.5 text-base" />
                   <div>
                     <p className="font-medium text-xs mb-1">
                       Community Village
@@ -169,13 +171,14 @@ const Footer = () => {
                       rel="noopener noreferrer"
                       className="text-[#c9a86a] hover:text-[#d4b87d] hover:underline text-[10px] mt-0.5 inline-block"
                     >
-                      📍 View on Maps
+                  <LocationOn className="flex-shrink-0 text-[#c9a86a] hover:text-[#d4b87d] hover:underline  text-sm" size={12} />
+                   View on Maps
                     </a>
                   </div>
                 </div>
 
                 <div className="flex gap-2 items-start text-white/90">
-                  <LocationOn className="flex-shrink-0 text-white mt-0.5 text-base" />
+                  <BusinessIcon className="flex-shrink-0 text-white mt-0.5 text-base" />
                   <div>
                     <p className="font-medium text-xs mb-1">Office</p>
                     <a
@@ -243,7 +246,8 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="text-[#c9a86a] hover:text-[#d4b87d] hover:underline text-xs mt-2 inline-block"
               >
-                📍 View Parking Location
+                                <LocationOn className="flex-shrink-0 text-[#c9a86a] hover:text-[#d4b87d] hover:underline  text-sm" size={12} />
+ View Parking Location
               </a>
             </div>
           </div>

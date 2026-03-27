@@ -1,9 +1,14 @@
-import EmojiNature from "@mui/icons-material/EmojiNature";
-import LocalFlorist from "@mui/icons-material/LocalFlorist";
-import SelfImprovement from "@mui/icons-material/SelfImprovement";
-import Spa from "@mui/icons-material/Spa";
-import HealingIcon from "@mui/icons-material/Healing";
-import { Box, Button, Card, Stack, Tab, Tabs, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Chip,
+  Container,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import BeautyTherapy from "./beautyTherapy/BeautyTherapy";
 import DetoxHouse from "./detoxHouse/DetoxHouse";
@@ -13,34 +18,44 @@ import OPDClinic from "./opdClinic/OPDClinic";
 
 const tabsData = [
   {
-    label: "स्वचिचित्सालय OPD Clinic",
+    label: "OPD Clinic",
+    fullLabel: "स्वचिचित्सालय OPD Clinic",
     component: <OPDClinic />,
-    icon: <EmojiNature sx={{ fontSize: 18 }} />,
     color: "#4a90a4",
+    bgColor: "rgba(74, 144, 164, 0.08)",
+    darkColor: "#2d5f7d",
   },
   {
-    label: "स्वास्थ्य निवास Wellness Stay ",
-    icon: <Spa sx={{ fontSize: 18 }} />,
+    label: "Wellness",
+    fullLabel: "स्वास्थ्य निवास Wellness Stay",
     component: <IPDHospital />,
     color: "#5a437a",
+    bgColor: "rgba(90, 67, 122, 0.08)",
+    darkColor: "#3d2e52",
   },
   {
-    label: "स्वशोधनालय Detox House",
+    label: "Detox",
+    fullLabel: "स्वशोधनालय Detox House",
     component: <DetoxHouse />,
-    icon: <Spa sx={{ fontSize: 18 }} />,
     color: "#d4731c",
+    bgColor: "rgba(212, 115, 28, 0.08)",
+    darkColor: "#a1570d",
   },
   {
-    label: "नैसर्गचिकित्सा Nature Therapy",
+    label: "Nature",
+    fullLabel: "नैसर्गचिकित्सा Nature Therapy",
     component: <NatureTherapy />,
-    icon: <LocalFlorist sx={{ fontSize: 18 }} />,
     color: "#4a7c59",
+    bgColor: "rgba(74, 124, 89, 0.08)",
+    darkColor: "#2d5035",
   },
   {
-    label: "स्वसौन्दर्यचिकित्सा Beauty Therapy ",
+    label: "Beauty",
+    fullLabel: "स्वसौन्दर्यचिकित्सा Beauty Therapy",
     component: <BeautyTherapy />,
-    icon: <SelfImprovement sx={{ fontSize: 18 }} />,
     color: "#7b4397",
+    bgColor: "rgba(123, 67, 151, 0.08)",
+    darkColor: "#532860",
   },
 ];
 
@@ -57,70 +72,158 @@ const ServicesTabs = () => {
   const hasChildren = current.children && current.children.length > 0;
 
   return (
-    <div className="md:px-12 py-3 my-16 lg:my-0">
-      <Box>
-        <h1 className="text-ayuBrown font-semibold text-center text:xl xl:text-2xl">
-          <HealingIcon /> स्वउपचारसेवा Healing Services <HealingIcon />
-        </h1>
-        <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
+    <Box
+      sx={{
+        background: "linear-gradient(135deg, #f5f7fa 0%, #e9ecf1 100%)",
+        minHeight: "100vh",
+        py: { xs: 2, md: 2 },
+      }}
+    >
+      <h1 className="text-2xl font-bold text-center text-green-800 mb-4">
+       स्वउपचारसेवा Healing Services
+      </h1>
+      <Container maxWidth="2xl">
+        <Box
+          sx={{
+            background: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "blur(10px)",
+            borderRadius: "9px",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            p: { xs: 1 },
+            mb: { xs: 1, md: 1 },
+            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
+          }}
+        >
           <Tabs
             value={selectedTab}
             onChange={handleChange}
             variant="scrollable"
-            scrollButtons
+            scrollButtons="auto"
             allowScrollButtonsMobile
             sx={{
+              minHeight: "auto",
+              "& .MuiTabs-scrollableX": {
+                overflowX: "auto",
+                scrollBehavior: "smooth",
+              },
               "& .MuiTab-root": {
+                fontSize: { xs: "0.85rem" },
                 fontWeight: 600,
                 textTransform: "none",
-                minHeight: 48,
-                fontSize: "0.875rem",
-                px: 1.5,
-                py: 1,
+                minHeight: { xs: 22, md: 20 },
+                py: { xs: 1, md: 1 },
+                px: { xs: 1.5, md: 2.5 },
+                display: "flex",
+                gap: { xs: 0.5, md: 1 },
+                color: "rgba(0, 0, 0, 0.6)",
+                transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                borderRadius: { xs: "7px" },
+                position: "relative",
+                overflow: "hidden",
+                margin: { xs: "0 4px", md: "0 6px" },
+                "&::before": {
+                  content: '""',
+                  position: "absolute",
+                  inset: 0,
+                  background: "transparent",
+                  transition: "background 0.3s ease",
+                },
+
+                "&:hover": {
+                  backgroundColor: `${current.color}12`,
+                  color: current.color,
+                },
+
+                "&.Mui-selected": {
+                  color: "#fff",
+                  fontWeight: 700,
+                  background: `linear-gradient(135deg, ${current.color} 0%, ${current.darkColor} 100%)`,
+                  boxShadow: `0 4px 20px ${current.color}30`,
+                },
               },
-              "& .Mui-selected": { color: current.color },
+              "& .MuiTabs-indicator": {
+                display: "none",
+              },
+              "& .MuiTabScrollButtonWrapper": {
+                color: current.color,
+                opacity: 0.7,
+                "&:hover": {
+                  opacity: 1,
+                },
+              },
             }}
             TabIndicatorProps={{
-              sx: { height: 3, bgcolor: current.color },
+              sx: {
+                display: "none",
+              },
             }}
           >
             {tabsData.map((tab, index) => (
               <Tab
                 key={index}
-                label={tab.label}
-                icon={tab.icon}
-                iconPosition="start"
+                label={
+                  <Box>
+                    <span>{tab.fullLabel}</span>
+                  </Box>
+                }
+                aria-label={tab.fullLabel}
               />
             ))}
           </Tabs>
         </Box>
+
+        {/* Child Tabs/Buttons */}
         {hasChildren && (
           <Stack
             direction="row"
             flexWrap="wrap"
-            gap={1}
-            mb={2}
+            gap={{ xs: 1, md: 1.5 }}
+            mb={{ xs: 2.5, md: 1 }}
             justifyContent="center"
+            useFlexGap
+            sx={{
+              animation: "fadeIn 0.4s ease-in",
+              "@keyframes fadeIn": {
+                from: { opacity: 0, transform: "translateY(-10px)" },
+                to: { opacity: 1, transform: "translateY(0)" },
+              },
+            }}
           >
             {current.children.map((child, i) => (
               <Button
                 key={i}
                 variant={selectedChild === i ? "contained" : "outlined"}
-                size="small"
+                onClick={() => setSelectedChild(i)}
                 sx={{
-                  borderRadius: 2,
+                  borderRadius: "12px",
                   textTransform: "none",
-                  borderColor: current.color,
+                  fontWeight: selectedChild === i ? 700 : 600,
+                  fontSize: { xs: "0.8rem", md: "0.9rem" },
+                  px: { xs: 1.75, md: 2.5 },
+
+                  transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                  backgroundColor:
+                    selectedChild === i ? current.color : "transparent",
                   color: selectedChild === i ? "#fff" : current.color,
-                  bgcolor: selectedChild === i ? current.color : "transparent",
-                  fontSize: "0.8rem",
-                  px: 1.5,
-                  py: 0.5,
+                  borderColor: current.color,
+                  border: `2px solid ${current.color}`,
+                  background:
+                    selectedChild === i
+                      ? `linear-gradient(135deg, ${current.color} 0%, ${current.darkColor} 100%)`
+                      : "transparent",
+                  boxShadow:
+                    selectedChild === i
+                      ? `0 4px 16px ${current.color}30`
+                      : "none",
                   "&:hover": {
-                    bgcolor: selectedChild === i ? current.color : "#f0ead1",
+                    backgroundColor:
+                      selectedChild === i
+                        ? current.color
+                        : `${current.color}15`,
+                    transform: "translateY(-2px)",
+                    boxShadow: `0 8px 24px ${current.color}25`,
                   },
                 }}
-                onClick={() => setSelectedChild(i)}
               >
                 {child.title}
               </Button>
@@ -128,35 +231,154 @@ const ServicesTabs = () => {
           </Stack>
         )}
 
+        {/* Content Card */}
         <Card
-          elevation={0}
           sx={{
-            paddingBottom: 2,
-            borderRadius: 2,
-            boxShadow: 2,
-            bgcolor: "#F1FFF5",
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            borderRadius: { xs: "20px", md: "18px" },
+            overflow: "hidden",
+            boxShadow: `0 16px 48px ${current.color}15`,
+            transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
+            position: "relative",
+            minHeight: { xs: "auto", sm: "400px", md: "500px" },
+            animation: "slideUp 0.5s ease-out",
+            "@keyframes slideUp": {
+              from: {
+                opacity: 0,
+                transform: "translateY(30px)",
+              },
+              to: {
+                opacity: 1,
+                transform: "translateY(0)",
+              },
+            },
+
+            "&::before": {
+              content: '""',
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "4px",
+              background: `linear-gradient(90deg, ${current.color}, ${current.darkColor})`,
+            },
           }}
         >
-          {hasChildren ? (
-            current.children[selectedChild].component
-          ) : current.component ? (
-            current.component
-          ) : (
-            <>
-              <Typography
-                variant="h5"
-                sx={{ color: current.color, fontWeight: 700, mb: 1 }}
-              >
-                {current.label}
-              </Typography>
-              <Typography sx={{ fontSize: "1rem", opacity: 0.7 }}>
-                Coming Soon...
-              </Typography>
-            </>
-          )}
+          {/* Decorative Background Elements */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: -100,
+              right: -100,
+              width: 300,
+              height: 300,
+              borderRadius: "50%",
+              background: `${current.color}08`,
+              filter: "blur(50px)",
+              pointerEvents: "none",
+            }}
+          />
+          <Box
+            sx={{
+              position: "absolute",
+              bottom: -150,
+              left: -150,
+              width: 400,
+              height: 400,
+              borderRadius: "50%",
+              background: `${current.color}05`,
+              filter: "blur(60px)",
+              pointerEvents: "none",
+            }}
+          />
+
+          {/* Content */}
+          <Box
+            sx={{
+              p: { xs: 0 },
+              position: "relative",
+              zIndex: 1,
+              animation: "fadeInContent 0.6s ease-out 0.2s both",
+              "@keyframes fadeInContent": {
+                from: {
+                  opacity: 0,
+                },
+                to: {
+                  opacity: 1,
+                },
+              },
+            }}
+          >
+            {hasChildren ? (
+              current.children[selectedChild].component
+            ) : current.component ? (
+              current.component
+            ) : (
+              <Box sx={{ textAlign: "center", py: { xs: 0, md: 0 } }}>
+                <Box
+                  sx={{
+                    width: { xs: 70, md: 90 },
+                    height: { xs: 70, md: 90 },
+                    borderRadius: "20px",
+                    background: current.bgColor,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    mx: "auto",
+                    mb: 1,
+                    fontSize: { xs: "2.5rem", md: "3rem" },
+                    color: current.color,
+                    transition: "transform 0.3s ease",
+                    "&:hover": {
+                      transform: "scale(1.1) rotate(5deg)",
+                    },
+                  }}
+                >
+                  <Box sx={{ "& svg": { fontSize: "inherit" } }}>
+                    {current.icon}
+                  </Box>
+                </Box>
+
+                <Typography
+                  variant="h5"
+                  sx={{
+                    color: current.color,
+                    fontWeight: 700,
+                    mb: 1,
+                    fontSize: { xs: "1.2rem", md: "1.5rem" },
+                  }}
+                >
+                  {current.fullLabel}
+                </Typography>
+
+                <Typography
+                  sx={{
+                    fontSize: { xs: "0.95rem", md: "1.05rem" },
+                    color: "#999",
+                    mb: 2,
+                  }}
+                >
+                  Coming Soon...
+                </Typography>
+
+                <Chip
+                  label="Stay tuned for updates"
+                  variant="outlined"
+                  sx={{
+                    borderColor: current.color,
+                    color: current.color,
+                    fontSize: "0.8rem",
+                    height: "32px",
+                  }}
+                />
+              </Box>
+            )}
+          </Box>
         </Card>
-      </Box>
-    </div>
+      </Container>
+    </Box>
   );
 };
 

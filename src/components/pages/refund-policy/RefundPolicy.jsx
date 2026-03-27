@@ -76,7 +76,9 @@ function PolicyCard({ item, index }) {
       >
         <div
           className="absolute -top-10 -right-10 w-36 h-36 rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-500 pointer-events-none"
-          style={{ background: `radial-gradient(circle, ${item.accent} 0%, transparent 70%)` }}
+          style={{
+            background: `radial-gradient(circle, ${item.accent} 0%, transparent 70%)`,
+          }}
         />
         <div
           className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
@@ -95,7 +97,9 @@ function PolicyCard({ item, index }) {
         </p>
         <div
           className="absolute bottom-0 left-0 h-[3px] w-0 group-hover:w-full transition-all duration-700 rounded-b-xl"
-          style={{ background: `linear-gradient(to right, ${item.accent}, ${item.accent}50)` }}
+          style={{
+            background: `linear-gradient(to right, ${item.accent}, ${item.accent}50)`,
+          }}
         />
       </div>
     </motion.div>
@@ -105,28 +109,41 @@ function PolicyCard({ item, index }) {
 function LeafDivider({ light = false }) {
   return (
     <div className="flex items-center justify-center gap-3 my-2">
-      <div className={`h-px flex-1 bg-gradient-to-r from-transparent ${light ? "to-[#a8d84880]" : "to-[#7aad1e50]"}`} />
+      <div
+        className={`h-px flex-1 bg-gradient-to-r from-transparent ${light ? "to-[#a8d84880]" : "to-[#7aad1e50]"}`}
+      />
       <SpaIcon sx={{ fontSize: 18, color: light ? "#a8d848" : "#7aad1e" }} />
-      <div className={`h-px flex-1 bg-gradient-to-l from-transparent ${light ? "to-[#a8d84880]" : "to-[#7aad1e50]"}`} />
+      <div
+        className={`h-px flex-1 bg-gradient-to-l from-transparent ${light ? "to-[#a8d84880]" : "to-[#7aad1e50]"}`}
+      />
     </div>
   );
 }
 
 export default function SwagramaRefundPolicy() {
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
   const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const timelineRef = useRef(null);
-  const timelineInView = useInView(timelineRef, { once: true, margin: "-60px" });
+  const timelineInView = useInView(timelineRef, {
+    once: true,
+    margin: "-60px",
+  });
   const agreementRef = useRef(null);
-  const agreementInView = useInView(agreementRef, { once: true, margin: "-60px" });
-
-
+  const agreementInView = useInView(agreementRef, {
+    once: true,
+    margin: "-60px",
+  });
 
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ backgroundColor: "#f4f8ee" }}>
-
+    <div
+      className="min-h-screen overflow-x-hidden"
+      style={{ backgroundColor: "#f4f8ee" }}
+    >
       <div
         className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -138,22 +155,32 @@ export default function SwagramaRefundPolicy() {
         }}
       />
 
-
-
-      <section ref={heroRef} className="relative z-10 pt-16  pb-5 sm:pb-24 px-6 sm:px-10 lg:px-16 text-center overflow-hidden">
+      <section
+        ref={heroRef}
+        className="relative z-10 pt-16  pb-5 sm:pb-24 px-6 sm:px-10 lg:px-16 text-center overflow-hidden"
+      >
         <motion.div style={{ y: heroY, opacity: heroOpacity }}>
           <motion.div
             initial={{ opacity: 0, scale: 0.85 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
             className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-xs tracking-[0.18em] uppercase font-['DM_Sans'] font-medium mb-8 border"
-            style={{ color: "#4a7c3f", borderColor: "#7aad1e50", backgroundColor: "#eef8e0" }}
+            style={{
+              color: "#4a7c3f",
+              borderColor: "#7aad1e50",
+              backgroundColor: "#eef8e0",
+            }}
           >
             <EventAvailableIcon sx={{ fontSize: 14 }} />
             Community Standards
           </motion.div>
 
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" custom={0}>
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="visible"
+            custom={0}
+          >
             <h1
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light leading-none tracking-tight font-['Playfair_Display'] mb-1"
               style={{ color: "#3a2e1e" }}
@@ -163,7 +190,8 @@ export default function SwagramaRefundPolicy() {
             <h1
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold italic leading-none tracking-tight font-['Playfair_Display'] pb-6 mb-3"
               style={{
-                background: "linear-gradient(130deg, #8abf22 0%, #4a7c3f 55%, #7a5c3a 100%)",
+                background:
+                  "linear-gradient(130deg, #8abf22 0%, #4a7c3f 55%, #7a5c3a 100%)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
               }}
@@ -182,8 +210,8 @@ export default function SwagramaRefundPolicy() {
             className="max-w-xl mx-auto text-base sm:text-lg leading-relaxed font-['DM_Sans'] font-light mt-6"
             style={{ color: "#7a6a58" }}
           >
-            At Swagrama, all appointments are confirmed only after successful payment.
-            Payment is mandatory to secure your booking.
+            At Swagrama, all appointments are confirmed only after successful
+            payment. Payment is mandatory to secure your booking.
           </motion.p>
 
           <motion.div
@@ -194,14 +222,33 @@ export default function SwagramaRefundPolicy() {
             className="flex flex-wrap items-center justify-center gap-3 mt-8"
           >
             {[
-              { label: "Secure Booking", c: "#4a7c3f", bc: "#7aad1e50", bg: "#eef8e0" },
-              { label: "Clear Terms", c: "#7a5c3a", bc: "#7a5c3a40", bg: "#f5f0e8" },
-              { label: "Fair Policy", c: "#4a7c3f", bc: "#7aad1e50", bg: "#eef8e0" },
+              {
+                label: "Secure Booking",
+                c: "#4a7c3f",
+                bc: "#7aad1e50",
+                bg: "#eef8e0",
+              },
+              {
+                label: "Clear Terms",
+                c: "#7a5c3a",
+                bc: "#7a5c3a40",
+                bg: "#f5f0e8",
+              },
+              {
+                label: "Fair Policy",
+                c: "#4a7c3f",
+                bc: "#7aad1e50",
+                bg: "#eef8e0",
+              },
             ].map((tag, i) => (
               <span
                 key={i}
                 className="text-xs font-['DM_Sans'] font-medium px-4 py-1.5 rounded-full border"
-                style={{ color: tag.c, borderColor: tag.bc, backgroundColor: tag.bg }}
+                style={{
+                  color: tag.c,
+                  borderColor: tag.bc,
+                  backgroundColor: tag.bg,
+                }}
               >
                 {tag.label}
               </span>
@@ -250,14 +297,19 @@ export default function SwagramaRefundPolicy() {
           <div
             className="absolute top-0 right-0 w-48 h-48 rounded-full pointer-events-none"
             style={{
-              background: "radial-gradient(circle, #7aad1e18 0%, transparent 70%)",
+              background:
+                "radial-gradient(circle, #7aad1e18 0%, transparent 70%)",
               transform: "translate(30%, -30%)",
             }}
           />
           <div className="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-7 relative z-10">
             <div
               className="flex-shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center border-2"
-              style={{ backgroundColor: "#eef8e0", borderColor: "#7aad1e50", color: "#4a7c3f" }}
+              style={{
+                backgroundColor: "#eef8e0",
+                borderColor: "#7aad1e50",
+                color: "#4a7c3f",
+              }}
             >
               <AccessTimeIcon sx={{ fontSize: 28 }} />
             </div>
@@ -268,33 +320,14 @@ export default function SwagramaRefundPolicy() {
               >
                 5–7 Business Days
               </h3>
-              <p className="text-sm sm:text-[15px] leading-relaxed font-['DM_Sans']" style={{ color: "#7a6a58" }}>
-                Approved refunds are processed within this window directly to your original payment method.
+              <p
+                className="text-sm sm:text-[15px] leading-relaxed font-['DM_Sans']"
+                style={{ color: "#7a6a58" }}
+              >
+                Approved refunds are processed within this window directly to
+                your original payment method.
               </p>
             </div>
-          </div>
-
-          <div className="mt-7 pt-6 border-t border-[#7aad1e25] grid grid-cols-3 gap-4">
-            {[
-              { label: "Request", step: "01", color: "#7aad1e" },
-              { label: "Review", step: "02", color: "#4a7c3f" },
-              { label: "Processed", step: "03", color: "#7a5c3a" },
-            ].map((s, i) => (
-              <div key={i} className="text-center">
-                <div
-                  className="text-2xl font-bold font-['Playfair_Display'] mb-1"
-                  style={{ color: s.color }}
-                >
-                  {s.step}
-                </div>
-                <div
-                  className="text-xs font-['DM_Sans'] font-medium uppercase tracking-wider"
-                  style={{ color: "#7a6a58" }}
-                >
-                  {s.label}
-                </div>
-              </div>
-            ))}
           </div>
         </motion.div>
       </section>
@@ -303,19 +336,22 @@ export default function SwagramaRefundPolicy() {
         <motion.div
           ref={agreementRef}
           initial={{ opacity: 0, y: 40 }}
-          animate={agreementInView ? { opacity: 1, y: 0 } : {}}
+          animate={agreementInView ? { opacity: 1, opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-          className="relative rounded-3xl overflow-hidden border-2 text-center px-7 sm:px-12 py-12 sm:py-16"
+          className="relative rounded-3xl overflow-hidden border text-center px-7 sm:px-12 py-12 sm:py-16 backdrop-blur-xl bg-white/40 shadow-xl"
           style={{
-            borderColor: "#4a7c3f60",
-            background: "linear-gradient(160deg, #1e3d14 0%, #193310 40%, #3d2a14 100%)",
+            borderColor: "#a7c95780",
+            background:
+              "linear-gradient(160deg, rgba(244,249,239,0.65) 0%, rgba(237,247,229,0.55) 45%, rgba(243,234,223,0.55) 100%)",
+            boxShadow:
+              "0 10px 30px rgba(132,169,140,0.18), inset 0 1px 0 rgba(255,255,255,0.5)",
           }}
         >
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
               backgroundImage:
-                "radial-gradient(ellipse 60% 50% at 25% 40%, #7aad1e20 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 80% 70%, #d4b89618 0%, transparent 60%)",
+                "radial-gradient(ellipse 60% 50% at 25% 40%, rgba(167,201,87,0.25) 0%, transparent 60%), radial-gradient(ellipse 40% 40% at 80% 70%, rgba(212,184,150,0.25) 0%, transparent 60%)",
             }}
           />
 
@@ -324,15 +360,18 @@ export default function SwagramaRefundPolicy() {
               initial={{ scale: 0.7, opacity: 0 }}
               animate={agreementInView ? { scale: 1, opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5 border-2"
-              style={{ backgroundColor: "#7aad1e22", borderColor: "#7aad1e60" }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-5 border backdrop-blur-md"
+              style={{
+                backgroundColor: "rgba(167,201,87,0.25)",
+                borderColor: "#84a98c",
+              }}
             >
-              <VerifiedUserIcon sx={{ fontSize: 34, color: "#a8d848" }} />
+              <VerifiedUserIcon sx={{ fontSize: 34, color: "#6a994e" }} />
             </motion.div>
 
             <h2
               className="text-2xl sm:text-3xl md:text-4xl font-light font-['Playfair_Display'] mb-4 leading-snug"
-              style={{ color: "#e0f0c8" }}
+              style={{ color: "#4f6f52" }}
             >
               Your Agreement
             </h2>
@@ -341,18 +380,19 @@ export default function SwagramaRefundPolicy() {
 
             <p
               className="max-w-lg mx-auto text-sm sm:text-base leading-relaxed font-['DM_Sans'] font-light mt-5"
-              style={{ color: "#8aaa78" }}
+              style={{ color: "#5f7f63" }}
             >
-              By making a payment and confirming an appointment, you acknowledge and agree to the
-              terms outlined in this refund policy.
+              By making a payment for any service, including event booking,
+              therapy booking, stay booking, or product purchase, you
+              acknowledge and agree to the terms outlined in this refund policy.
             </p>
 
             <div
-              className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-['DM_Sans'] font-medium text-sm border"
+              className="mt-8 inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-['DM_Sans'] font-medium text-sm border backdrop-blur-md"
               style={{
-                backgroundColor: "#7aad1e22",
-                borderColor: "#7aad1e70",
-                color: "#b8e060",
+                backgroundColor: "rgba(167,201,87,0.25)",
+                borderColor: "#84a98c",
+                color: "#5a7d4d",
               }}
             >
               <SpaIcon sx={{ fontSize: 16 }} />
@@ -361,8 +401,6 @@ export default function SwagramaRefundPolicy() {
           </div>
         </motion.div>
       </section>
-
-
     </div>
   );
 }

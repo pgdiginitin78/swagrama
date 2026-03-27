@@ -26,6 +26,8 @@ import { useLoader } from "../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import { getUserDetails } from "../../../services/login/LoginServices";
 import InputArea from "../../common/formFields/InputArea";
+import CancelButtonModal from "../../common/button/CancelButtonModal";
+import CommonButton from "../../common/button/CommonButton";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -332,7 +334,7 @@ export default function AddPatientModal({ open, handleClose }) {
         .then((data) => setIpAddress(data.ip))
         .catch((err) => console.error("IP fetch error:", err));
     }
-  }, [userData,setValue]);
+  }, [userData, setValue]);
 
   useEffect(() => {
     if (userData) {
@@ -362,7 +364,7 @@ export default function AddPatientModal({ open, handleClose }) {
             boxShadow: "0 20px 60px rgba(22, 163, 74, 0.18)",
             display: "flex",
             flexDirection: "column",
-            maxHeight: { xs: "95vh", sm: "90vh" },
+            maxHeight: { xs: "90vh", sm: "90vh" },
             m: { xs: 1, sm: 2 },
             width: { xs: "calc(100% - 16px)", sm: "calc(100% - 32px)" },
           },
@@ -418,22 +420,7 @@ export default function AddPatientModal({ open, handleClose }) {
                 </Typography>
               </Box>
             </Box>
-            <IconButton
-              onClick={handleCancel}
-              size="small"
-              sx={{
-                color: "white",
-                bgcolor: "rgba(255,255,255,0.18)",
-                border: "1px solid rgba(255,255,255,0.25)",
-                borderRadius: 1.5,
-                width: 32,
-                height: 32,
-                flexShrink: 0,
-                "&:hover": { bgcolor: "rgba(255,255,255,0.3)" },
-              }}
-            >
-              <CloseIcon fontSize="small" />
-            </IconButton>
+            <CancelButtonModal onClick={handleCancel} />
           </Box>
         </DialogTitle>
 
@@ -595,52 +582,21 @@ export default function AddPatientModal({ open, handleClose }) {
             borderTop: "1px solid #bbf7d0",
           }}
         >
-          <Button
-            variant="outlined"
+          <CommonButton
+            label="Reset"
             onClick={() => {
               reset();
               setValue("mobileNO", userData?.mobileNo);
             }}
-            sx={{
-              borderColor: "#ef4444",
-              color: "#ef4444",
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 600,
-              px: 3,
-              "&:hover": {
-                borderColor: "#dc2626",
-                bgcolor: "#fef2f2",
-              },
-            }}
-          >
-            Reset
-          </Button>
-          <Button
+            className={"border border-red-600 text-red-600"}
+          />
+
+          <CommonButton
+            label="Register Patient"
             type="submit"
-            form="patient-form"
-            variant="contained"
+            className={"bg-green-600 text-white"}
             disabled={isSubmitting}
-            sx={{
-              background: "linear-gradient(135deg, #16a34a, #22c55e)",
-              color: "#fff",
-              borderRadius: 2,
-              textTransform: "none",
-              fontWeight: 700,
-              px: 3,
-              boxShadow: "0 4px 14px rgba(22,163,74,0.3)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #15803d, #16a34a)",
-                boxShadow: "0 6px 20px rgba(22,163,74,0.4)",
-              },
-              "&:disabled": {
-                background: "#d1fae5",
-                color: "#6ee7b7",
-              },
-            }}
-          >
-            Register Patient
-          </Button>
+          />
         </Box>
       </Dialog>
       <ConfirmationModal

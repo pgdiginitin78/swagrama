@@ -5,6 +5,7 @@ import { ToastContainer } from "react-toastify";
 import Footer from "./components/footer/Footer";
 import Navbar from "./components/navbar/Navbar";
 import { useAuth } from "./context/AuthContext";
+import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
 import SwagramaRefundPolicy from "./components/pages/refund-policy/RefundPolicy";
 
@@ -47,8 +48,8 @@ function PageSkeleton() {
 export default function App() {
   const location = useLocation();
   const { user: userData } = useAuth();
-  // Token refresh is handled automatically by the AxiosInstance
-  // response interceptor on 401 — no manual interval needed here.
+  useTokenRefresh();
+
 
   return (
     <>

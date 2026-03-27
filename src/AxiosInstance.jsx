@@ -1,6 +1,15 @@
 import axios from "axios";
+import { toast } from "react-toastify";
 import { API_BASE_URL } from "./http-common";
 import { callAuthLogout } from "./context/AuthContext";
+
+const sessionExpiredLogout = () => {
+  localStorage.clear();
+  callAuthLogout();
+  toast.error("Session expired. Please login again.", {
+    toastId: "session-expired", // prevent duplicate toasts
+  });
+};
 
 const AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -35,22 +44,15 @@ AxiosInstance.interceptors.request.use(
 
 AxiosInstance.interceptors.response.use(
   (response) => response,
-
   async (error) => {
     const originalRequest = error.config;
-
-    // If the failing request is itself refresh-token, force logout immediately
-    // to prevent an infinite refresh → 401 → refresh loop.
     if (originalRequest?.url?.includes("refresh-token")) {
       processQueue(error, null);
-      callAuthLogout();
-      window.location.href = "/";
+      sessionExpiredLogout();
       return Promise.reject(error);
     }
-
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        // Queue this request until the ongoing refresh resolves
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -61,7 +63,6 @@ AxiosInstance.interceptors.response.use(
           })
           .catch((err) => Promise.reject(err));
       }
-
       originalRequest._retry = true;
       isRefreshing = true;
 
@@ -70,14 +71,20 @@ AxiosInstance.interceptors.response.use(
         if (!refreshToken) {
           throw new Error("No refresh token available");
         }
-
         const res = await axios.post(`${API_BASE_URL}refresh-token`, {
           refreshToken,
         });
-
-        const { accessToken, refreshToken: newRefreshToken } = res.data;
+        const {
+          accessToken,
+          refreshToken: newRefreshToken,
+          expiresIn,
+        } = res.data;
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", newRefreshToken);
+        if (expiresIn) {
+          localStorage.setItem("expiresIn", String(expiresIn));
+          localStorage.setItem("tokenSetTime", String(Date.now()));
+        }
         AxiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);
         originalRequest.headers = originalRequest.headers || {};
@@ -85,10 +92,7 @@ AxiosInstance.interceptors.response.use(
         return AxiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        // Clear storage and update React auth state, then redirect
-        localStorage.clear();
-        callAuthLogout();
-        window.location.href = "/";
+        sessionExpiredLogout();
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

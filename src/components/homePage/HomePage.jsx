@@ -346,11 +346,10 @@ export default function AyurvedaLanding({ userData }) {
             transition={{ delay: 0.3, duration: 0.8 }}
           >
             <motion.div
-              className="inline-flex items-center gap-2 px-3 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-amber-900/20 backdrop-blur-md border border-amber-700/30 rounded-full text-white font-medium text-[10px] sm:text-xs md:text-sm lg:text-base shadow-lg"
+              className="inline-flex items-center gap-2 px-3 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-amber-900/20 backdrop-blur-md border border-amber-700/30 rounded-lg text-white font-medium text-[10px] sm:text-xs md:text-sm lg:text-base shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Spa className="text-white w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
               Ancient Wisdom • Modern Healing
             </motion.div>
 

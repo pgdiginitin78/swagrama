@@ -13,6 +13,7 @@ import {
   getDoctorListByLocationDepartment,
 } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
 import OPDBookingModal from "../../opdBooking/OPDBookingModal";
+import AyurvedaForm from "../../opdBooking/AyurvedaFrom";
 
 const iconMap = {
   ayurveda: CompostIcon,
@@ -55,21 +56,17 @@ const OPDClinic = () => {
   const ActiveIcon = activeDept ? getDeptIcon(activeDept) : null;
   const activeGradient = activeDept ? getDeptGradient(activeDept) : "";
 
+
   useEffect(() => {
-    if (!user) {
-      setDepartmentList([]);
-      setDoctorList([]);
-      return;
-    }
     setLoadingDepts(true);
     getDepartmentList(5)
       .then((res) => setDepartmentList(res.data.data ?? []))
       .catch(() => setDepartmentList([]))
       .finally(() => setLoadingDepts(false));
-  }, [user]);
+  }, []);
 
   useEffect(() => {
-    if (!user || !activeDept) {
+    if (!activeDept) {
       setDoctorList([]);
       return;
     }
@@ -79,25 +76,10 @@ const OPDClinic = () => {
       .then((res) => setDoctorList(res.data.data ?? []))
       .catch(() => setDoctorList([]))
       .finally(() => setLoadingDoctors(false));
-  }, [user, activeTab, departmentList, activeDept]);
+  }, [activeTab, departmentList, activeDept]);
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center \ p-6">
-        <div className="text-center">
-          <div className="w-20 h-20 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
-            <Person sx={{ fontSize: 40, color: "#10b981" }} />
-          </div>
-          <h2 className="text-xl font-bold text-green-800 mb-2">
-            Login Required
-          </h2>
-          <p className="text-sm text-gray-500">
-            Please log in to view OPD Clinic services and book an appointment.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  console.log("selectdOPDTherapy",selectdOPDTherapy);
+  
 
   return (
     <div className="min-h-screen  p-3">
@@ -131,7 +113,6 @@ const OPDClinic = () => {
           <h1 className="text-xl md:text-2xl py-2 font-black bg-gradient-to-r from-green-700 via-emerald-600 to-green-600 bg-clip-text text-transparent drop-shadow-sm">
             स्वचिचित्सालय OPD Clinic
           </h1>
-        
         </div>
 
         {loadingDepts ? (
@@ -177,207 +158,17 @@ const OPDClinic = () => {
           </div>
         )}
 
-        {activeDept && (
-          <div className="max-w-4xl mx-auto card-enter" key={activeTab}>
-            <div className="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-green-100/50 hover:shadow-[0_25px_50px_-12px_rgba(34,197,94,0.25)] transition-shadow duration-300">
-              <div
-                className={`relative bg-gradient-to-r ${activeGradient} overflow-hidden`}
-              >
-                <div className="absolute inset-0 opacity-20">
-                  <div
-                    className="absolute inset-0"
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle, white 1px, transparent 1px)",
-                      backgroundSize: "20px 20px",
-                    }}
-                  />
-                </div>
-                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 spin-slow" />
-                <div className="relative px-4 py-3">
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-white/95 rounded-xl flex items-center justify-center shadow-xl">
-                        <span className="text-2xl text-green-600">
-                          {ActiveIcon && <ActiveIcon />}
-                        </span>
-                      </div>
-                      <div>
-                        <h2 className="text-lg font-black text-white drop-shadow-md capitalize">
-                          {activeDept} OPD Clinic
-                        </h2>
-                        {doctorList[0]?.clinicName && (
-                          <p className="text-xs font-bold text-white/90 mt-0.5">
-                            {doctorList[0].clinicName}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-white/95 px-3 py-2 rounded-lg shadow-lg hover:scale-105 transition-transform duration-200">
-                      <span className="text-base text-green-600">
-                        <Alarm />
-                      </span>
-                      <div>
-                        <p className="text-xs text-green-600 font-bold leading-none">
-                          Slot Duration
-                        </p>
-                        <p className="text-xs font-black text-green-900 mt-0.5">
-                          {getSlotDuration(activeDept)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+        {/* {activeDept === "Ayurveda" && ( */}
+          <AyurvedaForm
+            doctorList={doctorList}
+            loadingDoctors={loadingDoctors}
+            selectedDoctorId={selectedDoctorId}
+            setSelectedDoctorId={setSelectedDoctorId}
+            activeGradient={activeGradient}
+            activeDept={activeDept}
+          />
+        {/* // )} */}
 
-              <div className="px-4 py-4">
-                <div className="mb-4">
-                  <div className="flex items-center gap-1.5 mb-3">
-                    <div className="w-0.5 h-5 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full" />
-                    <h3 className="text-sm font-black text-green-900 capitalize">
-                      {activeDept} Doctor
-                    </h3>
-                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 pulse-animation" />
-                  </div>
-
-                  {loadingDoctors ? (
-                    <div className="flex justify-center py-8">
-                      <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
-                    </div>
-                  ) : doctorList.length === 0 ? (
-                    <div className="flex flex-col items-center py-8 text-center">
-                      <div className="w-14 h-14 bg-green-50 rounded-full flex items-center justify-center mb-3">
-                        <Person sx={{ fontSize: 32, color: "#6ee7b7" }} />
-                      </div>
-                      <p className="text-sm font-semibold text-gray-500">
-                        No Doctors available for this department.
-                      </p>
-                    </div>
-                  ) : (
-                    <div
-                      className={`grid ${doctorList.length > 1 ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"} gap-3`}
-                    >
-                      {doctorList.map((doctor, idx) => (
-                        <div
-                          key={doctor.userId ?? idx}
-                          onClick={() => setSelectedDoctorId(doctor.userId)}
-                          style={{ animationDelay: `${idx * 100}ms` }}
-                          className={`cursor-pointer p-3 rounded-xl border-2 transition-all duration-200 ${
-                            selectedDoctorId === doctor.userId
-                              ? `bg-gradient-to-br from-green-100 to-emerald-200 border-green-500 shadow-md scale-[1.02] ring-2 ring-green-400 ring-offset-1`
-                              : `bg-gradient-to-br from-green-50 to-emerald-50/50 border-green-200/50 hover:border-green-400 hover:scale-[1.02] hover:-translate-y-0.5`
-                          }`}
-                        >
-                          <div className="flex items-start gap-2">
-                            <div
-                              className={`w-10 h-10 bg-gradient-to-br ${activeGradient} rounded-lg flex items-center justify-center flex-shrink-0 shadow-md`}
-                            >
-                              <span className="text-lg text-white">
-                                <Person />
-                              </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-black text-green-900">
-                                {[
-                                  doctor.firstName?.trim(),
-                                  doctor.lName?.trim(),
-                                ]
-                                  .filter(Boolean)
-                                  .join(" ")}
-                                {doctor.degree?.trim()
-                                  ? ` (${doctor.degree.trim()})`
-                                  : ""}
-                              </p>
-                              {doctor.cityName && (
-                                <p className="text-xs text-green-600 font-semibold mt-0.5">
-                                  <LocationPinIcon /> {doctor.cityName}
-                                </p>
-                              )}
-                              {doctor.address && (
-                                <p className="text-xs text-gray-500 mt-0.5 truncate">
-                                  {doctor.address}
-                                </p>
-                              )}
-                              {doctor.weekDays?.[0] && (
-                                <div className="flex flex-wrap gap-1.5 mt-2">
-                                  {doctor.weekDays[0]
-                                    .split(",")
-                                    .map((day, dayIdx) =>
-                                      day.trim() ? (
-                                        <span
-                                          key={dayIdx}
-                                          className="inline-block bg-white border-2 border-green-300 text-green-700 text-xs font-bold px-2 py-0.5 rounded-md shadow-sm"
-                                        >
-                                          {day.trim()}
-                                        </span>
-                                      ) : null,
-                                    )}
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-gradient-to-br from-amber-50 to-yellow-50/50 p-3 rounded-xl border-2 border-amber-200/50">
-                  <div className="flex items-start gap-2">
-                    <span className="text-base flex-shrink-0 text-amber-700">
-                      <Info />
-                    </span>
-                    <div>
-                      <h4 className="text-xs font-black text-amber-900 mb-0.5">
-                        Important Information
-                      </h4>
-                      <p className="text-xs text-amber-800 leading-relaxed">
-                        After consultation, dispensing medicine, counter
-                        products &amp; service will cost extra charges according
-                        to patient's disease diagnosis.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => {
-                    const selectedDoctor = doctorList.find(
-                      (d) => d.userId === selectedDoctorId,
-                    );
-                    setSelectedOPDTherapy({
-                      clinicId: selectedDoctor?.clinicId ?? 5,
-                      weekDays: selectedDoctor?.weekDays,
-                      clinicName:
-                        selectedDoctor?.clinicName ?? "Swagram Community",
-                      departmentName: activeDept,
-                      slotDuration: getSlotDuration(activeDept),
-                      gradient: activeGradient,
-                      doctorId: selectedDoctor?.userId,
-                    });
-                    setOpenBookModal(true);
-                  }}
-                  disabled={!selectedDoctorId}
-                  className={`group w-full text-white font-black py-3 px-4 rounded-xl shadow-xl overflow-hidden relative mt-4 text-sm transition-all duration-200 ${
-                    selectedDoctorId
-                      ? `bg-gradient-to-r ${activeGradient} hover:scale-[1.02] hover:shadow-[0_20px_40px_-10px_rgba(34,197,94,0.4)] active:scale-[0.98]`
-                      : "bg-gray-400 cursor-not-allowed opacity-70"
-                  }`}
-                >
-                  {selectedDoctorId && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:shimmer" />
-                  )}
-                  <span className="relative flex items-center justify-center gap-1.5">
-                    {selectedDoctorId
-                      ? "Book Appointment Now"
-                      : "Please Select a Doctor"}
-                    {selectedDoctorId && <TrendingFlatIcon />}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {openBookModal && (

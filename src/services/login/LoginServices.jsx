@@ -24,3 +24,11 @@ export const refreshToken = (postObj) => {
 export const updatePatient = (postObj) => {
   return AxiosInstance.post(`/updatePatient`, postObj);
 };
+
+export const forgotPassword = (postObj) => {
+  return AxiosInstance.post(`/forgot-password`, postObj);
+};
+
+export const resetPassword = (postObj) => {
+  return AxiosInstance.post(`/reset-password`, postObj);
+};

@@ -2,7 +2,6 @@ import Close from "@mui/icons-material/Close";
 import Email from "@mui/icons-material/Email";
 import Lock from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
-import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import {
   Box,
   Button,
@@ -10,6 +9,7 @@ import {
   InputAdornment,
   Modal,
   TextField,
+  Typography,
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
@@ -19,8 +19,30 @@ import ConfirmationModal from "../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import SignUpModal from "./SignUpModal";
 import { useLoader } from "../common/commonLoader/LoaderContext";
-import { userLogin } from "../../services/login/LoginServices";
+import { forgotPassword, userLogin } from "../../services/login/LoginServices";
 import { useAuth } from "../../context/AuthContext";
+import CancelButtonModal from "../common/button/CancelButtonModal";
+import CommonButton from "../common/button/CommonButton";
+import ResetPassword from "./ResetPassword";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+const ModalStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  outline: "none",
+  width: "100%",
+  maxWidth: "100vw",
+  height: { xs: "100%", sm: "auto" },
+  maxHeight: { xs: "100vh", sm: "95vh" },
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  p: 1,
+  "&:focus": {
+    outline: "none",
+  },
+};
 
 const modalVariants = {
   hidden: { opacity: 0, y: -30 },
@@ -42,6 +64,10 @@ export default function LoginModal({ open, handleClose }) {
   const [loginOpen, setLoginOpen] = useState(true);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [openForgotModal, setOpenForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotEmailError, setForgotEmailError] = useState("");
+  const [openResetModal, setOpenResetModal] = useState(false);
 
   const { setIsLoading } = useLoader();
 
@@ -93,6 +119,42 @@ export default function LoginModal({ open, handleClose }) {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!forgotEmail) {
+      setForgotEmailError("Please enter your email");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(forgotEmail)) {
+      setForgotEmailError("Please enter a valid email address");
+      return;
+    }
+    setForgotEmailError("");
+
+    try {
+      setIsLoading(true);
+      const response = await forgotPassword({
+        email: forgotEmail,
+        ClinicId: 5,
+      });
+      if (response.status === 200) {
+        successAlert(response.data?.message || "Password reset email sent!");
+        setOpenForgotModal(false);
+        setForgotEmail("");
+        setForgotEmailError("");
+        setOpenResetModal(true);
+      } else {
+        errorAlert(response.data?.message || "Something went wrong");
+      }
+    } catch (error) {
+      errorAlert(
+        error?.response?.data?.message || "Failed to send reset email",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       {loginOpen ? (
@@ -116,15 +178,8 @@ export default function LoginModal({ open, handleClose }) {
                 style={{ willChange: "transform, opacity" }}
                 className="w-full max-w-[440px] mx-4 sm:mx-6 md:mx-8 outline-none max-h-[95vh] sm:max-h-[90vh] flex"
               >
-                <div className="bg-white rounded-3xl shadow-2xl relative w-full flex flex-col max-h-full overflow-hidden">
-                  <div className="h-1.5 bg-gradient-to-r from-green-500 to-lime-500 flex-shrink-0 rounded-t-3xl" />
-
-                  <IconButton
-                    onClick={handleClose}
-                    className="!absolute top-3 sm:top-4 right-3 sm:right-4 !text-gray-600 z-10 hover:!bg-gray-100 hover:!text-gray-800"
-                  >
-                    <Close />
-                  </IconButton>
+                <div className="bg-white rounded-xl shadow-2xl relative w-full flex flex-col max-h-full overflow-hidden">
+                  <CancelButtonModal onClick={handleClose} />
 
                   <div className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar">
                     <style>{`
@@ -234,7 +289,7 @@ export default function LoginModal({ open, handleClose }) {
                         />
                       </div>
 
-                      <div className="mb-5 sm:mb-6">
+                      <div className="mb-2">
                         <Controller
                           name="password"
                           control={control}
@@ -291,8 +346,8 @@ export default function LoginModal({ open, handleClose }) {
                                           },
                                         }}
                                       >
-                                        {showPassword ? (
-                                          <VisibilityOff size="small" />
+                                        {showPassword === false ? (
+                                          <VisibilityOffIcon size="small" />
                                         ) : (
                                           <Visibility size="small" />
                                         )}
@@ -330,6 +385,14 @@ export default function LoginModal({ open, handleClose }) {
                             </Box>
                           )}
                         />
+                      </div>
+                      <div className="flex justify-end my-2">
+                        <button
+                          className="text-xs text-ayuBrown hover:underline"
+                          onClick={() => setOpenForgotModal(true)}
+                        >
+                          Forgot Password
+                        </button>
                       </div>
 
                       <Button
@@ -382,6 +445,93 @@ export default function LoginModal({ open, handleClose }) {
       ) : (
         <SignUpModal open={true} handleClose={() => setLoginOpen(true)} />
       )}
+
+      {openForgotModal && (
+        <Modal open={openForgotModal}>
+          <Box sx={ModalStyle}>
+            <Box
+              sx={{
+                position: "relative",
+                width: "100%",
+                maxWidth: "400px",
+                bgcolor: "#f8fbf6",
+                borderRadius: 3,
+                boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+                border: "1px solid #e6efe3",
+                p: 3,
+              }}
+            >
+              <CancelButtonModal
+                onClick={() => {
+                  setOpenForgotModal(false);
+                  setForgotEmailError("");
+                  setForgotEmail("");
+                }}
+              />
+              <Typography
+                variant="h6"
+                sx={{ mb: 2, fontWeight: 700, color: "#2f3e2e" }}
+              >
+                Forgot Password
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 3, color: "#6b7d6a" }}>
+                Enter your email address to reset your password.
+              </Typography>
+              <TextField
+                fullWidth
+                label="Email Address"
+                value={forgotEmail}
+                size="small"
+                error={!!forgotEmailError}
+                onChange={(e) => {
+                  setForgotEmail(e.target.value);
+                  if (forgotEmailError) setForgotEmailError("");
+                }}
+                variant="outlined"
+                sx={{
+                  mb: forgotEmailError ? 1 : 3,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: 2,
+                    bgcolor: "#ffffff",
+                  },
+                  "& .MuiFormHelperText-root": {
+                    marginLeft: 0,
+                    mb: forgotEmailError ? 1 : 0,
+                  },
+                }}
+              />
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "end",
+                  width: "100%",
+                  gap: 2,
+                }}
+              >
+                <CommonButton
+                  type="button"
+                  onClick={() => {
+                    setForgotEmailError("");
+                    setForgotEmail("");
+                  }}
+                  label="Reset"
+                  className={
+                    "border border-red-600 text-red-600 hover:bg-red-100 w-full"
+                  }
+                />
+
+                <CommonButton
+                  type="button"
+                  onClick={handleForgotPassword}
+                  label="Confirm"
+                  className={" bg-green-600 text-white  w-full"}
+                />
+              </Box>
+            </Box>
+          </Box>
+        </Modal>
+      )}
+
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationHandleClose={() => setOpenConfirmationModal(false)}
@@ -390,6 +540,12 @@ export default function LoginModal({ open, handleClose }) {
         confirmationMsg="Are you sure you want to log in?"
         confirmationButtonMsg="Confirm"
       />
+      {openResetModal && (
+        <ResetPassword
+          open={openResetModal}
+          handleClose={() => setOpenResetModal(false)}
+        />
+      )}
     </>
   );
 }

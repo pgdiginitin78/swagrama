@@ -32,6 +32,7 @@ import { signupJYA } from "../../services/login/LoginServices";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoader } from "../common/commonLoader/LoaderContext";
+import CancelButtonModal from "../common/button/CancelButtonModal";
 
 const modalVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -120,7 +121,7 @@ const calculateDOBFromAge = (age) => {
   return new Date(birthYear, 0, 1);
 };
 
-export default function SignUpModal({ open, handleClose}) {
+export default function SignUpModal({ open, handleClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [ipAddress, setIpAddress] = useState(null);
@@ -303,8 +304,6 @@ export default function SignUpModal({ open, handleClose}) {
                 exit="exit"
                 style={{
                   willChange: "transform, opacity",
-                  maxHeight: "90vh",
-                  overflowY: "auto",
                   borderRadius: 12,
                 }}
               >
@@ -314,35 +313,39 @@ export default function SignUpModal({ open, handleClose}) {
                     borderRadius: 3,
                     boxShadow: "0 24px 48px rgba(0,0,0,0.2)",
                     position: "relative",
-                    overflow: "hidden",
+                    maxHeight: "90vh",
+                    display: "flex",
+                    flexDirection: "column",
                   }}
                 >
+                  {/* Cancel button fixed outside the scroll area */}
+                  <CancelButtonModal onClick={handleClose} />
+
+                  <style>{`
+                      .custom-green-scrollbar {
+                        scrollbar-width: thin;
+                        scrollbar-color: #22c55e #f3f4f6;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar {
+                        width: 8px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-track {
+                        background: #f3f4f6;
+                        border-radius: 10px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-thumb {
+                        background: #22c55e;
+                        border-radius: 10px;
+                      }
+                      .custom-green-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #16a34a;
+                      }
+                    `}</style>
+
                   <Box
-                    sx={{
-                      height: 6,
-                      background:
-                        "linear-gradient(90deg, #22c55e 0%, #84cc16 100%)",
-                    }}
-                  />
-
-                  <IconButton
-                    onClick={handleClose}
-                    sx={{
-                      position: "absolute",
-                      top: 16,
-                      right: 16,
-                      color: "#718096",
-                      zIndex: 1,
-                      "&:hover": {
-                        backgroundColor: "rgba(0,0,0,0.04)",
-                        color: "#2d3748",
-                      },
-                    }}
+                    className="custom-green-scrollbar"
+                    sx={{ p: 4, pt: 3, overflowY: "auto", flex: 1 }}
                   >
-                    <Close />
-                  </IconButton>
-
-                  <Box sx={{ p: 4, pt: 3 }}>
                     <div className="flex justify-center">
                       <img
                         src={SwagramaLogo}
@@ -620,7 +623,7 @@ export default function SignUpModal({ open, handleClose}) {
                                             setShowPassword(!showPassword)
                                           }
                                         >
-                                          {showPassword ? (
+                                          {showPassword === false ? (
                                             <VisibilityOffIcon
                                               sx={{ fontSize: 20 }}
                                             />
@@ -673,7 +676,7 @@ export default function SignUpModal({ open, handleClose}) {
                                             )
                                           }
                                         >
-                                          {showConfirmPassword ? (
+                                          {showConfirmPassword === false ? (
                                             <VisibilityOffIcon
                                               sx={{ fontSize: 20 }}
                                             />

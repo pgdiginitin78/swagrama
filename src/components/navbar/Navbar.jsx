@@ -23,48 +23,49 @@ const ProfileDropdown = ({
   onLogout,
   onClose,
   setOpenManageMembers,
-  dropdownRef,
 }) => (
-  <div
-    ref={dropdownRef}
-    className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999]"
-    style={{ animation: "fadeInDown 0.15s ease forwards" }}
-  >
-    <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
-      <p className="text-sm font-bold text-green-800 truncate">
-        {user?.firstName} {user?.lastName}
-      </p>
-      <p className="text-xs text-green-500 truncate">
-        {user?.email || (user?.userName ? `@${user.userName}` : "")}
-      </p>
-    </div>
+  <>
 
-    <button
-      onClick={onManage}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+    <div
+      className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999]"
+      style={{ animation: "fadeInDown 0.15s ease forwards" }}
     >
-      <EditIcon fontSize="small" style={{ color: "#10b981" }} />
-      Manage Profile
-    </button>
-    <button
-      onClick={() => {
-        setOpenManageMembers(true);
-        onClose();
-      }}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
-    >
-      <EditIcon fontSize="small" style={{ color: "#10b981" }} />
-      Manage Members
-    </button>
-    <div className="border-t border-gray-100" />
-    <button
-      onClick={onLogout}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
-    >
-      <LogoutIcon fontSize="small" />
-      Logout
-    </button>
-  </div>
+      <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+        <p className="text-sm font-bold text-green-800 truncate">
+          {user?.firstName} {user?.lastName}
+        </p>
+        <p className="text-xs text-green-500 truncate">
+          {user?.email || (user?.userName ? `@${user.userName}` : "")}
+        </p>
+      </div>
+
+      <button
+        onClick={onManage}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+      >
+        <EditIcon fontSize="small" style={{ color: "#10b981" }} />
+        Manage Profile
+      </button>
+      <button
+        onClick={() => {
+          setOpenManageMembers(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+      >
+        <EditIcon fontSize="small" style={{ color: "#10b981" }} />
+        Manage Members
+      </button>
+      <div className="border-t border-gray-100" />
+      <button
+        onClick={onLogout}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+      >
+        <LogoutIcon fontSize="small" />
+        Logout
+      </button>
+    </div>
+  </>
 );
 
 const AvatarIcon = ({ user, size = 32 }) => (
@@ -93,20 +94,25 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [openManageMembers, setOpenManageMembers] = useState(false);
-  const dropdownRef = useRef(null);
+  const profileRef = useRef(null);
+  const mobileProfileRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      if (
+        profileRef.current &&
+        !profileRef.current.contains(event.target) &&
+        mobileProfileRef.current &&
+        !mobileProfileRef.current.contains(event.target)
+      ) {
         setShowDropdown(false);
       }
     };
+
     if (showDropdown) {
       document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showDropdown]);
 
   const location = useLocation();
@@ -234,7 +240,7 @@ const Navbar = () => {
             </Link>
 
             <div className="hidden lg:flex items-center justify-center flex-1 mx-4 xl:mx-8">
-              <div className="flex items-center gap-2 xl:space-x-6 2xl:space-x-8">
+              <div className="flex items-center gap-2 lg:space-x-6 2xl:space-x-8">
                 {navLinks.map((item) => {
                   const { en, hi } = splitTitle(item.name);
                   const active = isActive(item.path);
@@ -261,7 +267,7 @@ const Navbar = () => {
             </div>
             <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
               {user ? (
-                <div className="relative">
+                <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setShowDropdown((v) => !v)}
                     className="focus:outline-none"
@@ -276,7 +282,6 @@ const Navbar = () => {
                       onLogout={handleLogout}
                       onClose={() => setShowDropdown(false)}
                       setOpenManageMembers={setOpenManageMembers}
-                      dropdownRef={dropdownRef}
                     />
                   )}
                 </div>
@@ -313,7 +318,7 @@ const Navbar = () => {
             </div>
             <div className="flex lg:hidden items-center gap-2 sm:gap-3">
               {user ? (
-                <div className="relative">
+                <div className="relative" ref={mobileProfileRef}>
                   <button
                     onClick={() => setShowDropdown((v) => !v)}
                     className="focus:outline-none"
@@ -328,7 +333,6 @@ const Navbar = () => {
                       onLogout={handleLogout}
                       onClose={() => setShowDropdown(false)}
                       setOpenManageMembers={setOpenManageMembers}
-                      dropdownRef={dropdownRef}
                     />
                   )}
                 </div>

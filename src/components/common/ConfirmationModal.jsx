@@ -23,6 +23,9 @@ export default function ConfirmationModal({
               sx: {
                 backgroundColor: "rgba(0, 0, 0, 0.5)",
                 backdropFilter: "blur(3px)",
+                "&:focus": {
+                  outline: "none",
+                },
               },
             },
           }}
@@ -90,7 +93,7 @@ export default function ConfirmationModal({
                           "linear-gradient(135deg,#22c55e 0%,#84cc16 100%)",
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "center", 
+                        justifyContent: "center",
                       }}
                     >
                       <svg

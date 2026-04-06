@@ -1,4 +1,3 @@
-import { yupResolver } from "@hookform/resolvers/yup";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -7,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, Clock, Stethoscope, User } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
   bookAppointment,

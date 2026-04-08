@@ -231,7 +231,6 @@ const ServicesTabs = () => {
           </Stack>
         )}
 
-        {/* Content Card */}
         <Card
           sx={{
             background: "rgba(255, 255, 255, 0.95)",

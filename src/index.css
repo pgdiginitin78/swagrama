@@ -2,18 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 10px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #cbd5e1;
-  }
+
+
+/* Wellness Stay - Premium Brown Theme Scrollbar */
+.custom-scrollbar-wellness-stay {
+  scrollbar-width: thin !important;
+  scrollbar-color: #56aa78 transparent !important;
 }
+
+.custom-scrollbar-wellness-stay::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.custom-scrollbar-wellness-stay::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.custom-scrollbar-wellness-stay::-webkit-scrollbar-thumb {
+  background: #4a7c2c !important;
+  border-radius: 10px !important;
+  border: 1px solid transparent !important;
+}
+

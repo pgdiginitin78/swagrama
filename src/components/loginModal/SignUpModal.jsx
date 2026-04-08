@@ -33,6 +33,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoader } from "../common/commonLoader/LoaderContext";
 import CancelButtonModal from "../common/button/CancelButtonModal";
+import DropdownField from "../common/formFields/DropdownField";
 
 const modalVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -47,6 +48,15 @@ const modalVariants = {
     transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
   },
 };
+
+const dropdownObjectSchema = yup
+  .object()
+  .shape({
+    id: yup.mixed().required(),
+    label: yup.string().required(),
+  })
+  .nullable()
+  .required("This field is required");
 
 const signupValidationSchema = yup.object().shape({
   FirstName: yup
@@ -69,6 +79,7 @@ const signupValidationSchema = yup.object().shape({
     .integer("Must be integer")
     .min(1, "Age must be at least 1")
     .max(120, "Age cannot exceed 120"),
+  bloodGroup: dropdownObjectSchema.typeError("Blood group is required"),
   mobileNo: yup
     .string()
     .required("Mobile required")
@@ -121,6 +132,17 @@ const calculateDOBFromAge = (age) => {
   return new Date(birthYear, 0, 1);
 };
 
+const bloodGroupOptions = [
+  { id: 1, value: "A+", label: "A+" },
+  { id: 2, value: "A-", label: "A-" },
+  { id: 3, value: "B+", label: "B+" },
+  { id: 4, value: "B-", label: "B-" },
+  { id: 5, value: "AB+", label: "AB+" },
+  { id: 6, value: "AB-", label: "AB-" },
+  { id: 7, value: "O+", label: "O+" },
+  { id: 8, value: "O-", label: "O-" },
+];
+
 export default function SignUpModal({ open, handleClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -162,6 +184,7 @@ export default function SignUpModal({ open, handleClose }) {
       macIp: ipAddress,
       agreeToTerms: false,
       relation: "self",
+      bloodGroup: null,
     },
   });
 
@@ -175,6 +198,7 @@ export default function SignUpModal({ open, handleClose }) {
       ...data,
       dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
       macIp: ipAddress,
+      bloodGroup: data.bloodGroup?.value,
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
@@ -275,9 +299,7 @@ export default function SignUpModal({ open, handleClose }) {
     <>
       <Modal
         open={open}
-        onClose={handleClose}
         closeAfterTransition={false}
-        disableScrollLock
         sx={{
           display: "flex",
           alignItems: "center",
@@ -344,7 +366,7 @@ export default function SignUpModal({ open, handleClose }) {
 
                   <Box
                     className="custom-green-scrollbar"
-                    sx={{ p: 4, pt: 3, overflowY: "auto", flex: 1 }}
+                    sx={{ p: 4, pt: 3, overflowY: "auto", flex: 1, overscrollBehavior: "contain" }}
                   >
                     <div className="flex justify-center">
                       <img
@@ -365,7 +387,7 @@ export default function SignUpModal({ open, handleClose }) {
                       onSubmit={handleSubmit(onSubmit)}
                       className="space-y-2 mt-2"
                     >
-                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
+                      <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-[#22c55e] to-[#84cc16] px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -375,7 +397,7 @@ export default function SignUpModal({ open, handleClose }) {
                           </h3>
                         </div>
                         <div className="p-4 sm:p-6">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
                             <InputField
                               control={control}
                               name="FirstName"
@@ -403,7 +425,21 @@ export default function SignUpModal({ open, handleClose }) {
                               label="Age *"
                               error={errors.age}
                             />
-                            <div className="sm:col-span-2">
+                            <div>
+                              <DropdownField
+                                control={control}
+                                name="bloodGroup"
+                                placeholder="Select Blood Group *"
+                                dataArray={bloodGroupOptions}
+                                error={errors.bloodGroup}
+                              />
+                              {errors.bloodGroup && (
+                                <p className="text-red-500 text-[11px] mt-0.5">
+                                  {errors.bloodGroup.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="md:col-span-2 xl:col-span-1">
                               <RadioField
                                 control={control}
                                 name="gender"
@@ -427,7 +463,7 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
+                      <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-amber-200 to-amber-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -491,7 +527,7 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
+                      <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-teal-200 to-teal-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -551,7 +587,7 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
+                      <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-green-200 to-green-100 px-4 py-3">
                           <h3 className="text-lg sm:text-xl font-bold text-[#2f3e2e] flex items-center gap-2">
                             <span className="w-8 h-8 bg-white/30 rounded-full flex items-center justify-center text-sm">
@@ -697,7 +733,7 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                       </div>
 
-                      <div className="bg-white rounded-2xl shadow-md border border-[#e6efe3] overflow-hidden">
+                      <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="p-4 sm:p-6">
                           <h4 className="text-base sm:text-lg font-bold text-[#2f3e2e] mb-3">
                             Terms and Conditions

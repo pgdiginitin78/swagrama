@@ -25,6 +25,8 @@ import CancelButtonModal from "../common/button/CancelButtonModal";
 import CommonButton from "../common/button/CommonButton";
 import ResetPassword from "./ResetPassword";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import OTPVerificationModal from "./OTPVerificationModal";
+
 const ModalStyle = {
   position: "absolute",
   top: "50%",
@@ -68,6 +70,8 @@ export default function LoginModal({ open, handleClose }) {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotEmailError, setForgotEmailError] = useState("");
   const [openResetModal, setOpenResetModal] = useState(false);
+  const [openOTPModal, setOpenOTPModal] = useState(false);
+  const [otpEmailForVerification, setOtpEmailForVerification] = useState("");
 
   const { setIsLoading } = useLoader();
 
@@ -119,13 +123,14 @@ export default function LoginModal({ open, handleClose }) {
     }
   };
 
-  const handleForgotPassword = async () => {
-    if (!forgotEmail) {
+  const handleForgotPassword = async (emailFromResend) => {
+    const emailToUse = emailFromResend || forgotEmail;
+    if (!emailToUse) {
       setForgotEmailError("Please enter your email");
       return;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(forgotEmail)) {
+    if (!emailRegex.test(emailToUse)) {
       setForgotEmailError("Please enter a valid email address");
       return;
     }
@@ -134,15 +139,16 @@ export default function LoginModal({ open, handleClose }) {
     try {
       setIsLoading(true);
       const response = await forgotPassword({
-        email: forgotEmail,
+        email: emailToUse,
         ClinicId: 5,
       });
       if (response.status === 200) {
         successAlert(response.data?.message || "Password reset email sent!");
+        setOtpEmailForVerification(emailToUse);
         setOpenForgotModal(false);
         setForgotEmail("");
         setForgotEmailError("");
-        setOpenResetModal(true);
+        setOpenOTPModal(true);
       } else {
         errorAlert(response.data?.message || "Something went wrong");
       }
@@ -388,6 +394,7 @@ export default function LoginModal({ open, handleClose }) {
                       </div>
                       <div className="flex justify-end my-2">
                         <button
+                          type="button"
                           className="text-xs text-ayuBrown hover:underline"
                           onClick={() => setOpenForgotModal(true)}
                         >
@@ -546,6 +553,17 @@ export default function LoginModal({ open, handleClose }) {
           handleClose={() => setOpenResetModal(false)}
         />
       )}
+
+      <OTPVerificationModal
+        open={openOTPModal}
+        handleClose={() => setOpenOTPModal(false)}
+        onVerify={(otp) => {
+          setOpenOTPModal(false);
+          setOpenResetModal(true);
+        }}
+        handleResend={handleForgotPassword}
+        phoneNumber={otpEmailForVerification}
+      />
     </>
   );
 }

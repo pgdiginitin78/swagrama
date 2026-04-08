@@ -1,375 +1,273 @@
-import { motion } from "framer-motion";
 import {
-  Clock,
-  Home,
-  Leaf,
-  Sparkles,
-  Star,
-  Sun,
-  Trees,
-  Users,
-} from "lucide-react";
-import { useState } from "react";
+  PeopleAlt,
+  ArrowForward,
+  SelfImprovement,
+  Spa,
+} from "@mui/icons-material";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
+import { getRoomList } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import ipdDoubleImg from "../../../assets/healingServices/ipd/ipdDouble.jpg";
 import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.jpg";
 import SingleStayImg from "../../../assets/healingServices/ipd/Single Stay.png";
-import { errorAlert } from "../../../common/toast/CustomToast";
-import BookingFormModal from "./BookingFormModal";
-import { useAuth } from "../../../../context/AuthContext";
-
-export const wellnessServices = [
-  {
-    serviceName: "स्वबहिस्वसतिचर्या Outdoor Living ",
-    person: "Single Person",
-    checkIn: "11:15",
-    checkOut: "14:15",
-    description:
-      "Outdoor stay in natural surroundings at Swagrama with Herbal Gud Tea & 2 wholesome meal.",
-    benefits:
-      "Immersion in nature, relaxation, fresh air, mental rejuvenation.",
-    price: 3000,
-    rooms: [],
-    image: OutdoorLeavingImg,
-    badge: "Nature Retreat",
-  },
-  {
-    serviceName: "स्वएकनिवास Single Stay",
-    person: "Single Person",
-    checkIn: "11:15",
-    checkOut: "14:15",
-    description:
-      "Single occupancy room with Herbal Gud Tea & 2 wholesome meal.",
-    benefits: "Shared stay with comfort, suitable for couples or companions.",
-    price: 3750,
-    rooms: [
-      "स्वअमृतकक्ष | Eternity Room",
-      "स्वनित्यकक्ष | Eternal Room",
-      "स्वशाश्वतकक्ष | Perpetual Room",
-      "स्वनैष्ठिककक्ष | Firmness Room",
-      "स्वअनन्तकक्ष | Infinite Room",
-    ],
-    image: SingleStayImg,
-    badge: "Premium Stay",
-  },
-  {
-    serviceName: "स्वद्वयनिवास Double Stay",
-    person: "Two Person",
-    checkIn: "11:15",
-    checkOut: "14:15",
-    description:
-      "Double occupancy room with Herbal Gud Tea & 2 wholesome meal.",
-    benefits: "Shared stay with comfort, suitable for couples or companions.",
-    price: 6000,
-    rooms: [
-      "स्वअमृतकक्ष | Eternity Room",
-      "स्वनित्यकक्ष | Eternal Room",
-      "स्वशाश्वतकक्ष | Perpetual Room",
-      "स्वनैष्ठिककक्ष | Firmness Room",
-      "स्वअनन्तकक्ष | Infinite Room",
-    ],
-    image: ipdDoubleImg,
-    badge: "Couple's Choice",
-  },
-  {
-    serviceName: "स्वस्थकूपगृहएक Well House Single",
-    person: "Single Person",
-    checkIn: "11:15",
-    checkOut: "14:15",
-    description:
-      "Well House Single occupancy with Herbal Gud Tea & 2 wholesome meal.",
-    benefits:
-      "Full wellness experience with facilities for relaxation and care.",
-    price: 4250,
-    rooms: [],
-    image: SingleStayImg,
-    badge: "Luxury Wellness",
-  },
-  {
-    serviceName: "स्वस्थकूपगृहद्वय Well House Double",
-    person: "Two Person",
-    checkIn: "11:15",
-    checkOut: "14:15",
-    description:
-      "Well House Double occupancy with Herbal Gud Tea & 2 wholesome meal.",
-    benefits:
-      "Full wellness experience with facilities for relaxation and care.",
-    price: 7000,
-    rooms: [],
-    image: ipdDoubleImg,
-    badge: "Elite Experience",
-  },
-];
+import StayBookingModal from "./StayBookingModal";
 
 const cardVariants = {
-  hidden: {
-    opacity: 0,
-    y: 30,
-  },
+  hidden: { opacity: 0, y: 40, scale: 0.97 },
   visible: (i) => ({
     opacity: 1,
     y: 0,
-    transition: {
-      duration: 0.4,
-      delay: i * 0.08,
-      ease: "easeOut",
-    },
+    scale: 1,
+    transition: { delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   }),
 };
 
-const ServiceCard = ({
-  service,
-  index,
-  setOpenModal,
-  setSelectedService,
-  user,
-}) => {
-  const getServiceIcon = () => {
-    if (service.serviceName.includes("Outdoor")) return Trees;
-    if (service.serviceName.includes("Well House")) return Home;
-    return Sparkles;
-  };
-
-  const ServiceIcon = getServiceIcon();
-
-  return (
-    <motion.div
-      custom={index}
-      variants={cardVariants}
-      initial="hidden"
-      animate="visible"
-      className="group relative bg-gradient-to-br from-white/80 via-white/60 to-white/40 backdrop-blur-xl rounded-2xl overflow-hidden shadow-lg border border-emerald-900/10 hover:-translate-y-2 transition-transform duration-300 will-change-transform"
-    >
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-emerald-900/20 via-lime-800/10 to-amber-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-      <div className="relative h-52 2xl:h-64 overflow-hidden">
-        <img
-          src={service.image}
-          alt={service.serviceName}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 will-change-transform"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pointer-events-none"></div>
-
-        <div className="absolute top-1 right-2 bg-emerald-900/90 backdrop-blur-md px-2 py-1 rounded-lg shadow-lg border border-lime-400/20">
-          <div className="flex items-center gap-1">
-            <Users size={12} className="text-lime-300" />
-            <span className="text-xs font-bold text-white">
-              {service.person}
-            </span>
-          </div>
-        </div>
-
-   
-
-   
-      </div>
-
-      <div className="relative p-4 w-full">
-        <h3 className="font-bold text-gray-900 leading-tight mb-3 text-base">
-          {service.serviceName}
-        </h3>
-        <div className="flex justify-end">
-        <div className="inline-flex justify-end  items-center gap-1.5 px-3 py-1.5 mb-3 bg-gradient-to-r from-emerald-900/20 to-lime-900/20 backdrop-blur-md rounded-lg border border-emerald-800/30 shadow-sm hover:scale-105 transition-transform duration-200">
-          <Clock size={14} className="text-emerald-800" />
-          <span className="text-sm font-bold text-gray-900">
-            {service.checkIn} - {service.checkOut}
-          </span>
-        </div>
-        </div>
-
-        <div className="space-y-2 mb-3">
-          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-xl border border-amber-800/10 shadow-sm hover:scale-[1.01] transition-transform duration-200">
-            <div className="flex gap-2">
-              <div className="flex-shrink-0 mt-0.5">
-                <div className="p-1.5 bg-gradient-to-br from-amber-800/20 to-amber-700/20 backdrop-blur-sm rounded-lg group/sun hover:rotate-180 transition-transform duration-500">
-                  <Sun size={14} className="text-amber-800" />
-                </div>
-              </div>
-              <p className="text-sm text-gray-700 leading-snug font-medium">
-                {service.description}
-              </p>
-            </div>
-          </div>
-
-          <div className="p-2.5 bg-white/70 backdrop-blur-md rounded-xl border border-emerald-800/10 shadow-sm hover:scale-[1.01] transition-transform duration-200">
-            <div className="flex gap-2">
-              <div className="flex-shrink-0 mt-0.5">
-                <div className="p-1.5 bg-gradient-to-br from-emerald-800/20 to-lime-800/20 backdrop-blur-sm rounded-lg group/leaf hover:-rotate-180 transition-transform duration-500">
-                  <Leaf size={14} className="text-emerald-800" />
-                </div>
-              </div>
-              <p className="text-sm text-gray-700 leading-snug font-medium">
-                {service.benefits}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {service.rooms.length > 0 && (
-          <div className="mb-3 p-3 bg-gradient-to-br from-emerald-900/10 to-lime-900/10 backdrop-blur-md rounded-xl border border-emerald-800/20 shadow-sm">
-            <div className="flex items-center gap-1.5 mb-2">
-              <Home size={14} className="text-emerald-900" />
-              <p className="text-sm font-bold text-emerald-900">
-                Available Rooms
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {service.rooms.map((room, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center px-2.5 py-1 bg-white/80 backdrop-blur-sm text-gray-800 text-xs font-bold rounded-lg border border-emerald-800/20 shadow-sm hover:scale-105 hover:-translate-y-0.5 transition-transform duration-200"
-                >
-                  {room}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-end pt-3 border-t border-emerald-900/10">
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                if (user) {
-                  setSelectedService(service);
-                  setOpenModal(true);
-                } else {
-                  errorAlert("Please login to proceed.");
-                }
-              } catch (err) {
-                console.error("error in handleClick", err);
-              }
-            }}
-            className="relative z-10 flex items-center space-x-2 px-5 py-2 bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-white font-bold rounded-xl shadow-lg border border-lime-400/30 hover:scale-105 active:scale-95 transition-transform duration-200"
-          >
-            <span>Book Now</span>
-            <Sparkles size={14} />
-          </button>
-        </div>
-      </div>
-      <div className="absolute bottom-0 right-0 w-24 h-24 bg-gradient-to-tl from-lime-400/10 to-transparent rounded-tl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-    </motion.div>
-  );
-};
-
-const FilterBar = ({ selectedRoom, setSelectedRoom, roomOptions }) => {
-  return (
-    <div className="flex flex-wrap justify-center gap-2 mb-6">
-      {roomOptions.map((room) => (
-        <button
-          key={room}
-          onClick={() => setSelectedRoom(room)}
-          className={`relative px-4 py-2 font-bold rounded-xl transition-all duration-200 overflow-hidden text-sm ${
-            selectedRoom === room
-              ? "bg-gradient-to-r from-emerald-900 via-emerald-800 to-lime-900 text-lime-100 shadow-lg border border-lime-400/30 scale-105"
-              : "bg-white/70 backdrop-blur-md text-gray-800 border border-emerald-900/20 hover:border-emerald-900/40 shadow-sm hover:scale-105"
-          }`}
-        >
-          <span className="relative z-10">{room}</span>
-        </button>
-      ))}
-    </div>
-  );
-};
+const FILTERS = [
+  { key: "all", label: "All Rooms" },
+  { key: "available", label: "Available" },
+  { key: "solo", label: "Solo" },
+  { key: "group", label: "Group" },
+];
 
 const IPDWellnessStay = () => {
-  const [selectedRoom, setSelectedRoom] = useState("All");
-  const [openModal, setOpenModal] = useState(false);
   const [selectedService, setSelectedService] = useState(null);
-  const { user } = useAuth();
+  const [openBookingModal, setOpenBookingModal] = useState(false);
+  const [roomList, setRoomList] = useState([]);
 
-  const filteredData =
-    selectedRoom === "All"
-      ? wellnessServices
-      : wellnessServices.filter((s) => {
-          const matchInRooms = s.rooms?.some((r) =>
-            r.toLowerCase().includes(selectedRoom.toLowerCase()),
-          );
-          const matchInServiceName = s.serviceName
-            .toLowerCase()
-            .includes(selectedRoom.toLowerCase());
-          return matchInRooms || matchInServiceName;
-        });
+  const dynamicWellnessServices = roomList.map((room) => {
+    const lowerName = room.roomName?.toLowerCase() || "";
+    let image = SingleStayImg;
+    if (lowerName.includes("out door") || lowerName.includes("outdoor")) {
+      image = OutdoorLeavingImg;
+    } else if (
+      lowerName.includes("well house") ||
+      (room.maxOccupancy ?? 0) > 1
+    ) {
+      image = ipdDoubleImg;
+    }
 
-  const roomOptions = [
-    "Eternity Room",
-    "Eternal Room",
-    "Perpetual Room",
-    "Firmness Room",
-    "Infinite Room",
-    "Well House",
-    "Outdoor Living",
-    "All",
-  ];
+    const occ = room.maxOccupancy ?? 0;
+    let occupancyLabel = "Flexible";
+    if (occ === 1) occupancyLabel = "Solo Retreat";
+    else if (occ === 2) occupancyLabel = "Dual Sanctuary";
+    else if (occ > 2) occupancyLabel = `Up to ${occ} Guests`;
+
+    return {
+      serviceName: room.roomName ?? "",
+      price: room.basePrice ?? 0,
+      image,
+      occupancyLabel,
+      maxOcc: occ,
+      isActive: room.isActive ?? false,
+      benefits: room.benefits ?? null,
+      description: room.description ?? null,
+      roomTypeId: room.roomTypeId ?? null,
+    };
+  });
+
+  const handleGetRoomList = () => {
+    getRoomList()
+      .then((res) => {
+        if (res?.status === 200) setRoomList(res.data?.data ?? []);
+        else setRoomList([]);
+      })
+      .catch(() => setRoomList([]));
+  };
+
+  useEffect(() => {
+    handleGetRoomList();
+  }, []);
+
+  const handleBook = (service) => {
+    if (!service.isActive) return;
+    setSelectedService(service);
+    setOpenBookingModal(true);
+  };
+
+  const handleClose = () => {
+    setOpenBookingModal(false);
+    setSelectedService(null);
+  };
 
   return (
-    <div className="min-h-screen py-6 px-3 md:px-6 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-lime-50/50 to-amber-50/30"></div>
-      <div className="w-full mx-auto relative z-10">
-        <motion.div
-          className="text-center mb-6"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <h1 className="text-2xl md:text-3xl font-bold py-2 bg-gradient-to-r from-emerald-900 via-lime-800 to-amber-800 bg-clip-text text-transparent">
-            स्वास्थ्य निवास Wellness Stay
-          </h1>
-          <p
-            className="text-sm bg-gradient-to-r from-emerald-500 via-lime-600 to-amber-700
-                        bg-clip-text text-transparent
-                        drop-shadow-[0_1px_2px_rgba(180,130,20,0.5)]
-                        mx-auto mb-3 font-medium"
-          >
-            Experience authentic Ayurvedic healing in the embrace of nature's
-            tranquility
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-stone-50 to-amber-50 selection:bg-green-200 selection:text-green-900 relative overflow-hidden">
+      <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-green-100 opacity-50 blur-3xl pointer-events-none" />
+      <div className="absolute top-48 -left-20 w-72 h-72 rounded-full bg-amber-100 opacity-40 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/3 w-80 h-80 rounded-full bg-emerald-50 opacity-60 blur-3xl pointer-events-none" />
 
-        <FilterBar
-          selectedRoom={selectedRoom}
-          setSelectedRoom={setSelectedRoom}
-          roomOptions={roomOptions}
-        />
+      <div className="relative max-w-7xl mx-auto px-4 md:px-8 pt-10 pb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+          <div className="flex flex-col gap-5 max-w-2xl">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              className="inline-flex items-center gap-2 self-start px-4 py-2 rounded-full bg-green-100 border border-green-200"
+            >
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-xs font-semibold tracking-widest uppercase text-green-700">
+                Swagrama Wellness Retreat
+              </span>
+            </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-          {filteredData.map((service, index) => (
-            <ServiceCard
-              key={index}
-              service={service}
-              index={index}
-              setOpenModal={setOpenModal}
-              setSelectedService={setSelectedService}
-              user={user}
-            />
+            <motion.h1
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.1,
+                duration: 0.7,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold text-stone-800 leading-[1.05] tracking-tight"
+            >
+              Find Your
+              <span className="block text-green-700 font-light italic">
+                Sacred Space
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="text-stone-500 text-base leading-relaxed max-w-md"
+            >
+              Immerse yourself in premium therapeutic sanctuaries crafted for
+              deep healing, rest, and absolute comfort.
+            </motion.p>
+          </div>
+        </div>
+
+        <div className="mt-5 h-px bg-gradient-to-r from-green-300 via-amber-200 to-transparent" />
+      </div>
+
+      <div className="relative max-w-7xl mx-auto px-4 md:px-8 pb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8">
+          {dynamicWellnessServices.map((service, idx) => (
+            <motion.div
+              key={`${service.serviceName}-${idx}`}
+              custom={idx}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              className="bg-white rounded-xl overflow-hidden border border-stone-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:border-green-200 transition-all duration-300 transform hover:-translate-y-2 flex flex-col group will-change-transform"
+            >
+              <div className="relative h-52 overflow-hidden flex-shrink-0 bg-stone-100">
+                <img
+                  src={service.image}
+                  alt={service.serviceName}
+                  className={`w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:scale-110 ${!service.isActive ? "grayscale brightness-90" : ""}`}
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+                {!service.isActive && (
+                  <div className="absolute inset-0 bg-white/50 backdrop-blur-sm flex items-center justify-center z-10">
+                    <span className="bg-white/90 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest text-stone-500 border border-stone-200 shadow-sm">
+                      Fully Booked
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-5 flex flex-col flex-1 gap-4">
+                <div>
+                  <div className="flex justify-between items-start mb-1.5">
+                    <h3 className="text-lg font-bold text-stone-800 leading-snug">
+                      {service.serviceName}
+                    </h3>
+                  </div>
+                  <div className="w-8 h-0.5 rounded-full bg-green-400" />
+                </div>
+
+                <div className="bg-gradient-to-br from-green-50 to-amber-50 rounded-xl px-4 py-3.5 border border-green-100 flex items-end justify-between">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-green-700 mb-0.5">
+                      Per Person / Night
+                    </p>
+                    <p className="text-2xl font-bold text-stone-800 leading-none">
+                      ₹{(service.price || 0).toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                </div>
+
+                {service.description && (
+                  <p className="text-stone-500 text-[13px] leading-relaxed line-clamp-2">
+                    {service.description}
+                  </p>
+                )}
+
+                {service.benefits && (
+                  <div className="flex bg-stone-50 rounded-lg p-2.5 items-start gap-2 border border-stone-100">
+                    <Spa
+                      className="text-green-600 mt-0.5"
+                      sx={{ fontSize: 16 }}
+                    />
+                    <p className="text-stone-600 text-xs font-medium leading-snug line-clamp-2">
+                      {service.benefits}
+                    </p>
+                  </div>
+                )}
+
+                <div className="flex-1" />
+
+                <div className="flex gap-2">
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    disabled={!service.isActive}
+                    onClick={() => handleBook(service)}
+                    className={`flex-1 py-2 rounded-[5px] text-xs font-semibold uppercase tracking-widest flex items-center justify-center gap-1.5 transition-all duration-300 ${
+                      !service.isActive
+                        ? "bg-stone-100 text-stone-400 cursor-not-allowed"
+                        : "bg-green-700 text-white hover:bg-green-800 shadow-md shadow-green-200 hover:shadow-lg hover:shadow-green-300"
+                    }`}
+                  >
+                    {service.isActive ? (
+                      <>
+                        Check Availbility 
+                      </>
+                    ) : (
+                      "Unavailable"
+                    )}
+                  </motion.button>
+
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    className="px-4 py-2 rounded-[5px] border border-stone-200 text-stone-500 text-xs font-semibold uppercase tracking-wide hover:border-green-400 hover:text-green-700 hover:bg-green-50 transition-all duration-300"
+                  >
+                    T & C
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
           ))}
         </div>
 
-        {filteredData.length === 0 && (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-20 h-20 mb-4 bg-gradient-to-br from-emerald-900/10 to-lime-900/10 backdrop-blur-md rounded-full border border-emerald-900/20">
-              <Leaf className="text-emerald-800" size={36} />
-            </div>
-            <h3 className="font-bold text-gray-900 mb-2">
-              No packages available
-            </h3>
-            <p className="text-sm text-gray-700">
-              Please select a different room type to view available packages
-            </p>
-          </div>
-        )}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="flex items-center justify-center gap-3 mt-14"
+        >
+          <div className="h-px w-16 bg-gradient-to-r from-transparent to-green-300" />
+          <span className="text-[10px] font-semibold tracking-[0.28em] uppercase text-stone-400">
+            Swagrama · Wellness Centre
+          </span>
+          <div className="h-px w-16 bg-gradient-to-l from-transparent to-green-300" />
+        </motion.div>
       </div>
 
-      {openModal && (
-        <BookingFormModal
-          open={openModal}
-          handleClose={() => {
-            setOpenModal(false);
-            setSelectedService(null);
-          }}
-          eventDetails={selectedService}
-        />
-      )}
+      <AnimatePresence>
+        {openBookingModal && (
+          <StayBookingModal
+            open={openBookingModal}
+            handleClose={handleClose}
+            selectedService={selectedService}
+            handleGetRoomList={handleGetRoomList}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

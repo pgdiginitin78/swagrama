@@ -10,7 +10,7 @@ function CancelButtonModal({ onClick }) {
       whileHover={{ scale: 1.1, rotate: 90 }}
       whileTap={{ scale: 0.9 }}
       transition={{ duration: 0.2 }}
-      className="absolute top-2 right-4 lg:top-1 lg:right-2 z-50
+      className="absolute top-3 right-4 lg:top-3 lg:right-3 z-50
       w-[30px] h-[30px] rounded-full 
       bg-gray-100 hover:bg-red-50
       border border-gray-200 hover:border-red-200

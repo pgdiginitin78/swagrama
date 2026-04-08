@@ -28,9 +28,19 @@ import { getUserDetails } from "../../../services/login/LoginServices";
 import InputArea from "../../common/formFields/InputArea";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
+import DropdownField from "../../common/formFields/DropdownField";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
+
+const dropdownObjectSchema = yup
+  .object()
+  .shape({
+    id: yup.mixed().required(),
+    label: yup.string().required(),
+  })
+  .nullable()
+  .required("This field is required");
 
 const patientSchema = yup.object().shape({
   firstName: yup
@@ -46,7 +56,7 @@ const patientSchema = yup.object().shape({
     .min(2, "Minimum 2 characters")
     .max(50, "Maximum 50 characters")
     .matches(/^[A-Za-z\s]+$/, "Letters only"),
-
+  bloodGroup: dropdownObjectSchema.typeError("Blood group is required"),
   mobileNO: yup
     .string()
     .required("Contact number is required")
@@ -214,6 +224,7 @@ export default function AddPatientModal({ open, handleClose }) {
       mobileNO: "",
       dob: null,
       age: "",
+      bloodGroup: null,
       relation: "",
       address: "",
       pinCode: "",
@@ -235,6 +246,7 @@ export default function AddPatientModal({ open, handleClose }) {
       pinCode: data.pinCode,
       macIp: ipAddress ?? "",
       macId: "",
+      bloodGroup:data.bloodGroup.value
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -493,6 +505,29 @@ export default function AddPatientModal({ open, handleClose }) {
                   inputProps={{ maxLength: 3 }}
                   onInput={handleAgeInput}
                 />
+                <div>
+                  <DropdownField
+                    control={control}
+                    name="bloodGroup"
+                    placeholder="Select Blood Group *"
+                    dataArray={[
+                      { id: 1, value: "A+", label: "A+" },
+                      { id: 2, value: "A-", label: "A-" },
+                      { id: 3, value: "B+", label: "B+" },
+                      { id: 4, value: "B-", label: "B-" },
+                      { id: 5, value: "AB+", label: "AB+" },
+                      { id: 6, value: "AB-", label: "AB-" },
+                      { id: 7, value: "O+", label: "O+" },
+                      { id: 8, value: "O-", label: "O-" },
+                    ]}
+                    error={errors.bloodGroup}
+                  />
+                  {errors.bloodGroup && (
+                    <p className="text-red-500 text-[11px] mt-0.5">
+                      {errors.bloodGroup.message}
+                    </p>
+                  )}
+                </div>
                 <InputField
                   name="relation"
                   control={control}

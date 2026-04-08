@@ -1,23 +1,18 @@
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import AutoAwesome from "@mui/icons-material/AutoAwesome";
 import Bloodtype from "@mui/icons-material/Bloodtype";
-import CheckCircle from "@mui/icons-material/CheckCircle";
-import Favorite from "@mui/icons-material/Favorite";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import Female from "@mui/icons-material/Female";
-import FilterVintage from "@mui/icons-material/FilterVintage";
 import Healing from "@mui/icons-material/Healing";
 import Hearing from "@mui/icons-material/Hearing";
-import LocalFlorist from "@mui/icons-material/LocalFlorist";
 import LocalPharmacy from "@mui/icons-material/LocalPharmacy";
 import Masks from "@mui/icons-material/Masks";
 import MedicalServices from "@mui/icons-material/MedicalServices";
 import Opacity from "@mui/icons-material/Opacity";
 import Spa from "@mui/icons-material/Spa";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { Box, Modal } from "@mui/material";
 import { motion } from "framer-motion";
-import { Filter, Leaf, Shield, Sparkles } from "lucide-react";
-import { useRef, useState } from "react";
+import { Filter, Leaf } from "lucide-react";
+import { useState } from "react";
 import { MdEco } from "react-icons/md";
 import BathingSweaterTherapyImg from "../../../assets/healingServices/detoxTherapy/BathingSweaterTherapyImg.png";
 import BodyAnointingImg from "../../../assets/healingServices/detoxTherapy/BodyAnointing.png";
@@ -26,6 +21,7 @@ import ContinuousPouringImg from "../../../assets/healingServices/detoxTherapy/C
 import CuppingTherapy from "../../../assets/healingServices/detoxTherapy/Cupping Therapy.png";
 import DailyUnguentImg from "../../../assets/healingServices/detoxTherapy/DailyUnguent.png";
 import DeepTissueFootMassageImg from "../../../assets/healingServices/detoxTherapy/Deep Tissue Foot Massage.png";
+import DetoxMainImg from "../../../assets/healingServices/detoxTherapy/DetoxMainImg.png";
 import DryBrushingImg from "../../../assets/healingServices/detoxTherapy/Dry Brushing.jpg";
 import FemaleGenitalCareImg from "../../../assets/healingServices/detoxTherapy/Female Genital Cleansing.png";
 import footMassageImg from "../../../assets/healingServices/detoxTherapy/footMassage.png";
@@ -115,11 +111,8 @@ import FullBodyAnointingImg from "../../../assets/healingServices/detoxTherapy/�
 import सुवर्णाग्निकर्मGoldCauterization from "../../../assets/healingServices/detoxTherapy/सुवर्णाग्निकर्म Gold Cauterization.png";
 import FemaleGenitalEnemaDetoxImg from "../../../assets/healingServices/detoxTherapy/स्त्रीउत्तरबस्ति - Female Genital Enema Detox.jpg";
 import स्नैहिकधूमपानUnctuousSmokeInhalation from "../../../assets/healingServices/detoxTherapy/स्नैहिकधूमपान Unctuous Smoke Inhalation.png";
-import DetoxMainImg from "../../../assets/healingServices/detoxTherapy/DetoxMainImg.png";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
-import CommonButton from "../../../common/button/CommonButton";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
-import BookEventForm from "./DetoxBookingModal";
+import BookTherapySession from "./BookTherapySession";
 
 const FILTER = {
   ALL: "All Services",
@@ -1078,154 +1071,7 @@ const categories = [
   },
 ];
 
-function ServiceModal({ open, onClose, item }) {
-  const backdropRef = useRef(null);
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedService, setSelectedService] = useState(null);
 
-  if (!open || !item) return null;
-
-  const hasSubServices = item?.subServices && item.subServices.length > 0;
-  const benefitText = item?.benefits || "";
-  const descriptionText = Array.isArray(item?.description)
-    ? item.description[0]
-    : item?.description;
-
-  return (
-    <>
-      <Modal open={open} onClose={onClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: { xs: 2, sm: 3, md: 4 },
-          }}
-          ref={backdropRef}
-          className="w-[95%] sm:w-[85%] md:w-[72%] lg:w-[60%] max-h-[92vh] overflow-y-auto rounded-xl"
-        >
-          <CancelButtonModal onClick={onClose} />
-
-          <div className="flex flex-wrap gap-1 items-start bg-lime-200/70 rounded-xl px-3 py-2 mb-3 shadow-inner">
-            <span className="text-sm sm:text-base font-semibold text-green-900">
-              Service:
-            </span>
-            <span className="text-sm sm:text-base font-semibold text-green-900 leading-snug">
-              {item.serviceName}
-            </span>
-          </div>
-
-          {descriptionText && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-3 mb-3 border border-green-200 shadow-inner">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center flex-shrink-0">
-                  <MdEco className="text-white text-sm" />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-green-900">
-                  Description
-                </h3>
-              </div>
-              <p className="text-gray-800 text-sm sm:text-base leading-relaxed">
-                {descriptionText}
-              </p>
-            </div>
-          )}
-
-          {hasSubServices && (
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center flex-shrink-0">
-                  <FilterVintage
-                    className="text-white"
-                    style={{ fontSize: 16 }}
-                  />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-green-900">
-                  Specialized Treatments
-                </h3>
-              </div>
-              <div className="grid gap-3">
-                {item.subServices.map((subService, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gradient-to-r from-lime-50 via-white to-green-50 rounded-2xl p-4 border-l-4 border-lime-500 shadow-md"
-                  >
-                    <h4 className="font-bold text-green-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
-                      <LocalFlorist
-                        className="text-lime-600"
-                        style={{ fontSize: 18 }}
-                      />
-                      {subService}
-                    </h4>
-                    {Array.isArray(item.description) &&
-                      item.description[idx] && (
-                        <p className="text-gray-700 text-xs sm:text-sm mb-3 leading-relaxed">
-                          {item.description[idx]}
-                        </p>
-                      )}
-                    {Array.isArray(item.benefits) && item.benefits[idx] && (
-                      <div className="bg-green-100/70 rounded-xl p-3">
-                        <p className="text-green-900 text-xs sm:text-sm font-medium flex items-start gap-2">
-                          <CheckCircle
-                            className="text-green-600 flex-shrink-0 mt-0.5"
-                            style={{ fontSize: 16 }}
-                          />
-                          <span>{item.benefits[idx]}</span>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {benefitText && !hasSubServices && (
-            <div className="bg-gradient-to-br from-lime-100/80 via-white to-green-100/80 rounded-2xl p-3 mb-3 border-l-4 border-green-600 shadow-md">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-br from-lime-400 to-green-500 flex items-center justify-center flex-shrink-0">
-                  <Favorite className="text-white" style={{ fontSize: 16 }} />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-green-900">
-                  Benefits
-                </h3>
-              </div>
-              <p className="text-green-900 text-sm sm:text-base leading-relaxed">
-                {benefitText}
-              </p>
-            </div>
-          )}
-
-          <div className="flex justify-end mt-4 sm:mt-5">
-            <CommonButton
-              type="button"
-              label="Book Therapy"
-              className="text-white bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 transition-all transform hover:scale-105 text-sm sm:text-base"
-              onClick={() => {
-                setOpenModal(true);
-                setSelectedService(item);
-              }}
-            />
-          </div>
-        </Box>
-      </Modal>
-
-      {openModal && (
-        <BookEventForm
-          open={openModal}
-          handleClose={() => {
-            setOpenModal(false);
-            setSelectedService(null);
-          }}
-          eventDetails={selectedService}
-        />
-      )}
-    </>
-  );
-}
 
 function ServiceCard({ item }) {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1281,7 +1127,7 @@ function ServiceCard({ item }) {
       </div>
 
       {modalOpen && (
-        <ServiceModal
+        <BookTherapySession
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           item={item}

@@ -2,10 +2,8 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import CloseIcon from "@mui/icons-material/Close";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
 import LocalFloristIcon from "@mui/icons-material/LocalFlorist";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
 import NatureIcon from "@mui/icons-material/Nature";
 import NavigateBeforeRoundedIcon from "@mui/icons-material/NavigateBeforeRounded";
 import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
@@ -15,20 +13,23 @@ import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import YardIcon from "@mui/icons-material/Yard";
-import {
-  Box,
-  Dialog,
-  DialogContent,
-  Divider,
-  Fade,
-  IconButton,
-} from "@mui/material";
+import { Dialog, DialogContent, Divider, Fade } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
+import CompostIcon from "@mui/icons-material/Compost";
+import FilterVintageIcon from "@mui/icons-material/FilterVintage";
+import HealingIcon from "@mui/icons-material/Healing";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { format } from "date-fns";
+import {
+  eachDayOfInterval,
+  endOfMonth,
+  format,
+  isBefore,
+  startOfDay,
+  startOfMonth,
+} from "date-fns";
 import { Clock, Stethoscope } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -40,38 +41,39 @@ import panchakarmaImg from "../../../assets/images/ayurveda/ayurveda_panchakarma
 import shirodharaImg from "../../../assets/images/ayurveda/ayurveda_shirodhara.png";
 import panchakarmaAsset from "../../../assets/images/ayurveda/panchakarma.png";
 import shirodharaAsset from "../../../assets/images/ayurveda/shirodhara.png";
-import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
-import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
-import PradipTawareImg from "../../assets/landing-page/ourexperts/PradipTaware.jpg";
-import SandipMehetreImg from "../../assets/landing-page/ourexperts/SandipMahetre.jpg";
-import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.jpg";
-import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
-import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.jpg";
-import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.jpg";
-import {
-  getDoctorAvailableSlots,
-  getPatientDataByMobileNo,
-  getServicesByClinicId,
-} from "../../../services/bookAppointment/BookAppointmentServices";
-import DatePickerField from "../../common/formFields/DatePickerField";
-import DropdownField from "../../common/formFields/DropdownField";
-import { useAuth } from "../../../context/AuthContext";
-import CommonButton from "../../common/button/CommonButton";
-import AddPatientModal from "./AddPatientModal";
-import InputField from "../../common/formFields/InputField";
-import InputArea from "../../common/formFields/InputArea";
-import CancelButtonModal from "../../common/button/CancelButtonModal";
-import FilterVintageIcon from '@mui/icons-material/FilterVintage';
-import CompostIcon from '@mui/icons-material/Compost';
-import HealingIcon from "@mui/icons-material/Healing";
+import homeopathyBottlesImg from "../../../assets/images/homeopathy/homeopathy_bottles_pills.png";
+import homeopathyConsultationImg from "../../../assets/images/homeopathy/homeopathy_consultation.png";
+import homeopathyHerbsImg from "../../../assets/images/homeopathy/homeopathy_herbs.png";
+import yogaBreathImg from "../../../assets/images/yoga/yoga_breath_meditation.png";
+import yogaBridgeImg from "../../../assets/images/yoga/yoga_bridge_pose.png";
 import yogaLotusImg from "../../../assets/images/yoga/yoga_lotus_meditation.png";
 import yogaTreeImg from "../../../assets/images/yoga/yoga_tree_pose.png";
 import yogaWarriorImg from "../../../assets/images/yoga/yoga_warrior_group.png";
-import yogaBridgeImg from "../../../assets/images/yoga/yoga_bridge_pose.png";
-import yogaBreathImg from "../../../assets/images/yoga/yoga_breath_meditation.png";
-import homeopathyBottlesImg from "../../../assets/images/homeopathy/homeopathy_bottles_pills.png";
-import homeopathyHerbsImg from "../../../assets/images/homeopathy/homeopathy_herbs.png";
-import homeopathyConsultationImg from "../../../assets/images/homeopathy/homeopathy_consultation.png";
+import { useAuth } from "../../../context/AuthContext";
+import {
+  bookAppointment,
+  getDoctorAvailableSlots,
+  getPatientDataByMobileNo,
+  getServicesByClinicId,
+  InitiatePayment,
+} from "../../../services/bookAppointment/BookAppointmentServices";
+import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.jpg";
+import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.jpg";
+import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
+import PradipTawareImg from "../../assets/landing-page/ourexperts/PradipTaware.jpg";
+import SandipMehetreImg from "../../assets/landing-page/ourexperts/SandipMahetre.jpg";
+import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
+import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.jpg";
+import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
+import CancelButtonModal from "../../common/button/CancelButtonModal";
+import DatePickerField from "../../common/formFields/DatePickerField";
+import DropdownField from "../../common/formFields/DropdownField";
+import InputArea from "../../common/formFields/InputArea";
+import InputField from "../../common/formFields/InputField";
+import AddPatientModal from "./AddPatientModal";
+import ConfirmationModal from "../../common/ConfirmationModal";
+import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
+import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -99,27 +101,68 @@ const homeopathyCarouselImages = [
 ];
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
+  const isMorning =
+    slot.slotStartTime.includes("AM") ||
+    parseInt(slot.slotStartTime.split(":")[0]) < 12;
+
   return (
-    <button
+    <motion.button
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.98 }}
       type="button"
       onClick={onSelect}
       disabled={!slot.slotStartTime}
       className={`
-        relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
+        relative px-2 py-2 rounded-[5px] font-bold text-[11px] transition-all duration-200 
+        flex flex-col items-center justify-center border
         ${
           isSelected
-            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
-            : "bg-[#F0EDE9] text-slate-700 hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
+            ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200/50"
+            : "bg-emerald-50/50 border-emerald-100 text-slate-700 hover:border-emerald-300 hover:bg-white hover:shadow-sm"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
     >
-      <span className="flex items-center space-x-1 whitespace-nowrap">
-        <span className="font-bold">{slot.slotStartTime}</span>
-        <NavigateNextIcon sx={{ fontSize: 14 }} />
-        <span className="font-normal opacity-90">{slot.slotEndTime}</span>
+      <span
+        className={`text-[8px] uppercase tracking-tighter font-black ${isSelected ? "text-emerald-100" : "text-emerald-600/60"}`}
+      >
+        {isMorning ? "Morning" : "Afternoon"}
       </span>
-    </button>
+      <span>{slot.slotStartTime}</span>
+    </motion.button>
+  );
+}
+
+function DateCard({ date, isSelected, onClick, disabled }) {
+  const isToday =
+    format(date, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
+  const dayName = format(date, "EEE");
+  const dayNum = format(date, "dd");
+
+  return (
+    <motion.button
+      whileHover={disabled ? {} : { y: -2 }}
+      whileTap={disabled ? {} : { scale: 0.96 }}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      className={`
+        relative flex flex-col items-center justify-center min-w-[56px] py-1.5 rounded-[5px] border transition-all duration-300
+        ${
+          isSelected || isToday
+            ? "bg-gradient-to-br from-emerald-600 to-teal-700 border-emerald-500 text-white shadow-md shadow-emerald-200/40"
+            : disabled
+              ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
+              : "bg-white border-slate-100 text-slate-600 hover:border-emerald-200 hover:shadow-sm"
+        }
+      `}
+    >
+      <span
+        className={`text-[9px] font-bold uppercase tracking-tight ${isSelected ? "text-emerald-100" : disabled ? "text-gray-200" : "text-slate-400"}`}
+      >
+        {dayName}
+      </span>
+      <span className="text-base font-black leading-none my-0.5">{dayNum}</span>
+    </motion.button>
   );
 }
 
@@ -140,33 +183,34 @@ const validationSchema = yup.object().shape({
     .nullable()
     .required("Appointment date is required")
     .typeError("Appointment date is required"),
-  fullName: yup
-    .string()
-    .trim()
-    .required("Full name is required")
-    .min(3, "Name must be at least 3 characters"),
-  mobileNumber: yup
-    .string()
-    .trim()
-    .required("Mobile number is required")
-    .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"),
-  age: yup
-    .number()
-    .typeError("Age must be a number")
-    .required("Age is required")
-    .min(1, "Age must be at least 1")
-    .max(120, "Age seems invalid"),
-  gender: dropdownObjectSchema.typeError("Gender is required"),
-  emailAddress: yup
-    .string()
-    .trim()
-    .email("Enter a valid email address")
-    .required("Email address is required"),
-  city: yup
-    .string()
-    .trim()
-    .required("City is required")
-    .min(2, "Enter a valid city name"),
+  // fullName: yup
+  //   .string()
+  //   .trim()
+  //   .required("Full name is required")
+  //   .min(3, "Name must be at least 3 characters"),
+  // mobileNumber: yup
+  //   .string()
+  //   .trim()
+  //   .required("Mobile number is required")
+  //   .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"),
+  // age: yup
+  //   .number()
+  //   .typeError("Age must be a number")
+  //   .required("Age is required")
+  //   .min(1, "Age must be at least 1")
+  //   .max(120, "Age seems invalid"),
+  // bloodGroup: dropdownObjectSchema.typeError("Blood group is required"),
+  // gender: dropdownObjectSchema.typeError("Gender is required"),
+  // emailAddress: yup
+  //   .string()
+  //   .trim()
+  //   .email("Enter a valid email address")
+  //   .required("Email address is required"),
+  // city: yup
+  //   .string()
+  //   .trim()
+  //   .required("City is required")
+  //   .min(2, "Enter a valid city name"),
   reasonForVisit: yup
     .string()
     .trim()
@@ -311,6 +355,23 @@ const homeopathySideContent = [
   },
 ];
 
+const bloodGroupOptions = [
+  { id: 1, value: "A+", label: "A+" },
+  { id: 2, value: "A-", label: "A-" },
+  { id: 3, value: "B+", label: "B+" },
+  { id: 4, value: "B-", label: "B-" },
+  { id: 5, value: "AB+", label: "AB+" },
+  { id: 6, value: "AB-", label: "AB-" },
+  { id: 7, value: "O+", label: "O+" },
+  { id: 8, value: "O-", label: "O-" },
+];
+
+const genderOptions = [
+  { id: 1, value: "Male", label: "Male" },
+  { id: 2, value: "Female", label: "Female" },
+  { id: 3, value: "Other", label: "Other" },
+];
+
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: {
@@ -339,7 +400,16 @@ function PreviewRow({ label, value }) {
   );
 }
 
-function BookingPreviewModal({ open, onClose, onProceed, data }) {
+function BookingPreviewModal({
+  open,
+  onClose,
+  onProceed,
+  data,
+  activeDept,
+  selectedDoctorId,
+}) {
+  console.log("activeDept", data, selectedDoctorId);
+
   return (
     <Dialog
       open={open}
@@ -357,20 +427,7 @@ function BookingPreviewModal({ open, onClose, onProceed, data }) {
     >
       <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-green-800 px-5 pt-5 pb-6 relative">
         <div className="absolute top-3 right-3">
-          {/* <IconButton
-            onClick={onClose}
-            size="small"
-            sx={{
-              color: "rgba(255,255,255,0.7)",
-              "&:hover": {
-                color: "#fff",
-                background: "rgba(255,255,255,0.12)",
-              },
-            }}
-          >
-            <CloseIcon fontSize="small" />
-          </IconButton> */}
-          <CancelButtonModal     onClick={onClose} />
+          <CancelButtonModal onClick={onClose} />
         </div>
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
@@ -385,28 +442,6 @@ function BookingPreviewModal({ open, onClose, onProceed, data }) {
             </p>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2 mt-4">
-          {data?.appointmentDate && (
-            <span className="flex items-center gap-1 bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
-              <CalendarMonthIcon sx={{ fontSize: 13 }} />
-              {format(new Date(data.appointmentDate), "dd MMM yyyy")}
-            </span>
-          )}
-          {data?.selectedTimeSlot && (
-            <span className="flex items-center gap-1 bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full backdrop-blur-sm">
-              <Clock size={13} />
-              {data.selectedTimeSlot.slotStartTime} –{" "}
-              {data.selectedTimeSlot.slotEndTime}
-            </span>
-          )}
-          {data?.serviceFid?.label && (
-            <span className="flex items-center gap-1 bg-emerald-400/20 text-white text-xs font-semibold px-3 py-1 rounded-full">
-              <LocalFloristIcon sx={{ fontSize: 13 }} />
-              {data.serviceFid.label}
-            </span>
-          )}
-        </div>
       </div>
 
       <DialogContent sx={{ p: 0 }}>
@@ -415,12 +450,29 @@ function BookingPreviewModal({ open, onClose, onProceed, data }) {
             Patient Details
           </p>
           <div className="bg-emerald-50/60 rounded-lg px-4 py-1 border border-emerald-100">
-            <PreviewRow label="Full Name" value={data?.fullName} />
-            <PreviewRow label="Mobile Number" value={data?.mobileNumber} />
-            <PreviewRow label="Age" value={data?.age} />
-            <PreviewRow label="Gender" value={data?.gender?.label} />
-            <PreviewRow label="Email" value={data?.emailAddress} />
-            <PreviewRow label="City" value={data?.city} />
+            <PreviewRow
+              label="Consultation"
+              value={activeDept + "  " + "OPD Consultation"}
+            />
+            <PreviewRow
+              label="Doctor"
+              value={
+                selectedDoctorId?.firstName + " " + selectedDoctorId?.lName
+              }
+            />
+            <PreviewRow
+              label="Date & Time"
+              value={
+                format(new Date(data.appointmentDate), "dd MMM yyyy") +
+                " " +
+                data?.selectedTimeSlot?.slotStartTime +
+                " - " +
+                data?.selectedTimeSlot?.slotEndTime
+              }
+            />
+            <PreviewRow label="Visit Type" value={data.serviceFid.label} />
+            <PreviewRow label="Patient" value={data?.fullName} />
+            <PreviewRow label="Total Fee" value={data?.serviceFid?.charges} />
           </div>
         </div>
 
@@ -473,14 +525,14 @@ function AyurvedaForm({
   const currentCarouselImages = isYoga
     ? yogaCarouselImages
     : isHomeopathy
-    ? homeopathyCarouselImages
-    : ayurvedaCarouselImages;
+      ? homeopathyCarouselImages
+      : ayurvedaCarouselImages;
 
   const currentSideContent = isYoga
     ? yogaSideContent
     : isHomeopathy
-    ? homeopathySideContent
-    : ayurvedaSideContent;
+      ? homeopathySideContent
+      : ayurvedaSideContent;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [visibleCount, setVisibleCount] = useState(1);
@@ -493,18 +545,21 @@ function AyurvedaForm({
   const [openAddPatientModal, setOpenAddPatientModal] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
+  const [ipAddress, setIpAddress] = useState(null);
+  const [finalObj, setFinalObj] = useState(null);
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const cancelPaymentRef = useRef(null);
 
   const { user } = useAuth();
 
-  console.log("previewOpen",previewOpen,selectedTimeSlot);
-  
+  console.log("previewOpen", previewOpen, selectedTimeSlot);
 
   const {
     handleSubmit,
     control,
     watch,
     reset,
-    getValues,
+    setValue,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -512,7 +567,7 @@ function AyurvedaForm({
       patientFid: null,
       doctorFid: null,
       serviceFid: null,
-      appointmentDate: null,
+      appointmentDate: new Date(),
       Status: null,
       ServiceDetails: "",
       taxDetails: "",
@@ -525,12 +580,16 @@ function AyurvedaForm({
       emailAddress: "",
       city: "",
       reasonForVisit: "",
+      bloodGroup: null,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
 
   const appointmentDate = watch("appointmentDate");
+  const patientFid = watch("patientFid");
+
+  console.log("patientFid", patientFid);
 
   const updateVisibleCount = useCallback(() => {
     const w = window.innerWidth;
@@ -545,7 +604,10 @@ function AyurvedaForm({
     return () => window.removeEventListener("resize", updateVisibleCount);
   }, [updateVisibleCount]);
 
-  const totalSlides = Math.max(currentCarouselImages.length - visibleCount + 1, 1);
+  const totalSlides = Math.max(
+    currentCarouselImages.length - visibleCount + 1,
+    1,
+  );
 
   const handlePrev = useCallback(() => {
     setDirection(-1);
@@ -575,14 +637,14 @@ function AyurvedaForm({
     [doc.firstName?.trim(), doc.lName?.trim()].filter(Boolean).join(" ");
 
   const expertImages = {
-    "santosh": SantoshSuryawanshiImg,
-    "manisha": ManishaSuryawanshiImg,
-    "pradip": PradipTawareImg,
-    "sandip": SandipMehetreImg,
-    "smita": SmitaMehetreImg,
-    "vaishali": VaishaliHolmukheImg,
-    "avanti": AvantiNitsureImg,
-    "dhananjay": DhananjayAnvikarImg
+    santosh: SantoshSuryawanshiImg,
+    manisha: ManishaSuryawanshiImg,
+    pradip: PradipTawareImg,
+    sandip: SandipMehetreImg,
+    smita: SmitaMehetreImg,
+    vaishali: VaishaliHolmukheImg,
+    avanti: AvantiNitsureImg,
+    dhananjay: DhananjayAnvikarImg,
   };
 
   const getDoctorImage = (doctorName) => {
@@ -638,7 +700,7 @@ function AyurvedaForm({
       setSlotError("");
       setLoading(true);
       getDoctorAvailableSlots(
-        selectedDoctorId,
+        selectedDoctorId?.userId,
         format(new Date(appointmentDate), "yyyy-MM-dd"),
         5,
       )
@@ -663,13 +725,152 @@ function AyurvedaForm({
       setSlotError("Please select a time slot to continue.");
       return;
     }
+
+    // macId: "",
+    // macIp: ipAddress,
+    // clinicFid: dataObj.clinicFid.id,
+    // patientFid: dataObj.patientFid.id,
+    // doctorFid: dataObj?.doctorFid.id,
+    // serviceFid: String(dataObj.serviceFid.id),
+    // appoinmentDate: format(new Date(dataObj.appointmentDate), "yyyy-MM-dd"),
+    // Status: dataObj.Status?.label || "",
+    // SloteEndTime: selectedTimeSlot?.slotEndTime,
+    // SloteStartTime: selectedTimeSlot?.slotStartTime,
+    // ServiceDetails: dataObj.ServiceDetails,
+    // taxDeatils: dataObj.taxDetails,
+    // EncounterStatus: dataObj?.EncounterStatus,
+
+    const saveObj = {
+      macId: "22.22",
+      macIp: ipAddress,
+      clinicFid: selectedDoctorId?.clinicId,
+      doctorFid: selectedDoctorId?.userId,
+      serviceFid: data?.serviceFid?.id?.toString(),
+      appoinmentDate: format(new Date(data.appointmentDate), "yyyy-MM-dd"),
+      Status: "",
+      SloteEndTime: selectedTimeSlot?.slotEndTime,
+      SloteStartTime: selectedTimeSlot?.slotStartTime,
+      ServiceDetails: `${data?.serviceFid?.label}- Rs ${data?.serviceFid?.charges}/-`,
+      taxDeatils: "",
+      EncounterStatus: "",
+      reason: data.reasonForVisit,
+    };
+    setFinalObj(saveObj);
     setPreviewData({ ...data, selectedTimeSlot });
     setPreviewOpen(true);
   });
 
+  const initiatePayment = async () => {
+    try {
+      const userId = user?.userId;
+      const tempObj = {
+        amount: previewData?.serviceFid?.charges || 0,
+        SloteEndTime: selectedTimeSlot?.slotEndTime,
+        SloteStartTime: selectedTimeSlot?.slotStartTime,
+        appointmentDate: format(
+          new Date(previewData.appointmentDate),
+          "yyyy-MM-dd",
+        ),
+        userId: userId,
+      };
+
+      const res = await InitiatePayment(
+        selectedDoctorId?.clinicId,
+        userId,
+        tempObj,
+      );
+      const data = res?.data;
+
+      if (data?.status === 200) {
+        setIsPaymentPending(true);
+
+        cancelPaymentRef.current = RedirectToSabPaisa(
+          data,
+          selectedDoctorId?.clinicId,
+          data.clientTxnId,
+          async () => {
+            const res = await bookAppointment(finalObj, userId);
+            if (res.data.status === 200) {
+              successAlert(
+                res.data.message || "Appointment booked successfully!",
+              );
+              setIsPaymentPending(false);
+              reset({
+                clinicFid: null,
+                patientFid: null,
+                doctorFid: null,
+                serviceFid: null,
+                appointmentDate: null,
+                Status: null,
+                ServiceDetails: "",
+                taxDetails: "",
+                EncounterStatus: "",
+                location: null,
+                fullName: "",
+                mobileNumber: "",
+                age: "",
+                gender: null,
+                emailAddress: "",
+                city: "",
+                reasonForVisit: "",
+                bloodGroup: null,
+              });
+              setSelectedTimeSlot(null);
+              setSelectedDoctorId(null);
+              setFinalObj(null);
+              setPreviewData(null);
+            } else {
+              errorAlert(res.data.message || "Booking failed after payment.");
+              setIsPaymentPending(false);
+            }
+          },
+          (errorStatus) => {
+            const msg =
+              errorStatus?.message ||
+              "Payment failed or cancelled. Please try again.";
+            errorAlert(msg);
+            setIsPaymentPending(false);
+          },
+        );
+      } else {
+        errorAlert(data?.message || "Failed to initiate payment");
+      }
+    } catch (error) {
+      console.error("Payment initiation error:", error);
+      errorAlert("An error occurred while initiating payment.");
+    }
+  };
+
   const handleProceed = () => {
     setPreviewOpen(false);
+    initiatePayment();
   };
+
+  useEffect(() => {
+    if (patientFid !== null) {
+      setValue("fullName", patientFid.label);
+      setValue("mobileNumber", patientFid.mobileNo);
+      setValue("age", patientFid?.age);
+      const bloodGroupFilter = bloodGroupOptions.find(
+        (list) => list.label === patientFid.bloodGroup,
+      );
+      const filterGender = genderOptions.find(
+        (list) => list.label.toLowerCase() === patientFid.gender,
+      );
+
+      setValue("bloodGroup", bloodGroupFilter);
+      setValue("gender", filterGender);
+      setValue("city", patientFid.city);
+      setValue("emailAddress", patientFid.emailId);
+    }
+  }, [patientFid]);
+
+  useEffect(() => {
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => setIpAddress(data.ip))
+      .catch((error) => console.error("Error:", error));
+  }, []);
 
   return (
     <>
@@ -689,11 +890,23 @@ function AyurvedaForm({
                 <div>
                   <h2 className="text-base md:text-lg font-bold text-emerald-800 flex items-center gap-2">
                     <span className="text-xl">
-                      {isYoga ? <SelfImprovementIcon /> : isHomeopathy ? <HealingIcon /> : <CompostIcon />}
-                    </span> Our {activeDept || "Ayurveda"} {isYoga ? "Sessions" : "Treatments"}
+                      {isYoga ? (
+                        <SelfImprovementIcon />
+                      ) : isHomeopathy ? (
+                        <HealingIcon />
+                      ) : (
+                        <CompostIcon />
+                      )}
+                    </span>{" "}
+                    Our {activeDept || "Ayurveda"}{" "}
+                    {isYoga ? "Sessions" : "Treatments"}
                   </h2>
                   <p className="text-xs text-gray-400 mt-0.5 pl-7">
-                    {isYoga ? "Find balance through guided practice" : isHomeopathy ? "Natural healing for root causes" : "Ancient therapies for modern well-being"}
+                    {isYoga
+                      ? "Find balance through guided practice"
+                      : isHomeopathy
+                        ? "Natural healing for root causes"
+                        : "Ancient therapies for modern well-being"}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -714,7 +927,7 @@ function AyurvedaForm({
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 border border-emerald-100 shadow-inner p-2 md:p-3">
+              <div className="relative overflow-hidden rounded-[9px] bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 border border-emerald-100 shadow-inner p-2 md:p-3">
                 <div className="flex gap-2 md:gap-3">
                   <AnimatePresence custom={direction} mode="popLayout">
                     {visibleImages.map((img) => (
@@ -731,7 +944,7 @@ function AyurvedaForm({
                         }}
                         className="flex-1 min-w-0"
                       >
-                        <div className="relative overflow-hidden rounded-xl aspect-[4/3] md:aspect-[3/2] group shadow-md">
+                        <div className="relative overflow-hidden rounded-[9px] aspect-[4/3] md:aspect-[3/2] group shadow-md">
                           <img
                             src={img.src}
                             alt={img.alt}
@@ -812,7 +1025,8 @@ function AyurvedaForm({
                   style={{ maxHeight: "360px" }}
                 >
                   {doctorList.map((doctor, idx) => {
-                    const isSelected = selectedDoctorId === doctor.userId;
+                    const isSelected =
+                      selectedDoctorId?.userId === doctor.userId;
                     const doctorName = getDoctorName(doctor);
                     const initials = doctorName
                       .split(" ")
@@ -822,7 +1036,7 @@ function AyurvedaForm({
                       .toUpperCase();
 
                     const days =
-                      doctor.weekDays?.[0]
+                      doctor?.sessions[0].weekDays
                         ?.split(",")
                         .filter((d) => d.trim())
                         .map((d) => d.trim().substring(0, 3)) ?? [];
@@ -837,9 +1051,9 @@ function AyurvedaForm({
                           duration: 0.35,
                           ease: "easeOut",
                         }}
-                        onClick={() => setSelectedDoctorId(doctor.userId)}
+                        onClick={() => setSelectedDoctorId(doctor)}
                         whileTap={{ scale: 0.98 }}
-                        className={`cursor-pointer rounded-2xl border-2 transition-all duration-200 ${
+                        className={`cursor-pointer rounded-[9px] border-2 transition-all duration-200 ${
                           isSelected
                             ? "border-emerald-500 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-lg shadow-emerald-100"
                             : "border-gray-100 bg-white hover:border-emerald-300 hover:shadow-md"
@@ -847,9 +1061,13 @@ function AyurvedaForm({
                       >
                         <div className="flex items-center gap-3 p-3">
                           <div className="relative shrink-0">
-                            {getDoctorImage(doctorName) || doctor.profilePhoto ? (
+                            {getDoctorImage(doctorName) ||
+                            doctor.profilePhoto ? (
                               <img
-                                src={getDoctorImage(doctorName) || doctor.profilePhoto}
+                                src={
+                                  getDoctorImage(doctorName) ||
+                                  doctor.profilePhoto
+                                }
                                 alt={doctorName}
                                 className={`w-20 h-20 rounded-full object-cover bg-top shadow-md border-2 ${isSelected ? "border-emerald-400" : "border-gray-100"}`}
                               />
@@ -883,27 +1101,32 @@ function AyurvedaForm({
                               >
                                 {doctorName}
                               </p>
-                              <span className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isSelected ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}>
+                              <span
+                                className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isSelected ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
+                              >
                                 <Clock size={10} />
-                                30 min
+                                {doctor?.sessions[0].timeSlot} min
                               </span>
                             </div>
                             {doctor.degree?.trim() && (
                               <p className="text-xs text-gray-500 mt-0.5 font-medium">
-                                {doctor.degree.trim()}
+                                {doctor?.degree?.trim()}
                               </p>
                             )}
+                            <p className="text-xs text-ayuBrown mt-0.5 font-medium">
+                              {doctor?.clinicName}
+                            </p>
 
                             {days.length > 0 && (
                               <div className="flex items-center gap-1 mt-1.5 flex-wrap">
                                 <CalendarMonthIcon
-                                  style={{ fontSize: 12 }}
+                                  style={{ fontSize: 16 }}
                                   className="text-gray-400 shrink-0"
                                 />
                                 {days.map((d, di) => (
                                   <span
                                     key={di}
-                                    className={`text-xs px-1.5 py-0.5 rounded-md font-semibold ${
+                                    className={`text-xs px-3 py-0.5 rounded-[5px] font-semibold ${
                                       isSelected
                                         ? "bg-emerald-100 text-emerald-700"
                                         : "bg-gray-100 text-gray-600"
@@ -914,6 +1137,19 @@ function AyurvedaForm({
                                 ))}
                               </div>
                             )}
+                            <div className="flex space-x-2 items-center mt-1 ">
+                              <EventAvailableIcon
+                                style={{ fontSize: 16 }}
+                                className="text-gray-400 shrink-0"
+                              />
+                              <p className="text-xs text-gray-500 mt-0.5 font-medium bg-slate-100 px-2 py-0.5 rounded-[5px]">
+                                {doctor?.sessions[0].morning}
+                              </p>
+                              &nbsp; -
+                              <p className="text-xs text-gray-500 mt-0.5 font-medium bg-slate-100 px-2 py-0.5 rounded-[5px]">
+                                {doctor?.sessions[0].evening}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </motion.div>
@@ -928,11 +1164,22 @@ function AyurvedaForm({
             <div className="mb-3">
               <h2 className="text-base md:text-lg font-bold text-emerald-800 flex items-center gap-2">
                 <span className="text-xl">
-                  {isYoga ? <SelfImprovementIcon /> : isHomeopathy ? <HealingIcon /> : <FilterVintageIcon/>}
-                </span> Why {activeDept || "Ayurveda"}?
+                  {isYoga ? (
+                    <SelfImprovementIcon />
+                  ) : isHomeopathy ? (
+                    <HealingIcon />
+                  ) : (
+                    <FilterVintageIcon />
+                  )}
+                </span>{" "}
+                Why {activeDept || "Ayurveda"}?
               </h2>
               <p className="text-xs text-gray-400 mt-0.5 pl-7">
-                {isYoga ? "Path to inner peace" : isHomeopathy ? "Gentle and effective healing" : "Discover the science of life"}
+                {isYoga
+                  ? "Path to inner peace"
+                  : isHomeopathy
+                    ? "Gentle and effective healing"
+                    : "Discover the science of life"}
               </p>
             </div>
 
@@ -971,68 +1218,94 @@ function AyurvedaForm({
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
-          className="rounded-2xl border border-emerald-100 shadow-md overflow-hidden bg-white"
+          className="rounded-[9px] border border-emerald-100 shadow-xl overflow-hidden bg-white"
         >
-          <div className="bg-gradient-to-r from-emerald-700 to-teal-700 px-4 sm:px-5 py-3 flex items-center gap-2.5">
-            <div className="p-1.5 bg-white/15 rounded-xl">
-              <CalendarMonthIcon sx={{ color: "#fff", fontSize: 20 }} />
+          <div className="bg-emerald-900 px-4 py-2.5 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <CalendarMonthIcon sx={{ color: "#fff", fontSize: 18 }} />
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider">
+                Schedule Appointment
+              </h2>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-white">
-              Choose Date & Time
-            </h2>
+            <div className="flex-1 max-w-[280px]">
+              <DropdownField
+                control={control}
+                name="serviceFid"
+                placeholder="Service *"
+                dataArray={servicesOptions}
+                error={errors.serviceFid}
+                className="scale-90"
+              />
+            </div>
           </div>
 
-          <div className="p-4 sm:p-5">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <DatePickerField
-                  control={control}
-                  name="appointmentDate"
-                  label="Appointment Date *"
-                  inputFormat="dd-MM-yyyy"
-                  disablePast={true}
-                  error={errors.appointmentDate}
-                />
+          <div className="p-3 sm:p-4 space-y-5">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  {appointmentDate
+                    ? format(new Date(appointmentDate), "MMMM yyyy")
+                    : format(new Date(), "MMMM yyyy")}
+                </span>
+                <div className="scale-75 origin-right">
+                  <DatePickerField
+                    control={control}
+                    name="appointmentDate"
+                    label="Appointment Date"
+                    inputFormat="dd-MM-yyyy"
+                    disablePast={true}
+                    error={errors.appointmentDate}
+                  />
+                </div>
               </div>
-              <div>
-                <DropdownField
-                  control={control}
-                  name="serviceFid"
-                  placeholder="Select Service *"
-                  dataArray={servicesOptions}
-                  error={errors.serviceFid}
-                />
+
+              <div className="flex gap-2 overflow-x-auto pb-2 ayur-scroll">
+                {(() => {
+                  const today = startOfDay(new Date());
+                  const baseDate = appointmentDate
+                    ? new Date(appointmentDate)
+                    : new Date();
+                  const monthDays = eachDayOfInterval({
+                    start: startOfMonth(baseDate),
+                    end: endOfMonth(baseDate),
+                  });
+                  return monthDays.map((d, i) => (
+                    <DateCard
+                      key={i}
+                      date={d}
+                      disabled={isBefore(startOfDay(d), today)}
+                      isSelected={
+                        appointmentDate &&
+                        format(new Date(appointmentDate), "yyyy-MM-dd") ===
+                          format(d, "yyyy-MM-dd")
+                      }
+                      onClick={() => setValue("appointmentDate", d)}
+                    />
+                  ));
+                })()}
               </div>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-              <div className="bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-2.5 flex items-center gap-2">
-                <div className="p-1 bg-white/15 rounded-lg">
-                  <Clock className="w-4 h-4 text-white" />
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   Available Slots
-                </h3>
+                </span>
               </div>
 
-              <div className="p-4 sm:p-5">
+              <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100 min-h-[140px]">
                 <AnimatePresence mode="wait">
                   {selectedDoctorId === null ? (
                     <motion.div
                       key="no-doctor"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex flex-col items-center justify-center py-10 text-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col items-center justify-center py-6 text-center"
                     >
-                      <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-200 rounded-full flex items-center justify-center mb-3 shadow-inner">
-                        <Stethoscope className="w-7 h-7 text-slate-400" />
-                      </div>
-                      <p className="text-slate-600 text-sm font-medium mb-1">
-                        No Doctor Selected
-                      </p>
-                      <p className="text-slate-400 text-xs px-4">
-                        Select a doctor and date to view available time slots
+                      <Stethoscope className="w-8 h-8 text-slate-300 mb-2" />
+                      <p className="text-slate-500 font-bold text-[11px]">
+                        Select a Consultant
                       </p>
                     </motion.div>
                   ) : loading ? (
@@ -1040,67 +1313,51 @@ function AyurvedaForm({
                       key="loading"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="flex flex-col items-center justify-center py-10"
+                      className="flex flex-col items-center justify-center py-6"
                     >
-                      <div className="relative">
-                        <div className="w-12 h-12 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin" />
-                        <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-b-teal-600 rounded-full animate-spin animation-delay-150" />
-                      </div>
-                      <p className="text-slate-600 text-sm font-medium mt-4">
-                        Loading available slots...
+                      <div className="w-8 h-8 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
+                      <p className="text-slate-400 text-[10px] font-bold mt-2">
+                        Checking slots...
                       </p>
                     </motion.div>
                   ) : doctorSlots.length === 0 ? (
                     <motion.div
                       key="no-slots"
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      className="flex flex-col items-center justify-center py-10 text-center"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col items-center justify-center py-6 text-center"
                     >
-                      <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-full flex items-center justify-center mb-3 shadow-inner">
-                        <Clock className="w-7 h-7 text-white" />
-                      </div>
-                      <p className="text-slate-600 text-sm font-medium mb-1">
-                        No Slots Available
-                      </p>
-                      <p className="text-slate-400 text-xs px-4">
-                        No available slots for the selected date
+                      <Clock className="w-8 h-8 text-slate-300 mb-2" />
+                      <p className="text-slate-400 font-bold text-[11px]">
+                        No slots this day
                       </p>
                     </motion.div>
                   ) : (
                     <motion.div
                       key="slots"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="space-y-3 max-h-[300px] overflow-y-auto overflow-x-hidden pr-1 ayur-scroll"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="grid grid-cols-3 xs:grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2"
                     >
-                      <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2">
-                        {doctorSlots.map((slot, index) => (
-                          <TimeSlotChip
-                            key={index}
-                            slot={slot}
-                            isSelected={
-                              selectedTimeSlot?.slotStartTime ===
-                              slot.slotStartTime
-                            }
-                            onSelect={() => {
-                              setSelectedTimeSlot(slot);
-                              setSlotError("");
-                            }}
-                          />
-                        ))}
-                      </div>
-                      {slotError && (
-                        <p className="text-red-500 text-xs mt-1">{slotError}</p>
-                      )}
+                      {doctorSlots.map((slot, index) => (
+                        <TimeSlotChip
+                          key={index}
+                          slot={slot}
+                          isSelected={
+                            selectedTimeSlot?.slotStartTime ===
+                            slot.slotStartTime
+                          }
+                          onSelect={() => {
+                            setSelectedTimeSlot(slot);
+                            setSlotError("");
+                          }}
+                        />
+                      ))}
                     </motion.div>
                   )}
                 </AnimatePresence>
-                {slotError && doctorSlots.length === 0 && (
-                  <p className="text-red-500 text-xs mt-2 text-center">
+                {slotError && (
+                  <p className="text-red-500 text-[10px] font-bold mt-3 text-center bg-red-50 py-1.5 rounded-lg">
                     {slotError}
                   </p>
                 )}
@@ -1113,11 +1370,11 @@ function AyurvedaForm({
           variants={sectionVariants}
           initial="hidden"
           animate="visible"
-          className="rounded-2xl border border-emerald-100 shadow-md overflow-hidden bg-white"
+          className="rounded-[9px] border border-emerald-100 shadow-md overflow-hidden bg-white"
         >
           <div className="bg-gradient-to-r from-teal-700 to-green-700 px-4 sm:px-5 py-3 flex items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <div className="p-1.5 bg-white/15 rounded-xl">
+              <div className="py-1.5 px-2 bg-white/15 rounded-[9px]">
                 <PersonSearchIcon sx={{ color: "#fff", fontSize: 20 }} />
               </div>
               <h2 className="text-base sm:text-lg font-bold text-white">
@@ -1149,8 +1406,9 @@ function AyurvedaForm({
                 <InputField
                   control={control}
                   name="fullName"
-                  label="Full Name *"
+                  label="Full Name"
                   error={errors.fullName}
+                  disabled={true}
                 />
                 {errors.fullName && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1162,8 +1420,9 @@ function AyurvedaForm({
                 <InputField
                   control={control}
                   name="mobileNumber"
-                  label="Mobile Number *"
+                  label="Mobile Number"
                   error={errors.mobileNumber}
+                  disabled={true}
                 />
                 {errors.mobileNumber && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1175,8 +1434,9 @@ function AyurvedaForm({
                 <InputField
                   control={control}
                   name="age"
-                  label="Age *"
+                  label="Age"
                   error={errors.age}
+                  disabled={true}
                 />
                 {errors.age && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1188,18 +1448,10 @@ function AyurvedaForm({
                 <DropdownField
                   control={control}
                   name="bloodGroup"
-                  placeholder="Select Blood Group *"
-                  dataArray={[
-                    { id: 1, value: "A+", label: "A+" },
-                    { id: 2, value: "A-", label: "A-" },
-                    { id: 3, value: "B+", label: "B+" },
-                    { id: 4, value: "B-", label: "B-" },
-                    { id: 5, value: "AB+", label: "AB+" },
-                    { id: 6, value: "AB-", label: "AB-" },
-                    { id: 7, value: "O+", label: "O+" },
-                    { id: 8, value: "O-", label: "O-" },
-                  ]}
+                  placeholder="Select Blood Group"
+                  dataArray={bloodGroupOptions}
                   error={errors.bloodGroup}
+                  isDisabled={true}
                 />
                 {errors.bloodGroup && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1211,13 +1463,10 @@ function AyurvedaForm({
                 <DropdownField
                   control={control}
                   name="gender"
-                  placeholder="Select Gender *"
-                  dataArray={[
-                    { id: 1, value: "Male", label: "Male" },
-                    { id: 2, value: "Female", label: "Female" },
-                    { id: 3, value: "Other", label: "Other" },
-                  ]}
+                  placeholder="Select Gender"
+                  dataArray={genderOptions}
                   error={errors.gender}
+                  isDisabled={true}
                 />
                 {errors.gender && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1229,8 +1478,9 @@ function AyurvedaForm({
                 <InputField
                   control={control}
                   name="emailAddress"
-                  label="Email Address *"
+                  label="Email Address"
                   error={errors.emailAddress}
+                           disabled={true}
                 />
                 {errors.emailAddress && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1242,8 +1492,9 @@ function AyurvedaForm({
                 <InputField
                   control={control}
                   name="city"
-                  label="City *"
+                  label="City"
                   error={errors.city}
+                           disabled={true}
                 />
                 {errors.city && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1296,11 +1547,29 @@ function AyurvedaForm({
         />
       )}
 
-      <BookingPreviewModal
-        open={previewOpen}
-        onClose={() => setPreviewOpen(false)}
-        onProceed={handleProceed}
-        data={previewData}
+      {previewOpen && (
+        <BookingPreviewModal
+          open={previewOpen}
+          onClose={() => setPreviewOpen(false)}
+          onProceed={handleProceed}
+          data={previewData}
+          activeDept={activeDept}
+          selectedDoctorId={selectedDoctorId}
+        />
+      )}
+
+      <ConfirmationModal
+        confirmationOpen={isPaymentPending}
+        confirmationHandleClose={() => {
+          if (isPaymentPending) {
+            cancelPaymentRef.current?.();
+            setIsPaymentPending(false);
+          }
+        }}
+        confirmationSubmitFunc={() => {}}
+        confirmationLabel="Payment in Progress"
+        confirmationMsg="Please complete the transaction in the new tab to book your appointment. Do not close this window."
+        confirmationButtonMsg="Waiting..."
       />
     </>
   );

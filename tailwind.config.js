@@ -15,7 +15,7 @@ module.exports = {
         ayuMysticBlue: "#4F5FFF",
         ayuOrange: "#d4731c",
         ayuLightBlue: "#4a90a4",
-        gold:"#FFD700",
+        gold: "#FFD700",
 
         border: "#e5e7eb",
         input: "#e5e7eb",
@@ -51,7 +51,7 @@ module.exports = {
           DEFAULT: "#ffffff",
           foreground: "#0f172a",
         },
-        
+
         sidebar: {
           DEFAULT: "#f8fafc",
           foreground: "#0f172a",
@@ -63,16 +63,16 @@ module.exports = {
           ring: "#3b82f6",
         },
         forest: {
-          DEFAULT: "#1a4d2e", 
-          light: "#2d6a4f", 
+          DEFAULT: "#1a4d2e",
+          light: "#2d6a4f",
         },
         lime: {
-          DEFAULT: "#b8e986", 
-          light: "#d4f1c5", 
+          DEFAULT: "#b8e986",
+          light: "#d4f1c5",
         },
         earth: {
-          DEFAULT: "#8b4513", 
-          light: "#a0522d", 
+          DEFAULT: "#8b4513",
+          light: "#a0522d",
         },
         cream: {
           DEFAULT: "#faf8f3",
@@ -116,19 +116,10 @@ module.exports = {
             height: "0",
           },
         },
-        "spin-reverse": {
-          from: {
-            transform: "rotate(360deg)",
-          },
-          to: {
-            transform: "rotate(0deg)",
-          },
-        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "spin-reverse": "spin-reverse 1s linear infinite",
       },
     },
   },

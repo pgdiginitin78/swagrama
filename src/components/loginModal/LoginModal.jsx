@@ -14,6 +14,8 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
@@ -26,6 +28,7 @@ import CommonButton from "../common/button/CommonButton";
 import ResetPassword from "./ResetPassword";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import OTPVerificationModal from "./OTPVerificationModal";
+import InputField from "../common/formFields/InputField";
 
 const ModalStyle = {
   position: "absolute",
@@ -60,6 +63,12 @@ const modalVariants = {
   },
 };
 
+const validationSchema = yup.object().shape({
+  userName: yup.string().required("Email / Mobile No. is required"),
+  password: yup.string().required("Password is required"),
+  emailAddress: yup.string().email("Please enter a valid email address"),
+});
+
 export default function LoginModal({ open, handleClose }) {
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -67,25 +76,32 @@ export default function LoginModal({ open, handleClose }) {
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [openForgotModal, setOpenForgotModal] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
-  const [forgotEmailError, setForgotEmailError] = useState("");
   const [openResetModal, setOpenResetModal] = useState(false);
   const [openOTPModal, setOpenOTPModal] = useState(false);
   const [otpEmailForVerification, setOtpEmailForVerification] = useState("");
+
+  const [emailFromResend, setEmailFromResend] = useState("");
 
   const { setIsLoading } = useLoader();
 
   const {
     control,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
+    trigger,
+    setError,
   } = useForm({
     defaultValues: {
       userName: "",
       password: "",
+      emailAddress: "",
     },
+    resolver: yupResolver(validationSchema),
   });
+
+  const emailAddressValue = watch("emailAddress");
 
   const onSubmit = async (data) => {
     setFormData(data);
@@ -124,18 +140,32 @@ export default function LoginModal({ open, handleClose }) {
   };
 
   const handleForgotPassword = async (emailFromResend) => {
-    const emailToUse = emailFromResend || forgotEmail;
-    if (!emailToUse) {
-      setForgotEmailError("Please enter your email");
-      return;
-    }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailToUse)) {
-      setForgotEmailError("Please enter a valid email address");
-      return;
-    }
-    setForgotEmailError("");
+    const emailToUse = emailFromResend || emailAddressValue;
 
+    try {
+      // Manual check for empty since trigger might not work on an optional field in schema
+      if (
+        !emailToUse ||
+        (typeof emailToUse === "string" && emailToUse.trim() === "")
+      ) {
+        setError("emailAddress", {
+          type: "manual",
+          message: "Please enter your email",
+        });
+        return;
+      }
+
+      const forgotSchema = yup
+        .string()
+        .email("Please enter a valid email address")
+        .required("Please enter your email");
+
+      await forgotSchema.validate(emailToUse);
+    } catch (err) {
+      setError("emailAddress", { type: "manual", message: err.message });
+      return;
+    }
+    setEmailFromResend(emailToUse);
     try {
       setIsLoading(true);
       const response = await forgotPassword({
@@ -146,8 +176,11 @@ export default function LoginModal({ open, handleClose }) {
         successAlert(response.data?.message || "Password reset email sent!");
         setOtpEmailForVerification(emailToUse);
         setOpenForgotModal(false);
-        setForgotEmail("");
-        setForgotEmailError("");
+        reset({
+          emailAddress: "",
+          userName: watch("userName"),
+          password: watch("password"),
+        });
         setOpenOTPModal(true);
       } else {
         errorAlert(response.data?.message || "Something went wrong");
@@ -396,7 +429,10 @@ export default function LoginModal({ open, handleClose }) {
                         <button
                           type="button"
                           className="text-xs text-ayuBrown hover:underline"
-                          onClick={() => setOpenForgotModal(true)}
+                          onClick={() => {
+                            reset({ emailAddress: "" });
+                            setOpenForgotModal(true);
+                          }}
                         >
                           Forgot Password
                         </button>
@@ -471,8 +507,7 @@ export default function LoginModal({ open, handleClose }) {
               <CancelButtonModal
                 onClick={() => {
                   setOpenForgotModal(false);
-                  setForgotEmailError("");
-                  setForgotEmail("");
+                  reset({ emailAddress: "" });
                 }}
               />
               <Typography
@@ -484,42 +519,75 @@ export default function LoginModal({ open, handleClose }) {
               <Typography variant="body2" sx={{ mb: 3, color: "#6b7d6a" }}>
                 Enter your email address to reset your password.
               </Typography>
-              <TextField
-                fullWidth
-                label="Email Address"
-                value={forgotEmail}
-                size="small"
-                error={!!forgotEmailError}
-                onChange={(e) => {
-                  setForgotEmail(e.target.value);
-                  if (forgotEmailError) setForgotEmailError("");
-                }}
-                variant="outlined"
-                sx={{
-                  mb: forgotEmailError ? 1 : 3,
-                  "& .MuiOutlinedInput-root": {
-                    borderRadius: 2,
-                    bgcolor: "#ffffff",
-                  },
-                  "& .MuiFormHelperText-root": {
-                    marginLeft: 0,
-                    mb: forgotEmailError ? 1 : 0,
-                  },
-                }}
+              <Controller
+                name="emailAddress"
+                control={control}
+                render={({ field }) => (
+                  <Box
+                    sx={{
+                      position: "relative",
+                      padding: "2px",
+                      borderRadius: 2,
+                      background:
+                        "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
+                      mb: 2,
+                      "&:hover": {
+                        boxShadow: "0 4px 12px rgba(34, 197, 94, 0.25)",
+                      },
+                    }}
+                  >
+                    <TextField
+                      {...field}
+                      value={field.value || ""}
+                      fullWidth
+                      label="Email Address"
+                      size="small"
+                      error={!!errors.emailAddress}
+                      helperText={errors.emailAddress?.message}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <Email size="small" sx={{ color: "#22c55e" }} />
+                          </InputAdornment>
+                        ),
+                      }}
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          borderRadius: "6px",
+                          backgroundColor: "#ffffff",
+                          "& fieldset": { border: "none" },
+                          "&:hover fieldset": { border: "none" },
+                          "&.Mui-focused fieldset": {
+                            border: "none",
+                          },
+                          "&.Mui-focused": {
+                            boxShadow: "0 0 0 3px rgba(34, 197, 94, 0.1)",
+                          },
+                        },
+                        "& .MuiInputLabel-root": {
+                          color: "#22c55e",
+                          fontWeight: 500,
+                          background: "white",
+                          paddingRight: 1,
+                          paddingLeft: 1,
+                          "&.Mui-focused": { color: "#22c55e" },
+                        },
+                        "& .MuiFormHelperText-root": {
+                          marginLeft: 0,
+                          color: "#d32f2f",
+                          position: "absolute",
+                          bottom: "-20px",
+                        },
+                      }}
+                    />
+                  </Box>
+                )}
               />
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "end",
-                  width: "100%",
-                  gap: 2,
-                }}
-              >
+              <div className="flex justify-end mt-6 space-x-3">
                 <CommonButton
                   type="button"
                   onClick={() => {
-                    setForgotEmailError("");
-                    setForgotEmail("");
+                    reset({ emailAddress: "" });
                   }}
                   label="Reset"
                   className={
@@ -529,11 +597,11 @@ export default function LoginModal({ open, handleClose }) {
 
                 <CommonButton
                   type="button"
-                  onClick={handleForgotPassword}
+                  onClick={() => handleForgotPassword()}
                   label="Confirm"
                   className={" bg-green-600 text-white  w-full"}
                 />
-              </Box>
+              </div>
             </Box>
           </Box>
         </Modal>
@@ -562,7 +630,7 @@ export default function LoginModal({ open, handleClose }) {
           setOpenResetModal(true);
         }}
         handleResend={handleForgotPassword}
-        phoneNumber={otpEmailForVerification}
+        emailFromResend={emailFromResend}
       />
     </>
   );

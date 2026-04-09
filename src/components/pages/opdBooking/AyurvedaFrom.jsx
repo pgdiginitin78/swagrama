@@ -865,6 +865,8 @@ function AyurvedaForm({
     }
   }, [patientFid]);
 
+
+
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
@@ -1036,7 +1038,7 @@ function AyurvedaForm({
                       .toUpperCase();
 
                     const days =
-                      doctor?.sessions[0].weekDays
+                      doctor?.sessions[0]?.weekDays
                         ?.split(",")
                         .filter((d) => d.trim())
                         .map((d) => d.trim().substring(0, 3)) ?? [];
@@ -1053,13 +1055,13 @@ function AyurvedaForm({
                         }}
                         onClick={() => setSelectedDoctorId(doctor)}
                         whileTap={{ scale: 0.98 }}
-                        className={`cursor-pointer rounded-[9px] border-2 transition-all duration-200 ${
+                        className={`cursor-pointer rounded-lg border transition-all duration-200 ${
                           isSelected
-                            ? "border-emerald-500 bg-gradient-to-r from-emerald-50 to-teal-50 shadow-lg shadow-emerald-100"
-                            : "border-gray-100 bg-white hover:border-emerald-300 hover:shadow-md"
+                            ? "border-emerald-500 bg-emerald-50 shadow-md"
+                            : "border-gray-200 bg-white active:border-emerald-400"
                         }`}
                       >
-                        <div className="flex items-center gap-3 p-3">
+                        <div className="flex items-start gap-2 p-2 sm:items-center sm:gap-3 sm:p-3 md:gap-4 md:p-4">
                           <div className="relative shrink-0">
                             {getDoctorImage(doctorName) ||
                             doctor.profilePhoto ? (
@@ -1069,85 +1071,108 @@ function AyurvedaForm({
                                   doctor.profilePhoto
                                 }
                                 alt={doctorName}
-                                className={`w-20 h-20 rounded-full object-cover bg-top shadow-md border-2 ${isSelected ? "border-emerald-400" : "border-gray-100"}`}
+                                className={`w-12 h-12 rounded-full object-cover border ${
+                                  isSelected
+                                    ? "border-emerald-400"
+                                    : "border-gray-200"
+                                } sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20`}
                               />
                             ) : (
                               <div
-                                className={`w-20 h-20 rounded-full bg-gradient-to-br ${activeGradient} flex items-center justify-center shadow-md`}
+                                className={`w-12 h-12 rounded-full bg-gradient-to-br ${activeGradient} flex items-center justify-center sm:w-14 sm:h-14 md:w-16 md:h-16 lg:w-20 lg:h-20`}
                               >
-                                <span className="text-white font-black text-lg">
+                                <span className="text-white font-bold text-xs sm:text-sm md:text-base">
                                   {initials || "?"}
                                 </span>
                               </div>
                             )}
+
                             {isSelected && (
                               <motion.div
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
-                                className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center shadow-md border-2 border-white"
+                                className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border border-white sm:w-5 sm:h-5"
                               >
                                 <CheckCircleIcon
-                                  style={{ fontSize: 14 }}
-                                  className="text-white"
+                                  style={{ fontSize: 10 }}
+                                  className="text-white sm:text-[12px]"
                                 />
                               </motion.div>
                             )}
                           </div>
 
                           <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                               <p
-                                className={`font-black text-sm leading-tight ${isSelected ? "text-emerald-800" : "text-gray-800"}`}
+                                className={`font-semibold text-xs truncate ${
+                                  isSelected
+                                    ? "text-emerald-800"
+                                    : "text-gray-800"
+                                } sm:text-sm md:text-base`}
                               >
                                 {doctorName}
                               </p>
+
                               <span
-                                className={`flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full shrink-0 ${isSelected ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"}`}
+                                className={`flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full w-fit ${
+                                  isSelected
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-gray-100 text-gray-600"
+                                } sm:text-[10px] md:text-xs`}
                               >
-                                <Clock size={10} />
-                                {doctor?.sessions[0].timeSlot} min
+                                <Clock size={9} />
+                                {doctor?.sessions[0]?.timeSlot} min
                               </span>
                             </div>
+
                             {doctor.degree?.trim() && (
-                              <p className="text-xs text-gray-500 mt-0.5 font-medium">
+                              <p className="text-[10px] text-gray-500 truncate sm:text-xs">
                                 {doctor?.degree?.trim()}
                               </p>
                             )}
-                            <p className="text-xs text-ayuBrown mt-0.5 font-medium">
+
+                            <p className="text-[10px] text-ayuBrown truncate sm:text-xs">
                               {doctor?.clinicName}
                             </p>
 
-                            {days.length > 0 && (
-                              <div className="flex items-center gap-1 mt-1.5 flex-wrap">
+                            {days?.length > 0 && (
+                              <div className="flex items-center gap-1 flex-wrap mt-1">
                                 <CalendarMonthIcon
-                                  style={{ fontSize: 16 }}
-                                  className="text-gray-400 shrink-0"
+                                  style={{ fontSize: 14 }}
+                                  className="text-gray-400"
                                 />
+
                                 {days.map((d, di) => (
                                   <span
                                     key={di}
-                                    className={`text-xs px-3 py-0.5 rounded-[5px] font-semibold ${
+                                    className={`text-[9px] px-2 py-0.5 rounded font-semibold ${
                                       isSelected
                                         ? "bg-emerald-100 text-emerald-700"
                                         : "bg-gray-100 text-gray-600"
-                                    }`}
+                                    } sm:text-[10px] md:text-xs`}
                                   >
                                     {d}
                                   </span>
                                 ))}
                               </div>
                             )}
-                            <div className="flex space-x-2 items-center mt-1 ">
+
+                            <div className="flex flex-wrap items-center gap-1 mt-1">
                               <EventAvailableIcon
-                                style={{ fontSize: 16 }}
-                                className="text-gray-400 shrink-0"
+                                style={{ fontSize: 14 }}
+                                className="text-gray-400"
                               />
-                              <p className="text-xs text-gray-500 mt-0.5 font-medium bg-slate-100 px-2 py-0.5 rounded-[5px]">
-                                {doctor?.sessions[0].morning}
+
+                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded sm:text-[10px] md:text-xs">
+                                {doctor?.sessions[0]?.morning}
                               </p>
-                              &nbsp; -
-                              <p className="text-xs text-gray-500 mt-0.5 font-medium bg-slate-100 px-2 py-0.5 rounded-[5px]">
-                                {doctor?.sessions[0].evening}
+
+                              <span className="text-[9px] text-gray-400 sm:text-[10px]">
+                                -
+                              </span>
+
+                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-2 py-0.5 rounded sm:text-[10px] md:text-xs">
+                                {doctor?.sessions[0]?.evening}
                               </p>
                             </div>
                           </div>
@@ -1391,7 +1416,7 @@ function AyurvedaForm({
           </div>
 
           <div className="p-4 sm:p-5">
-            <div className="mb-4 max-w-xs">
+            <div className="mb-5 max-w-xs">
               <DropdownField
                 control={control}
                 name="patientFid"
@@ -1402,7 +1427,7 @@ function AyurvedaForm({
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-              <div className="col-span-2">
+              <div className="sm:col-span-2">
                 <InputField
                   control={control}
                   name="fullName"
@@ -1416,6 +1441,7 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <InputField
                   control={control}
@@ -1430,6 +1456,7 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <InputField
                   control={control}
@@ -1444,6 +1471,7 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <DropdownField
                   control={control}
@@ -1459,6 +1487,7 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <DropdownField
                   control={control}
@@ -1474,13 +1503,14 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <InputField
                   control={control}
                   name="emailAddress"
                   label="Email Address"
                   error={errors.emailAddress}
-                           disabled={true}
+                  disabled={true}
                 />
                 {errors.emailAddress && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1488,13 +1518,14 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div>
                 <InputField
                   control={control}
                   name="city"
                   label="City"
                   error={errors.city}
-                           disabled={true}
+                  disabled={true}
                 />
                 {errors.city && (
                   <p className="text-red-500 text-[11px] mt-0.5">
@@ -1502,6 +1533,7 @@ function AyurvedaForm({
                   </p>
                 )}
               </div>
+
               <div className="col-span-1 sm:col-span-2 lg:col-span-4">
                 <InputArea
                   control={control}
@@ -1522,14 +1554,14 @@ function AyurvedaForm({
                 <button
                   type="button"
                   onClick={() => reset()}
-                  className="w-full sm:w-auto h-10 px-6 rounded-[9px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 transition-all duration-200"
+                  className="w-full sm:w-auto h-10 px-6 rounded-[9px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200"
                 >
                   Reset
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBooking}
-                  className="w-full sm:w-auto h-10 px-8 rounded-[9px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 transition-all duration-200 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto h-10 px-8 rounded-[9px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
                 >
                   <EventAvailableIcon sx={{ fontSize: 17 }} />
                   Confirm Booking

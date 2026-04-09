@@ -32,3 +32,7 @@ export const forgotPassword = (postObj) => {
 export const resetPassword = (postObj) => {
   return AxiosInstance.post(`/reset-password`, postObj);
 };
+
+export const verifyOtp = (postObj) => {
+  return AxiosInstance.post(`/verify-otp`, postObj);
+};

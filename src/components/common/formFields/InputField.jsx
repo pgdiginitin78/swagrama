@@ -62,14 +62,6 @@ const InputField = ({
                   },
                 })
 
-                // : (inputProps,
-                //   {
-                //     style: {
-                //       textTransform: "capitalize",
-                //       fontSize: tableInputField ? "12px" : "14px",
-                //       height: tableInputField ? "10px" : "18.5px",
-                //     },
-                //   })
               }
               sx={{
                 "& .MuiFormLabel-root": {

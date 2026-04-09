@@ -247,7 +247,7 @@ const ResetPassword = ({open,handleClose}) => {
                     type="submit"
                     label={loading ? "Updating..." : "Confirm"}
                     disabled={loading}
-                    className="flex-1 bg-ayuMid text-white  transition-all duration-300 font-semibold"
+                    className="flex-1 bg-green-600 text-white  transition-all duration-300 font-semibold"
                   />
                 </motion.div>
               </form>

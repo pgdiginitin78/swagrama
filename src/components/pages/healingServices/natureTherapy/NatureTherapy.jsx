@@ -306,21 +306,7 @@ export default function NatureTherapy() {
                     />
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                    <motion.div
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.5 }}
-                      className="absolute top-3 left-3 
-                        bg-green-500/25 
-                        backdrop-blur-md 
-                        WebkitBackdropFilter-[blur(12px)]
-                        p-2.5 rounded-xl 
-                        border border-white/30 
-                        shadow-lg"
-                    >
-                      <span className="text-green-400 text-xl">
-                        {getIcon(therapy.icon)}
-                      </span>
-                    </motion.div>
+       
                     <div
                       className="
                           absolute bottom-0 left-0 right-0

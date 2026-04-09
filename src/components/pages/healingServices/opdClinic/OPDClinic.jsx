@@ -1,19 +1,14 @@
-import Alarm from "@mui/icons-material/Alarm";
-import Info from "@mui/icons-material/Info";
-import Person from "@mui/icons-material/Person";
 import CompostIcon from "@mui/icons-material/Compost";
 import HealingIcon from "@mui/icons-material/Healing";
-import LocationPinIcon from "@mui/icons-material/LocationPin";
 import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
-import TrendingFlatIcon from "@mui/icons-material/TrendingFlat";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../../context/AuthContext";
 import {
   getDepartmentList,
   getDoctorListByLocationDepartment,
 } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
-import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 import AyurvedaForm from "../../opdBooking/AyurvedaFrom";
+import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 
 const iconMap = {
   ayurveda: CompostIcon,
@@ -37,8 +32,6 @@ const getDeptGradient = (name) => {
   return colorMap[key] ?? "from-green-600 to-emerald-500";
 };
 
-const getSlotDuration = (name) =>
-  name?.toLowerCase() === "ayurveda" ? "30 Min" : "45 Min";
 
 const OPDClinic = () => {
   const { user } = useAuth();
@@ -53,7 +46,6 @@ const OPDClinic = () => {
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
 
   const activeDept = departmentList[activeTab] ?? null;
-  const ActiveIcon = activeDept ? getDeptIcon(activeDept) : null;
   const activeGradient = activeDept ? getDeptGradient(activeDept) : "";
 
 

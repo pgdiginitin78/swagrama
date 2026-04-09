@@ -52,24 +52,43 @@ const schema = yup.object().shape({
 });
 
 const containerVariants = {
-  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  hidden: { opacity: 0, scale: 0.97, y: 16 },
   visible: {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.28, ease: "easeOut" },
   },
 };
 
 const genderOptions = [
   { id: "Male", value: "Male", label: "Male" },
-  {
-    id: "Female",
-    value: "Female",
-    label: "Female",
-  },
+  { id: "Female", value: "Female", label: "Female" },
   { id: "Other", value: "Other", label: "Other" },
 ];
+
+const SectionCard = ({
+  icon,
+  iconBg,
+  iconColor,
+  title,
+  children,
+  className = "",
+}) => (
+  <section
+    className={`bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden ${className}`}
+  >
+    <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100">
+      <div className={`p-1.5 rounded-lg ${iconBg}`}>
+        <span className={iconColor}>{icon}</span>
+      </div>
+      <h3 className="text-sm font-extrabold text-slate-800 tracking-tight">
+        {title}
+      </h3>
+    </div>
+    <div className="p-4">{children}</div>
+  </section>
+);
 
 const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   const { user } = useAuth();
@@ -128,7 +147,6 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
       macIp: ipAddress,
       userId: user?.userId,
-
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
@@ -173,10 +191,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
               (item) =>
                 item.label?.toLowerCase() === userData?.gender?.toLowerCase(),
             );
-
-            if (filterGender) {
-              setValue("gender", filterGender.value);
-            }
+            if (filterGender) setValue("gender", filterGender.value);
             setValue("age", userData.age || "");
             setValue("address", userData.address || "");
             setValue("city", userData.city || "");
@@ -186,7 +201,6 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
             setValue("country", userData.country || "India");
             setValue("userName", userData.userName || "");
             setValue("occupation", userData.occupation || "");
-
             if (userData.avatar) setAvatarPreview(userData.avatar);
           }
         })
@@ -246,9 +260,15 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       <Modal
         open={open}
         onClose={onClose}
-        sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        sx={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "center",
+          "@media (min-width: 640px)": { alignItems: "center" },
+        }}
       >
-        <Box sx={{ outline: "none" }}>
+        <Box sx={{ outline: "none", width: "100%" }}>
+          
           <AnimatePresence>
             {open && (
               <motion.div
@@ -256,125 +276,135 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
-                className="w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[1000px] max-h-[95vh] overflow-hidden rounded-[9px] shadow-2xl bg-white border border-emerald-100 flex flex-col"
+                className="w-[92vw] md:w-[85vw] lg:w-[960px] mx-auto max-h-[92vh] sm:max-h-[90vh] flex flex-col rounded-t-2xl sm:rounded-2xl shadow-2xl bg-white overflow-hidden border border-emerald-100"
               >
-                <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-6 py-4 relative ">
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl pointer-events-none" />
-
+                <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-4 sm:px-6 py-3.5 sm:py-4 relative shrink-0">
+              
                   <div className="relative flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="bg-white/20 backdrop-blur-md p-2 rounded-[9px] border border-white/30 shadow-inner">
-                        <UserIcon className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="shrink-0 bg-white/20 backdrop-blur-md p-1.5 sm:p-2 rounded-lg border border-white/30">
+                        <UserIcon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                       </div>
-                      <div>
-                        <h2 className="text-xl md:text-2xl font-black text-white ">
+                      <div className="min-w-0">
+                        <h2 className="text-base sm:text-xl font-black text-white leading-tight truncate">
                           Manage Profile
                         </h2>
+                        <p className="text-white/70 text-[10px] sm:text-xs font-medium hidden sm:block">
+                          Update your personal information
+                        </p>
                       </div>
                     </div>
                     <CancelButtonModal onClick={onClose} />
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto p-4 sm:p-6 custom-scrollbar bg-slate-50/30">
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                      <div className="lg:col-span-3 flex flex-col items-center">
-                        <div className="relative group">
-                          <div className="w-24 h-24 rounded-[9px] overflow-hidden border-2 border-white shadow-lg bg-emerald-50 flex items-center justify-center relative transition-transform group-hover:scale-105 duration-300">
-                            {avatarPreview ? (
-                              <img
-                                src={avatarPreview}
-                                alt="Avatar"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <UserIcon className="w-12 h-12 text-emerald-200" />
-                            )}
-                            <div
-                              onClick={() => fileRef.current?.click()}
-                              className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity duration-300"
-                            >
-                              <Camera className="w-6 h-6 text-white" />
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => fileRef.current?.click()}
-                            className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1.5 rounded-[9px] shadow-lg border-2 border-white hover:bg-emerald-600 transition-colors"
-                          >
-                            <Camera size={14} />
-                          </button>
-                          <input
-                            ref={fileRef}
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={handleAvatarChange}
-                          />
-                        </div>
-                        <p className="mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                          Profile Picture
-                        </p>
+                <div className="flex-1 overflow-y-auto overscroll-contain bg-slate-50/40">
+                  <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="p-3 sm:p-4 md:p-5 space-y-3 sm:space-y-4"
+                  >
+                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-slate-100">
+                        <h3 className="text-sm font-extrabold text-slate-800 tracking-tight">
+                          Profile
+                        </h3>
                       </div>
+                      <div className="p-4">
+                        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                          <div className="flex flex-col items-center gap-2 shrink-0">
+                            <div
+                              className="relative group cursor-pointer"
+                              onClick={() => fileRef.current?.click()}
+                            >
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border-2 border-emerald-100 shadow-md bg-emerald-50 flex items-center justify-center">
+                                {avatarPreview ? (
+                                  <img
+                                    src={avatarPreview}
+                                    alt="Avatar"
+                                    className="w-full h-full object-cover"
+                                  />
+                                ) : (
+                                  <UserIcon className="w-9 h-9 sm:w-10 sm:h-10 text-emerald-200" />
+                                )}
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 group-active:opacity-100 flex items-center justify-center transition-opacity duration-200 rounded-xl">
+                                  <Camera className="w-5 h-5 text-white" />
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 sm:p-1.5 rounded-lg shadow-md border-2 border-white hover:bg-emerald-600 active:scale-95 transition-all"
+                              >
+                                <Camera
+                                  size={12}
+                                  className="sm:w-3.5 sm:h-3.5"
+                                />
+                              </button>
+                            </div>
+                            <p className="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                              Photo
+                            </p>
+                            <input
+                              ref={fileRef}
+                              type="file"
+                              accept="image/*"
+                              hidden
+                              onChange={handleAvatarChange}
+                            />
+                          </div>
 
-                      <div className="lg:col-span-9 bg-white p-4 rounded-[9px] border border-slate-200 shadow-sm relative overflow-hidden">
-                        <div>
-                          <h3 className="text-base font-black text-slate-800 mb-2 flex items-center gap-2">
-                            User Info
-                          </h3>
-                        </div>
-                        <div className=" grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
-                          <InputField
-                            control={control}
-                            name="FirstName"
-                            label="First Name *"
-                            error={errors.FirstName}
-                          />
-
-                          <InputField
-                            control={control}
-                            name="lastName"
-                            label="Last Name *"
-                            error={errors.lastName}
-                          />
-
-                          <div className="space-y-1 col-span-2">
+                          <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <InputField
                               control={control}
-                              name="userName"
-                              label="Username *"
-                              error={errors.userName}
+                              name="FirstName"
+                              label="First Name *"
+                              error={errors.FirstName}
                             />
+                            <InputField
+                              control={control}
+                              name="lastName"
+                              label="Last Name *"
+                              error={errors.lastName}
+                            />
+                            <div className="sm:col-span-2">
+                              <InputField
+                                control={control}
+                                name="userName"
+                                label="Username *"
+                                error={errors.userName}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <section className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                        <h3 className="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
-                          <div className="p-1.5 bg-amber-100 rounded-[9px] text-amber-600">
-                            <Calendar size={18} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+                      <SectionCard
+                        icon={<Calendar size={16} />}
+                        iconBg="bg-amber-100"
+                        iconColor="text-amber-600"
+                        title="Personal Information"
+                      >
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="col-span-2 sm:col-span-1">
+                            <DatePickerField
+                              control={control}
+                              name="dob"
+                              label="Date of Birth *"
+                              disableFuture
+                              error={errors.dob}
+                            />
                           </div>
-                          Personal Information
-                        </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <DatePickerField
-                            control={control}
-                            name="dob"
-                            label="Date of Birth *"
-                            disableFuture
-                            error={errors.dob}
-                          />
-                          <InputField
-                            control={control}
-                            name="age"
-                            label="Age"
-                            error={errors.age}
-                            disabled
-                          />
-                          <div className="sm:col-span-2">
+                          <div className="col-span-2 sm:col-span-1">
+                            <InputField
+                              control={control}
+                              name="age"
+                              label="Age"
+                              error={errors.age}
+                              disabled
+                            />
+                          </div>
+                          <div className="col-span-2">
                             <RadioField
                               control={control}
                               name="gender"
@@ -383,15 +413,15 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                             />
                           </div>
                         </div>
-                      </section>
-                      <section className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                        <h3 className="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
-                          <div className="p-1.5 bg-blue-100 rounded-[9px] text-blue-600">
-                            <Phone size={18} />
-                          </div>
-                          Contact Information
-                        </h3>
-                        <div className="space-y-4">
+                      </SectionCard>
+
+                      <SectionCard
+                        icon={<Phone size={16} />}
+                        iconBg="bg-blue-100"
+                        iconColor="text-blue-600"
+                        title="Contact Information"
+                      >
+                        <div className="space-y-3">
                           <InputField
                             control={control}
                             name="mobileNo"
@@ -410,85 +440,90 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                             error={errors.emailId}
                           />
                         </div>
-                      </section>
-                      <section className="lg:col-span-2 bg-white p-5 rounded-[9px] shadow-sm border border-slate-200 hover:shadow-md transition-shadow">
-                        <h3 className="text-base font-black text-slate-800 mb-4 flex items-center gap-2">
-                          <div className="p-1.5 bg-emerald-100 rounded-[9px] text-emerald-600">
-                            <MapPin size={18} />
-                          </div>
-                          Address Information
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      </SectionCard>
+                    </div>
+
+                    <SectionCard
+                      icon={<MapPin size={16} />}
+                      iconBg="bg-emerald-100"
+                      iconColor="text-emerald-600"
+                      title="Address Information"
+                    >
+                      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="col-span-1">
                           <InputField
                             control={control}
                             name="pinCode"
                             label="Pincode *"
                             error={errors.pinCode}
                           />
+                        </div>
+                        <div className="col-span-1">
                           <InputField
                             control={control}
                             name="locality"
                             label="Locality *"
                             error={errors.locality}
                           />
+                        </div>
+                        <div className="col-span-1">
                           <InputField
                             control={control}
                             name="city"
                             label="City *"
                             error={errors.city}
                           />
+                        </div>
+                        <div className="col-span-1">
                           <InputField
                             control={control}
                             name="state"
                             label="State *"
                             error={errors.state}
                           />
-
-                          <div className="md:col-span-1">
-                            <InputField
-                              control={control}
-                              name="country"
-                              label="Country *"
-                              error={errors.country}
-                            />
-                          </div>
-
-                          <div className="md:col-span-3">
-                            <InputArea
-                              control={control}
-                              name="address"
-                              label="Address *"
-                              error={errors.address}
-                              minRows={1}
-                            />
-                          </div>
                         </div>
-                      </section>
-                    </div>
+                        <div className="col-span-1">
+                          <InputField
+                            control={control}
+                            name="country"
+                            label="Country *"
+                            error={errors.country}
+                          />
+                        </div>
+                        <div className="col-span-2 sm:col-span-1 md:col-span-3">
+                          <InputArea
+                            control={control}
+                            name="address"
+                            label="Address *"
+                            error={errors.address}
+                            minRows={1}
+                          />
+                        </div>
+                      </div>
+                    </SectionCard>
                   </form>
                 </div>
-                <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between">
-                  <div className="hidden sm:flex items-center gap-2 text-slate-400 text-xs font-medium">
-                    <CheckCircle size={14} /> Data is secured with SSL
-                    encryption
-                  </div>
-                  <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <div className="flex-1 sm:flex-initial">
+
+                <div className="shrink-0 px-3 sm:px-6 py-3 sm:py-4 border-t border-slate-100 bg-white">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="hidden sm:flex items-center gap-1.5 text-slate-400 text-xs font-medium shrink-0">
+                      <CheckCircle size={13} />
+                      <span>SSL encrypted</span>
+                    </div>
+                    <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
                       <CommonButton
                         type="button"
                         label="Reset"
                         onClick={reset}
-                        className={"text-red-600 border border-red-600"}
+                        className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all text-sm py-2 px-4 rounded-lg font-bold"
                       />
-                    </div>
-                    <div className="flex-[2] sm:flex-initial">
                       <CommonButton
                         onClick={handleSubmit(onSubmit)}
                         disabled={
                           !isDirty && authUser?.avatar === avatarPreview
                         }
-                        label="Update"
-                        className="bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:grayscale disabled:opacity-50 text-sm"
+                        label="Update Profile"
+                        className="flex-[2] sm:flex-initial bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-md hover:shadow-lg active:scale-95 transition-all disabled:grayscale disabled:opacity-50 text-sm py-2 px-5 rounded-lg"
                       />
                     </div>
                   </div>
@@ -498,12 +533,13 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
           </AnimatePresence>
         </Box>
       </Modal>
+
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationHandleClose={() => setOpenConfirmationModal(false)}
         confirmationSubmitFunc={handleUserSignup}
         confirmationLabel="Confirm Registration"
-        confirmationMsg="Are you sure you want to upadte this account profile"
+        confirmationMsg="Are you sure you want to update this account profile"
         confirmationButtonMsg="Confirm"
       />
     </>

@@ -35,7 +35,12 @@ const schema = yup.object().shape({
     .oneOf([yup.ref("password"), null], "Passwords must match"),
 });
 
-const ResetPassword = ({open,handleClose}) => {
+const ResetPassword = ({
+  open,
+  handleClose,
+  otpEmailForVerification,
+  setOtpEmailForVerification,
+}) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,17 +68,17 @@ const ResetPassword = ({open,handleClose}) => {
     setLoading(true);
     try {
       const postObj = {
-        token: token,
+        token: otpEmailForVerification,
         NewPassword: data.password,
         ConfirmPassword: data.confirmPassword,
       };
       const response = await resetPassword(postObj);
-      if (response.status === 200 || response.status === 201) {
-        successAlert(response.data.message || "Password reset successfully!");
-        setTimeout(() => navigate("/"), 2000);
-      } else {
-        errorAlert(response.data.message || "Something went wrong!");
-      }
+      console.log("response12345", response);
+
+      handleClose();
+      successAlert(response.data.message || "Password reset successfully!");
+      setTimeout(() => navigate("/"), 2000);
+      setOtpEmailForVerification("");
     } catch (error) {
       errorAlert(error.response?.data?.message || "Failed to reset password");
     } finally {
@@ -104,27 +109,25 @@ const ResetPassword = ({open,handleClose}) => {
   };
 
   const ModalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "100%",
-  maxWidth: "400px",
-  maxHeight: "600px",
-  overflowY: "auto",
-  bgcolor: "#f8fbf6",
-  borderRadius: 3,
-  boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
-  border: "1px solid #e6efe3",
-  p: 3,
-};
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "100%",
+    maxWidth: "400px",
+    maxHeight: "600px",
+    overflowY: "auto",
+    bgcolor: "#f8fbf6",
+    borderRadius: 3,
+    boxShadow: "0 10px 40px rgba(0,0,0,0.08)",
+    border: "1px solid #e6efe3",
+    p: 3,
+  };
 
   return (
-    <Modal open={open} >
+    <Modal open={open}>
       <Box sx={ModalStyle}>
-        <Box
- 
-        >
+        <Box>
           <CancelButtonModal onClick={handleClose} />
           <div className="">
             <motion.div
@@ -189,7 +192,6 @@ const ResetPassword = ({open,handleClose}) => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         bgcolor: "#ffffff",
-                    
                       },
                     }}
                   />
@@ -227,7 +229,6 @@ const ResetPassword = ({open,handleClose}) => {
                     sx={{
                       "& .MuiOutlinedInput-root": {
                         bgcolor: "#ffffff",
-               
                       },
                     }}
                   />

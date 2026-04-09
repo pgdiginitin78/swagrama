@@ -72,17 +72,11 @@ const ServicesTabs = () => {
   const hasChildren = current.children && current.children.length > 0;
 
   return (
-    <Box
-      sx={{
-        background: "linear-gradient(135deg, #f5f7fa 0%, #e9ecf1 100%)",
-        minHeight: "100vh",
-        py: { xs: 2, md: 2 },
-      }}
-    >
-      <h1 className="text-2xl font-bold text-center text-green-800 mb-4">
-       स्वउपचारसेवा Healing Services
+    <div className="pt-16 md:pt-3">
+      <h1 className="text-xl md:text-2xl font-semibold text-center text-green-800 mb-4">
+        स्वउपचारसेवा Healing Services
       </h1>
-      <Container maxWidth="2xl">
+      <div className="max-w-6xl mx-auto">
         <Box
           sx={{
             background: "rgba(255, 255, 255, 0.7)",
@@ -376,8 +370,8 @@ const ServicesTabs = () => {
             )}
           </Box>
         </Card>
-      </Container>
-    </Box>
+      </div>
+    </div>
   );
 };
 

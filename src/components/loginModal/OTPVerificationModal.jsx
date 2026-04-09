@@ -15,10 +15,12 @@ const OTPVerificationModal = ({
   handleResend,
   phoneNumber = "",
   emailFromResend,
+  setOtpEmailForVerification
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+
   const inputRefs = [
     useRef(),
     useRef(),
@@ -140,6 +142,7 @@ const OTPVerificationModal = ({
     };
 
     setIsLoading(true);
+    setOtpEmailForVerification(otpString)
     verifyOtp(tempObj)
       .then((res) => {
         if (res.status === 200) {

@@ -28,7 +28,7 @@ import CommonButton from "../common/button/CommonButton";
 import ResetPassword from "./ResetPassword";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import OTPVerificationModal from "./OTPVerificationModal";
-import InputField from "../common/formFields/InputField";
+
 
 const ModalStyle = {
   position: "absolute",
@@ -619,6 +619,8 @@ export default function LoginModal({ open, handleClose }) {
         <ResetPassword
           open={openResetModal}
           handleClose={() => setOpenResetModal(false)}
+          otpEmailForVerification={otpEmailForVerification}
+                  setOtpEmailForVerification={setOtpEmailForVerification}
         />
       )}
 
@@ -631,6 +633,7 @@ export default function LoginModal({ open, handleClose }) {
         }}
         handleResend={handleForgotPassword}
         emailFromResend={emailFromResend}
+        setOtpEmailForVerification={setOtpEmailForVerification}
       />
     </>
   );

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getPatientDataByMobileNo } from "../../services/bookAppointment/BookAppointmentServices";
-import { Modal, Box, IconButton } from "@mui/material";
+import { Modal, Box } from "@mui/material";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -8,11 +8,8 @@ import {
   Phone,
   Calendar,
   Heart,
-  ChevronRight,
   Pencil,
-  Plus,
   ArrowLeft,
-  Save,
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import InputField from "../common/formFields/InputField";
@@ -48,6 +45,20 @@ const relationOptions = [
   { value: "Other", label: "Other" },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 320, damping: 26 },
+  },
+};
+
 export default function ManageMembers({ open, onClose, user, setOpen }) {
   const [memberList, setMemberList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,6 +84,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       dob: "",
       relation: null,
       address: "",
+      pinCode: "",
     },
   });
 
@@ -86,8 +98,8 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
     setValue(
       "relation",
       relationOptions.find(
-        (opt) => opt.value.toLowerCase() === member.relation.toLowerCase(),
-      ) || null,
+        (opt) => opt.value.toLowerCase() === member.relation.toLowerCase()
+      ) || null
     );
     setValue("address", member.address);
     setView("form");
@@ -102,12 +114,11 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       dob: null,
       relation: null,
       address: "",
+      pinCode: "",
     });
     setView("form");
   };
 
-  console.log("memberList", memberList);
- 
   const onSubmit = (data) => {
     const payload = {
       userId: editingId,
@@ -142,26 +153,12 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       });
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { type: "spring", stiffness: 300, damping: 24 },
-    },
-  };
-
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => setIpAddress(data.ip))
       .catch((err) => console.error("IP fetch error:", err));
-  }, [setValue]);
+  }, []);
 
   useEffect(() => {
     if (user?.mobileNo && open) {
@@ -171,11 +168,10 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
           setMemberList(res.data.data);
           setLoading(false);
         })
-        .catch(() => {
-          setLoading(false);
-        });
+        .catch(() => setLoading(false));
     }
   }, [user, open]);
+
   return (
     <>
       <Modal
@@ -183,64 +179,78 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
         onClose={onClose}
         aria-labelledby="manage-members-title"
         closeAfterTransition
-        className="flex items-center justify-center p-4"
       >
         <Box
           sx={modalStyle}
-          className="w-full max-w-[950px] focus:outline-none"
+          className="w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] md:w-[720px] lg:w-[950px] focus:outline-none h-full max-h-[90vh]"
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            initial={{ opacity: 0, scale: 0.96, y: 24 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="bg-white rounded-xl overflow-hidden shadow-xl border border-gray-100 flex flex-col max-h-[90vh]"
+            exit={{ opacity: 0, scale: 0.96, y: 24 }}
+            transition={{ type: "spring", stiffness: 280, damping: 28 }}
+            className="bg-white rounded-2xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col h-full max-h-[92vh] sm:max-h-[88vh]"
           >
-            <div className="bg-gradient-to-r from-green-600 to-emerald-500 px-4 py-4 flex justify-between items-center text-white sticky top-0 z-10">
-              <div className="flex items-center gap-4">
+            <div className="bg-gradient-to-r from-green-600 to-emerald-500 px-3 sm:px-6 py-3 sm:py-4 md:flex items-center md:justify-between text-white sticky top-0 z-10 shrink-0">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                 {view === "form" && (
                   <button
                     onClick={() => setView("list")}
-                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                    className="p-1.5 sm:p-2 hover:bg-white/20 rounded-full transition-colors shrink-0"
                   >
-                    <ArrowLeft size={20} />
+                    <ArrowLeft size={18} />
                   </button>
                 )}
-                <div>
+                <div className="min-w-0">
                   <h2
                     id="manage-members-title"
-                    className="text-2xl font-bold tracking-tight"
+                    className="text-base sm:text-xl font-bold tracking-tight truncate"
                   >
                     {view === "list"
                       ? "Manage Members"
                       : editingId
-                        ? "Edit Member"
-                        : "Add New Member"}
+                      ? "Edit Member"
+                      : "Add New Member"}
                   </h2>
+                  {view === "list" && memberList.length > 0 && (
+                    <p className="text-green-100 text-[10px] sm:text-xs font-medium mt-0.5">
+                      {memberList.length} member{memberList.length !== 1 ? "s" : ""} linked
+                    </p>
+                  )}
                 </div>
               </div>
-              <CancelButtonModal onClick={onClose} />
+
+              <div className="md:flex items-center gap-2 shrink-0 flex justify-end">
+                {view === "list" && (
+                  <button
+                    onClick={handleAddNew}
+                    className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors mr-5"
+                  >
+                    <span className="text-base leading-none">+</span>
+                    <span className="hidden sm:inline">Add Member</span>
+                    <span className="sm:hidden">Add</span>
+                  </button>
+                )}
+           
+                <CancelButtonModal   onClick={onClose}/>
+              </div>
             </div>
 
-            <div className="overflow-y-auto custom-scrollbar grow bg-gray-50/30">
+            <div className="overflow-y-auto grow bg-gray-50/40">
               <AnimatePresence mode="wait">
                 {view === "list" ? (
                   <motion.div
                     key="list"
-                    initial={{ opacity: 0, x: -20 }}
+                    initial={{ opacity: 0, x: -16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    className="p-8 space-y-4"
+                    exit={{ opacity: 0, x: 16 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3 sm:p-5 lg:p-7"
                   >
-                    <div className="flex justify-between items-center mb-6">
-                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        Your Family ({memberList.length})
-                      </span>
-                    </div>
-
                     {loading ? (
-                      <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                        <div className="w-10 h-10 border-4 border-green-500/30 border-t-green-600 rounded-full animate-spin" />
-                        <p className="text-sm text-gray-500 font-medium tracking-wide">
+                      <div className="flex flex-col items-center justify-center py-16 sm:py-24 gap-4">
+                        <div className="w-9 h-9 border-4 border-green-500/30 border-t-green-600 rounded-full animate-spin" />
+                        <p className="text-sm text-gray-500 font-medium">
                           Fetching family members...
                         </p>
                       </div>
@@ -249,76 +259,66 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
-                        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+                        className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
                       >
                         {memberList.map((member) => (
                           <motion.div
                             key={member.id}
                             variants={itemVariants}
-                            whileHover={{ scale: 1.02, y: -2 }}
-                            className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex items-center gap-5 group border-l-4 border-l-transparent hover:border-l-green-500"
+                            whileHover={{ scale: 1.01, y: -2 }}
+                            className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 group overflow-hidden"
                           >
-                            <div className="w-14 h-14 rounded-full bg-green-50 border border-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-100 transition-colors">
-                              <User
-                                className="text-green-600 group-hover:scale-110 transition-transform"
-                                size={28}
-                              />
-                            </div>
-
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1.5">
-                                <h3 className="font-bold text-gray-800 truncate text-lg capitalize">
-                                  {member.firstName} {member.lastName}
-                                </h3>
-                                <span className="text-[10px] font-black px-2.5 py-1 bg-green-50 text-green-700 border border-green-100 rounded-lg uppercase tracking-wider">
-                                  {member.relation || user?.relation}
-                                </span>
+                            <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border-l-4 border-l-transparent group-hover:border-l-green-500 transition-all duration-300">
+                              <div className="w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-green-50 border border-green-100 flex items-center justify-center shrink-0 group-hover:bg-green-100 transition-colors">
+                                <User className="text-green-600" size={22} />
                               </div>
 
-                              <div className="flex flex-col gap-1.5 mt-2">
-                                <div className="flex items-center text-xs text-gray-500 gap-2 font-medium">
-                                  <Phone
-                                    size={14}
-                                    className="text-green-500 shrink-0"
-                                  />
-                                  <span>{member.mobileNo}</span>
-                                </div>
-                                <div className="flex items-center text-xs text-gray-500 gap-2 font-medium">
-                                  <Calendar
-                                    size={14}
-                                    className="text-blue-500 shrink-0"
-                                  />
-                                  <span>
-                                    {member.dob || "Date of Birth N/A"}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between gap-2 mb-1">
+                                  <h3 className="font-bold text-gray-800 text-sm sm:text-base capitalize leading-tight truncate">
+                                    {member.firstName} {member.lastName}
+                                  </h3>
+                                  <span className="text-[9px] sm:text-[10px] font-black px-2 py-0.5 bg-green-50 text-green-700 border border-green-100 rounded-md uppercase tracking-wider shrink-0">
+                                    {member.relation || user?.relation}
                                   </span>
                                 </div>
-                              </div>
-                            </div>
 
-                            <button
-                              onClick={() => handleEdit(member)}
-                              className="p-3 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
-                            >
-                              <Pencil size={20} />
-                            </button>
+                                <div className="flex flex-col gap-1 mt-1.5">
+                                  <div className="flex items-center text-[11px] sm:text-xs text-gray-500 gap-1.5 font-medium">
+                                    <Phone size={11} className="text-green-500 shrink-0" />
+                                    <span className="truncate">{member.mobileNo}</span>
+                                  </div>
+                                  <div className="flex items-center text-[11px] sm:text-xs text-gray-500 gap-1.5 font-medium">
+                                    <Calendar size={11} className="text-blue-400 shrink-0" />
+                                    <span>{member.dob || "DOB not available"}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <button
+                                onClick={() => handleEdit(member)}
+                                className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all shrink-0"
+                              >
+                                <Pencil size={16} />
+                              </button>
+                            </div>
                           </motion.div>
                         ))}
                       </motion.div>
                     ) : (
-                      <div className="text-center py-24 px-10">
-                        <div className="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border-2 border-dashed border-gray-200">
-                          <Heart className="text-gray-300" size={40} />
+                      <div className="flex flex-col items-center justify-center py-16 sm:py-24 px-6 text-center">
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-50 rounded-2xl sm:rounded-3xl flex items-center justify-center mx-auto mb-5 border-2 border-dashed border-gray-200">
+                          <Heart className="text-gray-300" size={32} />
                         </div>
-                        <h3 className="text-gray-900 text-xl font-bold mb-2">
+                        <h3 className="text-gray-900 text-lg sm:text-xl font-bold mb-2">
                           Build Your Family Circle
                         </h3>
-                        <p className="text-gray-500 text-sm max-w-xs mx-auto">
-                          Link family members to centralize health records and
-                          manage appointments seamlessly.
+                        <p className="text-gray-500 text-sm max-w-xs">
+                          Link family members to centralize health records and manage appointments seamlessly.
                         </p>
                         <button
                           onClick={handleAddNew}
-                          className="mt-8 px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-bold text-sm transition-all shadow-lg"
+                          className="mt-6 sm:mt-8 px-6 sm:px-8 py-2.5 sm:py-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white rounded-xl font-bold text-sm transition-all shadow-lg shadow-green-600/20"
                         >
                           Add First Member
                         </button>
@@ -328,16 +328,14 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                 ) : (
                   <motion.div
                     key="form"
-                    initial={{ opacity: 0, x: 20 }}
+                    initial={{ opacity: 0, x: 16 }}
                     animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    className="p-10"
+                    exit={{ opacity: 0, x: -16 }}
+                    transition={{ duration: 0.2 }}
+                    className="p-3 sm:p-5 lg:p-8"
                   >
-                    <form
-                      onSubmit={handleSubmit(onSubmit)}
-                      className="space-y-8"
-                    >
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-x-6 sm:gap-y-5">
                         <InputField
                           name="firstName"
                           label="First Name"
@@ -370,38 +368,33 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                           dataArray={relationOptions}
                           error={errors.relation}
                         />
-                      </div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <InputField
-                            name="pinCode"
-                            label="Pin Code"
-                            control={control}
-                            error={errors.pinCode}
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <InputArea
-                            name="address"
-                            label="Address"
-                            control={control}
-                            error={errors.address}
-                            minRows={3}
-                          />
-                        </div>
+                        <InputField
+                          name="pinCode"
+                          label="Pin Code"
+                          control={control}
+                          error={errors.pinCode}
+                        />
                       </div>
 
-                      <div className="flex gap-4 justify-end">
+                      <InputArea
+                        name="address"
+                        label="Address"
+                        control={control}
+                        error={errors.address}
+                        minRows={3}
+                      />
+
+                      <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-1">
                         <CommonButton
                           type="button"
                           label="Reset"
                           onClick={reset}
-                          className="border border-red-600 text-red-600 "
+                          className="border border-red-500 text-red-600 w-full sm:w-auto"
                         />
                         <CommonButton
                           type="submit"
                           label={editingId ? "Update Member" : "Save Member"}
-                          className="bg-green-600  text-white"
+                          className="bg-green-600 text-white w-full sm:w-auto"
                         />
                       </div>
                     </form>
@@ -412,6 +405,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
           </motion.div>
         </Box>
       </Modal>
+
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationHandleClose={() => setOpenConfirmationModal(false)}

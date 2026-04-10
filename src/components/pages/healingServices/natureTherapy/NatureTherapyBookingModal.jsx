@@ -25,6 +25,7 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
 
 const dropdownObjectSchema = yup
   .object()
@@ -32,17 +33,15 @@ const dropdownObjectSchema = yup
     id: yup.mixed().required(),
     label: yup.string().required(),
   })
-  .nullable()
-  .required("This field is required");
+  .nullable();
 
 const schema = yup.object().shape({
-  location: dropdownObjectSchema.typeError("Location is required"),
-  clinicFid: dropdownObjectSchema.typeError("Clinic is required"),
-  patientFid: dropdownObjectSchema.typeError("Patient is required"),
-  doctorFid: dropdownObjectSchema.typeError("Therapist/Doctor is required"),
-  serviceFid: dropdownObjectSchema.typeError("Therapy is required"),
-  fromDate: yup.date().required("From date is required").nullable(),
-  toDate: yup.date().required("To date is required").nullable(),
+  serviceFid: yup.object().nullable().required("Therapy is required"),
+  fromDate: yup
+    .date()
+    .typeError("Invalid date")
+    .required("Date is required")
+    .nullable(),
   noOfPerson: yup
     .number()
     .typeError("Must be a number")
@@ -53,6 +52,10 @@ const schema = yup.object().shape({
     .oneOf([true], "You must accept the terms")
     .required(),
   specialRequest: yup.string().nullable(),
+  fullName: yup.string().required("Full name is required"),
+  mobile: yup.string().required("Mobile number is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  city: yup.string().nullable(),
 });
 
 const containerVariants = {
@@ -133,16 +136,18 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     defaultValues: {
       location: null,
       clinicFid: null,
-      patientFid: null,
       doctorFid: null,
       serviceFid: null,
       fromDate: null,
-      toDate: null,
       noOfPerson: 1,
       termsAccepted: false,
       specialRequest: "",
       totalAmount: 0,
       perDayAmount: 0,
+      fullName: "",
+      email: "",
+      mobile: "",
+      city: "",
     },
     mode: "onChange",
   });
@@ -151,44 +156,36 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   const clinicFidValue = watch("clinicFid");
   const doctorValue = watch("doctorFid");
   const fromDate = watch("fromDate");
-  const toDate = watch("toDate");
   const noOfPerson = watch("noOfPerson");
 
   useEffect(() => {
-    let days = 0;
-    if (fromDate && toDate) {
-      days =
-        Math.max(0, differenceInDays(new Date(toDate), new Date(fromDate))) + 1;
-    }
-
     const totalPeople = parseInt(noOfPerson) || 1;
-
     let pricePerPerson = 1000;
-    if (therapy) {
-      const singlePrice = therapy.price
-        ? parseInt(therapy.price.split("/")[0])
-        : 1000;
-      const groupPrice = therapy.priceRange
-        ? parseInt(therapy.priceRange.split("/")[0])
-        : 750;
-      const bulkPrice = therapy.bulkPrice
-        ? parseInt(therapy.bulkPrice.split("/")[0])
-        : 500;
 
-      if (totalPeople >= 5) {
+    if (therapy) {
+      const getBasePrice = (priceStr) => {
+        if (!priceStr) return 0;
+        const mainPart = String(priceStr).split("/")[0];
+        return parseInt(mainPart.replace(/[^0-9]/g, "")) || 0;
+      };
+
+      const singlePrice = getBasePrice(therapy.price);
+      const groupPrice = getBasePrice(therapy.priceRange);
+      const bulkPrice = getBasePrice(therapy.bulkPrice);
+
+      if (totalPeople >= 5 && bulkPrice > 0) {
         pricePerPerson = bulkPrice;
-      } else if (totalPeople >= 2) {
+      } else if (totalPeople >= 2 && groupPrice > 0) {
         pricePerPerson = groupPrice;
       } else {
-        pricePerPerson = singlePrice;
+        pricePerPerson = singlePrice || 1000;
       }
     }
 
-    const sessionAmount = pricePerPerson * (totalPeople > 0 ? totalPeople : 1);
-
-    setValue("perDayAmount", sessionAmount);
-    setValue("totalAmount", days > 0 ? days * sessionAmount : sessionAmount);
-  }, [fromDate, toDate, noOfPerson, therapy, setValue]);
+    const sessionAmount = pricePerPerson * totalPeople;
+    setValue("perDayAmount", pricePerPerson);
+    setValue("totalAmount", sessionAmount);
+  }, [noOfPerson, therapy, setValue]);
 
   useEffect(() => {
     getLocationList()
@@ -241,72 +238,77 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   }, [clinicsOptions, setValue]);
 
   useEffect(() => {
-    if (clinicFidValue?.id > 0) {
-      setValue("doctorFid", null);
-      setDoctorSlots([]);
-      setSelectedTimeSlot(null);
-      setSlotError("");
+    setValue("doctorFid", null);
+    setDoctorSlots([]);
+    setSelectedTimeSlot(null);
+    setSlotError("");
 
-      getDoctorsByClinicId(clinicFidValue?.id)
+    getDoctorsByClinicId(5)
+      .then((res) => {
+        const data = res?.data?.data;
+        if (data?.length) {
+          const formatted = data.map((item) => ({
+            ...item,
+            id: item.userId,
+            value: item.userId,
+            label: `${item.firstName} ${item.lName}`,
+          }));
+          setDoctorOptions(formatted);
+          if (formatted.length > 0) {
+            setValue("doctorFid", formatted[0]);
+          }
+        }
+      })
+      .catch((error) => console.error(error));
+
+    getServicesByClinicId(5)
+      .then((res) => {
+        const data = res?.data?.data;
+        if (data?.length) {
+          const formatted = data.map((item) => ({
+            ...item,
+            id: item.serviceFid,
+            value: item.serviceFid,
+            label: `${item.serviceName}`,
+            charges: item.charges || 0,
+          }));
+          setServicesOptions(formatted);
+        }
+      })
+      .catch((error) => console.error(error));
+
+    if (user !== null) {
+      getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setDoctorOptions(
+          const data = res?.data?.data || [];
+          const filterData = data.find((item) => String(item.userId) === String(user?.userId));
+          
+          if (data.length > 0) {
+            setPatientOptions(
               data.map((item) => ({
                 ...item,
                 id: item.userId,
                 value: item.userId,
-                label: `${item.firstName} ${item.lName}`,
+                label: `${item.firstName} ${item.lastName}`,
               })),
             );
           }
-        })
-        .catch((error) => console.error(error));
 
-      getServicesByClinicId(clinicFidValue?.id)
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            const formatted = data.map((item) => ({
-              ...item,
-              id: item.serviceFid,
-              value: item.serviceFid,
-              label: `${item.serviceName}`,
-              charges: item.charges || 0,
-            }));
-            setServicesOptions(formatted);
+          if (filterData) {
+            setValue("fullName", `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(), { shouldValidate: true, shouldDirty: true });
+            setValue("email", filterData.emailId || "", { shouldValidate: true, shouldDirty: true });
+            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true, shouldDirty: true });
+            setValue("city", filterData.city || "", { shouldValidate: true, shouldDirty: true });
+          } else if (user) {
+            console.log("Using user context fallback");
+            setValue("fullName", `${user.firstName || ""} ${user.lastName || ""}`.trim(), { shouldValidate: true, shouldDirty: true });
+            setValue("email", user.emailId || "", { shouldValidate: true, shouldDirty: true });
+            setValue("mobile", String(user.mobileNo || ""), { shouldValidate: true, shouldDirty: true });
           }
         })
         .catch((error) => console.error(error));
-
-      if (user !== null) {
-        getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
-          .then((res) => {
-            const data = res?.data?.data;
-            if (data?.length) {
-              setPatientOptions(
-                data.map((item) => ({
-                  ...item,
-                  id: item.userId,
-                  value: item.userId,
-                  label: `${item.firstName} ${item.lastName}`,
-                })),
-              );
-            }
-          })
-          .catch((error) => console.error(error));
-      }
     }
-  }, [clinicFidValue, user, setValue]);
-
-  useEffect(() => {
-    if (patientOptions?.length > 0 && user?.userId) {
-      const filterPatient = patientOptions.filter(
-        (item) => item.id === user?.userId,
-      );
-      setValue("patientFid", filterPatient[0] || null);
-    }
-  }, [patientOptions, user, setValue]);
+  }, [user, setValue]);
 
   useEffect(() => {
     if (servicesOptions?.length > 0 && therapy?.nameEnglish) {
@@ -361,8 +363,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     setSlotError("");
     const saveObj = {
       ...data,
-      SloteEndTime: selectedTimeSlot?.slotEndTime,
-      SloteStartTime: selectedTimeSlot?.slotStartTime,
+      slotStartTime: selectedTimeSlot?.slotStartTime,
+      slotEndTime: selectedTimeSlot?.slotEndTime,
+      therapyName: therapy?.nameEnglish,
+      appointmentDate: format(new Date(data.fromDate), "yyyy-MM-dd"),
     };
     setFormData(saveObj);
     setOpenConfirmation(true);
@@ -370,6 +374,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
   const handleConfirmBooking = () => {
     console.log("Nature Therapy Booking Confirmed:", formData);
+    // Here you would typically call your booking service
     setOpenConfirmation(false);
     reset();
     handleClose();
@@ -395,7 +400,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
+              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-[9px] shadow-2xl border border-emerald-100 overflow-hidden">
                 <div className="sticky top-0 z-20 bg-emerald-600 px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
                   <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                     <span className="bg-white/20 p-1.5 rounded-lg flex items-center justify-center">
@@ -403,154 +408,118 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                     </span>
                     Book Nature Therapy
                   </h2>
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="text-white hover:bg-white/20 p-1 rounded-full transition-colors flex items-center justify-center"
-                  >
-                    <CloseIcon />
-                  </button>
+
+                  <CancelButtonModal onClick={handleClose} />
                 </div>
 
                 <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar bg-[#f8fafc]">
-                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    <div className="grid lg:grid-cols-3 gap-5">
+                  <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid lg:grid-cols-12 gap-6">
                       <motion.div
                         variants={sectionVariants}
-                        className="lg:col-span-2 space-y-5"
+                        className="lg:col-span-8 space-y-6"
                       >
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
-                              <User className="w-5 h-5 text-white" />
-                            </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
-                              Patient & Therapy Details
+                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden">
+                          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 flex items-center gap-3">
+                            <User className="w-5 h-5 text-white" />
+                            <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                              Patient Information
                             </h2>
                           </div>
-                          <div className="p-4 sm:p-5">
+                          <div className="p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div className="col-span-2 hidden">
-                                <DropdownField
+                              <div className="col-span-2">
+                                <InputField
                                   control={control}
-                                  name="location"
-                                  dataArray={locationListOptions}
-                                  isDisabled={true}
-                                />
-                                <DropdownField
-                                  control={control}
-                                  name="clinicFid"
-                                  dataArray={clinicsOptions}
-                                  isDisabled={true}
+                                  name="fullName"
+                                  label="Full Name *"
+                                  error={errors.fullName}
+                                  shrink={true}
                                 />
                               </div>
-                              <DropdownField
-                                control={control}
-                                name="patientFid"
-                                placeholder="Select Patient *"
-                                dataArray={patientOptions}
-                                error={errors.patientFid}
-                              />
-                              <DropdownField
-                                control={control}
-                                name="serviceFid"
-                                placeholder="Select Therapy *"
-                                dataArray={servicesOptions}
-                                error={errors.serviceFid}
-                                isDisabled={therapy?.nameEnglish ? true : false}
-                              />
+                              <div>
+                                <InputField
+                                  control={control}
+                                  name="mobile"
+                                  label="Mobile Number *"
+                                  error={errors.mobile}
+                                  shrink={true}
+                                />
+                              </div>
+                              <div>
+                                <InputField
+                                  control={control}
+                                  name="email"
+                                  label="Email Address *"
+                                  error={errors.email}
+                                  shrink={true}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <InputField
+                                  control={control}
+                                  name="city"
+                                  label="City"
+                                  error={errors.city}
+                                  shrink={true}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-lime-400 to-emerald-400 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
-                              <Calendar className="w-5 h-5 text-white" />
-                            </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
-                              Schedule Options
+                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden">
+                          <div className="bg-gradient-to-r from-lime-500 to-emerald-500 px-5 py-3 flex items-center gap-3">
+                            <Calendar className="w-5 h-5 text-white" />
+                            <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                              Therapy & Schedule
                             </h2>
                           </div>
-                          <div className="p-4 sm:p-5">
+                          <div className="p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-2">
                                 <DropdownField
                                   control={control}
-                                  name="doctorFid"
-                                  placeholder="Select Therapist *"
-                                  dataArray={doctorOptions}
-                                  error={errors.doctorFid}
+                                  name="serviceFid"
+                                  placeholder="Select Therapy *"
+                                  dataArray={servicesOptions}
+                                  error={errors.serviceFid}
+                                  isDisabled={!!therapy?.nameEnglish}
                                 />
                               </div>
                               <DatePickerField
                                 control={control}
                                 name="fromDate"
-                                label="From Date *"
+                                label="Appointment Date *"
                                 inputFormat="dd-MM-yyyy"
                                 disablePast={true}
                                 error={errors.fromDate}
                               />
-                              <DatePickerField
-                                control={control}
-                                name="toDate"
-                                label="To Date *"
-                                inputFormat="dd-MM-yyyy"
-                                disablePast={true}
-                                error={errors.toDate}
-                              />
                               <InputField
                                 control={control}
                                 name="noOfPerson"
-                                label="Number of Person *"
+                                label="Number of Persons *"
                                 type="number"
                                 error={errors.noOfPerson}
                                 InputProps={{ inputProps: { min: 1 } }}
                               />
                             </div>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
-                              <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                                  <Banknote className="w-3.5 h-3.5" /> Amount
-                                  per Session
-                                </span>
-                                <InputField
-                                  name="perDayAmount"
-                                  control={control}
-                                  type="text"
-                                  disabled={true}
-                                />
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                                  <Calendar className="w-3.5 h-3.5" /> Total
-                                  Amount
-                                </span>
-                                <InputField
-                                  name="totalAmount"
-                                  control={control}
-                                  type="text"
-                                  disabled={true}
-                                />
-                              </div>
-                            </div>
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden p-4 sm:p-5">
+                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden p-5">
                           <InputArea
                             name="specialRequest"
                             control={control}
-                            label="Any specific requests?"
-                            placeholder="Type your message here..."
+                            label="Specific Requests or Medical Conditions"
+                            placeholder="Please mention any special requirements..."
                             error={errors.specialRequest}
                           />
                           <div className="mt-4">
                             <CheckBoxField
                               name="termsAccepted"
                               control={control}
-                              label="I agree to the terms and conditions and clinical guidelines."
+                              label="I agree to the clinical guidelines and terms."
                               error={errors.termsAccepted}
                             />
                           </div>
@@ -559,103 +528,117 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
                       <motion.div
                         variants={sectionVariants}
-                        className="lg:col-span-1"
+                        className="lg:col-span-4 lg:sticky lg:top-0 h-fit"
                       >
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 lg:sticky lg:top-0 h-full flex flex-col">
-                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 flex items-center gap-2 rounded-t-lg">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
+                        <div className="space-y-6">
+                          <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden flex flex-col">
+                            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 flex items-center gap-3">
                               <Clock className="w-5 h-5 text-white" />
+                              <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                                Slots
+                              </h2>
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
-                              Available Slots
-                            </h2>
-                          </div>
 
-                          <div className="p-4 sm:p-5 flex-1 relative min-h-[300px]">
-                            {loading ? (
-                              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80">
-                                <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
-                                <p className="mt-3 text-sm text-slate-500 font-medium animate-pulse">
-                                  Loading slots...
+                            <div className="p-4 flex-1 min-h-[220px]">
+                              {loading ? (
+                                <div className="flex flex-col items-center justify-center h-40">
+                                  <div className="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
+                                </div>
+                              ) : doctorSlots?.length > 0 ? (
+                                <div className="grid grid-cols-2 gap-2">
+                                  {doctorSlots.map((slot, index) => (
+                                    <TimeSlotChip
+                                      key={index}
+                                      slot={slot}
+                                      isSelected={
+                                        selectedTimeSlot?.slotStartTime ===
+                                        slot.slotStartTime
+                                      }
+                                      onSelect={() => {
+                                        setSelectedTimeSlot(slot);
+                                        setSlotError("");
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              ) : (
+                                <div className="flex flex-col items-center justify-center h-40 text-center p-4 bg-slate-50 rounded-[9px] border border-dashed border-slate-200">
+                                  <Clock className="w-8 h-8 text-slate-300 mb-2" />
+                                  <p className="text-[10px] text-slate-500 font-medium">
+                                    {doctorValue && fromDate
+                                      ? "No slots available for this date"
+                                      : "Select therapist and date to view slots"}
+                                  </p>
+                                </div>
+                              )}
+                              {slotError && (
+                                <p className="text-red-500 text-[10px] mt-2 font-bold text-center">
+                                  {slotError}
                                 </p>
-                              </div>
-                            ) : doctorSlots?.length > 0 ? (
-                              <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="grid grid-cols-2 gap-2 content-start h-full"
-                              >
-                                {doctorSlots.map((slot, index) => (
-                                  <TimeSlotChip
-                                    key={index}
-                                    slot={slot}
-                                    isSelected={
-                                      selectedTimeSlot?.slotStartTime ===
-                                      slot.slotStartTime
-                                    }
-                                    onSelect={() => {
-                                      setSelectedTimeSlot(slot);
-                                      setSlotError("");
-                                    }}
-                                  />
-                                ))}
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 rounded-xl border border-dashed border-slate-200"
-                              >
-                                {doctorValue && fromDate ? (
-                                  <>
-                                    <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mb-3">
-                                      <Clock className="w-6 h-6 text-amber-500" />
-                                    </div>
-                                    <p className="text-slate-600 font-medium">
-                                      No slots available
-                                    </p>
-                                    <p className="text-xs text-slate-400 mt-1">
-                                      Please select a different date (From Date)
-                                      or therapist.
-                                    </p>
-                                  </>
-                                ) : (
-                                  <>
-                                    <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-3">
-                                      <Calendar className="w-6 h-6 text-emerald-500" />
-                                    </div>
-                                    <p className="text-slate-500 font-medium">
-                                      Select therapist and From Date to view
-                                      slots
-                                    </p>
-                                  </>
-                                )}
-                              </motion.div>
-                            )}
+                              )}
+                            </div>
                           </div>
 
-                          {slotError && (
-                            <div className="px-4 py-2 bg-red-50 text-red-500 text-xs font-medium border-t border-red-100 flex items-center gap-1.5">
-                              <span className="w-1 h-1 rounded-full bg-red-500"></span>
-                              {slotError}
+                          <div className="bg-emerald-900 rounded-[9px] shadow-xl p-5 text-white">
+                            <div className="flex items-center gap-2 mb-4 border-b border-white/10 pb-3">
+                              <Banknote className="w-5 h-5 text-lime-400" />
+                              <h3 className="font-bold text-sm tracking-widest uppercase">
+                                Bill Summary
+                              </h3>
                             </div>
-                          )}
+                            <div className="space-y-3">
+                              <div className="flex justify-between text-xs font-medium">
+                                <span className="text-emerald-300">
+                                  Price / Person
+                                </span>
+                                <span>
+                                  ₹{watch("perDayAmount")?.toLocaleString()}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-xs font-medium">
+                                <span className="text-emerald-300">
+                                  Persons
+                                </span>
+                                <span>x {watch("noOfPerson")}</span>
+                              </div>
+                                      <div className="flex justify-between text-xs font-medium">
+                                <span className="text-emerald-300">
+                                  GST & TC
+                                </span>
+                                <span>0</span>
+                              </div>
+                              <div className="pt-3 border-t border-white/10 flex justify-between items-end">
+                                <div>
+                                  <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-tighter">
+                                    Total Amount
+                                  </p>
+                                  <p className="text-2xl font-black tracking-tight">
+                                    ₹{watch("totalAmount")?.toLocaleString()}
+                                  </p>
+                                </div>
+                                <CommonButton
+                                  type="submit"
+                                  label="Book Now"
+                                  className="bg-lime-500 hover:bg-lime-600 text-white font-black px-6 py-2 rounded-[5px] transition-all shadow-lg active:scale-95 text-xs truncate"
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </motion.div>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-6 pb-2">
+                    <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 lg:hidden">
                       <CommonButton
                         type="button"
                         onClick={handleClose}
                         label="Cancel"
-                        className="rounded-lg border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition-colors w-full sm:w-auto"
+                        className="border border-slate-200 text-slate-500"
                       />
                       <CommonButton
                         type="submit"
-                        label="Book Now"
-                        onClick={handleSubmit(onSubmit)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md font-semibold px-8 transition-transform w-full sm:w-auto"
+                        label="Confirm Booking"
+                        className="bg-emerald-600 text-white"
                       />
                     </div>
                   </form>

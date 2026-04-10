@@ -17,7 +17,7 @@ import TempleBuddhistIcon from "@mui/icons-material/TempleBuddhist";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, isValidElement } from "react";
 import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.png";
 import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.png";
 import MorningVisionWholeMealImg from "../../../assets/community-activities/Morning Vision Whole Meal.png";
@@ -29,9 +29,6 @@ import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.p
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
 import VisitorsFormModal from "./VisitorsFormModal";
 import MainPageImg from "../../../assets/community-activities/mainPage.png"
-
-
-
 
 const walkInServices = [
   {
@@ -169,7 +166,7 @@ const visitorServices = [
     benefits:
       "Provides knowledge about therapies, Panchakarma, wellness practices, and site orientation.",
     price: "₹750",
-    icon: <SpaIcon />,
+    icon: SpaIcon,
     image: MorningVisionImg,
   },
   {
@@ -184,7 +181,7 @@ const visitorServices = [
       "Offers overview of holistic treatments, Q&A, and insight into wellness practices.",
     price: "₹750",
     image: EveningSwagramaImg,
-    icon: <SpaIcon />,
+    icon: SpaIcon,
   },
   {
     nameHindi: "स्वप्रातःदर्शनपूर्णाहार",
@@ -198,7 +195,7 @@ const visitorServices = [
       "Combines experiential learning with nutritious meal for holistic experience.",
     price: "₹1000",
     image: MorningVisionWholeMealImg,
-    icon: <RestaurantIcon />,
+    icon: RestaurantIcon,
   },
   {
     nameHindi: "स्वसायम्दर्शनपूर्णाहार",
@@ -212,13 +209,21 @@ const visitorServices = [
       "Knowledge sharing + nourishing meal for comprehensive understanding.",
     price: "₹1000",
     image: EveningVisionWholeMealImg,
-    icon: <RestaurantIcon />,
+    icon: RestaurantIcon,
   },
 ];
 
+const generalService = {
+  serviceName: "General Visit Inquiry",
+  nameHindi: "सामान्य दर्शन पूछताछ",
+  checkIn: "08:00",
+  checkOut: "18:00",
+  price: "Price varies",
+};
+
 const OurVision = () => {
-  const [openEventBookModal, setOpenEventBookModal] = useState(false);
-  const [selectedEventDeatils, setSelectedEventDetails] = useState(null);
+  const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
+  const [selectedEnquiryDetails, setSelectedEnquiryDetails] = useState(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -304,10 +309,19 @@ const OurVision = () => {
             className="flex flex-col sm:flex-row items-center gap-4"
           >
             <button
+              onClick={() => {
+                setSelectedEnquiryDetails(generalService);
+                setOpenEnquiryModal(true);
+              }}
               className="group relative bg-gradient-to-br from-[#8bc34a] to-[#5d9e28] text-[#0f2415] font-bold rounded-full text-sm sm:text-base md:text-lg px-8 sm:px-10 md:px-14 py-3 sm:py-3.5 md:py-4 w-full sm:w-auto min-w-[200px] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(139,195,74,0.55)] active:scale-95"
-              style={{ boxShadow: "0 8px 32px rgba(139, 195, 74, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)" }}
+              style={{
+                boxShadow:
+                  "0 8px 32px rgba(139, 195, 74, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+              }}
             >
-              <span className="relative z-10 tracking-wide">Begin Your Journey</span>
+              <span className="relative z-10 tracking-wide">
+                Begin Your Journey
+              </span>
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9ccc65] to-[#7cb342] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
 
@@ -444,6 +458,10 @@ const OurVision = () => {
             className="flex justify-center"
           >
             <button
+              onClick={() => {
+                setSelectedEnquiryDetails(generalService);
+                setOpenEnquiryModal(true);
+              }}
               className="bg-gradient-to-br from-[#8bc34a] to-[#689f38] hover:from-[#9ccc65] hover:to-[#7cb342] text-[#1a3a25] font-bold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 lg:px-12 py-2.5 sm:py-3 md:py-4 rounded-full hover:-translate-y-1 transition-all duration-300"
               style={{ boxShadow: "0 8px 32px rgba(139, 195, 74, 0.4)" }}
             >
@@ -462,7 +480,7 @@ const OurVision = () => {
               transition={{ duration: 0.8 }}
               className="text-center mb-6 sm:mb-8 md:mb-10"
             >
-              <h3 className="text-xl sm:text-2xl md:text-3xl  text-[#1a3a25] font-semibold mb-3 sm:mb-4">
+              <h3 className="text-xl sm:text-2xl md:text-3xl  text-[#1a3a25] font-semibold mb-1">
                 Visitor Services
               </h3>
               <div className="w-48 sm:w-56 md:w-60 h-1 bg-gradient-to-r from-[#8bc34a] to-[#689f38] mx-auto mb-3 sm:mb-4 rounded-full" />
@@ -493,11 +511,7 @@ const OurVision = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                      <div className="absolute top-2 right-2 bg-lime-50/60 backdrop-blur-md p-1.5 sm:p-2 rounded-full shadow-lg">
-                        <div className="text-green-600 text-lg sm:text-xl">
-                          {service.icon}
-                        </div>
-                      </div>
+                   
                     </div>
 
                     <div className="p-3 sm:p-4">
@@ -547,7 +561,15 @@ const OurVision = () => {
                       <div className="mb-4 sm:mb-5">
                         <div className="flex items-start gap-1.5 sm:gap-2">
                           <div className="bg-gradient-to-br from-lime-100 to-green-100 p-1 sm:p-1.5 rounded-lg mt-0.5 flex-shrink-0">
-                            <SpaIcon className="text-green-600 text-xs sm:text-sm" />
+                            {service.icon ? (
+                              isValidElement(service.icon) ? (
+                                service.icon
+                              ) : (
+                                <service.icon className="text-green-600 text-xs sm:text-sm" />
+                              )
+                            ) : (
+                              <SpaIcon className="text-green-600 text-xs sm:text-sm" />
+                            )}
                           </div>
                           <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">
                             {service.benefits}
@@ -559,12 +581,12 @@ const OurVision = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => {
-                          setSelectedEventDetails(service);
-                          setOpenEventBookModal(true);
+                          setSelectedEnquiryDetails(service);
+                          setOpenEnquiryModal(true);
                         }}
                         className="w-full bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-semibold py-2 sm:py-2.5 md:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group text-xs sm:text-sm md:text-base"
                       >
-                        <span>Book Now</span>
+                        <span>Enquire Now</span>
                         <ArrowForwardIcon className="text-sm sm:text-base group-hover:translate-x-1 transition-transform duration-300" />
                       </motion.button>
                     </div>
@@ -628,11 +650,7 @@ const OurVision = () => {
                               alt={service.serviceName}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
-                            <div className="absolute top-2 right-2 z-20">
-                              <div className="bg-green-100/60 backdrop-blur-md p-1.5 sm:p-2 rounded-full shadow-lg">
-                                <IconComponent className="text-green-600 text-xl sm:text-2xl" />
-                              </div>
-                            </div>
+                     
                           </div>
 
                           <div className="p-3 sm:p-4 flex-1 flex flex-col">
@@ -675,17 +693,15 @@ const OurVision = () => {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => {
-                                setOpenEventBookModal(true);
-                                setSelectedEventDetails(service);
+                                setOpenEnquiryModal(true);
+                                setSelectedEnquiryDetails(service);
                               }}
                               className={`${service.price === "Free"
                                 ? "bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600"
                                 : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                                 } text-white font-semibold py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl w-full flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 mt-auto text-xs sm:text-sm md:text-base`}
                             >
-                              {service.price === "Free"
-                                ? "Join Now"
-                                : "Book Now"}
+                              Enquire Now
                               <ArrowForwardIcon className="text-base sm:text-lg" />
                             </motion.button>
                           </div>
@@ -702,14 +718,14 @@ const OurVision = () => {
         </div>
       </div>
 
-      {openEventBookModal && (
+      {openEnquiryModal && (
         <VisitorsFormModal
-          open={openEventBookModal}
+          open={openEnquiryModal}
           handleClose={() => {
-            setSelectedEventDetails(null);
-            setOpenEventBookModal(false);
+            setSelectedEnquiryDetails(null);
+            setOpenEnquiryModal(false);
           }}
-          serviceDetails={selectedEventDeatils}
+          serviceDetails={selectedEnquiryDetails}
         />
       )}
     </div>

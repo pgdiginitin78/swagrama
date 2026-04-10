@@ -117,15 +117,26 @@ function StayBookingModal({
 
   const handleDateClick = (date) => {
     if (isBefore(date, startOfToday())) return;
+    
+    // If we have nothing or already have a full range, start a new selection
     if (!checkIn || (checkIn && checkOut)) {
       setCheckIn(date);
       setCheckOut(null);
     } else if (checkIn && !checkOut) {
+      // If we have only check-in, try to set check-out
       if (isBefore(date, checkIn)) {
+        // If clicked date is before check-in, it becomes the new check-in
         setCheckIn(date);
         setCheckOut(null);
+      } else if (isSameDay(date, checkIn)) {
+        // Clicking same day as check-in resets selection (or could set 1-night stay)
+        setCheckIn(null);
+        setCheckOut(null);
       } else {
+        // Valid check-out date
         setCheckOut(date);
+        // On mobile, maybe don't close immediately so they can see the range?
+        // But the user usually wants to move to guests.
         setCalendarAnchorEl(null);
         setHoveredDate(null);
         setTimeout(() => {
@@ -197,8 +208,8 @@ function StayBookingModal({
             onClick={() =>
               isCurrentMonth && !isPast && handleDateClick(currentDay)
             }
-            className={`relative flex items-center justify-center h-8 w-8 md:h-9 md:w-9 cursor-pointer text-[13px] font-medium transition-all
-                ${!isCurrentMonth ? "invisible pointer-events-none" : isPast ? "text-gray-300 pointer-events-none" : "text-gray-700"}
+            className={`relative flex items-center justify-center h-8 w-8 md:h-10 md:w-10 cursor-pointer text-[13px] font-medium transition-all
+                ${!isCurrentMonth ? "opacity-0 pointer-events-none" : isPast ? "text-gray-300 pointer-events-none" : "text-gray-700"}
                 ${inRange && isCurrentMonth ? "bg-lime-light/60" : ""}
                 ${isStart && isCurrentMonth ? "rounded-l-full" : ""}
                 ${isEnd && isCurrentMonth ? "rounded-r-full" : ""}
@@ -209,7 +220,7 @@ function StayBookingModal({
               <div className="absolute inset-0 bg-lime-light/40 z-0"></div>
             )}
             <div
-              className={`relative z-10 w-7 h-7 md:w-8 md:h-8 flex items-center justify-center rounded-full transition-all
+              className={`relative z-10 w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all
                 ${selected && isCurrentMonth ? "bg-ayuMid text-white shadow-sm scale-110" : "hover:bg-gray-100"}
               `}
             >
@@ -403,93 +414,102 @@ function StayBookingModal({
                 animate={{ opacity: 1, scale: 1 }}
                 className="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-2 flex flex-col gap-2 border group-hover/searchbar:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-500"
               >
-                <div className="grid grid-cols-2 gap-2">
-                  <div
-                    onClick={(e) => setCalendarAnchorEl(e.currentTarget)}
-                    className="flex flex-col px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
-                  >
-                    <p className="text-[8px] font-semibold text-ayuMid uppercase tracking-widest mb-1">
-                      Check-in
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarMonth
-                        className="text-ayuMid"
-                        sx={{ fontSize: 14 }}
-                      />
-                      <span className="text-gray-800 font-semibold text-xs tracking-tight truncate">
-                        {checkIn ? format(checkIn, "MMM dd, yyyy") : "Add date"}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    onClick={(e) => setCalendarAnchorEl(e.currentTarget)}
-                    className="flex flex-col px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
-                  >
-                    <p className="text-[8px] font-semibold text-ayuMid uppercase tracking-widest mb-1">
-                      Check-out
-                    </p>
-                    <div className="flex items-center gap-1.5">
-                      <CalendarMonth
-                        className="text-ayuMid"
-                        sx={{ fontSize: 14 }}
-                      />
-                      <span className="text-gray-800 font-semibold text-xs tracking-tight truncate">
-                        {checkOut
-                          ? format(checkOut, "MMM dd, yyyy")
-                          : "Add date"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <div
-                  ref={guestInputRef}
-                  onClick={(e) => setGuestsAnchorEl(e.currentTarget)}
-                  className="px-3 py-2.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
-                >
-                  <div className="flex items-center gap-2">
-                    <PeopleAlt className="text-ayuMid" sx={{ fontSize: 16 }} />
-                    {!guestsConfirmed ? (
-                      <span className="text-ayuMid font-semibold text-[11px] uppercase tracking-wider">
-                        Add guests
-                      </span>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-800 font-bold text-xs tracking-tight">
-                          {guests.adults} Adults · {guests.children} Children
-                        </span>
-                        <span className="text-ayuMid font-black text-[9px] uppercase bg-lime-light px-1.5 py-0.5 rounded-full">
-                          {guests.rooms} {guests.rooms > 1 ? "Rooms" : "Room"}
+                <div className="flex flex-col md:flex-row items-stretch gap-2">
+                  <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div
+                      onClick={(e) => {
+                        setCalendarAnchorEl(e.currentTarget);
+                        if (checkIn) setCalendarViewDate(checkIn);
+                      }}
+                      className="flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
+                    >
+                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                        Check-in
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarMonth
+                          className="text-ayuMid/60"
+                          sx={{ fontSize: 13 }}
+                        />
+                        <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
+                          {checkIn ? format(checkIn, "MMM dd, yyyy") : "Add date"}
                         </span>
                       </div>
-                    )}
-                    <KeyboardArrowDown
-                      sx={{ fontSize: 16 }}
-                      className={`text-gray-300 ml-auto transition-transform duration-300 ${guestsAnchorEl ? "rotate-180" : ""}`}
-                    />
-                  </div>
-                </div>
+                    </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <button
-                    type="button"
-                    onClick={handleCheckVailabilty}
-                    className="w-full py-3 bg-gradient-to-r from-ayuMid to-ayuTulsi text-white font-semibold rounded-lg hover:shadow-lg transition-all shadow-forest/10 active:scale-95 text-xs uppercase tracking-widest"
-                  >
-                    Search Availability
-                  </button>
-                  {roomStatus !== null && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`text-[9px] font-bold text-center ${roomStatus === "available" ? "text-ayuMid" : "text-ayuBrown"}`}
+                    <div
+                      onClick={(e) => {
+                        setCalendarAnchorEl(e.currentTarget);
+                        if (checkIn) setCalendarViewDate(checkIn);
+                      }}
+                      className="flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
                     >
-                      {roomStatus === "available"
-                        ? "✓ Room is Available"
-                        : "✕ Not Available for selected dates"}
-                    </motion.p>
-                  )}
+                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                        Check-out
+                      </p>
+                      <div className="flex items-center gap-1.5">
+                        <CalendarMonth
+                          className="text-ayuMid/60"
+                          sx={{ fontSize: 13 }}
+                        />
+                        <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
+                          {checkOut
+                            ? format(checkOut, "MMM dd, yyyy")
+                            : "Add date"}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      ref={guestInputRef}
+                      onClick={(e) => setGuestsAnchorEl(e.currentTarget)}
+                      className="col-span-2 lg:col-span-1 px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item flex flex-col justify-center"
+                    >
+                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                        Guests
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <PeopleAlt className="text-ayuMid/60" sx={{ fontSize: 14 }} />
+                        {!guestsConfirmed ? (
+                          <span className="text-ayuMid/60 font-bold text-[10px] uppercase tracking-wider">
+                            Add guests
+                          </span>
+                        ) : (
+                          <div className="flex items-center gap-1.5 truncate">
+                            <span className="text-gray-800 font-bold text-[11px] tracking-tight">
+                              {guests.adults}A · {guests.children}C
+                            </span>
+                            <span className="text-ayuMid font-black text-[8px] uppercase bg-lime-light px-1.5 py-0.5 rounded-full">
+                              {guests.rooms}R
+                            </span>
+                          </div>
+                        )}
+                        <KeyboardArrowDown
+                          sx={{ fontSize: 14 }}
+                          className={`text-gray-300 ml-auto transition-transform duration-300 ${guestsAnchorEl ? "rotate-180" : ""}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1 md:w-48">
+                    <button
+                      type="button"
+                      onClick={handleCheckVailabilty}
+                      className="h-full py-2.5 md:py-0 bg-gradient-to-r from-ayuMid to-ayuTulsi text-white font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 text-[10px] uppercase tracking-widest whitespace-nowrap"
+                    >
+                      Search
+                    </button>
+                    {roomStatus !== null && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`text-[8px] font-bold text-center ${roomStatus === "available" ? "text-ayuMid" : "text-ayuBrown"}`}
+                      >
+                        {roomStatus === "available" ? "✓ Available" : "✕ Full"}
+                      </motion.p>
+                    )}
+                  </div>
                 </div>
               </motion.div>
 
@@ -574,11 +594,11 @@ function StayBookingModal({
                             <ArrowForwardIos sx={{ fontSize: 12 }} />
                           </button>
                         </div>
-                        <div className="flex flex-col md:flex-row gap-6">
-                          <div className="flex-1">
+                        <div className="flex flex-col md:flex-row gap-8">
+                          <div className="flex-1 min-w-[280px]">
                             {renderCalendar(calendarViewDate)}
                           </div>
-                          <div className="flex-1 hidden md:block">
+                          <div className="flex-1 min-w-[280px]">
                             {renderCalendar(addMonths(calendarViewDate, 1))}
                           </div>
                         </div>

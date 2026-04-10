@@ -679,6 +679,9 @@ const CommunityMembership = () => {
                           setExpandedCard(expandedCard === idx ? null : idx)
                         }
                         onViewDetails={() => setSelectedMembership(membership)}
+                        setOpenEventRegistrationModal={
+                          setOpenEventRegistrationModal
+                        }
                       />
                     </motion.div>
                   ))}
@@ -688,16 +691,6 @@ const CommunityMembership = () => {
           </div>
         </section>
       </div>
-
-      <AnimatePresence>
-        {selectedMembership && (
-          <MembershipModal
-            membership={selectedMembership}
-            onClose={() => setSelectedMembership(null)}
-            setOpenEventRegistrationModal={setOpenEventRegistrationModal}
-          />
-        )}
-      </AnimatePresence>
       <AnimatePresence>
         {openEventRegistrationModal && (
           <MembershipRegistrationModal
@@ -718,6 +711,7 @@ const MembershipCard = ({
   isExpanded,
   onToggle,
   onViewDetails,
+  setOpenEventRegistrationModal,
 }) => {
   const Icon = membership.icon;
 
@@ -814,7 +808,7 @@ const MembershipCard = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onToggle}
-            className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 rounded-lg flex items-center justify-center gap-1 sm:gap-2 transition-colors text-xs sm:text-sm"
+            className="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-semibold py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 rounded-[5px] flex items-center justify-center gap-1 sm:gap-2 transition-colors text-xs sm:text-sm"
           >
             <span className="hidden xs:inline">
               {isExpanded ? "Show Less" : "Learn More"}
@@ -830,8 +824,11 @@ const MembershipCard = ({
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={onViewDetails}
-            className="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 rounded-lg transition-colors text-xs sm:text-sm"
+            onClick={() => {
+              setOpenEventRegistrationModal(true);
+              onViewDetails();
+            }}
+            className="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 rounded-[5px] transition-colors text-xs sm:text-sm"
           >
             Details
           </motion.button>
@@ -850,165 +847,165 @@ const style = {
   boxShadow: 24,
 };
 
-const MembershipModal = ({
-  membership,
-  onClose,
-  setOpenEventRegistrationModal,
-}) => {
-  const Icon = membership.icon;
-  const [copySuccess, setCopySuccess] = useState(false);
+// const MembershipModal = ({
+//   membership,
+//   onClose,
+//   setOpenEventRegistrationModal,
+// }) => {
+//   const Icon = membership.icon;
+//   const [copySuccess, setCopySuccess] = useState(false);
 
-  const handleCopy = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
-  };
+//   const handleCopy = (text) => {
+//     navigator.clipboard.writeText(text);
+//     setCopySuccess(true);
+//     setTimeout(() => setCopySuccess(false), 2000);
+//   };
 
-  return (
-    <Modal
-      open={membership}
-      onClose={onClose}
-      aria-labelledby="booking-modal-title"
-    >
-      <Box
-        sx={style}
-        className="w-[95%] sm:w-[85%] md:w-[75%] lg:w-[70%] max-h-[90%] overflow-y-auto max-w-3xl rounded-xl relative bg-white"
-      >
-        <div>
-          <CancelButtonModal onClick={onClose} />
-          <div
-            className={`bg-gradient-to-r ${membership.gradientClass} p-3 sm:p-4  relative`}
-          >
-            <div className="flex items-start gap-2 sm:gap-3 pr-8 sm:pr-10">
-              <div className="bg-white p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl shadow-lg flex-shrink-0">
-                <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-green-700" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-green-900 mb-0.5 sm:mb-1 line-clamp-2">
-                  {membership.serviceName}
-                </h2>
-                <p className="text-sm sm:text-base text-green-800 font-semibold truncate">
-                  {membership.membershipNameHi}
-                </p>
-              </div>
-            </div>
-          </div>
+//   return (
+//     <Modal
+//       open={membership}
+//       onClose={onClose}
+//       aria-labelledby="booking-modal-title"
+//     >
+//       <Box
+//         sx={style}
+//         className="w-[95%] sm:w-[85%] md:w-[75%] lg:w-[70%] max-h-[90%] overflow-y-auto max-w-3xl rounded-xl relative bg-white"
+//       >
+//         <div>
+//           <CancelButtonModal onClick={onClose} />
+//           <div
+//             className={`bg-gradient-to-r ${membership.gradientClass} p-3 sm:p-4  relative`}
+//           >
+//             <div className="flex items-start gap-2 sm:gap-3 pr-8 sm:pr-10">
+//               <div className="bg-white p-2 sm:p-2.5 md:p-3 rounded-lg sm:rounded-xl shadow-lg flex-shrink-0">
+//                 <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-green-700" />
+//               </div>
+//               <div className="flex-1 min-w-0">
+//                 <h2 className="text-base sm:text-lg md:text-xl font-bold text-green-900 mb-0.5 sm:mb-1 line-clamp-2">
+//                   {membership.serviceName}
+//                 </h2>
+//                 <p className="text-sm sm:text-base text-green-800 font-semibold truncate">
+//                   {membership.membershipNameHi}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
 
-          <div className="p-3 sm:p-4 md:p-5">
-            <div className="bg-gradient-to-r from-green-50 to-lime-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 md:mb-5 border border-green-200">
-              <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-2 sm:mb-3">
-                <div>
-                  <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
-                    Original
-                  </p>
-                  <p className="text-sm sm:text-base md:text-lg font-bold text-gray-400 line-through">
-                    ₹{membership.price.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
-                    Price
-                  </p>
-                  <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700">
-                    ₹{membership.primaryDiscount.toLocaleString()}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
-                    Savings
-                  </p>
-                  <p className="text-sm sm:text-base md:text-lg font-bold text-amber-600">
-                    ₹
-                    {Math.abs(
-                      membership.primaryDiscountAmount,
-                    ).toLocaleString()}
-                  </p>
-                </div>
-              </div>
+//           <div className="p-3 sm:p-4 md:p-5">
+//             <div className="bg-gradient-to-r from-green-50 to-lime-50 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 sm:mb-4 md:mb-5 border border-green-200">
+//               <div className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4 mb-2 sm:mb-3">
+//                 <div>
+//                   <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
+//                     Original
+//                   </p>
+//                   <p className="text-sm sm:text-base md:text-lg font-bold text-gray-400 line-through">
+//                     ₹{membership.price.toLocaleString()}
+//                   </p>
+//                 </div>
+//                 <div>
+//                   <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
+//                     Price
+//                   </p>
+//                   <p className="text-lg sm:text-xl md:text-2xl font-bold text-green-700">
+//                     ₹{membership.primaryDiscount.toLocaleString()}
+//                   </p>
+//                 </div>
+//                 <div>
+//                   <p className="text-[10px] sm:text-xs text-gray-600 mb-0.5">
+//                     Savings
+//                   </p>
+//                   <p className="text-sm sm:text-base md:text-lg font-bold text-amber-600">
+//                     ₹
+//                     {Math.abs(
+//                       membership.primaryDiscountAmount,
+//                     ).toLocaleString()}
+//                   </p>
+//                 </div>
+//               </div>
 
-              <div className="flex items-center justify-between bg-white rounded-lg p-2 sm:p-2.5">
-                <span className="text-[10px] sm:text-xs font-semibold text-green-800">
-                  Coupon:
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="bg-amber-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-bold">
-                    {membership.couponCode}
-                  </span>
-                  <Tooltip
-                    title={copySuccess ? "Copied!" : "Copy Code"}
-                    placement="top"
-                    {...(copySuccess ? { open: true } : {})}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={() => handleCopy(membership.couponCode)}
-                      sx={{
-                        color: "#f59e0b",
-                        padding: "4px",
-                        "&:hover": { backgroundColor: "#fef3c7" },
-                      }}
-                    >
-                      <ContentCopy sx={{ fontSize: "16px" }} />
-                    </IconButton>
-                  </Tooltip>
-                </div>
-              </div>
+//               <div className="flex items-center justify-between bg-white rounded-lg p-2 sm:p-2.5">
+//                 <span className="text-[10px] sm:text-xs font-semibold text-green-800">
+//                   Coupon:
+//                 </span>
+//                 <div className="flex items-center gap-2">
+//                   <span className="bg-amber-500 text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-xs sm:text-sm font-bold">
+//                     {membership.couponCode}
+//                   </span>
+//                   <Tooltip
+//                     title={copySuccess ? "Copied!" : "Copy Code"}
+//                     placement="top"
+//                     {...(copySuccess ? { open: true } : {})}
+//                   >
+//                     <IconButton
+//                       size="small"
+//                       onClick={() => handleCopy(membership.couponCode)}
+//                       sx={{
+//                         color: "#f59e0b",
+//                         padding: "4px",
+//                         "&:hover": { backgroundColor: "#fef3c7" },
+//                       }}
+//                     >
+//                       <ContentCopy sx={{ fontSize: "16px" }} />
+//                     </IconButton>
+//                   </Tooltip>
+//                 </div>
+//               </div>
 
-              {membership.additionalDiscount && (
-                <div className="mt-2 sm:mt-3 bg-lime-100 rounded-lg p-2 sm:p-2.5">
-                  <p className="text-[10px] sm:text-xs font-semibold text-green-800">
-                    Extra Discount: ₹{membership.additionalDiscount}
-                  </p>
-                </div>
-              )}
-            </div>
+//               {membership.additionalDiscount && (
+//                 <div className="mt-2 sm:mt-3 bg-lime-100 rounded-lg p-2 sm:p-2.5">
+//                   <p className="text-[10px] sm:text-xs font-semibold text-green-800">
+//                     Extra Discount: ₹{membership.additionalDiscount}
+//                   </p>
+//                 </div>
+//               )}
+//             </div>
 
-            <div className="mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-bold text-green-900 mb-1.5 sm:mb-2">
-                About
-              </h3>
-              <p className="text-xs sm:text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-                {membership.description}
-              </p>
-            </div>
+//             <div className="mb-3 sm:mb-4">
+//               <h3 className="text-base sm:text-lg font-bold text-green-900 mb-1.5 sm:mb-2">
+//                 About
+//               </h3>
+//               <p className="text-xs sm:text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+//                 {membership.description}
+//               </p>
+//             </div>
 
-            <div className="mb-3 sm:mb-4">
-              <h3 className="text-base sm:text-lg font-bold text-green-900 mb-1.5 sm:mb-2">
-                Benefits
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
-                {membership.benifits.map((benefit, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className="flex items-start sm:items-center gap-1.5 sm:gap-2 bg-green-50 p-2 rounded-lg border border-green-200"
-                  >
-                    <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-                    <span className="text-xs sm:text-sm text-green-800 font-medium">
-                      {benefit}
-                    </span>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+//             <div className="mb-3 sm:mb-4">
+//               <h3 className="text-base sm:text-lg font-bold text-green-900 mb-1.5 sm:mb-2">
+//                 Benefits
+//               </h3>
+//               <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+//                 {membership.benifits.map((benefit, idx) => (
+//                   <motion.div
+//                     key={idx}
+//                     initial={{ opacity: 0, x: -20 }}
+//                     animate={{ opacity: 1, x: 0 }}
+//                     transition={{ delay: idx * 0.05 }}
+//                     className="flex items-start sm:items-center gap-1.5 sm:gap-2 bg-green-50 p-2 rounded-lg border border-green-200"
+//                   >
+//                     <Check className="w-3 h-3 sm:w-4 sm:h-4 text-green-600 flex-shrink-0 mt-0.5 sm:mt-0" />
+//                     <span className="text-xs sm:text-sm text-green-800 font-medium">
+//                       {benefit}
+//                     </span>
+//                   </motion.div>
+//                 ))}
+//               </div>
+//             </div>
 
-            <div className="flex">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setOpenEventRegistrationModal(true)}
-                className="flex-1 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl shadow-lg transition-all text-sm sm:text-base"
-              >
-                Book Now
-              </motion.button>
-            </div>
-          </div>
-        </div>
-      </Box>
-    </Modal>
-  );
-};
+//             <div className="flex">
+//               <motion.button
+//                 whileHover={{ scale: 1.02 }}
+//                 whileTap={{ scale: 0.98 }}
+//                 onClick={() => setOpenEventRegistrationModal(true)}
+//                 className="flex-1 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-800 hover:to-green-700 text-white font-bold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl shadow-lg transition-all text-sm sm:text-base"
+//               >
+//                 Book Now
+//               </motion.button>
+//             </div>
+//           </div>
+//         </div>
+//       </Box>
+//     </Modal>
+//   );
+// };
 
 export default CommunityMembership;

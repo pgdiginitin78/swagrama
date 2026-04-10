@@ -116,17 +116,6 @@ const categories = [
   { name: "All", icon: FilterList, value: "All" },
 ];
 
-const getIcon = (iconName) => {
-  const icons = {
-    Spa: Spa,
-    Pool: Pool,
-    Air: Air,
-    FitnessCenter: FitnessCenter,
-    Grass: Grass,
-  };
-  const IconComponent = icons[iconName];
-  return IconComponent ? <IconComponent /> : <Spa />;
-};
 
 export default function NatureTherapy() {
   const [selectedCategory, setSelectedCategory] = useState("All");

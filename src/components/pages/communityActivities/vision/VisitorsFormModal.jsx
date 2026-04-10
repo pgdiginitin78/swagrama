@@ -1,323 +1,326 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import CloseIcon from "@mui/icons-material/Close";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import EventIcon from "@mui/icons-material/Event";
-import GroupsIcon from "@mui/icons-material/Groups";
-import PersonOutlineIcon from "@mui/icons-material/PersonOutline";
-import { Box, IconButton, Modal, Typography } from "@mui/material";
-import { motion } from "framer-motion";
+import { Box, Modal } from "@mui/material";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  Calendar,
+  ClipboardList,
+  MessageSquare,
+  User as UserIcon
+} from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import CommonButton from "../../../common/button/CommonButton";
-import DatePickerField from "../../../common/formFields/DatePickerField";
-import DropdownField from "../../../common/formFields/DropdownField";
-import InputField from "../../../common/formFields/InputField";
+import { useAuth } from "../../../../context/AuthContext";
+import { getUserDetails } from "../../../../services/login/LoginServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
+import CommonButton from "../../../common/button/CommonButton";
+import CheckBoxField from "../../../common/formFields/CheckBoxField";
+import DatePickerField from "../../../common/formFields/DatePickerField";
+import InputArea from "../../../common/formFields/InputArea";
+import InputField from "../../../common/formFields/InputField";
+import { errorAlert } from "../../../common/toast/CustomToast";
 
 const schema = yup.object().shape({
-  firstName: yup
+  fullName: yup
     .string()
-    .required("First name is required")
-    .min(2, "Min 2 characters"),
-  lastName: yup
-    .string()
-    .required("Last name is required")
-    .min(2, "Min 2 characters"),
+    .required("Full name is required")
+    .min(3, "Min 3 characters"),
   email: yup
     .string()
     .required("Email is required")
     .email("Invalid email format"),
-  countryCode: yup.object().required("Required"),
   mobileNumber: yup
     .string()
     .required("Mobile number is required")
     .matches(/^[0-9]{10}$/, "Must be 10 digits"),
+  city: yup.string().required("City is required"),
+  state: yup.string().required("State is required"),
   bookingDate: yup
     .date()
-    .required("Booking date is required")
+    .nullable()
+    .required("Preferred date is required")
     .typeError("Invalid date"),
-  adultMale: yup.number().min(0).default(0),
-  adultFemale: yup.number().min(0).default(0),
-  adultOther: yup.number().min(0).default(0),
-  child0to6: yup.number().min(0).default(0),
-  child7to12: yup.number().min(0).default(0),
+  totalVisitors: yup
+    .number()
+    .required("Required")
+    .min(1, "Minimum 1 visitor")
+    .typeError("Must be a number"),
   specialRequests: yup.string().max(500, "Max 500 characters"),
+  termsAccepted: yup
+    .boolean()
+    .oneOf([true], "You must accept the terms")
+    .required(),
 });
 
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut", staggerChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { opacity: 1, x: 0 },
+};
+
 const VisitorsFormModal = ({ open, handleClose, serviceDetails }) => {
+  const { user } = useAuth();
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       email: "",
-      countryCode: { value: "+91", label: "+91" },
       mobileNumber: "",
-      bookingDate: new Date(),
-      adultMale: 0,
-      adultFemale: 0,
-      adultOther: 0,
-      child0to6: 0,
-      child7to12: 0,
+      city: "",
+      state: "",
+      bookingDate: null,
+      totalVisitors: 1,
       specialRequests: "",
+      termsAccepted: false,
     },
+    mode: "onChange",
   });
+
+  const termsAcceptedValue = watch("termsAccepted");
 
   useEffect(() => {
     if (open) {
       reset();
+      if (user?.userId) {
+        getUserDetails(user.userId)
+          .then((res) => {
+            const userData = res?.data?.data;
+            if (userData) {
+              setValue(
+                "fullName",
+                `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
+              );
+              setValue("mobileNumber", userData.whatsappNo || "");
+              setValue("email", userData.emailId || "");
+              setValue("city", userData.city || "");
+              setValue("state", userData.state || "");
+            }
+          })
+          .catch(() => {
+            errorAlert("Failed to fetch user details.");
+          });
+      }
     }
-  }, [open, reset]);
+  }, [open, user, reset, setValue]);
 
   const onSubmit = (data) => {
-    console.log("Visitor Booking Data:", {
+    console.log("Visitor Enquiry Data:", {
       service: serviceDetails?.serviceName,
       ...data,
     });
-    // Here you would typically call an API
+    // API Call would go here
     handleClose();
+    reset();
   };
 
   if (!serviceDetails) return null;
 
   return (
     <Modal open={open} onClose={handleClose} closeAfterTransition>
-      <Box className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[95%] max-w-2xl bg-white rounded-xl shadow-xl overflow-hidden max-h-[90vh] flex flex-col outline-none">
-        {/* Header */}
-        <div className="relative bg-gradient-to-r from-green-600 to-lime-500 p-3 text-white shrink-0">
-          <div className="flex justify-between items-start">
-            <div className="flex space-x-3 items-center">
-              <p className="font-bold flex items-center gap-2">
-                <span className="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
-                  {serviceDetails.icon &&
-                  typeof serviceDetails.icon === "function" ? (
-                    <serviceDetails.icon />
-                  ) : (
-                    serviceDetails.icon || <GroupsIcon />
-                  )}
-                </span>
-              </p>
-              <div className="flex flex-col">
-                <h2>{serviceDetails.serviceName}</h2>
-                <h3 variant="body2" className="mt-1 opacity-90 font-medium">
-                  {serviceDetails.nameHindi}
-                </h3>
-              </div>
-            </div>
-            <CancelButtonModal onClick={handleClose} />
-          </div>
-        </div>
-
-        {/* Content */}
-        <div className="overflow-y-auto p-6 space-y-8 custom-scrollbar">
-          {/* Service Summary Card */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          outline: "none",
+        }}
+      >
+        <AnimatePresence>
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-lime-50 rounded-2xl p-4 border border-lime-100"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[850px] max-h-[90vh] flex flex-col overflow-hidden rounded-2xl shadow-2xl bg-white border border-green-100"
           >
-            <div className="flex items-center gap-2">
-              <AccessTimeIcon className="text-green-600" fontSize="small" />
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
-                  In Time
-                </p>
-                <p className="text-sm font-bold text-gray-800">
-                  {serviceDetails.checkIn}
-                </p>
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-10 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2.5 rounded-xl hidden sm:block backdrop-blur-md">
+                  <ClipboardList className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
+                    Visitor Enquiry
+                  </h2>
+                  <p className="text-white/80 text-xs sm:text-sm font-medium">
+                    {serviceDetails.serviceName} ({serviceDetails.nameHindi})
+                  </p>
+                </div>
               </div>
+              <CancelButtonModal onClick={handleClose} />
             </div>
-            <div className="flex items-center gap-2">
-              <AccessTimeIcon className="text-lime-600" fontSize="small" />
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
-                  Out Time
-                </p>
-                <p className="text-sm font-bold text-gray-800">
-                  {serviceDetails.checkOut}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 col-span-2 md:col-span-1">
-              <CurrencyRupeeIcon className="text-green-700" fontSize="small" />
-              <div>
-                <p className="text-[10px] text-gray-500 uppercase font-bold tracking-wider">
-                  Price
-                </p>
-                <p className="text-sm font-bold text-gray-800">
-                  {serviceDetails.price}
-                </p>
-              </div>
-            </div>
-          </motion.div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* Personal Information */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-green-800 flex items-center gap-2 border-b border-green-100 pb-2">
-                <PersonOutlineIcon fontSize="small" />
-                Personal Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputField
-                  control={control}
-                  name="firstName"
-                  label="First Name"
-                  error={errors.firstName}
-                />
-                <InputField
-                  control={control}
-                  name="lastName"
-                  label="Last Name"
-                  error={errors.lastName}
-                />
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <InputField
-                  control={control}
-                  name="email"
-                  label="Email Address"
-                  type="email"
-                  error={errors.email}
-                />
-                <div className="flex gap-2">
-                  <div className="w-1/3">
-                    <DropdownField
-                      control={control}
-                      name="countryCode"
-                      placeholder="Code"
-                      dataArray={[
-                        { value: "+91", label: "+91" },
-                        { value: "+1", label: "+1" },
-                        { value: "+44", label: "+44" },
-                      ]}
-                      error={errors.countryCode}
-                    />
+            {/* Content */}
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 custom-scrollbar bg-slate-50/50">
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                {/* Service Quick Info */}
+                <motion.div
+                  variants={itemVariants}
+                  className="flex flex-wrap gap-3 sm:gap-6 p-3 bg-green-50 rounded-xl border border-green-100 flex-shrink-0"
+                >
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-green-700" />
+                    <span className="text-xs font-semibold text-green-800">
+                      Hours: {serviceDetails.checkIn} - {serviceDetails.checkOut}
+                    </span>
                   </div>
-                  <div className="flex-1">
+                  {serviceDetails.price && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-300" />
+                      <span className="text-xs font-semibold text-green-800">
+                        {serviceDetails.price}
+                      </span>
+                    </div>
+                  )}
+                  {serviceDetails.mealNote && (
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-300" />
+                      <span className="text-xs font-semibold text-amber-800">
+                        {serviceDetails.mealNote}
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Personal & Contact Details */}
+                <motion.section
+                  variants={itemVariants}
+                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"
+                >
+                  <h3 className="text-sm font-bold text-green-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2 uppercase tracking-tight">
+                    <UserIcon className="w-4 h-4" /> Personal & Contact Info
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <InputField
+                      control={control}
+                      name="fullName"
+                      label="Full Name *"
+                      error={errors.fullName}
+                    />
+                    <InputField
+                      control={control}
+                      name="email"
+                      label="Email Address *"
+                      type="email"
+                      error={errors.email}
+                    />
                     <InputField
                       control={control}
                       name="mobileNumber"
-                      label="Mobile Number"
+                      label="Mobile Number *"
                       type="tel"
                       error={errors.mobileNumber}
                     />
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <InputField
+                      control={control}
+                      name="city"
+                      label="City *"
+                      error={errors.city}
+                    />
+                    <InputField
+                      control={control}
+                      name="state"
+                      label="State *"
+                      error={errors.state}
+                    />
+                  </div>
+                </motion.section>
+
+                {/* Visit Details */}
+                <motion.section
+                  variants={itemVariants}
+                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"
+                >
+                  <h3 className="text-sm font-bold text-green-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2 uppercase tracking-tight">
+                    <Calendar className="w-4 h-4" /> Visit Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <DatePickerField
+                      control={control}
+                      name="bookingDate"
+                      label="Preferred Date *"
+                      minDate={new Date()}
+                      error={errors.bookingDate}
+                    />
+                    <InputField
+                      control={control}
+                      name="totalVisitors"
+                      label="Total Guests *"
+                      type="number"
+                      error={errors.totalVisitors}
+                    />
+        
+                  </div>
+                </motion.section>
+
+                {/* Requirements */}
+                <motion.section
+                  variants={itemVariants}
+                  className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"
+                >
+                  <InputArea
+                    control={control}
+                    name="specialRequests"
+                    label="Any special requests or medical history we should know about?"
+                    error={errors.specialRequests}
+                    minRows={2}
+                  />
+                </motion.section>
+
+                <div className="space-y-4">
+                  <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                    <CheckBoxField
+                      control={control}
+                      name="termsAccepted"
+                      label="I acknowledge this is an inquiry for the selected service and does not guarantee a slot until confirmed."
+                      error={errors.termsAccepted}
+                    />
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Visit Details */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-green-800 flex items-center gap-2 border-b border-green-100 pb-2">
-                <EventIcon fontSize="small" />
-                Visit Details
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <DatePickerField
-                  control={control}
-                  name="bookingDate"
-                  label="Booking Date"
-                  error={errors.bookingDate}
-                  minDate={new Date()}
-                />
-              </div>
+                {/* Actions */}
+                <div className="flex justify-end gap-3 pt-2">
+                  <CommonButton
+                    type="button"
+                    label="Reset"
+                    onClick={() => reset()}
+                    className=" border border-red-600 text-red-600 hover:bg-red-50 "
+                  />
+                  <CommonButton
+                    type="submit"
+                    label="Submit Enquiry Request"
+                    disabled={!termsAcceptedValue}
+                    className={` text-white transition-all ${
+                      termsAcceptedValue
+                        ? "bg-gradient-to-r from-green-700 to-green-600  hover:shadow-xl hover:-translate-y-0.5"
+                        : "bg-slate-300 pointer-events-none"
+                    }`}
+                  />
+                </div>
+              </form>
             </div>
-
-            {/* Guests Configuration */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-bold text-green-800 flex items-center gap-2 border-b border-green-100 pb-2">
-                <GroupsIcon fontSize="small" />
-                Guest Details
-              </h3>
-              <div className="grid grid-cols-3 gap-4">
-                <InputField
-                  control={control}
-                  name="adultMale"
-                  label="Adults (Male)"
-                  type="number"
-                  error={errors.adultMale}
-                />
-                <InputField
-                  control={control}
-                  name="adultFemale"
-                  label="Adults (Female)"
-                  type="number"
-                  error={errors.adultFemale}
-                />
-                <InputField
-                  control={control}
-                  name="adultOther"
-                  label="Adults (Other)"
-                  type="number"
-                  error={errors.adultOther}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <InputField
-                  control={control}
-                  name="child0to6"
-                  label="Children (0-6 yrs)"
-                  type="number"
-                  error={errors.child0to6}
-                />
-                <InputField
-                  control={control}
-                  name="child7to12"
-                  label="Children (7-12 yrs)"
-                  type="number"
-                  error={errors.child7to12}
-                />
-              </div>
-            </div>
-
-            {/* Special Requests */}
-            <div className="space-y-2">
-              <InputField
-                control={control}
-                name="specialRequests"
-                label="Special Requests (Optional)"
-                multiline
-                rows={3}
-                error={errors.specialRequests}
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex space-x-3 w-full pt-4 justify-end">
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-             
-                onClick={handleClose}
-              >
-                <CommonButton
-                  type="button"
-                  className="border border-red-600 text-red-600 hover:shadow-xl transition-all"
-                  label="Cancel"
-                />
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-          
-              >
-                <CommonButton
-                  type="submit"
-                  className=" bg-gradient-to-r from-green-600 to-lime-500 text-white  shadow-lg hover:shadow-xl transition-all"
-                  label="Book Visit Now"
-                />
-              </motion.div>
-            </div>
-          </form>
-        </div>
+          </motion.div>
+        </AnimatePresence>
       </Box>
     </Modal>
   );

@@ -1,5 +1,4 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import CloseIcon from "@mui/icons-material/Close";
 import Event from "@mui/icons-material/Event";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Box, Modal } from "@mui/material";
@@ -11,14 +10,13 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
 import {
-  getClinicList,
   getDoctorAvailableSlots,
   getDoctorsByClinicId,
-  getLocationList,
   getPatientDataByMobileNo,
-  getServicesByClinicId,
+  getServicesByClinicId
 } from "../../../../services/bookAppointment/BookAppointmentServices";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
 import DatePickerField from "../../../common/formFields/DatePickerField";
@@ -36,10 +34,10 @@ const dropdownObjectSchema = yup
   .required("This field is required");
 
 const schema = yup.object().shape({
-  location: dropdownObjectSchema.typeError("Location is required"),
-  clinicFid: dropdownObjectSchema.typeError("Clinic is required"),
-  patientFid: dropdownObjectSchema.typeError("Patient is required"),
-  doctorFid: dropdownObjectSchema.typeError("Therapist/Doctor is required"),
+  fullName: yup.string().required("Full name is required"),
+  mobile: yup.string().required("Mobile number is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  city: yup.string().nullable(),
   serviceFid: dropdownObjectSchema.typeError("Therapy is required"),
   bookingDate: yup.date().required("Booking date is required").nullable(),
   termsAccepted: yup
@@ -84,8 +82,8 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
           isSelected
-            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
-            : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
+            ? "bg-ayuMid text-white shadow-nature"
+            : "bg-ayuHerbal text-ayuTulsi hover:bg-ayuLight hover:text-white border border-ayuLight/30"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -140,141 +138,124 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     mode: "onChange",
   });
 
-  const locationValue = watch("location");
-  const clinicFidValue = watch("clinicFid");
+
   const doctorValue = watch("doctorFid");
   const bookingDate = watch("bookingDate");
   const selectedServiceValue = watch("serviceFid");
 
-  // Calculate Total Price
+  // Calculate Total Price with GST (18%)
   useEffect(() => {
     const price = selectedServiceValue?.charges || 0;
+    const gst = Math.round(price * 0.18);
     setValue("perDayAmount", price);
-    setValue("totalAmount", price);
+    setValue("totalAmount", price + 0);
   }, [selectedServiceValue, setValue]);
 
-  // Fetch Locations
+  // Hardcode Swagram Community Clinic (ID: 5)
   useEffect(() => {
-    getLocationList()
+    setValue("clinicFid", { id: 5, value: 5, label: "Swagram Community" });
+    setValue("location", { id: 1, value: 1, label: "Lavale" });
+  }, [setValue]);
+
+  // Fetch Doctors, Services & Patients
+  useEffect(() => {
+    setValue("doctorFid", null);
+    setDoctorSlots([]);
+    setSelectedTimeSlot(null);
+    setSlotError("");
+
+    getDoctorsByClinicId(5)
+      .then((res) => {
+        const data = res?.data?.data || [];
+        if (data.length) {
+          const formatted = data.map((item) => ({
+            ...item,
+            id: item.userId,
+            value: item.userId,
+            label: `${item.firstName} ${item.lName || item.lastName || ""}`.trim(),
+          }));
+          setDoctorOptions(formatted);
+          // Auto-select first doctor to unblock slot fetching
+          if (formatted.length > 0) {
+            setValue("doctorFid", formatted[0]);
+          }
+        }
+      })
+      .catch((error) => console.error(error));
+
+    getServicesByClinicId(5)
       .then((res) => {
         const data = res?.data?.data;
         if (data?.length) {
           const formatted = data.map((item) => ({
             ...item,
-            id: item.fid,
-            value: item.fid,
-            label: item.locationName,
+            id: item.serviceFid,
+            value: item.serviceFid,
+            label: `${item.serviceName}`,
+            charges: item.charges || 0,
           }));
-          setLocationListOptions(formatted);
-          const filterLocation = formatted.filter(
-            (item) => item.label === "Lavale",
-          );
-          setValue("location", filterLocation[0]);
+          setServicesOptions(formatted);
         }
       })
       .catch((error) => console.error(error));
-  }, [setValue]);
 
-  // Fetch Clinics
-  useEffect(() => {
-    if (locationValue?.id > 0) {
-      getClinicList(locationValue?.id)
+    if (user !== null) {
+      getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
           const data = res?.data?.data;
+          const filterData = data.find(
+            (item) => String(item.userId) === String(user?.userId),
+          );
           if (data?.length) {
-            setClinicOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.clinicid,
-                value: item.clinicid,
-                label: item.clinicName,
-              })),
-            );
-          }
-        })
-        .catch((err) => console.log(err.message));
-    }
-  }, [locationValue]);
-
-  // Auto-select Swagram Community Clinic
-  useEffect(() => {
-    if (clinicsOptions?.length > 0) {
-      const filterClinic = clinicsOptions.filter(
-        (item) => item.label === "Swagram Community",
-      );
-      setValue("clinicFid", filterClinic[0]);
-    }
-  }, [clinicsOptions, setValue]);
-
-  // Fetch Doctors, Services & Patients
-  useEffect(() => {
-    if (clinicFidValue?.id > 0) {
-      setValue("doctorFid", null);
-      setDoctorSlots([]);
-      setSelectedTimeSlot(null);
-      setSlotError("");
-
-      getDoctorsByClinicId(clinicFidValue?.id)
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setDoctorOptions(
+            setPatientOptions(
               data.map((item) => ({
                 ...item,
                 id: item.userId,
                 value: item.userId,
-                label: `${item.firstName} ${item.lName}`,
+                label: `${item.firstName} ${item.lastName}`,
               })),
             );
           }
-        })
-        .catch((error) => console.error(error));
-
-      getServicesByClinicId(clinicFidValue?.id)
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            const formatted = data.map((item) => ({
-              ...item,
-              id: item.serviceFid,
-              value: item.serviceFid,
-              label: `${item.serviceName}`,
-              charges: item.charges || 0,
-            }));
-            setServicesOptions(formatted);
+          if (filterData) {
+            setValue(
+              "fullName",
+              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+              { shouldValidate: true, shouldDirty: true },
+            );
+            setValue("email", filterData.emailId || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("mobile", String(filterData.mobileNo || ""), {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("city", filterData.city || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+          } else if (user) {
+            console.log("Using user context fallback");
+            setValue(
+              "fullName",
+              `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+              { shouldValidate: true, shouldDirty: true },
+            );
+            setValue("email", user.emailId || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("mobile", String(user.mobileNo || ""), {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           }
         })
         .catch((error) => console.error(error));
-
-      if (user !== null) {
-        getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
-          .then((res) => {
-            const data = res?.data?.data;
-            if (data?.length) {
-              setPatientOptions(
-                data.map((item) => ({
-                  ...item,
-                  id: item.userId,
-                  value: item.userId,
-                  label: `${item.firstName} ${item.lastName}`,
-                })),
-              );
-            }
-          })
-          .catch((error) => console.error(error));
-      }
     }
-  }, [clinicFidValue, user, setValue]);
+  }, [user, setValue]);
 
-  // Auto-Select Patient
-  useEffect(() => {
-    if (patientOptions?.length > 0 && user?.userId) {
-      const filterPatient = patientOptions.filter(
-        (item) => item.id === user?.userId,
-      );
-      setValue("patientFid", filterPatient[0] || null);
-    }
-  }, [patientOptions, user, setValue]);
+
 
   // Patch Pre-selected Service based on eventDetails
   useEffect(() => {
@@ -298,30 +279,29 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
   // Fetch Time Slots using bookingDate
   useEffect(() => {
-    if (doctorValue?.id && bookingDate && clinicFidValue?.id) {
+    if (doctorValue?.id && bookingDate) {
       setSelectedTimeSlot(null);
       setSlotError("");
       setLoading(true);
       getDoctorAvailableSlots(
         doctorValue.id,
         format(new Date(bookingDate), "yyyy-MM-dd"),
-        clinicFidValue.id,
+        5, // Hardcoded clinic ID
       )
         .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setDoctorSlots(data);
-          } else {
-            setDoctorSlots([]);
-          }
+          const data = res?.data?.data || [];
+          setDoctorSlots(data);
           setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch(() => {
+          setDoctorSlots([]);
+          setLoading(false);
+        });
     } else {
       setDoctorSlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [doctorValue?.id, bookingDate, clinicFidValue]);
+  }, [doctorValue?.id, bookingDate]);
 
   const onSubmit = (data) => {
     if (!selectedTimeSlot) {
@@ -366,21 +346,15 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
-                <div className="sticky top-0 z-20 bg-emerald-600 px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
+              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-[9px] shadow-2xl border border-emerald-100 overflow-hidden">
+                <div className="sticky top-0 z-20 bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
                   <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                    <span className="bg-white/20 p-1.5 rounded-lg flex items-center justify-center">
+                    <span className="bg-white/20 p-1.5 rounded-[9px] flex items-center justify-center">
                       <Event sx={{ fontSize: 20 }} />
                     </span>
                     Book Beauty Therapy
                   </h2>
-                  <button
-                    type="button"
-                    onClick={handleClose}
-                    className="text-white hover:bg-white/20 p-1 rounded-full transition-colors flex items-center justify-center"
-                  >
-                    <CloseIcon />
-                  </button>
+                  <CancelButtonModal onClick={handleClose} />
                 </div>
 
                 <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar bg-[#f8fafc]">
@@ -391,71 +365,87 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         className="lg:col-span-2 space-y-5"
                       >
                         {/* Patient & Therapy Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
-                              <User className="w-5 h-5 text-white" />
+                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden">
+                          <div className="bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 py-2 flex items-center gap-2 font-bold text-white">
+                            <div className="p-1.5 bg-white/20 rounded-[9px]">
+                              <User className="w-5 h-5" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg">
                               Patient & Therapy Details
                             </h2>
                           </div>
                           <div className="p-4 sm:p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div className="col-span-2 hidden">
-                                <DropdownField
+                              <div className="col-span-2">
+                                <InputField
                                   control={control}
-                                  name="location"
-                                  dataArray={locationListOptions}
-                                  isDisabled={true}
-                                />
-                                <DropdownField
-                                  control={control}
-                                  name="clinicFid"
-                                  dataArray={clinicsOptions}
-                                  isDisabled={true}
+                                  name="fullName"
+                                  label="Full Name *"
+                                  error={errors.fullName}
+                                  shrink={true}
                                 />
                               </div>
-                              <DropdownField
-                                control={control}
-                                name="patientFid"
-                                placeholder="Select Patient *"
-                                dataArray={patientOptions}
-                                error={errors.patientFid}
-                              />
-                              <DropdownField
-                                control={control}
-                                name="serviceFid"
-                                placeholder="Select Therapy *"
-                                dataArray={servicesOptions}
-                                error={errors.serviceFid}
-                                isDisabled={
-                                  eventDetails?.serviceName ? true : false
-                                }
-                              />
+                              <div>
+                                <InputField
+                                  control={control}
+                                  name="mobile"
+                                  label="Mobile Number *"
+                                  error={errors.mobile}
+                                  shrink={true}
+                                />
+                              </div>
+                              <div>
+                                <InputField
+                                  control={control}
+                                  name="email"
+                                  label="Email Address *"
+                                  error={errors.email}
+                                  shrink={true}
+                                />
+                              </div>
+                              <div className="col-span-2">
+                                <InputField
+                                  control={control}
+                                  name="city"
+                                  label="City"
+                                  error={errors.city}
+                                  shrink={true}
+                                />
+                              </div>
                             </div>
                           </div>
                         </div>
 
                         {/* Schedule Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-lime-400 to-emerald-400 px-4 py-2 flex items-center gap-2">
+                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden">
+                          <div className="bg-gradient-to-r from-lime to-ayuMid px-4 py-2 flex items-center gap-2 text-white font-bold">
                             <div className="p-1.5 bg-white/20 rounded-lg">
-                              <Calendar className="w-5 h-5 text-white" />
+                              <Calendar className="w-5 h-5" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg">
                               Schedule Options
                             </h2>
                           </div>
                           <div className="p-4 sm:p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                              <div className="col-span-2">
-                                <DropdownField
+                              <div className="">
+                                {/* <DropdownField
                                   control={control}
                                   name="doctorFid"
                                   placeholder="Select Therapist *"
                                   dataArray={doctorOptions}
                                   error={errors.doctorFid}
+                                /> */}
+
+                                <DropdownField
+                                  control={control}
+                                  name="serviceFid"
+                                  placeholder="Select Therapy *"
+                                  dataArray={servicesOptions}
+                                  error={errors.serviceFid}
+                                  isDisabled={
+                                    eventDetails?.serviceName ? true : false
+                                  }
                                 />
                               </div>
                               <div className="col-span-2 sm:col-span-1">
@@ -470,37 +460,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               </div>
                             </div>
 
-                            {/* Calculated Price Section */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
-                              <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
-                                  <Banknote className="w-3.5 h-3.5" /> Amount
-                                </span>
-                                <InputField
-                                  name="perDayAmount"
-                                  control={control}
-                                  type="text"
-                                  disabled={true}
-                                />
-                              </div>
-                              <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                                  <Calendar className="w-3.5 h-3.5" /> Total
-                                  Amount
-                                </span>
-                                <InputField
-                                  name="totalAmount"
-                                  control={control}
-                                  type="text"
-                                  disabled={true}
-                                />
-                              </div>
-                            </div>
                           </div>
                         </div>
 
                         {/* Additional Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden p-4 sm:p-5">
+                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden p-4 sm:p-5">
                           <InputArea
                             name="specialRequest"
                             control={control}
@@ -519,22 +483,21 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         </div>
                       </motion.div>
 
-                      {/* Right Panel: Time Slots */}
                       <motion.div
                         variants={sectionVariants}
                         className="lg:col-span-1"
                       >
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 lg:sticky lg:top-0 h-full flex flex-col">
-                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 flex items-center gap-2 rounded-t-lg">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
-                              <Clock className="w-5 h-5 text-white" />
+                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 lg:sticky lg:top-0 h-full flex flex-col">
+                          <div className="bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 py-2 flex items-center gap-2 rounded-t-[9px] text-white font-bold">
+                            <div className="p-1.5 bg-white/20 rounded-[9px]">
+                              <Clock className="w-5 h-5" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg">
                               Available Slots
                             </h2>
                           </div>
 
-                          <div className="p-4 sm:p-5 flex-1 relative min-h-[300px]">
+                          <div className="p-4 sm:p-5 flex-1 relative min-h-[200px]">
                             {loading ? (
                               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80">
                                 <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
@@ -567,58 +530,97 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 rounded-xl border border-dashed border-slate-200"
+                                className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 rounded-[9px] border border-dashed border-slate-200"
                               >
                                 {doctorValue && bookingDate ? (
                                   <>
-                                    <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mb-3">
-                                      <Clock className="w-6 h-6 text-amber-500" />
+                                    <div className="w-12 h-12 bg-ayuHerbal rounded-full flex items-center justify-center mb-3">
+                                      <Clock className="w-6 h-6 text-ayuMid" />
                                     </div>
                                     <p className="text-slate-600 font-medium">
                                       No slots available
                                     </p>
-                                    <p className="text-xs text-slate-400 mt-1">
-                                      Please select a different date or
-                                      therapist.
-                                    </p>
                                   </>
                                 ) : (
                                   <>
-                                    <div className="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mb-3">
-                                      <Calendar className="w-6 h-6 text-emerald-500" />
+                                    <div className="w-12 h-12 bg-lime-light rounded-full flex items-center justify-center mb-3">
+                                      <Calendar className="w-6 h-6 text-ayuTulsi" />
                                     </div>
-                                    <p className="text-slate-500 font-medium">
-                                      Select therapist and Booking Date to view
-                                      slots.
+                                    <p className="text-slate-500 font-medium text-sm">
+                                      Select Booking Date to view slots.
                                     </p>
                                   </>
                                 )}
                               </motion.div>
                             )}
                           </div>
-
                           {slotError && (
-                            <div className="px-4 py-2 bg-red-50 text-red-500 text-xs font-medium border-t border-red-100 flex items-center gap-1.5">
+                            <div className="px-4 py-2 bg-red-50 text-red-500 text-xs font-medium border-y border-red-100 flex items-center gap-1.5">
                               <span className="w-1 h-1 rounded-full bg-red-500"></span>
                               {slotError}
                             </div>
                           )}
+
+                          {/* Bill Summary Section */}
+                          <div className="bg-gradient-to-br from-ayuHerbal to-white mx-4 mb-4 p-4 rounded-[9px] border border-ayuMid/20 shadow-nature">
+                            <div className="flex items-center gap-2 mb-3 border-b border-ayuMid/10 pb-2">
+                              <Banknote className="w-4 h-4 text-ayuMid" />
+                              <h3 className="text-[11px] font-bold uppercase tracking-widest text-ayuTulsi">
+                                Bill Summary
+                              </h3>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">
+                                  Service Charge
+                                </span>
+                                <span className="text-slate-700 font-bold">
+                                  ₹{selectedServiceValue?.charges || 0}
+                                </span>
+                              </div>
+                              <div className="flex justify-between text-[11px] font-medium">
+                                <span className="text-slate-500">GST (18%)</span>
+                                <span className="text-slate-700 font-bold">
+                                  ₹{Math.round((selectedServiceValue?.charges || 0) * 0)}
+                                </span>
+                              </div>
+                              <div className="pt-2 mt-2 border-t border-ayuMid/10 flex justify-between items-end">
+                                <div>
+                                  <p className="text-[9px] text-ayuMid font-bold uppercase tracking-tighter">
+                                    Total Payable
+                                  </p>
+                                  <p className="text-xl font-black text-ayuTulsi leading-none">
+                                    ₹
+                                    {(
+                                      (selectedServiceValue?.charges || 0) +
+                                      Math.round(
+                                        (selectedServiceValue?.charges || 0) *
+                                          0.18,
+                                      )
+                                    ).toLocaleString()}
+                                  </p>
+                                </div>
+                                <div className="text-[8px] text-slate-400 font-medium italic">
+                                  Inclusive of GST
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </motion.div>
                     </div>
-
                     <div className="flex justify-end gap-3 pt-6 pb-2">
                       <CommonButton
                         type="button"
                         onClick={handleClose}
                         label="Cancel"
-                        className="rounded-lg border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition-colors w-full sm:w-auto"
+                        className=" border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition-colors w-full sm:w-auto"
                       />
                       <CommonButton
                         type="submit"
                         label="Book Now"
                         onClick={handleSubmit(onSubmit)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md font-semibold px-8 transition-transform w-full sm:w-auto"
+                        className="bg-ayuMid hover:bg-ayuTulsi text-white shadow-nature font-semibold px-8 transition-transform w-full sm:w-auto"
                       />
                     </div>
                   </form>

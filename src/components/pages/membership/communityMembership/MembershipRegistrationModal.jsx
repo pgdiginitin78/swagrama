@@ -1,31 +1,27 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import CloseIcon from "@mui/icons-material/Close";
 import { Box, Modal } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  User as UserIcon,
-  MapPin,
   CreditCard,
   Heart,
-  Tag,
-  CheckCircle,
+  MapPin,
+  User as UserIcon,
   Users,
-  UserPlus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import * as yup from "yup";
+import { useAuth } from "../../../../context/AuthContext";
+import { getUserDetails } from "../../../../services/login/LoginServices";
+import { DeleteIcon } from "../../../common/assets/CommonAssets";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
 import DatePickerField from "../../../common/formFields/DatePickerField";
+import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
-import DropdownField from "../../../common/formFields/DropdownField";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
-import { getUserDetails } from "../../../../services/login/LoginServices";
-import { useAuth } from "../../../../context/AuthContext";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
-import { DeleteIcon } from "../../../common/assets/CommonAssets";
 
 const schema = yup.object().shape({
   fullName: yup.string().required("Full name is required"),
@@ -50,8 +46,6 @@ const schema = yup.object().shape({
     .string()
     .required("Pincode is required")
     .matches(/^[0-9]{6}$/, "Pincode must be 6 digits"),
-  nomineeName: yup.string().nullable(),
-  nomineeRelation: yup.string().nullable(),
   emergencyContactName: yup
     .string()
     .required("Emergency contact name is required"),
@@ -60,18 +54,10 @@ const schema = yup.object().shape({
     .string()
     .required("Emergency contact number is required")
     .matches(/^[0-9]{10}$/, "Mobile number must be 10 digits"),
-  familyMembers: yup.array().of(
-    yup.object().shape({
-      name: yup.string().required("Name is required"),
-      relation: yup.string().required("Relation is required"),
-      dob: yup.date().nullable().required("DOB is required"),
-    }),
-  ),
   termsAccepted: yup
     .boolean()
     .oneOf([true], "You must accept the terms")
     .required(),
-  couponCode: yup.string().nullable(),
 });
 
 const containerVariants = {
@@ -95,24 +81,6 @@ const MembershipRegistrationModal = ({
   membershipDetails,
 }) => {
   const { user } = useAuth();
-  const [discount, setDiscount] = useState(0);
-  const [couponApplied, setCouponApplied] = useState(false);
-
-  const basePrice = membershipDetails?.primaryDiscount || 0;
-  const totalAmount = basePrice - discount;
-
-  const isFamilyPlan = membershipDetails?.benifits?.some((b) =>
-    [
-      "Mother",
-      "Father",
-      "Wife",
-      "Husband",
-      "Son",
-      "Daughter",
-      "Brother",
-      "Sister",
-    ].includes(b),
-  );
 
   const {
     control,
@@ -127,34 +95,21 @@ const MembershipRegistrationModal = ({
       fullName: "",
       dob: null,
       gender: "",
-      bloodGroup: "",
-      qualification: "",
       mobileNumber: "",
       email: "",
       aadharNumber: "",
-      occupation: "",
       address: "",
       city: "",
       state: "",
       pincode: "",
-      nomineeName: "",
-      nomineeRelation: "",
       emergencyContactName: "",
       emergencyContactRelation: "",
       emergencyContactNumber: "",
-      familyMembers: [],
       termsAccepted: false,
-      couponCode: "",
     },
     mode: "onChange",
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: "familyMembers",
-  });
-
-  const couponCodeValue = watch("couponCode");
   const termsAcceptedValue = watch("termsAccepted");
 
   useEffect(() => {
@@ -191,34 +146,12 @@ const MembershipRegistrationModal = ({
     }
   }, [open, user, setValue]);
 
-  const applyCoupon = () => {
-    if (!couponCodeValue) {
-      errorAlert("Please enter a coupon code");
-      return;
-    }
-
-    if (couponCodeValue === membershipDetails?.couponCode) {
-      const discountPercent = parseInt(couponCodeValue.match(/\d+/) || "0");
-      const discountVal = (basePrice * discountPercent) / 100;
-      setDiscount(discountVal);
-      setCouponApplied(true);
-      successAlert(`Coupon applied! ${discountPercent}% discount added.`);
-    } else {
-      setDiscount(0);
-      setCouponApplied(false);
-      errorAlert("Invalid coupon code for this membership.");
-    }
-  };
-
   const onSubmit = (data) => {
-    console.log("Membership Registration Data:", {
+    console.log("Membership Enquiry Data:", {
       membership: membershipDetails?.serviceName,
-      basePrice,
-      discount,
-      totalAmount,
       ...data,
     });
-    alert("Registration Successful!");
+    alert("Enquiry Submitted Successfully!");
     handleClose();
     reset();
   };
@@ -249,10 +182,11 @@ const MembershipRegistrationModal = ({
                 </div>
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
-                    Membership Registration
+                    Membership Enquiry
                   </h2>
                   <p className="text-white/80 text-xs sm:text-sm font-medium truncate max-w-[200px] sm:max-w-none">
-                    {membershipDetails?.serviceName}
+                    {membershipDetails?.serviceName}&nbsp;(
+                    {membershipDetails?.membershipNameHi})
                   </p>
                 </div>
               </div>
@@ -265,13 +199,15 @@ const MembershipRegistrationModal = ({
                   <h3 className="text-base sm:text-lg font-bold text-green-800 mb-4 flex items-center gap-2 border-b pb-2">
                     <UserIcon className="w-5 h-5" /> Personal Information
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <InputField
-                      control={control}
-                      name="fullName"
-                      label="Full Name *"
-                      error={errors.fullName}
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="lg:col-span-2">
+                      <InputField
+                        control={control}
+                        name="fullName"
+                        label="Full Name *"
+                        error={errors.fullName}
+                      />
+                    </div>
                     <DatePickerField
                       control={control}
                       name="dob"
@@ -288,7 +224,15 @@ const MembershipRegistrationModal = ({
                       dataArray={genderOptions}
                       error={errors.gender}
                     />
+                  </div>
+                </section>
 
+                <section className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200">
+                  <h3 className="text-base sm:text-lg font-bold text-green-800 mb-4 flex items-center gap-2 border-b pb-2">
+                    <Users className="w-5 h-5 text-blue-600" /> Contact
+                    Information
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     <InputField
                       control={control}
                       name="mobileNumber"
@@ -349,27 +293,6 @@ const MembershipRegistrationModal = ({
 
                 <section className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200">
                   <h3 className="text-base sm:text-lg font-bold text-green-800 mb-4 flex items-center gap-2 border-b pb-2">
-                    <UserPlus className="w-5 h-5 text-blue-500" /> Nominee
-                    Details (Optional)
-                  </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <InputField
-                      control={control}
-                      name="nomineeName"
-                      label="Nominee Name"
-                      error={errors.nomineeName}
-                    />
-                    <InputField
-                      control={control}
-                      name="nomineeRelation"
-                      label="Relation with Member"
-                      error={errors.nomineeRelation}
-                    />
-                  </div>
-                </section>
-
-                <section className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200">
-                  <h3 className="text-base sm:text-lg font-bold text-green-800 mb-4 flex items-center gap-2 border-b pb-2">
                     <Heart className="w-5 h-5 text-red-500" /> Emergency Contact
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -395,129 +318,6 @@ const MembershipRegistrationModal = ({
                   </div>
                 </section>
 
-                {isFamilyPlan && (
-                  <section className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200">
-                    <div className="flex items-center justify-between border-b pb-2 mb-4">
-                      <h3 className="text-base sm:text-lg font-bold text-green-800 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-emerald-500" /> Family
-                        Member Details
-                      </h3>
-                      <CommonButton
-                        type="button"
-                        onClick={() =>
-                          append({ name: "", relation: "", dob: null })
-                        }
-                        label="Add Member"
-                        className="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 text-xs px-3 py-1.5"
-                      />
-                    </div>
-
-                    {fields.length === 0 && (
-                      <p className="text-center text-slate-500 py-4 text-sm italic">
-                        No family members added yet. Click "Add Member" to
-                        include family details.
-                      </p>
-                    )}
-
-                    <div className="space-y-4">
-                      {fields.map((field, index) => (
-                        <div
-                          key={field.id}
-                          className="p-4 rounded-lg bg-slate-50 border border-slate-200 relative group"
-                        >
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <InputField
-                              control={control}
-                              name={`familyMembers.${index}.name`}
-                              label="Full Name *"
-                              error={errors.familyMembers?.[index]?.name}
-                            />
-                            <InputField
-                              control={control}
-                              name={`familyMembers.${index}.relation`}
-                              label="Relation *"
-                              error={errors.familyMembers?.[index]?.relation}
-                            />
-                            <div className="flex space-x-2 items-center w-full">
-                              <div>
-                                <DatePickerField
-                                  control={control}
-                                  name={`familyMembers.${index}.dob`}
-                                  label="Date of Birth *"
-                                  inputFormat="dd-MM-yyyy"
-                                  disableFuture={true}
-                                  error={errors.familyMembers?.[index]?.dob}
-                                />
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => remove(index)}
-                                className=" relative right-1 text-slate-400 hover:text-red-500 transition-colors"
-                              >
-                                <DeleteIcon fontSize="small" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </section>
-                )}
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                  <div className="bg-white p-4 sm:p-5 rounded-xl shadow-sm border border-slate-200">
-                    <h3 className="text-xs sm:text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                      <Tag className="w-4 h-4 text-orange-500" /> Have a Coupon?
-                    </h3>
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <InputField
-                          control={control}
-                          name="couponCode"
-                          label="Coupon Code"
-                          error={errors.couponCode}
-                        />
-                      </div>
-                      <CommonButton
-                        type="button"
-                        onClick={applyCoupon}
-                        className="bg-orange-500 text-white hover:bg-orange-600 transition-all font-semibold"
-                        label="Apply"
-                      />
-                    </div>
-                    {couponApplied && (
-                      <div className="mt-2 text-xs text-green-600 flex items-center gap-1 font-bold animate-pulse">
-                        <CheckCircle size={14} /> Coupon Applied Successfully
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="bg-gradient-to-br from-emerald-800 to-green-900 p-5 rounded-xl shadow-lg border border-slate-700 text-white">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center text-amber-500 text-sm font-semibold">
-                        <span>Base Amount :</span>
-                        <span>₹{basePrice.toLocaleString()}</span>
-                      </div>
-                      {discount > 0 && (
-                        <div className="flex justify-between items-center text-green-400 text-sm">
-                          <span>Discount Applied :</span>
-                          <span>- ₹{discount.toLocaleString()}</span>
-                        </div>
-                      )}
-                      <div className="border-t border-amber-500/30 my-2 pt-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-base sm:text-lg font-bold">
-                            Total Payable :
-                          </span>
-                          <span className="text-xl sm:text-2xl font-black text-amber-400">
-                            ₹{totalAmount.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="space-y-4">
                   <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
                     <CheckBoxField
@@ -538,9 +338,9 @@ const MembershipRegistrationModal = ({
                   />
                   <CommonButton
                     type="submit"
-                    label="Proceed to Payment"
+                    label="Submit Enquiry"
                     disabled={!termsAcceptedValue}
-                    className={`text-white ${termsAcceptedValue ? "bg-gradient-to-r from-green-700 to-green-600" : ""}`}
+                    className={`text-white px-10 ${termsAcceptedValue ? "bg-gradient-to-r from-green-700 to-green-600 shadow-md" : "bg-slate-300"}`}
                   />
                 </div>
               </form>

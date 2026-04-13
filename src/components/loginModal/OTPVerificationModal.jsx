@@ -15,7 +15,7 @@ const OTPVerificationModal = ({
   handleResend,
   phoneNumber = "",
   emailFromResend,
-  setOtpEmailForVerification
+  setOtpEmailForVerification,
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [timer, setTimer] = useState(30);
@@ -127,7 +127,7 @@ const OTPVerificationModal = ({
     }),
   };
 
-  console.log("emailAddressValue",emailFromResend);
+  console.log("emailAddressValue", emailFromResend);
 
   const handleVerifyOtp = () => {
     const otpString = otp.join("");
@@ -142,7 +142,7 @@ const OTPVerificationModal = ({
     };
 
     setIsLoading(true);
-    setOtpEmailForVerification(otpString)
+    setOtpEmailForVerification(otpString);
     verifyOtp(tempObj)
       .then((res) => {
         if (res.status === 200) {
@@ -153,14 +153,11 @@ const OTPVerificationModal = ({
         } else {
           errorAlert(res.data?.message || "Invalid OTP");
         }
-        setOtp("")
+        setOtp("");
       })
       .catch((err) => {
-        console.error(err);
-        errorAlert(
-          err?.response?.data?.message ||
-            "Verification failed. Please try again.",
-        );
+        console.error("verifyOtp", err);
+        errorAlert(err?.response?.data?.message || "Invalid OTP");
       })
       .finally(() => {
         setIsLoading(false);
@@ -170,7 +167,6 @@ const OTPVerificationModal = ({
   return (
     <Modal
       open={open}
-      onClose={handleClose}
       closeAfterTransition
       sx={{
         display: "flex",
@@ -194,7 +190,12 @@ const OTPVerificationModal = ({
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-lime-100/40 to-green-100/40 rounded-full -ml-16 -mb-16 blur-2xl" />
 
               <div className="p-3 relative z-10">
-                <CancelButtonModal onClick={handleClose} />
+                <CancelButtonModal
+                  onClick={() => {
+                    handleClose();
+                    setOtp("");
+                  }}
+                />
 
                 <div className="flex flex-col items-center text-center mb-3 mt-2">
                   <motion.div

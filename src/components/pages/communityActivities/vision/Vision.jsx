@@ -16,7 +16,7 @@ import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import TempleBuddhistIcon from "@mui/icons-material/TempleBuddhist";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useState, isValidElement } from "react";
 import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.png";
 import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.png";
@@ -28,7 +28,8 @@ import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.p
 import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.png";
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
 import VisitorsFormModal from "./VisitorsFormModal";
-import MainPageImg from "../../../assets/community-activities/mainPage.png"
+import MainPageImg from "../../../assets/community-activities/mainPage.png";
+import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
 
 const walkInServices = [
   {
@@ -36,8 +37,7 @@ const walkInServices = [
     serviceName: "Morning Whole Meal",
     checkIn: "06:45",
     checkOut: "09:15",
-    description:
-      "Morning wholesome meal provided at Swagrama.",
+    description: "Morning wholesome meal provided at Swagrama.",
     benefits: "Nutritious start to the day, energizes body and mind.",
     price: "₹500",
     image: MorningMealImg,
@@ -48,8 +48,7 @@ const walkInServices = [
     serviceName: "Evening Whole Meal",
     checkIn: "16:00",
     checkOut: "18:00",
-    description:
-      "Evening wholesome meal provided at Swagrama.",
+    description: "Evening wholesome meal provided at Swagrama.",
     benefits:
       "Balanced nutrition to relax and rejuvenate after day's activities.",
     price: "₹500",
@@ -88,6 +87,65 @@ const walkInServices = [
     price: "Free",
     image: PatientCampImg,
     icon: LocalHospitalIcon,
+  },
+];
+
+const visitorServices = [
+  {
+    nameHindi: "स्वप्रातःदर्शन",
+    serviceName: "Morning Swagrama",
+    checkIn: "08:45",
+    checkOut: "11:15",
+    description:
+      "Morning Swagrama informative visit / guided session with Herbal Gud Tea.",
+    mealNote: "(without meal)",
+    benefits:
+      "Provides knowledge about therapies, Panchakarma, wellness practices, and site orientation.",
+    price: "₹750",
+    icon: SpaIcon,
+    image: MorningVisionImg,
+  },
+  {
+    nameHindi: "स्वसायम्दर्शन",
+    serviceName: "Evening Swagrama",
+    checkIn: "14:45",
+    checkOut: "17:15",
+    description:
+      "Evening Swagrama informative visit / guided session with Herbal Gud Tea.",
+    mealNote: "(without meal)",
+    benefits:
+      "Offers overview of holistic treatments, Q&A, and insight into wellness practices.",
+    price: "₹750",
+    image: EveningSwagramaImg,
+    icon: SpaIcon,
+  },
+  {
+    nameHindi: "स्वप्रातःदर्शनपूर्णाहार",
+    serviceName: "Morning Vision Whole Meal",
+    checkIn: "06:45",
+    checkOut: "11:15",
+    description:
+      "Morning informative visit with Herbal Gud Tea & wholesome meal.",
+    mealNote: "",
+    benefits:
+      "Combines experiential learning with nutritious meal for holistic experience.",
+    price: "₹1000",
+    image: MorningVisionWholeMealImg,
+    icon: RestaurantIcon,
+  },
+  {
+    nameHindi: "स्वसायम्दर्शनपूर्णाहार",
+    serviceName: "Evening Vision Whole Meal",
+    checkIn: "14:45",
+    checkOut: "19:15",
+    description:
+      "Evening informative visit with Herbal Gud Tea & wholesome meal.",
+    mealNote: "",
+    benefits:
+      "Knowledge sharing + nourishing meal for comprehensive understanding.",
+    price: "₹1000",
+    image: EveningVisionWholeMealImg,
+    icon: RestaurantIcon,
   },
 ];
 
@@ -154,65 +212,6 @@ const journeyItems = [
   },
 ];
 
-const visitorServices = [
-  {
-    nameHindi: "स्वप्रातःदर्शन",
-    serviceName: "Morning Swagrama",
-    checkIn: "08:45",
-    checkOut: "11:15",
-    description:
-      "Morning Swagrama informative visit / guided session with Herbal Gud Tea.",
-    mealNote: "(without meal)",
-    benefits:
-      "Provides knowledge about therapies, Panchakarma, wellness practices, and site orientation.",
-    price: "₹750",
-    icon: SpaIcon,
-    image: MorningVisionImg,
-  },
-  {
-    nameHindi: "स्वसायम्दर्शन",
-    serviceName: "Evening Swagrama",
-    checkIn: "14:45",
-    checkOut: "17:15",
-    description:
-      "Evening Swagrama informative visit / guided session with Herbal Gud Tea.",
-    mealNote: "(without meal)",
-    benefits:
-      "Offers overview of holistic treatments, Q&A, and insight into wellness practices.",
-    price: "₹750",
-    image: EveningSwagramaImg,
-    icon: SpaIcon,
-  },
-  {
-    nameHindi: "स्वप्रातःदर्शनपूर्णाहार",
-    serviceName: "Morning Vision Whole Meal",
-    checkIn: "06:45",
-    checkOut: "11:15",
-    description:
-      "Morning informative visit with Herbal Gud Tea & wholesome meal.",
-    mealNote: "",
-    benefits:
-      "Combines experiential learning with nutritious meal for holistic experience.",
-    price: "₹1000",
-    image: MorningVisionWholeMealImg,
-    icon: RestaurantIcon,
-  },
-  {
-    nameHindi: "स्वसायम्दर्शनपूर्णाहार",
-    serviceName: "Evening Vision Whole Meal",
-    checkIn: "14:45",
-    checkOut: "19:15",
-    description:
-      "Evening informative visit with Herbal Gud Tea & wholesome meal.",
-    mealNote: "",
-    benefits:
-      "Knowledge sharing + nourishing meal for comprehensive understanding.",
-    price: "₹1000",
-    image: EveningVisionWholeMealImg,
-    icon: RestaurantIcon,
-  },
-];
-
 const generalService = {
   serviceName: "General Visit Inquiry",
   nameHindi: "सामान्य दर्शन पूछताछ",
@@ -224,6 +223,7 @@ const generalService = {
 const OurVision = () => {
   const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
   const [selectedEnquiryDetails, setSelectedEnquiryDetails] = useState(null);
+  const [openWalkInServiceBookingModal,setOpenWalkInServiceBookingModal]=useState(false)
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -271,7 +271,10 @@ const OurVision = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.15 }}
             className="font-playfair text-center mb-5 sm:mb-6 md:mb-8"
-            style={{ textShadow: "0 4px 24px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9)" }}
+            style={{
+              textShadow:
+                "0 4px 24px rgba(0,0,0,0.7), 0 1px 3px rgba(0,0,0,0.9)",
+            }}
           >
             <span className="block text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-[#f0ede4] leading-tight tracking-wide">
               स्वग्रामदर्शन
@@ -295,11 +298,15 @@ const OurVision = () => {
             className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 text-center max-w-3xl mx-auto leading-relaxed sm:leading-loose mb-8 sm:mb-10 md:mb-14 px-2"
             style={{ textShadow: "0 2px 12px rgba(0,0,0,0.8)" }}
           >
-            <strong className="text-[#a8d96c] font-semibold">स्वग्रामदर्शन</strong> is a holistic journey through the essence of community living
-            in harmony with nature. Visitors are welcomed into a world where knowledge, culture,
-            sustainability, and spirituality converge. Each element of the community embodies a
-            conscious lifestyle rooted in natural regulation{" "}
-            <span className="text-[#c8e89a]">(ऋत)</span> and traditional wisdom.
+            <strong className="text-[#a8d96c] font-semibold">
+              स्वग्रामदर्शन
+            </strong>{" "}
+            is a holistic journey through the essence of community living in
+            harmony with nature. Visitors are welcomed into a world where
+            knowledge, culture, sustainability, and spirituality converge. Each
+            element of the community embodies a conscious lifestyle rooted in
+            natural regulation <span className="text-[#c8e89a]">(ऋत)</span> and
+            traditional wisdom.
           </motion.p>
 
           <motion.div
@@ -324,13 +331,8 @@ const OurVision = () => {
               </span>
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#9ccc65] to-[#7cb342] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </button>
-
-
           </motion.div>
-
         </div>
-
-
       </div>
 
       <div className="py-6 sm:py-8 md:py-12 lg:py-16 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
@@ -510,8 +512,6 @@ const OurVision = () => {
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                   
                     </div>
 
                     <div className="p-3 sm:p-4">
@@ -650,7 +650,6 @@ const OurVision = () => {
                               alt={service.serviceName}
                               className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             />
-                     
                           </div>
 
                           <div className="p-3 sm:p-4 flex-1 flex flex-col">
@@ -693,13 +692,14 @@ const OurVision = () => {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => {
-                                setOpenEnquiryModal(true);
+                                setOpenWalkInServiceBookingModal(true);
                                 setSelectedEnquiryDetails(service);
                               }}
-                              className={`${service.price === "Free"
-                                ? "bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600"
-                                : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                                } text-white font-semibold py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl w-full flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 mt-auto text-xs sm:text-sm md:text-base`}
+                              className={`${
+                                service.price === "Free"
+                                  ? "bg-gradient-to-r from-lime-500 to-green-500 hover:from-lime-600 hover:to-green-600"
+                                  : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                              } text-white font-semibold py-2 sm:py-2.5 md:py-3 rounded-lg sm:rounded-xl w-full flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 mt-auto text-xs sm:text-sm md:text-base`}
                             >
                               Enquire Now
                               <ArrowForwardIcon className="text-base sm:text-lg" />
@@ -728,6 +728,17 @@ const OurVision = () => {
           serviceDetails={selectedEnquiryDetails}
         />
       )}
+      <AnimatePresence>
+        {openWalkInServiceBookingModal && (
+          <MembershipRegistrationModal
+            open={openWalkInServiceBookingModal}
+            handleClose={() => {
+              setOpenWalkInServiceBookingModal(false);
+            }}
+            membershipDetails={selectedEnquiryDetails}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

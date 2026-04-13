@@ -12,6 +12,7 @@ import VolunteerActivismOutlined from "@mui/icons-material/VolunteerActivismOutl
 import { motion } from "framer-motion";
 import { useState } from "react";
 import BookEventForm from "../../bookEventForm/BookEventForm";
+import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -45,24 +46,26 @@ const scaleVariants = {
 const eventSlots = [
   {
     serviceName: "स्वसहभावउत्सव Community Ceremony",
+    nameHindi:"स्वसहभावउत्सव",
     checkIn: "06:45",
     checkOut: "19:15",
     description:
       "Community festival and group celebrations at Swagrama. Full Day with meal celebration of Indian, Seasonal or Traditional festivals & Rituals.",
     benefits:
       "Encourages bonding, cultural participation, and collective well-being.",
-    value: "",
+    price: "",
     image:
       "https://images.unsplash.com/photo-1532635241-17e820acc59f?w=600&h=400&fit=crop",
   },
   {
     serviceName: "ग्रामपूर्णदिनकर्मण्य Full Day Activities",
+    nameHindi:"ग्रामपूर्णदिनकर्मण्य",
     checkIn: "06:45",
     checkOut: "19:15",
     description:
       "Full-day structured activities at Swagrama including ceremonies, Ayurveda, Diet, Yoga, Natural Lifestyle, Farming & Gauseva.",
     benefits: "Engages body and mind, promotes wellness and learning.",
-    value: "2000",
+    price: "2000",
     image:
       "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=600&h=400&fit=crop",
   },
@@ -526,13 +529,13 @@ const CommunityActivities = () => {
       </main>
 
       {openEventBookModal && (
-        <BookEventForm
+        <MembershipRegistrationModal
           open={openEventBookModal}
           handleClose={() => {
             setOpenEventBookModal(false);
             setSelectedEvent(null);
           }}
-          eventDetails={selectedEvent}
+          membershipDetails={selectedEvent}
         />
       )}
     </div>

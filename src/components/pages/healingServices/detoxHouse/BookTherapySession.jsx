@@ -91,7 +91,7 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   const priceParsed = parseInt(String(item.price).replace(/[^0-9]/g, "")) || 0;
   const subTotal = priceParsed * sessionsCount;
-  const taxes = Math.round(subTotal * 0.1);
+  const taxes = Math.round(subTotal * 0);
   const total = subTotal + taxes;
   const shortServiceName =
     item?.serviceName?.split(" ").slice(0, 3).join(" ") || "Therapy";
@@ -138,9 +138,9 @@ export default function BookTherapySession({ open, onClose, item }) {
       <Box
         sx={ModalStyle}
         ref={backdropRef}
-        className="w-[96%] sm:w-[90%] md:w-[80%] lg:w-[65%] xl:w-[52%] max-h-[94vh] overflow-hidden rounded-[9px] bg-[#faf9f6] p-0 flex flex-col"
+        className="w-[96%] sm:w-[90%] md:w-[80%] lg:w-[65%] xl:w-[52%] max-h-[94vh] p-2 overflow-hidden rounded-[9px] bg-[#faf9f6]  flex flex-col"
       >
-        <div className="flex items-center justify-between md:px-4 md:pt-4 pb-3 border-b border-[#e8ede4] flex-shrink-0">
+        <div className="flex items-center justify-between md:px-4  pb-3 border-b border-[#e8ede4] flex-shrink-0">
           <h1 className="font-serif text-ayuTulsi text-base sm:text-lg font-bold leading-tight">
             Book Therapy Session
           </h1>
@@ -520,7 +520,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                   </span>
                 </div>
                 <div className="flex justify-between items-center px-1 text-[10px]">
-                  <span>Taxes (10%)</span>
+                  <span>Taxes (18%)</span>
                   <span className="text-ayuTulsi">
                     ₹{taxes.toLocaleString()}
                   </span>

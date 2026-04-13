@@ -380,8 +380,6 @@ function BookingPreviewModal({
   activeDept,
   selectedDoctorId,
 }) {
-  console.log("activeDept", data, selectedDoctorId);
-
   return (
     <Dialog
       open={open}
@@ -524,7 +522,6 @@ function AyurvedaForm({
 
   const { user } = useAuth();
 
-
   const {
     handleSubmit,
     control,
@@ -556,6 +553,8 @@ function AyurvedaForm({
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
+
+  console.log("activeDeptactiveDeptactiveDept", activeDept);
 
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
@@ -690,7 +689,9 @@ function AyurvedaForm({
   }, [selectedDoctorId, appointmentDate]);
 
   const handleConfirmBooking = handleSubmit((data) => {
-    if (selectedTimeSlot === null) {
+    if (user === null) {
+      errorAlert("Please Login First !");
+    } else if (selectedTimeSlot === null) {
       setSlotError("Please select a time slot to continue.");
       return;
     }
@@ -699,16 +700,18 @@ function AyurvedaForm({
       macId: "",
       macIp: ipAddress,
       clinicFid: selectedDoctorId?.clinicId,
+      patientFid: data.patientFid.id,
       doctorFid: selectedDoctorId?.userId,
-      serviceFid: data?.serviceFid?.id?.toString(),
+      serviceFid: String(data.serviceFid.id),
       appoinmentDate: format(new Date(data.appointmentDate), "yyyy-MM-dd"),
-      Status: "",
+      Status: data.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
-      ServiceDetails: `${data?.serviceFid?.label}- Rs ${data?.serviceFid?.charges}/-`,
-      taxDeatils: "",
-      EncounterStatus: "",
+      ServiceDetails: data.ServiceDetails,
+      taxDeatils: data.taxDetails,
+      EncounterStatus: data?.EncounterStatus,
       reason: data.reasonForVisit,
+      paymentFor: "OPD",
     };
     setFinalObj(saveObj);
     setPreviewData({ ...data, selectedTimeSlot });
@@ -727,6 +730,7 @@ function AyurvedaForm({
           "yyyy-MM-dd",
         ),
         userId: userId,
+        paymentFor: "OPD",
       };
 
       const res = await InitiatePayment(
@@ -820,8 +824,6 @@ function AyurvedaForm({
     }
   }, [patientFid]);
 
-
-
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
@@ -839,671 +841,691 @@ function AyurvedaForm({
         .ayur-scroll { scrollbar-width: thin; scrollbar-color: #059669 #d1fae5; }
       `}</style>
 
-<div className="px-3 py-4 space-y-5 sm:px-4 sm:py-5 md:px-5">
+      <div className="px-3 py-4 space-y-5 sm:px-4 sm:py-5 md:px-5">
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4">
+          <div className="flex flex-col gap-4 lg:col-span-3">
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-1.5 sm:text-base md:text-lg">
+                    <span className="text-lg sm:text-xl">
+                      {isYoga ? (
+                        <SelfImprovementIcon />
+                      ) : isHomeopathy ? (
+                        <HealingIcon />
+                      ) : (
+                        <CompostIcon />
+                      )}
+                    </span>
+                    Our {activeDept || "Ayurveda"}
+                    {isYoga ? "Sessions" : "Treatments"}
+                  </h2>
+                  <p className="text-[10px] text-gray-400 mt-0.5 pl-6 sm:text-xs">
+                    {isYoga
+                      ? "Find balance through guided practice"
+                      : isHomeopathy
+                        ? "Natural healing for root causes"
+                        : "Ancient therapies for modern well-being"}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    onClick={handlePrev}
+                    aria-label="Previous"
+                    className="w-8 h-8 rounded-full border border-emerald-300 bg-white text-emerald-700 flex items-center justify-center shadow-sm hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-200 sm:w-9 sm:h-9"
+                  >
+                    <NavigateBeforeRoundedIcon fontSize="small" />
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    aria-label="Next"
+                    className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md hover:bg-emerald-700 transition-all duration-200 sm:w-9 sm:h-9"
+                  >
+                    <NavigateNextRoundedIcon fontSize="small" />
+                  </button>
+                </div>
+              </div>
 
-  <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4">
+              <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 border border-emerald-100 shadow-inner p-2 sm:p-3">
+                <div className="flex gap-2 sm:gap-3">
+                  <AnimatePresence custom={direction} mode="popLayout">
+                    {visibleImages.map((img) => (
+                      <motion.div
+                        key={img.id}
+                        custom={direction}
+                        variants={slideVariants}
+                        initial="enter"
+                        animate="center"
+                        exit="exit"
+                        transition={{
+                          x: { type: "spring", stiffness: 280, damping: 30 },
+                          opacity: { duration: 0.2 },
+                        }}
+                        className="flex-1 min-w-0"
+                      >
+                        <div className="relative overflow-hidden rounded-xl aspect-[4/3] group shadow-md sm:aspect-[3/2]">
+                          <img
+                            src={img.src}
+                            alt={img.alt}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-xl" />
+                          <div className="absolute bottom-1.5 left-1.5 right-1.5 sm:bottom-2 sm:left-2 sm:right-2">
+                            <span className="text-white text-[9px] font-semibold bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full sm:text-[10px]">
+                              {img.alt}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
 
-    <div className="flex flex-col gap-4 lg:col-span-3">
-
-      <div className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-1.5 sm:text-base md:text-lg">
-              <span className="text-lg sm:text-xl">
-                {isYoga ? (
-                  <SelfImprovementIcon />
-                ) : isHomeopathy ? (
-                  <HealingIcon />
-                ) : (
-                  <CompostIcon />
-                )}
-              </span>
-              Our {activeDept || "Ayurveda"}{" "}
-              {isYoga ? "Sessions" : "Treatments"}
-            </h2>
-            <p className="text-[10px] text-gray-400 mt-0.5 pl-6 sm:text-xs">
-              {isYoga
-                ? "Find balance through guided practice"
-                : isHomeopathy
-                  ? "Natural healing for root causes"
-                  : "Ancient therapies for modern well-being"}
-            </p>
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            <button
-              onClick={handlePrev}
-              aria-label="Previous"
-              className="w-8 h-8 rounded-full border border-emerald-300 bg-white text-emerald-700 flex items-center justify-center shadow-sm hover:bg-emerald-600 hover:text-white hover:border-emerald-600 transition-all duration-200 sm:w-9 sm:h-9"
-            >
-              <NavigateBeforeRoundedIcon fontSize="small" />
-            </button>
-            <button
-              onClick={handleNext}
-              aria-label="Next"
-              className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-md hover:bg-emerald-700 transition-all duration-200 sm:w-9 sm:h-9"
-            >
-              <NavigateNextRoundedIcon fontSize="small" />
-            </button>
-          </div>
-        </div>
-
-        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-emerald-50 via-teal-50 to-green-50 border border-emerald-100 shadow-inner p-2 sm:p-3">
-          <div className="flex gap-2 sm:gap-3">
-            <AnimatePresence custom={direction} mode="popLayout">
-              {visibleImages.map((img) => (
-                <motion.div
-                  key={img.id}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    x: { type: "spring", stiffness: 280, damping: 30 },
-                    opacity: { duration: 0.2 },
-                  }}
-                  className="flex-1 min-w-0"
-                >
-                  <div className="relative overflow-hidden rounded-xl aspect-[4/3] group shadow-md sm:aspect-[3/2]">
-                    <img
-                      src={img.src}
-                      alt={img.alt}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                <div className="flex justify-center gap-1.5 mt-2.5 sm:mt-3">
+                  {Array.from({ length: totalSlides }).map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        setDirection(i > currentIndex ? 1 : -1);
+                        setCurrentIndex(i);
+                      }}
+                      aria-label={`Slide ${i + 1}`}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        i === currentIndex
+                          ? "bg-emerald-600 w-6"
+                          : "bg-emerald-200 w-2 hover:bg-emerald-400"
+                      }`}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent rounded-xl" />
-                    <div className="absolute bottom-1.5 left-1.5 right-1.5 sm:bottom-2 sm:left-2 sm:right-2">
-                      <span className="text-white text-[9px] font-semibold bg-black/30 backdrop-blur-sm px-2 py-0.5 rounded-full sm:text-[10px]">
-                        {img.alt}
-                      </span>
-                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2.5 sm:mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-1 h-5 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full" />
+                  <h3 className="text-xs font-bold text-emerald-900 flex items-center gap-1 sm:text-sm">
+                    <PersonSearchIcon
+                      fontSize="small"
+                      className="text-emerald-600"
+                    />
+                    Choose Your Vaidya
+                  </h3>
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                {doctorList.length > 0 && (
+                  <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-semibold sm:text-xs">
+                    {doctorList.length} available
+                  </span>
+                )}
+              </div>
+
+              {loadingDoctors ? (
+                <div className="flex flex-col items-center justify-center py-8 gap-3 sm:py-10">
+                  <div className="w-9 h-9 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin sm:w-10 sm:h-10" />
+                  <p className="text-xs text-gray-400 animate-pulse">
+                    Finding expert Vaidyas…
+                  </p>
+                </div>
+              ) : doctorList.length === 0 ? (
+                <div className="flex flex-col items-center py-8 text-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 gap-2 sm:py-10">
+                  <AccountCircleIcon sx={{ fontSize: 40, color: "#6ee7b7" }} />
+                  <p className="text-sm font-semibold text-gray-400">
+                    No doctors available
+                  </p>
+                  <p className="text-xs text-gray-300">
+                    Please try another department
+                  </p>
+                </div>
+              ) : (
+                <div
+                  className="ayur-scroll overflow-y-auto space-y-2 pr-1 py-1.5 sm:space-y-2.5 sm:py-2"
+                  style={{ maxHeight: "360px" }}
+                >
+                  {doctorList.map((doctor, idx) => {
+                    const isSelected =
+                      selectedDoctorId?.userId === doctor.userId;
+                    const doctorName = getDoctorName(doctor);
+                    const initials = doctorName
+                      .split(" ")
+                      .slice(0, 2)
+                      .map((n) => n[0])
+                      .join("")
+                      .toUpperCase();
+
+                    const days =
+                      doctor?.sessions[0]?.weekDays
+                        ?.split(",")
+                        .filter((d) => d.trim())
+                        .map((d) => d.trim().substring(0, 3)) ?? [];
+
+                    return (
+                      <motion.div
+                        key={doctor.userId ?? idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          delay: idx * 0.06,
+                          duration: 0.35,
+                          ease: "easeOut",
+                        }}
+                        onClick={() => setSelectedDoctorId(doctor)}
+                        whileTap={{ scale: 0.98 }}
+                        className={`cursor-pointer rounded-lg border transition-all duration-200 ${
+                          isSelected
+                            ? "border-emerald-500 bg-emerald-50 shadow-md"
+                            : "border-gray-200 bg-white active:border-emerald-400"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2.5 p-2.5 sm:gap-3 sm:p-3 md:gap-4 md:p-4">
+                          <div className="relative shrink-0">
+                            {getDoctorImage(doctorName) ||
+                            doctor.profilePhoto ? (
+                              <img
+                                src={
+                                  getDoctorImage(doctorName) ||
+                                  doctor.profilePhoto
+                                }
+                                alt={doctorName}
+                                className={`w-11 h-11 rounded-full object-cover border ${
+                                  isSelected
+                                    ? "border-emerald-400"
+                                    : "border-gray-200"
+                                } sm:w-13 sm:h-13 md:w-14 md:h-14 lg:w-16 lg:h-16`}
+                              />
+                            ) : (
+                              <div
+                                className={`w-11 h-11 rounded-full bg-gradient-to-br ${activeGradient} flex items-center justify-center sm:w-13 sm:h-13 md:w-14 md:h-14 lg:w-16 lg:h-16`}
+                              >
+                                <span className="text-white font-bold text-xs sm:text-sm">
+                                  {initials || "?"}
+                                </span>
+                              </div>
+                            )}
+
+                            {isSelected && (
+                              <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border border-white sm:w-5 sm:h-5"
+                              >
+                                <CheckCircleIcon
+                                  style={{ fontSize: 10 }}
+                                  className="text-white sm:text-[12px]"
+                                />
+                              </motion.div>
+                            )}
+                          </div>
+
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <p
+                                className={`font-semibold text-xs truncate sm:text-sm ${
+                                  isSelected
+                                    ? "text-emerald-800"
+                                    : "text-gray-800"
+                                }`}
+                              >
+                                {doctorName}
+                              </p>
+                              <span
+                                className={`shrink-0 flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-full sm:text-[10px] sm:px-2 ${
+                                  isSelected
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-gray-100 text-gray-600"
+                                }`}
+                              >
+                                <Clock
+                                  size={8}
+                                  className="sm:w-[9px] sm:h-[9px]"
+                                />
+                                {doctor?.sessions[0]?.timeSlot} min
+                              </span>
+                            </div>
+
+                            {doctor.degree?.trim() && (
+                              <p className="text-[10px] text-gray-500 truncate mt-0.5 sm:text-xs">
+                                {doctor?.degree?.trim()}
+                              </p>
+                            )}
+
+                            <p className="text-[10px] text-ayuBrown truncate sm:text-xs">
+                              {doctor?.clinicName}
+                            </p>
+
+                            {days?.length > 0 && (
+                              <div className="flex items-center gap-1 flex-wrap mt-1">
+                                <CalendarMonthIcon
+                                  style={{ fontSize: 13 }}
+                                  className="text-gray-400"
+                                />
+                                {days.map((d, di) => (
+                                  <span
+                                    key={di}
+                                    className={`text-[9px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
+                                      isSelected
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : "bg-gray-100 text-gray-600"
+                                    }`}
+                                  >
+                                    {d}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                            <div className="flex flex-wrap items-center gap-1 mt-1">
+                              <EventAvailableIcon
+                                style={{ fontSize: 13 }}
+                                className="text-gray-400"
+                              />
+                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
+                                {doctor?.sessions[0]?.morning}
+                              </p>
+                              <span className="text-[9px] text-gray-400">
+                                -
+                              </span>
+                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
+                                {doctor?.sessions[0]?.evening}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:col-span-1">
+            <div className="mb-2.5 sm:mb-3">
+              <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-1.5 sm:text-base md:text-lg">
+                <span className="text-lg sm:text-xl">
+                  {isYoga ? (
+                    <SelfImprovementIcon />
+                  ) : isHomeopathy ? (
+                    <HealingIcon />
+                  ) : (
+                    <FilterVintageIcon />
+                  )}
+                </span>
+                Why {activeDept || "Ayurveda"}?
+              </h2>
+              <p className="text-[10px] text-gray-400 mt-0.5 pl-6 sm:text-xs">
+                {isYoga
+                  ? "Path to inner peace"
+                  : isHomeopathy
+                    ? "Gentle and effective healing"
+                    : "Discover the science of life"}
+              </p>
+            </div>
+
+            <div
+              className="ayur-scroll overflow-y-auto grid grid-cols-1 gap-2 pr-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-1"
+              style={{ maxHeight: "620px" }}
+            >
+              {currentSideContent.map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: 24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.07, duration: 0.3 }}
+                  className={`flex items-start gap-2 p-2.5 rounded-xl ${item.bg} border ${item.border} hover:shadow-md transition-shadow duration-200`}
+                >
+                  <div
+                    className={`shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center text-white shadow-sm sm:w-8 sm:h-8`}
+                  >
+                    {item.icon}
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-800 text-[11px] sm:text-xs">
+                      {item.title}
+                    </p>
+                    <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed sm:text-xs">
+                      {item.desc}
+                    </p>
                   </div>
                 </motion.div>
               ))}
-            </AnimatePresence>
-          </div>
-
-          <div className="flex justify-center gap-1.5 mt-2.5 sm:mt-3">
-            {Array.from({ length: totalSlides }).map((_, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setDirection(i > currentIndex ? 1 : -1);
-                  setCurrentIndex(i);
-                }}
-                aria-label={`Slide ${i + 1}`}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === currentIndex
-                    ? "bg-emerald-600 w-6"
-                    : "bg-emerald-200 w-2 hover:bg-emerald-400"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-2.5 sm:mb-3">
-          <div className="flex items-center gap-2">
-            <div className="w-1 h-5 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full" />
-            <h3 className="text-xs font-bold text-emerald-900 flex items-center gap-1 sm:text-sm">
-              <PersonSearchIcon fontSize="small" className="text-emerald-600" />
-              Choose Your Vaidya
-            </h3>
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          </div>
-          {doctorList.length > 0 && (
-            <span className="text-[10px] text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full font-semibold sm:text-xs">
-              {doctorList.length} available
-            </span>
-          )}
-        </div>
-
-        {loadingDoctors ? (
-          <div className="flex flex-col items-center justify-center py-8 gap-3 sm:py-10">
-            <div className="w-9 h-9 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin sm:w-10 sm:h-10" />
-            <p className="text-xs text-gray-400 animate-pulse">
-              Finding expert Vaidyas…
-            </p>
-          </div>
-        ) : doctorList.length === 0 ? (
-          <div className="flex flex-col items-center py-8 text-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 gap-2 sm:py-10">
-            <AccountCircleIcon sx={{ fontSize: 40, color: "#6ee7b7" }} />
-            <p className="text-sm font-semibold text-gray-400">
-              No doctors available
-            </p>
-            <p className="text-xs text-gray-300">
-              Please try another department
-            </p>
-          </div>
-        ) : (
-          <div
-            className="ayur-scroll overflow-y-auto space-y-2 pr-1 py-1.5 sm:space-y-2.5 sm:py-2"
-            style={{ maxHeight: "360px" }}
-          >
-            {doctorList.map((doctor, idx) => {
-              const isSelected = selectedDoctorId?.userId === doctor.userId;
-              const doctorName = getDoctorName(doctor);
-              const initials = doctorName
-                .split(" ")
-                .slice(0, 2)
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase();
-
-              const days =
-                doctor?.sessions[0]?.weekDays
-                  ?.split(",")
-                  .filter((d) => d.trim())
-                  .map((d) => d.trim().substring(0, 3)) ?? [];
-
-              return (
-                <motion.div
-                  key={doctor.userId ?? idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    delay: idx * 0.06,
-                    duration: 0.35,
-                    ease: "easeOut",
-                  }}
-                  onClick={() => setSelectedDoctorId(doctor)}
-                  whileTap={{ scale: 0.98 }}
-                  className={`cursor-pointer rounded-lg border transition-all duration-200 ${
-                    isSelected
-                      ? "border-emerald-500 bg-emerald-50 shadow-md"
-                      : "border-gray-200 bg-white active:border-emerald-400"
-                  }`}
-                >
-                  <div className="flex items-center gap-2.5 p-2.5 sm:gap-3 sm:p-3 md:gap-4 md:p-4">
-                    <div className="relative shrink-0">
-                      {getDoctorImage(doctorName) || doctor.profilePhoto ? (
-                        <img
-                          src={getDoctorImage(doctorName) || doctor.profilePhoto}
-                          alt={doctorName}
-                          className={`w-11 h-11 rounded-full object-cover border ${
-                            isSelected ? "border-emerald-400" : "border-gray-200"
-                          } sm:w-13 sm:h-13 md:w-14 md:h-14 lg:w-16 lg:h-16`}
-                        />
-                      ) : (
-                        <div
-                          className={`w-11 h-11 rounded-full bg-gradient-to-br ${activeGradient} flex items-center justify-center sm:w-13 sm:h-13 md:w-14 md:h-14 lg:w-16 lg:h-16`}
-                        >
-                          <span className="text-white font-bold text-xs sm:text-sm">
-                            {initials || "?"}
-                          </span>
-                        </div>
-                      )}
-
-                      {isSelected && (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center border border-white sm:w-5 sm:h-5"
-                        >
-                          <CheckCircleIcon
-                            style={{ fontSize: 10 }}
-                            className="text-white sm:text-[12px]"
-                          />
-                        </motion.div>
-                      )}
-                    </div>
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <p
-                          className={`font-semibold text-xs truncate sm:text-sm ${
-                            isSelected ? "text-emerald-800" : "text-gray-800"
-                          }`}
-                        >
-                          {doctorName}
-                        </p>
-                        <span
-                          className={`shrink-0 flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-full sm:text-[10px] sm:px-2 ${
-                            isSelected
-                              ? "bg-emerald-100 text-emerald-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          <Clock size={8} className="sm:w-[9px] sm:h-[9px]" />
-                          {doctor?.sessions[0]?.timeSlot} min
-                        </span>
-                      </div>
-
-                      {doctor.degree?.trim() && (
-                        <p className="text-[10px] text-gray-500 truncate mt-0.5 sm:text-xs">
-                          {doctor?.degree?.trim()}
-                        </p>
-                      )}
-
-                      <p className="text-[10px] text-ayuBrown truncate sm:text-xs">
-                        {doctor?.clinicName}
-                      </p>
-
-                      {days?.length > 0 && (
-                        <div className="flex items-center gap-1 flex-wrap mt-1">
-                          <CalendarMonthIcon style={{ fontSize: 13 }} className="text-gray-400" />
-                          {days.map((d, di) => (
-                            <span
-                              key={di}
-                              className={`text-[9px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
-                                isSelected
-                                  ? "bg-emerald-100 text-emerald-700"
-                                  : "bg-gray-100 text-gray-600"
-                              }`}
-                            >
-                              {d}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-1 mt-1">
-                        <EventAvailableIcon style={{ fontSize: 13 }} className="text-gray-400" />
-                        <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                          {doctor?.sessions[0]?.morning}
-                        </p>
-                        <span className="text-[9px] text-gray-400">-</span>
-                        <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                          {doctor?.sessions[0]?.evening}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </div>
-
-    <div className="flex flex-col lg:col-span-1">
-      <div className="mb-2.5 sm:mb-3">
-        <h2 className="text-sm font-bold text-emerald-800 flex items-center gap-1.5 sm:text-base md:text-lg">
-          <span className="text-lg sm:text-xl">
-            {isYoga ? (
-              <SelfImprovementIcon />
-            ) : isHomeopathy ? (
-              <HealingIcon />
-            ) : (
-              <FilterVintageIcon />
-            )}
-          </span>
-          Why {activeDept || "Ayurveda"}?
-        </h2>
-        <p className="text-[10px] text-gray-400 mt-0.5 pl-6 sm:text-xs">
-          {isYoga
-            ? "Path to inner peace"
-            : isHomeopathy
-              ? "Gentle and effective healing"
-              : "Discover the science of life"}
-        </p>
-      </div>
-
-      <div
-        className="ayur-scroll overflow-y-auto grid grid-cols-1 gap-2 pr-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-1"
-        style={{ maxHeight: "620px" }}
-      >
-        {currentSideContent.map((item, idx) => (
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.07, duration: 0.3 }}
-            className={`flex items-start gap-2 p-2.5 rounded-xl ${item.bg} border ${item.border} hover:shadow-md transition-shadow duration-200`}
-          >
-            <div
-              className={`shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center text-white shadow-sm sm:w-8 sm:h-8`}
-            >
-              {item.icon}
             </div>
-            <div>
-              <p className="font-semibold text-gray-800 text-[11px] sm:text-xs">
-                {item.title}
-              </p>
-              <p className="text-[10px] text-gray-500 mt-0.5 leading-relaxed sm:text-xs">
-                {item.desc}
-              </p>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
-  </div>
-
-  <motion.div
-    variants={sectionVariants}
-    initial="hidden"
-    animate="visible"
-    className="rounded-xl border border-emerald-100 shadow-xl overflow-hidden bg-white"
-  >
-    <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:gap-3">
-      <div className="flex items-center gap-2">
-        <CalendarMonthIcon sx={{ color: "#fff", fontSize: 17 }} />
-        <h2 className="text-xs font-bold text-white uppercase tracking-wider sm:text-sm">
-          Schedule Appointment
-        </h2>
-      </div>
-      <div className="w-full sm:max-w-[260px] md:max-w-[280px]">
-        <DropdownField
-          control={control}
-          name="serviceFid"
-          placeholder="Service *"
-          dataArray={servicesOptions}
-          error={errors.serviceFid}
-          className="scale-90"
-        />
-      </div>
-    </div>
-
-    <div className="p-3 space-y-4 sm:p-4 sm:space-y-5">
-      <div className="space-y-2">
-        <div className="md:flex items-center md:justify-between px-1">
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            {appointmentDate
-              ? format(new Date(appointmentDate), "MMMM yyyy")
-              : format(new Date(), "MMMM yyyy")}
-          </span>
-          <div className="md:scale-75 md:origin-right mt-2 md:mt-0">
-            <DatePickerField
-              control={control}
-              name="appointmentDate"
-              label="Appointment Date"
-              inputFormat="dd-MM-yyyy"
-              disablePast={true}
-              error={errors.appointmentDate}
-            />
           </div>
         </div>
 
-        <div className="flex gap-1.5 overflow-x-auto pb-2 ayur-scroll sm:gap-2">
-          {(() => {
-            const today = startOfDay(new Date());
-            const baseDate = appointmentDate
-              ? new Date(appointmentDate)
-              : new Date();
-            const monthDays = eachDayOfInterval({
-              start: startOfMonth(baseDate),
-              end: endOfMonth(baseDate),
-            });
-            return monthDays.map((d, i) => (
-              <DateCard
-                key={i}
-                date={d}
-                disabled={isBefore(startOfDay(d), today)}
-                isSelected={
-                  appointmentDate &&
-                  format(new Date(appointmentDate), "yyyy-MM-dd") ===
-                    format(d, "yyyy-MM-dd")
-                }
-                onClick={() => setValue("appointmentDate", d)}
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+          className="rounded-xl border border-emerald-100 shadow-xl overflow-hidden bg-white"
+        >
+          <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:gap-3">
+            <div className="flex items-center gap-2">
+              <CalendarMonthIcon sx={{ color: "#fff", fontSize: 17 }} />
+              <h2 className="text-xs font-bold text-white uppercase tracking-wider sm:text-sm">
+                Schedule Appointment
+              </h2>
+            </div>
+            <div className="w-full sm:max-w-[260px] md:max-w-[280px]">
+              <DropdownField
+                control={control}
+                name="serviceFid"
+                placeholder="Service *"
+                dataArray={servicesOptions}
+                error={errors.serviceFid}
+                className="scale-90"
               />
-            ));
-          })()}
-        </div>
-      </div>
+            </div>
+          </div>
 
-      <div className="space-y-2.5 sm:space-y-3">
-        <div className="flex items-center gap-2 px-1">
-          <div className="w-1 h-1 rounded-full bg-emerald-500" />
-          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-            Available Slots
-          </span>
-        </div>
-
-        <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
-          <AnimatePresence mode="wait">
-            {selectedDoctorId === null ? (
-              <motion.div
-                key="no-doctor"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
-              >
-                <Stethoscope className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
-                <p className="text-slate-500 font-bold text-[11px]">
-                  Select a Consultant
-                </p>
-              </motion.div>
-            ) : loading ? (
-              <motion.div
-                key="loading"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-5 sm:py-6"
-              >
-                <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
-                <p className="text-slate-400 text-[10px] font-bold mt-2">
-                  Checking slots...
-                </p>
-              </motion.div>
-            ) : doctorSlots.length === 0 ? (
-              <motion.div
-                key="no-slots"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
-              >
-                <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
-                <p className="text-slate-400 font-bold text-[11px]">
-                  No slots this day
-                </p>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="slots"
-                initial={{ opacity: 0, y: 5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8"
-              >
-                {doctorSlots.map((slot, index) => (
-                  <TimeSlotChip
-                    key={index}
-                    slot={slot}
-                    isSelected={
-                      selectedTimeSlot?.slotStartTime === slot.slotStartTime
-                    }
-                    onSelect={() => {
-                      setSelectedTimeSlot(slot);
-                      setSlotError("");
-                    }}
+          <div className="p-3 space-y-4 sm:p-4 sm:space-y-5">
+            <div className="space-y-2">
+              <div className="md:flex items-center md:justify-between px-1">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  {appointmentDate
+                    ? format(new Date(appointmentDate), "MMMM yyyy")
+                    : format(new Date(), "MMMM yyyy")}
+                </span>
+                <div className="md:scale-75 md:origin-right mt-2 md:mt-0">
+                  <DatePickerField
+                    control={control}
+                    name="appointmentDate"
+                    label="Appointment Date"
+                    inputFormat="dd-MM-yyyy"
+                    disablePast={true}
+                    error={errors.appointmentDate}
                   />
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
-          {slotError && (
-            <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
-              {slotError}
-            </p>
-          )}
-        </div>
+                </div>
+              </div>
+
+              <div className="flex gap-1.5 overflow-x-auto pb-2 ayur-scroll sm:gap-2">
+                {(() => {
+                  const today = startOfDay(new Date());
+                  const baseDate = appointmentDate
+                    ? new Date(appointmentDate)
+                    : new Date();
+                  const monthDays = eachDayOfInterval({
+                    start: startOfMonth(baseDate),
+                    end: endOfMonth(baseDate),
+                  });
+                  return monthDays.map((d, i) => (
+                    <DateCard
+                      key={i}
+                      date={d}
+                      disabled={isBefore(startOfDay(d), today)}
+                      isSelected={
+                        appointmentDate &&
+                        format(new Date(appointmentDate), "yyyy-MM-dd") ===
+                          format(d, "yyyy-MM-dd")
+                      }
+                      onClick={() => setValue("appointmentDate", d)}
+                    />
+                  ));
+                })()}
+              </div>
+            </div>
+
+            <div className="space-y-2.5 sm:space-y-3">
+              <div className="flex items-center gap-2 px-1">
+                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  Available Slots
+                </span>
+              </div>
+
+              <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
+                <AnimatePresence mode="wait">
+                  {selectedDoctorId === null ? (
+                    <motion.div
+                      key="no-doctor"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
+                    >
+                      <Stethoscope className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
+                      <p className="text-slate-500 font-bold text-[11px]">
+                        Select a Consultant
+                      </p>
+                    </motion.div>
+                  ) : loading ? (
+                    <motion.div
+                      key="loading"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col items-center justify-center py-5 sm:py-6"
+                    >
+                      <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
+                      <p className="text-slate-400 text-[10px] font-bold mt-2">
+                        Checking slots...
+                      </p>
+                    </motion.div>
+                  ) : doctorSlots.length === 0 ? (
+                    <motion.div
+                      key="no-slots"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
+                    >
+                      <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
+                      <p className="text-slate-400 font-bold text-[11px]">
+                        No slots this day
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="slots"
+                      initial={{ opacity: 0, y: 5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8"
+                    >
+                      {doctorSlots.map((slot, index) => (
+                        <TimeSlotChip
+                          key={index}
+                          slot={slot}
+                          isSelected={
+                            selectedTimeSlot?.slotStartTime ===
+                            slot.slotStartTime
+                          }
+                          onSelect={() => {
+                            setSelectedTimeSlot(slot);
+                            setSlotError("");
+                          }}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                {slotError && (
+                  <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
+                    {slotError}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          variants={sectionVariants}
+          initial="hidden"
+          animate="visible"
+          className="rounded-xl border border-emerald-100 shadow-md overflow-hidden bg-white"
+        >
+          <div className="bg-gradient-to-r from-teal-700 to-green-700 px-3 py-2.5 flex items-center justify-between gap-2 sm:px-4 sm:py-3 sm:gap-3">
+            <div className="flex items-center gap-2">
+              <div className="py-1 px-1.5 bg-white/15 rounded-lg sm:py-1.5 sm:px-2 sm:rounded-[9px]">
+                <PersonSearchIcon sx={{ color: "#fff", fontSize: 18 }} />
+              </div>
+              <h2 className="text-sm font-bold text-white sm:text-base md:text-lg">
+                Patient Information
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setOpenAddPatientModal(true)}
+              className="flex items-center gap-1 text-[10px] font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-2.5 py-1.5 rounded-lg transition-all duration-200 sm:text-xs sm:px-3 sm:rounded-[9px]"
+            >
+              + Add Patient
+            </button>
+          </div>
+
+          <div className="p-3 sm:p-4 md:p-5">
+            <div className="mb-4 sm:mb-5 max-w-full sm:max-w-xs">
+              <DropdownField
+                control={control}
+                name="patientFid"
+                placeholder="Select Patient *"
+                dataArray={patientOptions}
+                error={errors.patientFid}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:gap-4 lg:grid-cols-4">
+              <div className="col-span-1 xs:col-span-2">
+                <InputField
+                  control={control}
+                  name="fullName"
+                  label="Full Name"
+                  error={errors.fullName}
+                  disabled={true}
+                />
+                {errors.fullName && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.fullName.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <InputField
+                  control={control}
+                  name="mobileNumber"
+                  label="Mobile Number"
+                  error={errors.mobileNumber}
+                  disabled={true}
+                />
+                {errors.mobileNumber && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.mobileNumber.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <InputField
+                  control={control}
+                  name="age"
+                  label="Age"
+                  error={errors.age}
+                  disabled={true}
+                />
+                {errors.age && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.age.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <DropdownField
+                  control={control}
+                  name="bloodGroup"
+                  placeholder="Select Blood Group"
+                  dataArray={bloodGroupOptions}
+                  error={errors.bloodGroup}
+                  isDisabled={true}
+                />
+                {errors.bloodGroup && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.bloodGroup.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <DropdownField
+                  control={control}
+                  name="gender"
+                  placeholder="Select Gender"
+                  dataArray={genderOptions}
+                  error={errors.gender}
+                  isDisabled={true}
+                />
+                {errors.gender && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.gender.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <InputField
+                  control={control}
+                  name="emailAddress"
+                  label="Email Address"
+                  error={errors.emailAddress}
+                  disabled={true}
+                />
+                {errors.emailAddress && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.emailAddress.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <InputField
+                  control={control}
+                  name="city"
+                  label="City"
+                  error={errors.city}
+                  disabled={true}
+                />
+                {errors.city && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.city.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="col-span-1 xs:col-span-2 lg:col-span-4">
+                <InputArea
+                  control={control}
+                  name="reasonForVisit"
+                  label="Reason For Visit *"
+                  minRows={3}
+                  maxRows={5}
+                  error={errors.reasonForVisit}
+                />
+                {errors.reasonForVisit && (
+                  <p className="text-red-500 text-[11px] mt-0.5">
+                    {errors.reasonForVisit.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="col-span-1 xs:col-span-2 lg:col-span-4 flex flex-col gap-2.5 pt-2 sm:flex-row sm:justify-end sm:gap-3">
+                <button
+                  type="button"
+                  onClick={() => reset()}
+                  className="w-full h-10 px-5 rounded-xl border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 sm:rounded-[9px]"
+                >
+                  Reset
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmBooking}
+                  className="w-full h-10 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 sm:rounded-[9px]"
+                >
+                  <EventAvailableIcon sx={{ fontSize: 16 }} />
+                  Confirm Booking
+                </button>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </div>
-  </motion.div>
-
-  <motion.div
-    variants={sectionVariants}
-    initial="hidden"
-    animate="visible"
-    className="rounded-xl border border-emerald-100 shadow-md overflow-hidden bg-white"
-  >
-    <div className="bg-gradient-to-r from-teal-700 to-green-700 px-3 py-2.5 flex items-center justify-between gap-2 sm:px-4 sm:py-3 sm:gap-3">
-      <div className="flex items-center gap-2">
-        <div className="py-1 px-1.5 bg-white/15 rounded-lg sm:py-1.5 sm:px-2 sm:rounded-[9px]">
-          <PersonSearchIcon sx={{ color: "#fff", fontSize: 18 }} />
-        </div>
-        <h2 className="text-sm font-bold text-white sm:text-base md:text-lg">
-          Patient Information
-        </h2>
-      </div>
-      <button
-        type="button"
-        onClick={() => setOpenAddPatientModal(true)}
-        className="flex items-center gap-1 text-[10px] font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-2.5 py-1.5 rounded-lg transition-all duration-200 sm:text-xs sm:px-3 sm:rounded-[9px]"
-      >
-        + Add Patient
-      </button>
-    </div>
-
-    <div className="p-3 sm:p-4 md:p-5">
-      <div className="mb-4 sm:mb-5 max-w-full sm:max-w-xs">
-        <DropdownField
-          control={control}
-          name="patientFid"
-          placeholder="Select Patient *"
-          dataArray={patientOptions}
-          error={errors.patientFid}
-        />
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:gap-4 lg:grid-cols-4">
-        <div className="col-span-1 xs:col-span-2">
-          <InputField
-            control={control}
-            name="fullName"
-            label="Full Name"
-            error={errors.fullName}
-            disabled={true}
-          />
-          {errors.fullName && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.fullName.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <InputField
-            control={control}
-            name="mobileNumber"
-            label="Mobile Number"
-            error={errors.mobileNumber}
-            disabled={true}
-          />
-          {errors.mobileNumber && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.mobileNumber.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <InputField
-            control={control}
-            name="age"
-            label="Age"
-            error={errors.age}
-            disabled={true}
-          />
-          {errors.age && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.age.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <DropdownField
-            control={control}
-            name="bloodGroup"
-            placeholder="Select Blood Group"
-            dataArray={bloodGroupOptions}
-            error={errors.bloodGroup}
-            isDisabled={true}
-          />
-          {errors.bloodGroup && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.bloodGroup.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <DropdownField
-            control={control}
-            name="gender"
-            placeholder="Select Gender"
-            dataArray={genderOptions}
-            error={errors.gender}
-            isDisabled={true}
-          />
-          {errors.gender && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.gender.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <InputField
-            control={control}
-            name="emailAddress"
-            label="Email Address"
-            error={errors.emailAddress}
-            disabled={true}
-          />
-          {errors.emailAddress && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.emailAddress.message}
-            </p>
-          )}
-        </div>
-
-        <div>
-          <InputField
-            control={control}
-            name="city"
-            label="City"
-            error={errors.city}
-            disabled={true}
-          />
-          {errors.city && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.city.message}
-            </p>
-          )}
-        </div>
-
-        <div className="col-span-1 xs:col-span-2 lg:col-span-4">
-          <InputArea
-            control={control}
-            name="reasonForVisit"
-            label="Reason For Visit *"
-            minRows={3}
-            maxRows={5}
-            error={errors.reasonForVisit}
-          />
-          {errors.reasonForVisit && (
-            <p className="text-red-500 text-[11px] mt-0.5">
-              {errors.reasonForVisit.message}
-            </p>
-          )}
-        </div>
-
-        <div className="col-span-1 xs:col-span-2 lg:col-span-4 flex flex-col gap-2.5 pt-2 sm:flex-row sm:justify-end sm:gap-3">
-          <button
-            type="button"
-            onClick={() => reset()}
-            className="w-full h-10 px-5 rounded-xl border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 sm:rounded-[9px]"
-          >
-            Reset
-          </button>
-          <button
-            type="button"
-            onClick={handleConfirmBooking}
-            className="w-full h-10 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 sm:rounded-[9px]"
-          >
-            <EventAvailableIcon sx={{ fontSize: 16 }} />
-            Confirm Booking
-          </button>
-        </div>
-      </div>
-    </div>
-  </motion.div>
-
-</div>
 
       {openAddPatientModal && (
         <AddPatientModal

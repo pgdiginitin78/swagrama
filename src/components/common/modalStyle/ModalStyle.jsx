@@ -6,7 +6,6 @@ export const ModalStyle = {
   bgcolor: "background.paper",
   overflowY: "auto",
   boxShadow: 20,
-  p: 2,
   "&:focus": {
     outline: "none",
   },

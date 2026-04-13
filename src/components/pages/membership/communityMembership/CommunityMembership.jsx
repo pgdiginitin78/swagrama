@@ -1,4 +1,3 @@
-import { Box, Modal } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
@@ -19,14 +18,11 @@ import {
   TreePine,
   User,
   Users,
-  X,
 } from "lucide-react";
 import { useState } from "react";
 import CommunityMembershipImg from "../../../assets/membership/communityMembership.png";
 import MembershipRegistrationModal from "./MembershipRegistrationModal";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
-import { IconButton, Tooltip } from "@mui/material";
-import ContentCopy from "@mui/icons-material/ContentCopy";
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 
 const benefits = [
   {
@@ -97,6 +93,7 @@ const mergedMemberships = [
     icon: User,
     gradientClass: "from-lime-200 to-lime-300",
     featured: false,
+    duration: "5 Years",
   },
   {
     title: "स्वकर्मकरगणसदस्यत्व Community Staff Membership",
@@ -125,6 +122,7 @@ const mergedMemberships = [
     icon: Users,
     gradientClass: "from-green-200 to-green-300",
     featured: true,
+    duration: "5 Years",
   },
   {
     title: "स्वकीयसदस्यत्व Own Membership",
@@ -144,11 +142,11 @@ const mergedMemberships = [
     icon: User,
     gradientClass: "from-lime-300 to-green-200",
     featured: false,
+    duration: "5 Years",
   },
   {
     title: "स्वकुटुम्बिनीसदस्यत्व Joint Family Membership",
-    description:
-      "Rekindling the Spirit of Living Together. 🏡 Bring Back the Power of Togetherness. In today's fast-paced, fragmented world, the greatest casualty has been the traditional joint family system.",
+    description: "Rekindling the Spirit of Living Together.",
     discountText:
       "Joint Family Membership – स्वकुटुम्बिनीसदस्यत्व Joint Family Membership : 20% Discount Membership",
     benifits: [
@@ -171,11 +169,12 @@ const mergedMemberships = [
     icon: Users,
     gradientClass: "from-green-300 to-lime-200",
     featured: false,
+    duration: "5 Years",
   },
   {
     title: "स्ववैद्यसदस्यत्व Root Healer Membership",
     description:
-      "For Ayurvedic practitioners, this membership is more than a privilege—it's a gateway to living the Ayurvedic life you truly believe in. The Root Healer Membership is your path back to nature.",
+      "For Ayurvedic practitioners, this membership is more than a privilege.",
     discountText:
       "Root Healer's Family Membership: स्ववैद्यसदस्यत्व Root Healer Membership : 25% Discount",
     benifits: [
@@ -198,11 +197,12 @@ const mergedMemberships = [
     icon: Leaf,
     gradientClass: "from-lime-200 to-green-300",
     featured: false,
+    duration: "5 Years",
   },
   {
     title: "स्वभिषज्सदस्यत्व Physician's Membership",
     description:
-      "Embrace a Holistic Lifestyle with the Physician's Membership. Whether you're trained in Ayurveda, Allopathy, Homeopathy, or any other medical system, this membership welcomes you and your family.",
+      "Embrace a Holistic Lifestyle with the Physician's Membership.",
     discountText:
       "Self Physician Family Membership - स्वभिषज्सदस्यत्व Physician's Membership : 25% Discount",
     benifits: [
@@ -225,11 +225,12 @@ const mergedMemberships = [
     icon: Hospital,
     gradientClass: "from-green-200 to-lime-300",
     featured: false,
+    duration: "5 Years",
   },
   {
     title: "सन्तोषणीयसदस्यत्व Propitious Optimistic Membership",
     description:
-      "A prestigious and privileged membership designed exclusively for the Directors, Partners, and their families of the Swagram Community Organization. This 5-year membership recognizes leadership.",
+      "A prestigious and privileged membership designed exclusively for Directors.",
     discountText:
       "Director Family Membership - सन्तोषणीयसदस्यत्व Propitious Optimistic Membership 30% Discount",
     benifits: [
@@ -252,6 +253,7 @@ const mergedMemberships = [
     icon: Brain,
     gradientClass: "from-lime-300 to-green-300",
     featured: true,
+    duration: "5 Years",
   },
 ];
 
@@ -721,9 +723,9 @@ const MembershipCard = ({
       className="bg-white rounded-xl sm:rounded-2xl shadow-lg sm:shadow-xl overflow-hidden border border-green-200 hover:border-green-400 transition-all"
     >
       <div
-        className={`bg-gradient-to-r ${membership.gradientClass} p-2.5 sm:p-3 `}
+        className={`bg-gradient-to-r ${membership.gradientClass} p-2.5 sm:p-3 flex justify-between space-x-2 `}
       >
-        <div className="flex items-start gap-2">
+        <div className="flex  items-start gap-2">
           <div className="bg-white/90 p-2 sm:p-2.5 rounded-lg sm:rounded-xl shadow-md flex-shrink-0">
             <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-700" />
           </div>
@@ -739,7 +741,10 @@ const MembershipCard = ({
         </div>
       </div>
 
-      <div className="p-2.5 sm:p-3 md:p-4 lg:p-5">
+      <div className="p-2.5 sm:p-3 md:p-4 ">
+        <p className="text-xs pt-2 whitespace-nowrap text-green-600  items-center space-x-1 font-semibold flex justify-end pb-2">
+          Duration :&nbsp;<span>({membership?.duration})</span>
+        </p>
         <div className="bg-green-50 rounded-lg sm:rounded-xl p-2 sm:p-2.5 md:p-3 mb-2 sm:mb-3">
           <div className="flex items-center justify-between gap-3 mb-1.5 sm:mb-2">
             <span className="text-xs sm:text-sm text-gray-500 line-through">
@@ -830,7 +835,7 @@ const MembershipCard = ({
             }}
             className="flex-1 bg-green-700 hover:bg-green-800 text-white font-semibold py-1.5 sm:py-2 px-2 sm:px-3 md:px-4 rounded-[5px] transition-colors text-xs sm:text-sm"
           >
-            Details
+            View Details
           </motion.button>
         </div>
       </div>

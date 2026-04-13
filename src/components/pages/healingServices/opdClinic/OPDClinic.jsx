@@ -8,7 +8,6 @@ import {
   getDoctorListByLocationDepartment,
 } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
 import AyurvedaForm from "../../opdBooking/AyurvedaFrom";
-import OPDBookingModal from "../../opdBooking/OPDBookingModal";
 
 const iconMap = {
   ayurveda: CompostIcon,
@@ -41,8 +40,6 @@ const OPDClinic = () => {
   const [doctorList, setDoctorList] = useState([]);
   const [loadingDepts, setLoadingDepts] = useState(false);
   const [loadingDoctors, setLoadingDoctors] = useState(false);
-  const [openBookModal, setOpenBookModal] = useState(false);
-  const [selectdOPDTherapy, setSelectedOPDTherapy] = useState(null);
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
 
   const activeDept = departmentList[activeTab] ?? null;
@@ -70,8 +67,7 @@ const OPDClinic = () => {
       .finally(() => setLoadingDoctors(false));
   }, [activeTab, departmentList, activeDept]);
 
-  console.log("selectdOPDTherapy",selectdOPDTherapy);
-  
+    console.log("activeDept",activeDept);
 
   return (
     <div className="min-h-screen  p-3">
@@ -163,16 +159,7 @@ const OPDClinic = () => {
 
       </div>
 
-      {openBookModal && (
-        <OPDBookingModal
-          open={openBookModal}
-          handleClose={() => {
-            setOpenBookModal(false);
-            setSelectedOPDTherapy(null);
-          }}
-          selectedTherapy={selectdOPDTherapy}
-        />
-      )}
+ 
     </div>
   );
 };

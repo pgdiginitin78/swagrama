@@ -6,6 +6,8 @@ import {
   KeyboardArrowDown,
   PeopleAlt,
   Remove,
+  AccessTime,
+  SearchRounded,
 } from "@mui/icons-material";
 import {
   Box,
@@ -29,7 +31,10 @@ import {
   startOfWeek,
   subMonths,
   startOfToday,
+  parse,
 } from "date-fns";
+import { LocalizationProvider, TimeClock } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import CommonButton from "../../../common/button/CommonButton";
@@ -60,15 +65,21 @@ function StayBookingModal({
   handleGetRoomList,
 }) {
   const [checkIn, setCheckIn] = useState(null);
+  const [checkInTime, setCheckInTime] = useState(format(new Date(), "HH:mm"));
   const [checkOut, setCheckOut] = useState(null);
+  const [checkOutTime, setCheckOutTime] = useState(format(new Date(), "HH:mm"));
+
+  const [inTimeAnchorEl, setInTimeAnchorEl] = useState(null);
+  const [outTimeAnchorEl, setOutTimeAnchorEl] = useState(null);
+
   const [guests, setGuests] = useState({
     rooms: 1,
-    adults: 0,
+    adults: 1,
     children: 0,
     childrenAges: [],
   });
 
-  const [guestsConfirmed, setGuestsConfirmed] = useState(false);
+  const [guestsConfirmed, setGuestsConfirmed] = useState(true);
   const [activeTab, setActiveTab] = useState("calendar");
   const [flexibleDuration, setFlexibleDuration] = useState("1 week");
   const [selectedFlexibleMonth, setSelectedFlexibleMonth] = useState(null);
@@ -77,6 +88,7 @@ function StayBookingModal({
   const [calendarViewDate, setCalendarViewDate] = useState(new Date());
   const [hoveredDate, setHoveredDate] = useState(null);
   const [roomStatus, setRoomStatus] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
@@ -89,9 +101,13 @@ function StayBookingModal({
   }, [checkIn, checkOut, guests.adults, guests.children, guests.rooms]);
 
   const carouselRef = useRef(null);
+  const checkInDateRef = useRef(null);
+  const inTimeRef = useRef(null);
+  const checkOutDateRef = useRef(null);
+  const outTimeRef = useRef(null);
   const guestInputRef = useRef(null);
 
-  const { control, watch, setValue } = useForm({
+  const { control, watch, setValue,reset } = useForm({
     defaultValues: {
       fullName: "",
       email: "",
@@ -117,34 +133,22 @@ function StayBookingModal({
 
   const handleDateClick = (date) => {
     if (isBefore(date, startOfToday())) return;
-    
-    // If we have nothing or already have a full range, start a new selection
-    if (!checkIn || (checkIn && checkOut)) {
-      setCheckIn(date);
-      setCheckOut(null);
-    } else if (checkIn && !checkOut) {
-      // If we have only check-in, try to set check-out
-      if (isBefore(date, checkIn)) {
-        // If clicked date is before check-in, it becomes the new check-in
-        setCheckIn(date);
-        setCheckOut(null);
-      } else if (isSameDay(date, checkIn)) {
-        // Clicking same day as check-in resets selection (or could set 1-night stay)
+
+    if (checkIn && !checkOut) {
+      if (isSameDay(date, checkIn)) {
         setCheckIn(null);
         setCheckOut(null);
+      } else if (isBefore(date, checkIn)) {
+        setCheckIn(date);
+        setCheckOut(null);
       } else {
-        // Valid check-out date
         setCheckOut(date);
-        // On mobile, maybe don't close immediately so they can see the range?
-        // But the user usually wants to move to guests.
-        setCalendarAnchorEl(null);
         setHoveredDate(null);
-        setTimeout(() => {
-          if (guestInputRef.current) {
-            setGuestsAnchorEl(guestInputRef.current);
-          }
-        }, 300);
+        setCalendarAnchorEl(null);
       }
+    } else {
+      setCheckIn(date);
+      setCheckOut(null);
     }
   };
 
@@ -260,30 +264,31 @@ function StayBookingModal({
 
   const handleCheckVailabilty = () => {
     if (!checkIn) return;
+    setIsSearching(true);
+    setRoomStatus(null);
     checkRoomAvailability(
       selectedService.roomTypeId,
       format(new Date(checkIn), "yyyy-MM-dd"),
     )
       .then((res) => {
         setRoomStatus(res.data);
+        setIsSearching(false);
       })
-      .catch((err) => {
-        console.error("Availability check failed:", err);
+      .catch(() => {
         setRoomStatus("error");
+        setIsSearching(false);
       });
   };
-
-  console.log("selectedService", selectedService);
 
   const handleConfirmBooking = () => {
     const saveObj = {
       userId: user?.userId || 1,
-      resortId: 1, // Default resort ID
+      resortId: null,
       roomTypeId: selectedService.roomTypeId,
       stayType: "Seperate",
       checkInDate: format(new Date(checkIn), "yyyy-MM-dd"),
-      checkInTime: "",
-      checkOutTime: "",
+      checkInTime: checkInTime,
+      checkOutTime: checkOutTime,
       noOfPersons: guests.adults,
       noOfChildren: guests.children,
       isPet: formValues.bringingPet,
@@ -304,69 +309,63 @@ function StayBookingModal({
       const userId = user?.userId || 1;
       const clinicId = 5;
 
-      const tempObj = {
-        amount: costs.total,
-        checkInDate: format(new Date(checkIn), "yyyy-MM-dd"),
-        userId: userId,
-      };
-
       setIsLoading(true);
-      const res = await InitiatePayment(clinicId, userId, tempObj);
-      const data = res?.data;
 
-      if (data?.status === 200) {
-        setIsLoading(false);
-        setIsPaymentPending(true);
+      const bookingRes = await wellnessStayBooking(finalSaveObj);
+      const bookingData = bookingRes?.data;
 
-        cancelPaymentRef.current = RedirectToSabPaisa(
-          data,
-          clinicId,
-          data.clientTxnId,
-          async () => {
-            const res = await wellnessStayBooking(finalSaveObj);
-            if (res.data.status === 200) {
-              successAlert(res.data.message || "Booking Successful!");
+      if (bookingData?.status === 200) {
+        const bookingId = bookingData?.data?.id || bookingData?.bookingId || "";
+
+        const tempObj = {
+          amount: costs.total,
+          appointmentDate: format(new Date(checkIn), "yyyy-MM-dd"),
+          SloteStartTime: checkInTime,
+          SloteEndTime: checkOutTime,
+          userId: userId,
+          paymentFor: "StayBooking",
+          bookingId: bookingId,
+        };
+
+        const res = await InitiatePayment(clinicId, userId, tempObj);
+        const data = res?.data;
+
+        if (data?.status === 200) {
+          setIsLoading(false);
+          setIsPaymentPending(true);
+
+          cancelPaymentRef.current = RedirectToSabPaisa(
+            data,
+            clinicId,
+            data.clientTxnId,
+            async () => {
+              successAlert(bookingData.message || "Booking Successful!");
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
               handleClose();
               if (handleGetRoomList) handleGetRoomList();
-            } else {
-              errorAlert(res.data.message || "Booking failed after payment");
-            }
-          },
-          (errorStatus) => {
-            const msg = errorStatus?.message || "Payment failed or cancelled.";
-            errorAlert(msg);
-            setOpenConfirmationModal(false);
-            setIsPaymentPending(false);
-          },
-        );
+            },
+            (errorStatus) => {
+              const msg =
+                errorStatus?.message || "Payment failed or cancelled.";
+              errorAlert(msg);
+              setOpenConfirmationModal(false);
+              setIsPaymentPending(false);
+            },
+          );
+        } else {
+          setIsLoading(false);
+          errorAlert(data?.message || "Failed to initiate payment");
+        }
       } else {
         setIsLoading(false);
-        errorAlert(data?.message || "Failed to initiate payment");
+        errorAlert(bookingData?.message || "Booking failed");
       }
     } catch (error) {
       setIsLoading(false);
-      console.error("Payment Error:", error);
-      errorAlert("An unexpected error occurred during payment.");
+      errorAlert("An unexpected error occurred during the booking process.");
     }
   };
-
-  //   {
-  //     "userId": 6,
-  //     "firstName": "NITIN",
-  //     "lastName": "NIKUMBH",
-  //     "dob": "1998-04-06T00:00:00",
-  //     "mobileNo": 7788899665,
-  //     "gender": "male",
-  //     "emailId": "pgdiginitin78@gmail.com",
-  //     "city": "Pune",
-  //     "bloodGroup": "A+",
-  //     "address": "",
-  //     "pinCode": 411041,
-  //     "age": 28,
-  //     "relation": "self"
-  // }
 
   useEffect(() => {
     if (user !== null) {
@@ -374,7 +373,6 @@ function StayBookingModal({
         .then((res) => {
           const data = res?.data?.data;
           const filterData = data.find((item) => item.userId === user?.userId);
-
           setValue(
             "fullName",
             `${filterData?.firstName} ${filterData?.lastName}`,
@@ -382,8 +380,6 @@ function StayBookingModal({
           setValue("email", filterData?.emailId);
           setValue("mobile", filterData?.mobileNo);
           setValue("city", filterData?.city);
-
-          console.log("getPatientDataByMobileNo", filterData);
         })
         .catch((err) => err);
     }
@@ -408,538 +404,797 @@ function StayBookingModal({
           </div>
 
           <div className="p-3 sm:p-4">
-            <div className="relative group/searchbar">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.99 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-2 flex flex-col gap-2 border group-hover/searchbar:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-500"
-              >
-                <div className="flex flex-col md:flex-row items-stretch gap-2">
-                  <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-2">
-                    <div
-                      onClick={(e) => {
-                        setCalendarAnchorEl(e.currentTarget);
-                        if (checkIn) setCalendarViewDate(checkIn);
-                      }}
-                      className="flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
-                    >
-                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
-                        Check-in
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <CalendarMonth
-                          className="text-ayuMid/60"
-                          sx={{ fontSize: 13 }}
-                        />
-                        <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
-                          {checkIn ? format(checkIn, "MMM dd, yyyy") : "Add date"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div
-                      onClick={(e) => {
-                        setCalendarAnchorEl(e.currentTarget);
-                        if (checkIn) setCalendarViewDate(checkIn);
-                      }}
-                      className="flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item"
-                    >
-                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
-                        Check-out
-                      </p>
-                      <div className="flex items-center gap-1.5">
-                        <CalendarMonth
-                          className="text-ayuMid/60"
-                          sx={{ fontSize: 13 }}
-                        />
-                        <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
-                          {checkOut
-                            ? format(checkOut, "MMM dd, yyyy")
-                            : "Add date"}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div
-                      ref={guestInputRef}
-                      onClick={(e) => setGuestsAnchorEl(e.currentTarget)}
-                      className="col-span-2 lg:col-span-1 px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item flex flex-col justify-center"
-                    >
-                      <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
-                        Guests
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <PeopleAlt className="text-ayuMid/60" sx={{ fontSize: 14 }} />
-                        {!guestsConfirmed ? (
-                          <span className="text-ayuMid/60 font-bold text-[10px] uppercase tracking-wider">
-                            Add guests
-                          </span>
-                        ) : (
-                          <div className="flex items-center gap-1.5 truncate">
-                            <span className="text-gray-800 font-bold text-[11px] tracking-tight">
-                              {guests.adults}A · {guests.children}C
-                            </span>
-                            <span className="text-ayuMid font-black text-[8px] uppercase bg-lime-light px-1.5 py-0.5 rounded-full">
-                              {guests.rooms}R
-                            </span>
-                          </div>
-                        )}
-                        <KeyboardArrowDown
-                          sx={{ fontSize: 14 }}
-                          className={`text-gray-300 ml-auto transition-transform duration-300 ${guestsAnchorEl ? "rotate-180" : ""}`}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col gap-1 md:w-48">
-                    <button
-                      type="button"
-                      onClick={handleCheckVailabilty}
-                      className="h-full py-2.5 md:py-0 bg-gradient-to-r from-ayuMid to-ayuTulsi text-white font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 text-[10px] uppercase tracking-widest whitespace-nowrap"
-                    >
-                      Search
-                    </button>
-                    {roomStatus !== null && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`text-[8px] font-bold text-center ${roomStatus === "available" ? "text-ayuMid" : "text-ayuBrown"}`}
-                      >
-                        {roomStatus === "available" ? "✓ Available" : "✕ Full"}
-                      </motion.p>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-
-              <Popover
-                open={Boolean(calendarAnchorEl)}
-                anchorEl={calendarAnchorEl}
-                onClose={() => setCalendarAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                transformOrigin={{ vertical: "top", horizontal: "center" }}
-                PaperProps={{
-                  sx: {
-                    borderRadius: "12px",
-                    mt: 1,
-                    boxShadow: "0 15px 40px rgba(0,0,0,0.1)",
-                    border: "1px solid rgba(0,0,0,0.04)",
-                    overflow: "hidden",
-                    width: {
-                      xs: "calc(100vw - 24px)",
-                      sm: "360px",
-                      md: "680px",
-                    },
-                    maxWidth: "calc(100vw - 24px)",
-                  },
-                }}
-              >
-                <div
-                  className="bg-white flex flex-col"
-                  style={{ maxHeight: "80dvh" }}
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <div className="relative group/searchbar">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.99 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-2 flex flex-col gap-2 border group-hover/searchbar:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-500"
                 >
-                  <div className="flex items-center justify-center gap-6 py-3 border-b border-gray-100 flex-shrink-0">
-                    <button
-                      onClick={() => setActiveTab("calendar")}
-                      className={`pb-1 px-3 font-semibold text-xs transition-all relative ${activeTab === "calendar" ? "text-ayuMid" : "text-gray-400 hover:text-gray-600"}`}
-                    >
-                      Calendar
-                      {activeTab === "calendar" && (
-                        <motion.div
-                          layoutId="activeTab"
-                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-ayuMid rounded-t-full"
-                        />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setActiveTab("flexible")}
-                      className={`pb-1 px-3 font-semibold text-xs transition-all relative ${activeTab === "flexible" ? "text-ayuMid" : "text-gray-400 hover:text-gray-600"}`}
-                    >
-                      I'm flexible
-                      {activeTab === "flexible" && (
-                        <motion.div
-                          layoutId="activeTab"
-                          className="absolute bottom-0 left-0 right-0 h-0.5 bg-ayuMid rounded-t-full"
-                        />
-                      )}
-                    </button>
-                  </div>
-
-                  <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4">
-                    {activeTab === "calendar" && (
-                      <div className="relative animate-in fade-in duration-300">
-                        <div className="absolute top-0 left-0 right-0 flex justify-between items-center z-20 pointer-events-none">
-                          <button
-                            onClick={() =>
-                              setCalendarViewDate(
-                                subMonths(calendarViewDate, 1),
-                              )
-                            }
-                            className="pointer-events-auto p-1.5 hover:bg-lime-light/50 rounded-full transition-all text-ayuMid"
-                          >
-                            <ArrowBackIos
-                              sx={{ fontSize: 12 }}
-                              className="ml-1"
+                  <div className="flex flex-col md:flex-row items-stretch gap-2">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                      {/* Check-in Block */}
+                      <div className="flex items-stretch border border-gray-100 rounded-lg bg-white overflow-hidden hover:border-ayuMid transition-colors">
+                        <div
+                          ref={checkInDateRef}
+                          onClick={(e) => {
+                            setCalendarAnchorEl(e.currentTarget);
+                            if (checkIn) setCalendarViewDate(checkIn);
+                          }}
+                          className="flex-1 flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 transition-all border-r border-gray-50"
+                        >
+                          <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                            Check-in
+                          </p>
+                          <div className="flex items-center gap-1.5">
+                            <CalendarMonth
+                              className="text-ayuMid/60"
+                              sx={{ fontSize: 13 }}
                             />
-                          </button>
-                          <button
-                            onClick={() =>
-                              setCalendarViewDate(
-                                addMonths(calendarViewDate, 1),
-                              )
-                            }
-                            className="pointer-events-auto p-1.5 hover:bg-lime-light/50 rounded-full transition-all text-ayuMid"
-                          >
-                            <ArrowForwardIos sx={{ fontSize: 12 }} />
-                          </button>
-                        </div>
-                        <div className="flex flex-col md:flex-row gap-8">
-                          <div className="flex-1 min-w-[280px]">
-                            {renderCalendar(calendarViewDate)}
+                            <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
+                              {checkIn
+                                ? format(checkIn, "MMM dd, yyyy")
+                                : "Add date"}
+                            </span>
                           </div>
-                          <div className="flex-1 min-w-[280px]">
-                            {renderCalendar(addMonths(calendarViewDate, 1))}
+                        </div>
+                        <div
+                          ref={inTimeRef}
+                          onClick={(e) => setInTimeAnchorEl(e.currentTarget)}
+                          className="w-16 flex flex-col px-2 py-1.5 cursor-pointer hover:bg-gray-50 transition-all"
+                        >
+                          <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                            Time
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <AccessTime
+                              className="text-ayuMid/60"
+                              sx={{ fontSize: 12 }}
+                            />
+                            <span className="text-gray-800 font-bold text-[11px]">
+                              {checkInTime}
+                            </span>
                           </div>
                         </div>
                       </div>
-                    )}
 
-                    {activeTab === "flexible" && (
-                      <div className="space-y-5 animate-in fade-in duration-300 w-full">
-                        <div className="space-y-3">
-                          <p className="text-gray-800 font-semibold text-sm tracking-tight">
-                            How long do you want to stay?
+                      {/* Check-out Block */}
+                      <div className="flex items-stretch border border-gray-100 rounded-lg bg-white overflow-hidden hover:border-ayuMid transition-colors">
+                        <div
+                          ref={checkOutDateRef}
+                          onClick={(e) => {
+                            setCalendarAnchorEl(e.currentTarget);
+                            if (checkIn) setCalendarViewDate(checkIn);
+                          }}
+                          className="flex-1 flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 transition-all border-r border-gray-50"
+                        >
+                          <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                            Check-out
                           </p>
-                          <div className="flex flex-wrap gap-2">
-                            {["3 nights", "1 week", "1 month"].map(
-                              (duration) => (
-                                <button
-                                  key={duration}
-                                  onClick={() => setFlexibleDuration(duration)}
-                                  className={`px-4 py-2 rounded-full border-2 font-semibold text-[11px] transition-all duration-300 ${
-                                    flexibleDuration === duration
-                                      ? "bg-lime-light border-ayuMid text-ayuMid shadow-sm"
-                                      : "border-gray-100 text-ayuTulsi hover:border-gray-200"
-                                  }`}
-                                >
-                                  {duration}
-                                </button>
-                              ),
-                            )}
+                          <div className="flex items-center gap-1.5">
+                            <CalendarMonth
+                              className="text-ayuMid/60"
+                              sx={{ fontSize: 13 }}
+                            />
+                            <span className="text-gray-800 font-bold text-[11px] tracking-tight truncate">
+                              {checkOut
+                                ? format(checkOut, "MMM dd, yyyy")
+                                : "Add date"}
+                            </span>
                           </div>
                         </div>
-
-                        <div className="space-y-3">
-                          <div className="space-y-0.5">
-                            <p className="text-gray-800 font-semibold text-sm tracking-tight">
-                              When do you want to stay?
-                            </p>
-                            <p className="text-[11px] text-ayuMid font-medium">
-                              Select your preferred month
-                            </p>
+                        <div
+                          ref={outTimeRef}
+                          onClick={(e) => setOutTimeAnchorEl(e.currentTarget)}
+                          className="w-16 flex flex-col px-2 py-1.5 cursor-pointer hover:bg-gray-50 transition-all"
+                        >
+                          <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                            Time
+                          </p>
+                          <div className="flex items-center gap-1">
+                            <AccessTime
+                              className="text-ayuMid/60"
+                              sx={{ fontSize: 12 }}
+                            />
+                            <span className="text-gray-800 font-bold text-[11px]">
+                              {checkOutTime}
+                            </span>
                           </div>
+                        </div>
+                      </div>
 
-                          <div className="relative group/carousel px-4">
-                            <div
-                              ref={carouselRef}
-                              style={{
-                                scrollbarWidth: "none",
-                                msOverflowStyle: "none",
-                              }}
-                              className="flex gap-2 overflow-x-auto pb-1 pt-1 scroll-smooth [&::-webkit-scrollbar]:hidden"
-                            >
-                              {Array.from({ length: 12 }).map((_, i) => {
-                                const monthDate = addMonths(new Date(), i);
-                                const monthLabel = format(monthDate, "MMMM");
-                                const yearLabel = format(monthDate, "yyyy");
-                                const isSelected =
-                                  selectedFlexibleMonth &&
-                                  isSameMonth(monthDate, selectedFlexibleMonth);
-                                return (
-                                  <button
-                                    key={i}
-                                    onClick={() =>
-                                      setSelectedFlexibleMonth(
-                                        startOfMonth(monthDate),
-                                      )
-                                    }
-                                    className={`flex-shrink-0 w-20 py-3 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
-                                      isSelected
-                                        ? "bg-lime-light border-ayuMid shadow-sm"
-                                        : "bg-white border-gray-100 hover:border-gray-200"
-                                    }`}
-                                  >
-                                    <CalendarMonth
-                                      sx={{ fontSize: 14 }}
-                                      className="text-ayuMid"
-                                    />
-                                    <div className="text-center leading-none">
-                                      <p
-                                        className={`text-[9px] pt-1 font-semibold uppercase tracking-tighter ${isSelected ? "text-ayuMid" : "text-gray-800"}`}
-                                      >
-                                        {monthLabel}
-                                      </p>
-                                      <p className="text-[8px] font-semibold text-ayuMid mt-0.5">
-                                        {yearLabel}
-                                      </p>
-                                    </div>
-                                  </button>
-                                );
-                              })}
+                      <div
+                        ref={guestInputRef}
+                        onClick={(e) => setGuestsAnchorEl(e.currentTarget)}
+                        className="px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item flex flex-col justify-center bg-white"
+                      >
+                        <p className="text-[7px] font-bold text-ayuMid uppercase tracking-[0.15em] mb-0.5">
+                          Guests
+                        </p>
+                        <div className="flex items-center gap-2">
+                          <PeopleAlt
+                            className="text-ayuMid/60"
+                            sx={{ fontSize: 14 }}
+                          />
+                          {!guestsConfirmed ? (
+                            <span className="text-ayuMid/60 font-bold text-[10px] uppercase tracking-wider">
+                              Add guests
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-1.5 truncate">
+                              <span className="text-gray-800 font-bold text-[11px] tracking-tight">
+                                {guests.adults}A · {guests.children}C
+                              </span>
+                              <span className="text-ayuMid font-black text-[8px] uppercase bg-lime-light px-1.5 py-0.5 rounded-full">
+                                {guests.rooms}R
+                              </span>
                             </div>
+                          )}
+                          <KeyboardArrowDown
+                            sx={{ fontSize: 14 }}
+                            className={`text-gray-300 ml-auto transition-transform duration-300 ${guestsAnchorEl ? "rotate-180" : ""}`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col justify-center md:w-36">
+                      <button
+                        type="button"
+                        onClick={handleCheckVailabilty}
+                        disabled={isSearching}
+                        className={`relative h-full py-2.5 md:py-0 text-white font-bold rounded-[5px] transition-all duration-500 active:scale-95 overflow-hidden ${
+                          isSearching
+                            ? "bg-ayuMid/80 cursor-not-allowed"
+                            : roomStatus === "available"
+                              ? "bg-gradient-to-br from-emerald-500 to-green-600 shadow-[0_4px_20px_rgba(16,185,129,0.4)]"
+                              : roomStatus === "error" ||
+                                  roomStatus === "unavailable"
+                                ? "bg-gradient-to-br from-red-500 to-rose-600 shadow-[0_4px_20px_rgba(239,68,68,0.4)]"
+                                : "bg-gradient-to-br from-ayuMid via-ayuTulsi to-ayuMid hover:shadow-[0_8px_25px_rgba(38,61,33,0.35)]"
+                        }`}
+                      >
+                        <span className="relative flex items-center justify-center gap-1.5 px-3 py-1">
+                          {isSearching ? (
+                            <svg
+                              className="animate-spin w-5 h-5"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                              />
+                              <path
+                                className="opacity-90"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                              />
+                            </svg>
+                          ) : roomStatus === "available" ? (
+                            <>
+                              <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                              <span className="text-[10px] uppercase tracking-widest font-black">
+                                Available
+                              </span>
+                            </>
+                          ) : roomStatus !== null ? (
+                            <>
+                              <svg
+                                className="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="3"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
+                              </svg>
+                              <span className="text-[10px] uppercase tracking-widest font-black">
+                                Full
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <SearchRounded sx={{ fontSize: 16 }} />
+                              <span className="text-[10px] uppercase tracking-widest font-black">
+                                Search
+                              </span>
+                            </>
+                          )}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+
+                <Popover
+                  open={Boolean(inTimeAnchorEl)}
+                  anchorEl={inTimeAnchorEl}
+                  onClose={() => setInTimeAnchorEl(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "16px",
+                      mt: 1,
+                      boxShadow: "0 20px 50px rgba(38, 61, 33, 0.15)",
+                      overflow: "hidden",
+                      border: "1px solid rgba(212, 232, 194, 0.5)",
+                    },
+                  }}
+                >
+                  <div className="bg-white flex flex-col items-center">
+                    <div className="w-full text-center py-2.5 bg-[#f0f4ef] border-b border-[#e4ebdd]">
+                      <p className="text-[9px] font-black text-ayuMid uppercase tracking-[0.2em] mb-0.5">
+                        In Time
+                      </p>
+                      <p className="text-[11px] font-bold text-ayuTulsi">
+                        Selected: {checkInTime}
+                      </p>
+                    </div>
+                    <div className="p-2">
+                      <TimeClock
+                        value={parse(checkInTime, "HH:mm", new Date())}
+                        onChange={(val) => setCheckInTime(format(val, "HH:mm"))}
+                        ampm={false}
+                        sx={{
+                          "& .MuiClock-pin": { backgroundColor: "#263d21" },
+                          "& .MuiClockPointer-root": {
+                            backgroundColor: "#263d21",
+                          },
+                          "& .MuiClockPointer-thumb": {
+                            backgroundColor: "#263d21",
+                            borderColor: "#263d21",
+                          },
+                          "& .MuiClock-clock": {
+                            backgroundColor: "#f9faf7",
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className="w-full flex justify-end p-3 border-t border-gray-100 bg-gray-50/50">
+                      <button
+                        onClick={() => setInTimeAnchorEl(null)}
+                        className="px-6 py-2 bg-gradient-to-r from-ayuMid to-ayuTulsi text-white text-[10px] font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </Popover>
+
+                <Popover
+                  open={Boolean(outTimeAnchorEl)}
+                  anchorEl={outTimeAnchorEl}
+                  onClose={() => setOutTimeAnchorEl(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "16px",
+                      mt: 1,
+                      boxShadow: "0 20px 50px rgba(38, 61, 33, 0.15)",
+                      overflow: "hidden",
+                      border: "1px solid rgba(212, 232, 194, 0.5)",
+                    },
+                  }}
+                >
+                  <div className="bg-white flex flex-col items-center">
+                    <div className="w-full text-center py-2.5 bg-[#f0f4ef] border-b border-[#e4ebdd]">
+                      <p className="text-[9px] font-black text-ayuMid uppercase tracking-[0.2em] mb-0.5">
+                        Out Time
+                      </p>
+                      <p className="text-[11px] font-bold text-ayuTulsi">
+                        Selected: {checkOutTime}
+                      </p>
+                    </div>
+                    <div className="p-2">
+                      <TimeClock
+                        value={parse(checkOutTime, "HH:mm", new Date())}
+                        onChange={(val) =>
+                          setCheckOutTime(format(val, "HH:mm"))
+                        }
+                        ampm={false}
+                        sx={{
+                          "& .MuiClock-pin": { backgroundColor: "#263d21" },
+                          "& .MuiClockPointer-root": {
+                            backgroundColor: "#263d21",
+                          },
+                          "& .MuiClockPointer-thumb": {
+                            backgroundColor: "#263d21",
+                            borderColor: "#263d21",
+                          },
+                          "& .MuiClock-clock": {
+                            backgroundColor: "#f9faf7",
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className="w-full flex justify-end p-3 border-t border-gray-100 bg-gray-50/50">
+                      <button
+                        onClick={() => {
+                          setOutTimeAnchorEl(null);
+                          setTimeout(() => {
+                            if (guestInputRef.current) {
+                              setGuestsAnchorEl(guestInputRef.current);
+                            }
+                          }, 300);
+                        }}
+                        className="px-6 py-2 bg-gradient-to-r from-ayuMid to-ayuTulsi text-white text-[10px] font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </Popover>
+
+                <Popover
+                  open={Boolean(calendarAnchorEl)}
+                  anchorEl={calendarAnchorEl}
+                  onClose={() => setCalendarAnchorEl(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "12px",
+                      mt: 1,
+                      boxShadow: "0 15px 40px rgba(0,0,0,0.1)",
+                      border: "1px solid rgba(0,0,0,0.04)",
+                      overflow: "hidden",
+                      width: {
+                        xs: "calc(100vw - 24px)",
+                        sm: "360px",
+                        md: "680px",
+                      },
+                      maxWidth: "calc(100vw - 24px)",
+                    },
+                  }}
+                >
+                  <div
+                    className="bg-white flex flex-col"
+                    style={{ maxHeight: "80dvh" }}
+                  >
+                    <div className="flex items-center justify-center gap-6 py-3 border-b border-gray-100 flex-shrink-0">
+                      <button
+                        onClick={() => setActiveTab("calendar")}
+                        className={`pb-1 px-3 font-semibold text-xs transition-all relative ${activeTab === "calendar" ? "text-ayuMid" : "text-gray-400 hover:text-gray-600"}`}
+                      >
+                        Calendar
+                        {activeTab === "calendar" && (
+                          <motion.div
+                            layoutId="activeTab"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-ayuMid rounded-t-full"
+                          />
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setActiveTab("flexible")}
+                        className={`pb-1 px-3 font-semibold text-xs transition-all relative ${activeTab === "flexible" ? "text-ayuMid" : "text-gray-400 hover:text-gray-600"}`}
+                      >
+                        I'm flexible
+                        {activeTab === "flexible" && (
+                          <motion.div
+                            layoutId="activeTab"
+                            className="absolute bottom-0 left-0 right-0 h-0.5 bg-ayuMid rounded-t-full"
+                          />
+                        )}
+                      </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4">
+                      {activeTab === "calendar" && (
+                        <div className="relative animate-in fade-in duration-300">
+                          <div className="absolute top-0 left-0 right-0 flex justify-between items-center z-20 pointer-events-none">
                             <button
-                              onClick={() => scrollCarousel("prev")}
-                              className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1 border border-gray-100 flex items-center justify-center hover:bg-gray-50 active:scale-90 z-10 transition-colors"
+                              onClick={() =>
+                                setCalendarViewDate(
+                                  subMonths(calendarViewDate, 1),
+                                )
+                              }
+                              className="pointer-events-auto p-1.5 hover:bg-lime-light/50 rounded-full transition-all text-ayuMid"
                             >
                               <ArrowBackIos
-                                sx={{ fontSize: 10 }}
-                                className="text-gray-600 ml-0.5"
+                                sx={{ fontSize: 12 }}
+                                className="ml-1"
                               />
                             </button>
                             <button
-                              onClick={() => scrollCarousel("next")}
-                              className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1 border border-gray-100 flex items-center justify-center hover:bg-gray-50 active:scale-90 z-10 transition-colors"
+                              onClick={() =>
+                                setCalendarViewDate(
+                                  addMonths(calendarViewDate, 1),
+                                )
+                              }
+                              className="pointer-events-auto p-1.5 hover:bg-lime-light/50 rounded-full transition-all text-ayuMid"
                             >
-                              <ArrowForwardIos
-                                sx={{ fontSize: 10 }}
-                                className="text-gray-600"
-                              />
+                              <ArrowForwardIos sx={{ fontSize: 12 }} />
                             </button>
                           </div>
+                          <div className="flex flex-col md:flex-row gap-8">
+                            <div className="flex-1 min-w-[280px]">
+                              {renderCalendar(calendarViewDate)}
+                            </div>
+                            <div className="flex-1 min-w-[280px]">
+                              {renderCalendar(addMonths(calendarViewDate, 1))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {activeTab === "flexible" && (
+                        <div className="space-y-5 animate-in fade-in duration-300 w-full">
+                          <div className="space-y-3">
+                            <p className="text-gray-800 font-semibold text-sm tracking-tight">
+                              How long do you want to stay?
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {["3 nights", "1 week", "1 month"].map(
+                                (duration) => (
+                                  <button
+                                    key={duration}
+                                    onClick={() =>
+                                      setFlexibleDuration(duration)
+                                    }
+                                    className={`px-4 py-2 rounded-full border-2 font-semibold text-[11px] transition-all duration-300 ${
+                                      flexibleDuration === duration
+                                        ? "bg-lime-light border-ayuMid text-ayuMid shadow-sm"
+                                        : "border-gray-100 text-ayuTulsi hover:border-gray-200"
+                                    }`}
+                                  >
+                                    {duration}
+                                  </button>
+                                ),
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-3">
+                            <div className="space-y-0.5">
+                              <p className="text-gray-800 font-semibold text-sm tracking-tight">
+                                When do you want to stay?
+                              </p>
+                              <p className="text-[11px] text-ayuMid font-medium">
+                                Select your preferred month
+                              </p>
+                            </div>
+
+                            <div className="relative group/carousel px-4">
+                              <div
+                                ref={carouselRef}
+                                style={{
+                                  scrollbarWidth: "none",
+                                  msOverflowStyle: "none",
+                                }}
+                                className="flex gap-2 overflow-x-auto pb-1 pt-1 scroll-smooth [&::-webkit-scrollbar]:hidden"
+                              >
+                                {Array.from({ length: 12 }).map((_, i) => {
+                                  const monthDate = addMonths(new Date(), i);
+                                  const monthLabel = format(monthDate, "MMMM");
+                                  const yearLabel = format(monthDate, "yyyy");
+                                  const isSelected =
+                                    selectedFlexibleMonth &&
+                                    isSameMonth(
+                                      monthDate,
+                                      selectedFlexibleMonth,
+                                    );
+                                  return (
+                                    <button
+                                      key={i}
+                                      onClick={() =>
+                                        setSelectedFlexibleMonth(
+                                          startOfMonth(monthDate),
+                                        )
+                                      }
+                                      className={`flex-shrink-0 w-20 py-3 rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all duration-300 ${
+                                        isSelected
+                                          ? "bg-lime-light border-ayuMid shadow-sm"
+                                          : "bg-white border-gray-100 hover:border-gray-200"
+                                      }`}
+                                    >
+                                      <CalendarMonth
+                                        sx={{ fontSize: 14 }}
+                                        className="text-ayuMid"
+                                      />
+                                      <div className="text-center leading-none">
+                                        <p
+                                          className={`text-[9px] pt-1 font-semibold uppercase tracking-tighter ${isSelected ? "text-ayuMid" : "text-gray-800"}`}
+                                        >
+                                          {monthLabel}
+                                        </p>
+                                        <p className="text-[8px] font-semibold text-ayuMid mt-0.5">
+                                          {yearLabel}
+                                        </p>
+                                      </div>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+                              <button
+                                onClick={() => scrollCarousel("prev")}
+                                className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1 border border-gray-100 flex items-center justify-center hover:bg-gray-50 active:scale-90 z-10 transition-colors"
+                              >
+                                <ArrowBackIos
+                                  sx={{ fontSize: 10 }}
+                                  className="text-gray-600 ml-0.5"
+                                />
+                              </button>
+                              <button
+                                onClick={() => scrollCarousel("next")}
+                                className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-md rounded-full p-1 border border-gray-100 flex items-center justify-center hover:bg-gray-50 active:scale-90 z-10 transition-colors"
+                              >
+                                <ArrowForwardIos
+                                  sx={{ fontSize: 10 }}
+                                  className="text-gray-600"
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/20 flex-shrink-0 flex items-center justify-between gap-3">
+                      <button
+                        onClick={() => {
+                          setCheckIn(null);
+                          setCheckOut(null);
+                          setHoveredDate(null);
+                          setFlexibleDuration("1 week");
+                          setSelectedFlexibleMonth(null);
+                        }}
+                        className="text-ayuBrown font-bold hover:text-ayuBrown/80 transition-all text-[10px] tracking-widest uppercase"
+                      >
+                        Clear all
+                      </button>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setCalendarAnchorEl(null)}
+                          className="px-4 py-2 bg-white border border-gray-100 text-ayuMid font-semibold rounded-lg hover:bg-gray-50 transition-all text-xs"
+                        >
+                          Cancel
+                        </button>
+                        <CommonButton
+                          type="button"
+                          label="Select"
+                          onClick={() => {
+                            if (
+                              activeTab === "flexible" &&
+                              selectedFlexibleMonth
+                            ) {
+                              const start = startOfMonth(selectedFlexibleMonth);
+                              let end;
+                              if (flexibleDuration === "3 nights")
+                                end = addDays(start, 3);
+                              else if (flexibleDuration === "1 week")
+                                end = addDays(start, 7);
+                              else end = addMonths(start, 1);
+                              setCheckIn(start);
+                              setCheckOut(end);
+                            }
+                            setCalendarAnchorEl(null);
+                          }}
+                          className="bg-ayuMid text-white min-w-[80px]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </Popover>
+
+                <Popover
+                  open={Boolean(guestsAnchorEl)}
+                  anchorEl={guestsAnchorEl}
+                  onClose={() => setGuestsAnchorEl(null)}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                  transformOrigin={{ vertical: "top", horizontal: "center" }}
+                  PaperProps={{
+                    sx: {
+                      borderRadius: "12px",
+                      mt: 1,
+                      p: 2.5,
+                      width: { xs: "calc(100vw - 24px)", sm: "300px" },
+                      maxWidth: "calc(100vw - 24px)",
+                      boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                      border: "1px solid rgba(0,0,0,0.04)",
+                    },
+                  }}
+                >
+                  <div className="space-y-4">
+                    {[
+                      {
+                        label: "Room",
+                        key: "rooms",
+                        min: 1,
+                        subtitle: null,
+                        subtitleColor: null,
+                      },
+                      {
+                        label: "Adults",
+                        key: "adults",
+                        min: 1,
+                        subtitle: "Ages 13 or above",
+                        subtitleColor: "text-ayuMid",
+                      },
+                      {
+                        label: "Children",
+                        key: "children",
+                        min: 0,
+                        subtitle: "Ages 0–12",
+                        subtitleColor: "text-ayuBrown",
+                      },
+                    ].map(({ label, key, min, subtitle, subtitleColor }) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between"
+                      >
+                        <div>
+                          <p className="font-semibold text-gray-800 text-sm">
+                            {label}
+                          </p>
+                          {subtitle && (
+                            <p className={`text-[10px] ${subtitleColor}`}>
+                              {subtitle}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            disabled={label === "Room" || guests[key] <= min}
+                            onClick={() => {
+                              if (key === "children") {
+                                setGuests((g) => {
+                                  const newCount = Math.max(
+                                    min,
+                                    g.children - 1,
+                                  );
+                                  return {
+                                    ...g,
+                                    children: newCount,
+                                    childrenAges: g.childrenAges.slice(
+                                      0,
+                                      newCount,
+                                    ),
+                                  };
+                                });
+                              } else {
+                                setGuests((g) => ({
+                                  ...g,
+                                  [key]: Math.max(min, g[key] - 1),
+                                }));
+                              }
+                            }}
+                            className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all text-ayuBrown disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <Remove sx={{ fontSize: 14 }} />
+                          </button>
+                          <span className="w-4 text-center font-semibold text-sm text-gray-800">
+                            {guests[key]}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={label === "Room"}
+                            onClick={() => {
+                              if (key === "children") {
+                                setGuests((g) => ({
+                                  ...g,
+                                  children: g.children + 1,
+                                  childrenAges: [...g.childrenAges, ""],
+                                }));
+                              } else {
+                                setGuests((g) => ({ ...g, [key]: g[key] + 1 }));
+                              }
+                            }}
+                            className="w-8 h-8 rounded-full border border-ayuMid text-ayuMid flex items-center justify-center hover:bg-lime-light active:scale-90 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                          >
+                            <Add sx={{ fontSize: 14 }} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    {guests.children > 0 && (
+                      <div className="pt-3 border-t border-gray-100 space-y-3">
+                        <p className="text-[10px] text-ayuMid leading-tight">
+                          Enter your children's correct ages for accurate
+                          pricing.
+                        </p>
+                        <div className="space-y-2">
+                          {Array.from({ length: guests.children }).map(
+                            (_, i) => (
+                              <FormControl key={i} fullWidth size="small">
+                                <Select
+                                  value={guests.childrenAges[i] || ""}
+                                  onChange={(e) => {
+                                    const newAges = [...guests.childrenAges];
+                                    newAges[i] = e.target.value;
+                                    setGuests((g) => ({
+                                      ...g,
+                                      childrenAges: newAges,
+                                    }));
+                                  }}
+                                  displayEmpty
+                                  variant="outlined"
+                                  sx={{
+                                    borderRadius: "9px",
+                                    fontSize: "11px",
+                                    ".MuiSelect-select": { py: 1 },
+                                  }}
+                                  IconComponent={KeyboardArrowDown}
+                                >
+                                  <MenuItem
+                                    value=""
+                                    disabled
+                                    sx={{
+                                      fontSize: "11px",
+                                      "&::before": {
+                                        display: "none !important",
+                                      },
+                                    }}
+                                  >
+                                    Age of Child {i + 1}
+                                  </MenuItem>
+                                  {Array.from({ length: 13 }).map((_, age) => (
+                                    <MenuItem
+                                      key={age}
+                                      value={age}
+                                      sx={{
+                                        fontSize: "11px",
+                                        "&::before": {
+                                          display: "none !important",
+                                        },
+                                      }}
+                                    >
+                                      {age} years old
+                                    </MenuItem>
+                                  ))}
+                                </Select>
+                              </FormControl>
+                            ),
+                          )}
                         </div>
                       </div>
                     )}
-                  </div>
 
-                  <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/20 flex-shrink-0 flex items-center justify-between gap-3">
-                    <button
-                      onClick={() => {
-                        setCheckIn(null);
-                        setCheckOut(null);
-                        setHoveredDate(null);
-                        setFlexibleDuration("1 week");
-                        setSelectedFlexibleMonth(null);
-                      }}
-                      className="text-ayuBrown font-bold hover:text-ayuBrown/80 transition-all text-[10px] tracking-widest uppercase"
-                    >
-                      Clear all
-                    </button>
-                    <div className="flex gap-2">
+                    <div className="pt-3 flex justify-end gap-2 border-t border-gray-100">
                       <button
-                        onClick={() => setCalendarAnchorEl(null)}
-                        className="px-4 py-2 bg-white border border-gray-100 text-ayuMid font-semibold rounded-lg hover:bg-gray-50 transition-all text-xs"
+                        onClick={() => setGuestsAnchorEl(null)}
+                        className="px-4 py-2 text-[11px] font-semibold text-ayuMid hover:text-gray-600 transition-all"
                       >
                         Cancel
                       </button>
                       <CommonButton
                         type="button"
-                        label="Select"
                         onClick={() => {
-                          if (
-                            activeTab === "flexible" &&
-                            selectedFlexibleMonth
-                          ) {
-                            const start = startOfMonth(selectedFlexibleMonth);
-                            let end;
-                            if (flexibleDuration === "3 nights")
-                              end = addDays(start, 3);
-                            else if (flexibleDuration === "1 week")
-                              end = addDays(start, 7);
-                            else end = addMonths(start, 1);
-                            setCheckIn(start);
-                            setCheckOut(end);
-                          }
-                          setCalendarAnchorEl(null);
+                          setGuestsConfirmed(true);
+                          setGuestsAnchorEl(null);
                         }}
-                        className="bg-ayuMid text-white min-w-[80px]"
+                        className="bg-ayuMid text-white"
+                        label="Apply"
                       />
                     </div>
                   </div>
-                </div>
-              </Popover>
-
-              <Popover
-                open={Boolean(guestsAnchorEl)}
-                anchorEl={guestsAnchorEl}
-                onClose={() => setGuestsAnchorEl(null)}
-                anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-                transformOrigin={{ vertical: "top", horizontal: "center" }}
-                PaperProps={{
-                  sx: {
-                    borderRadius: "12px",
-                    mt: 1,
-                    p: 2.5,
-                    width: { xs: "calc(100vw - 24px)", sm: "300px" },
-                    maxWidth: "calc(100vw - 24px)",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
-                    border: "1px solid rgba(0,0,0,0.04)",
-                  },
-                }}
-              >
-                <div className="space-y-4">
-                  {[
-                    {
-                      label: "Room",
-                      key: "rooms",
-                      min: 1,
-                      subtitle: null,
-                      subtitleColor: null,
-                    },
-                    {
-                      label: "Adults",
-                      key: "adults",
-                      min: 1,
-                      subtitle: "Ages 13 or above",
-                      subtitleColor: "text-ayuMid",
-                    },
-                    {
-                      label: "Children",
-                      key: "children",
-                      min: 0,
-                      subtitle: "Ages 0–12",
-                      subtitleColor: "text-ayuBrown",
-                    },
-                  ].map(({ label, key, min, subtitle, subtitleColor }) => (
-                    <div
-                      key={key}
-                      className="flex items-center justify-between"
-                    >
-                      <div>
-                        <p className="font-semibold text-gray-800 text-sm">
-                          {label}
-                        </p>
-                        {subtitle && (
-                          <p className={`text-[10px] ${subtitleColor}`}>
-                            {subtitle}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => {
-                            if (key === "children") {
-                              setGuests((g) => {
-                                const newCount = Math.max(min, g.children - 1);
-                                return {
-                                  ...g,
-                                  children: newCount,
-                                  childrenAges: g.childrenAges.slice(
-                                    0,
-                                    newCount,
-                                  ),
-                                };
-                              });
-                            } else {
-                              setGuests((g) => ({
-                                ...g,
-                                [key]: Math.max(min, g[key] - 1),
-                              }));
-                            }
-                          }}
-                          className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all text-ayuBrown"
-                        >
-                          <Remove sx={{ fontSize: 14 }} />
-                        </button>
-                        <span className="w-4 text-center font-semibold text-sm text-gray-800">
-                          {guests[key]}
-                        </span>
-                        <button
-                          onClick={() => {
-                            if (key === "children") {
-                              setGuests((g) => ({
-                                ...g,
-                                children: g.children + 1,
-                                childrenAges: [...g.childrenAges, ""],
-                              }));
-                            } else {
-                              setGuests((g) => ({ ...g, [key]: g[key] + 1 }));
-                            }
-                          }}
-                          className="w-8 h-8 rounded-full border border-ayuMid text-ayuMid flex items-center justify-center hover:bg-lime-light active:scale-90 transition-all"
-                        >
-                          <Add sx={{ fontSize: 14 }} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-
-                  {guests.children > 0 && (
-                    <div className="pt-3 border-t border-gray-100 space-y-3">
-                      <p className="text-[10px] text-ayuMid leading-tight">
-                        Enter your children's correct ages for accurate pricing.
-                      </p>
-                      <div className="space-y-2">
-                        {Array.from({ length: guests.children }).map((_, i) => (
-                          <FormControl key={i} fullWidth size="small">
-                            <Select
-                              value={guests.childrenAges[i] || ""}
-                              onChange={(e) => {
-                                const newAges = [...guests.childrenAges];
-                                newAges[i] = e.target.value;
-                                setGuests((g) => ({
-                                  ...g,
-                                  childrenAges: newAges,
-                                }));
-                              }}
-                              displayEmpty
-                              variant="outlined"
-                              sx={{
-                                borderRadius: "9px",
-                                fontSize: "11px",
-                                ".MuiSelect-select": { py: 1 },
-                              }}
-                              IconComponent={KeyboardArrowDown}
-                            >
-                              <MenuItem
-                                value=""
-                                disabled
-                                sx={{
-                                  fontSize: "11px",
-                                  "&::before": { display: "none !important" },
-                                }}
-                              >
-                                Age of Child {i + 1}
-                              </MenuItem>
-                              {Array.from({ length: 13 }).map((_, age) => (
-                                <MenuItem
-                                  key={age}
-                                  value={age}
-                                  sx={{
-                                    fontSize: "11px",
-                                    "&::before": { display: "none !important" },
-                                  }}
-                                >
-                                  {age} years old
-                                </MenuItem>
-                              ))}
-                            </Select>
-                          </FormControl>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="pt-3 flex justify-end gap-2 border-t border-gray-100">
-                    <button
-                      onClick={() => setGuestsAnchorEl(null)}
-                      className="px-4 py-2 text-[11px] font-semibold text-ayuMid hover:text-gray-600 transition-all"
-                    >
-                      Cancel
-                    </button>
-                    <CommonButton
-                      type="button"
-                      onClick={() => {
-                        setGuestsConfirmed(true);
-                        setGuestsAnchorEl(null);
-                      }}
-                      className="bg-ayuMid text-white"
-                      label="Apply"
-                    />
-                  </div>
-                </div>
-              </Popover>
-            </div>
+                </Popover>
+              </div>
+            </LocalizationProvider>
 
             <div className="w-full mt-4">
               <motion.div
@@ -999,7 +1254,7 @@ function StayBookingModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 pt-3 border-t border-gray-100">
+                <div className="flex flex-col gap-3 pt-3 border rounded-xl p-2">
                   <p className="text-[10px] font-bold text-ayuMid uppercase tracking-widest">
                     Preferences
                   </p>
@@ -1020,7 +1275,7 @@ function StayBookingModal({
                     ].map(({ label, sub, subColor, field }) => (
                       <div
                         key={field}
-                        className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                        className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border  hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex items-center gap-2.5">
                           <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
@@ -1115,27 +1370,32 @@ function StayBookingModal({
                   </span>
                 </div>
 
-                <button
-                  disabled={
-                    !selectedService ||
-                    !checkIn ||
-                    !checkOut ||
-                    roomStatus !== "available"
-                  }
-                  onClick={handleConfirmBooking}
-                  className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all active:scale-[0.98] uppercase tracking-widest ${
-                    selectedService &&
-                    checkIn &&
-                    checkOut &&
-                    roomStatus === "available"
-                      ? "bg-gradient-to-r from-ayuMid to-ayuTulsi text-white shadow-lg shadow-ayuMid/10"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
-                  }`}
-                >
-                  {roomStatus === "available"
-                    ? "Complete Booking"
-                    : "Unavailable"}
-                </button>
+                <div className="flex justify-end space-x-2 border-t border-dashed pt-2">
+                  <CommonButton
+                    type="button"
+                    label="Reset"
+                    className="border border-red-600 text-red-600 bg-red-50"
+                    onClick={reset}
+                  />
+                  <CommonButton
+                    disabled={
+                      !selectedService ||
+                      !checkIn ||
+                      !checkOut ||
+                      roomStatus !== "available"
+                    }
+                    label={"Book Now"}
+                    onClick={handleConfirmBooking}
+                    className={`w-full py-3.5 rounded-[5px] font-bold text-sm transition-all active:scale-[0.98] uppercase tracking-widest ${
+                      selectedService &&
+                      checkIn &&
+                      checkOut &&
+                      roomStatus === "available"
+                        ? "bg-gradient-to-r from-ayuMid to-ayuTulsi text-white shadow-lg shadow-ayuMid/10"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                    }`}
+                  />
+                </div>
               </motion.div>
 
               <div className="mt-3 mb-2 grid grid-cols-3 gap-2">

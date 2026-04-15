@@ -7,12 +7,12 @@ import Pool from "@mui/icons-material/Pool";
 import Spa from "@mui/icons-material/Spa";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import FertileSoilTherapyImg from "../../../assets/healingServices/natureTherapy/स्वउर्वराचिकित्सा Fertile Soil Therapy.png";
-import SwimmingTherapyImg from "../../../assets/healingServices/natureTherapy/स्वजलतरणचिकित्सा Swimming Therapy.png";
-import MaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वपुंस्मृत्तिकास्नान Male MudBath.png";
-import AthleticTherapyImg from "../../../assets/healingServices/natureTherapy/स्वमल्लचिकित्सा Athletic Therapy.png";
-import WindSunRejuvenationImg from "../../../assets/healingServices/natureTherapy/स्ववातातपिकरसायन Wind Sun Rejuvenation.png";
-import FeMaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वस्त्रीमृत्तिकास्नान Female Mud Bath.png";
+import FertileSoilTherapyImg from "../../../assets/healingServices/natureTherapy/स्वउर्वराचिकित्सा Fertile Soil Therapy.webp";
+import SwimmingTherapyImg from "../../../assets/healingServices/natureTherapy/स्वजलतरणचिकित्सा Swimming Therapy.webp";
+import MaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वपुंस्मृत्तिकास्नान Male MudBath.webp";
+import AthleticTherapyImg from "../../../assets/healingServices/natureTherapy/स्वमल्लचिकित्सा Athletic Therapy.webp";
+import WindSunRejuvenationImg from "../../../assets/healingServices/natureTherapy/स्ववातातपिकरसायन Wind Sun Rejuvenation.webp";
+import FeMaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वस्त्रीमृत्तिकास्नान Female Mud Bath.webp";
 import NatureTherapyBookingModal from "./NatureTherapyBookingModal";
 
 const therapiesData = [

@@ -54,7 +54,7 @@ const theme = createTheme({
     secondary: { main: "#8b6914" },
     background: { default: "#faf8f3" },
   },
-  typography: { fontFamily: "'Cormorant Garamond', Georgia, serif" },
+  typography: { fontFamily: "Inter, sans-serif" },
 });
 
 const p = {
@@ -553,7 +553,7 @@ function SectionCard({ section }) {
                       background: `${section.accent}20`,
                       color: section.accent,
                       border: `1px solid ${section.accent}38`,
-                      fontFamily: "monospace",
+                      fontFamily: "'Inter', sans-serif",
                     }}
                   />
                   <Chip
@@ -565,14 +565,14 @@ function SectionCard({ section }) {
                       background: "rgba(255,255,255,0.65)",
                       color: p.tl,
                       border: `1px solid ${p.border}`,
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "Inter, sans-serif",
                       display: { xs: "none", sm: "flex" },
                     }}
                   />
                 </Box>
                 <Typography
                   sx={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontFamily: "Inter, sans-serif",
                     fontSize: { xs: "1.2rem", md: "1.5rem" },
                     fontWeight: 700,
                     color: p.td,
@@ -621,7 +621,7 @@ function SectionCard({ section }) {
                   >
                     <Typography
                       sx={{
-                        fontFamily: "'Cormorant Garamond', Georgia, serif",
+                        fontFamily: "Inter, sans-serif",
                         fontSize: { xs: "1rem", md: "1.08rem" },
                         lineHeight: 1.9,
                         color: p.tm,
@@ -644,7 +644,7 @@ function SectionCard({ section }) {
                     />
                     <Typography
                       sx={{
-                        fontFamily: "'Playfair Display', Georgia, serif",
+                        fontFamily: "Inter, sans-serif",
                         fontSize: { xs: "0.95rem", md: "1.05rem" },
                         fontWeight: 600,
                         color: section.accent,
@@ -691,8 +691,7 @@ function SectionCard({ section }) {
                           />
                           <Typography
                             sx={{
-                              fontFamily:
-                                "'Cormorant Garamond', Georgia, serif",
+                              fontFamily: "Inter, sans-serif",
                               fontSize: { xs: "0.95rem", md: "1.03rem" },
                               lineHeight: 1.75,
                               color: p.tm,
@@ -758,7 +757,7 @@ function SectionCard({ section }) {
                             </Box>
                             <Typography
                               sx={{
-                                fontFamily: "'Playfair Display', serif",
+                                fontFamily: "Inter, sans-serif",
                                 fontSize: "0.8rem",
                                 fontWeight: 600,
                                 color: section.accent,
@@ -770,7 +769,7 @@ function SectionCard({ section }) {
                             </Typography>
                             <Typography
                               sx={{
-                                fontFamily: "'Cormorant Garamond', serif",
+                                fontFamily: "Inter, sans-serif",
                                 fontSize: "1rem",
                                 color: p.tm,
                               }}
@@ -831,7 +830,7 @@ function TableOfContents({ activeSection, onSelect }) {
               >
                 <Typography
                   sx={{
-                    fontFamily: "'Playfair Display', serif",
+                    fontFamily: "Inter, sans-serif",
                     fontSize: "0.75rem",
                     fontWeight: 700,
                     color: p.tl,
@@ -873,7 +872,7 @@ function TableOfContents({ activeSection, onSelect }) {
                     />
                     <Typography
                       sx={{
-                        fontFamily: "'Cormorant Garamond', serif",
+                        fontFamily: "Inter, sans-serif",
                         fontSize: "0.87rem",
                         color: activeSection === s.id ? s.accent : p.tm,
                         fontWeight: activeSection === s.id ? 600 : 400,
@@ -939,7 +938,7 @@ function TableOfContents({ activeSection, onSelect }) {
             <SpaIcon sx={{ fontSize: 18, color: p.sage }} />
             <Typography
               sx={{
-                fontFamily: "'Playfair Display', serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: "0.95rem",
                 fontWeight: 700,
                 color: p.td,
@@ -950,7 +949,7 @@ function TableOfContents({ activeSection, onSelect }) {
           </Box>
           <Typography
             sx={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: "Inter, sans-serif",
               fontSize: "0.75rem",
               color: p.tl,
               mt: 0.3,
@@ -996,7 +995,7 @@ function TableOfContents({ activeSection, onSelect }) {
                   />
                   <Typography
                     sx={{
-                      fontFamily: "'Cormorant Garamond', serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: "0.85rem",
                       color: active ? s.accent : p.tm,
                       fontWeight: active ? 600 : 400,
@@ -1010,7 +1009,7 @@ function TableOfContents({ activeSection, onSelect }) {
                     sx={{
                       fontSize: "0.64rem",
                       color: p.tl,
-                      fontFamily: "monospace",
+                      fontFamily: "'Inter', sans-serif",
                       flexShrink: 0,
                     }}
                   >
@@ -1033,7 +1032,7 @@ function TableOfContents({ activeSection, onSelect }) {
             <FiberManualRecordIcon sx={{ fontSize: 8, color: p.lime }} />
             <Typography
               sx={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: "0.73rem",
                 color: p.tl,
               }}
@@ -1184,7 +1183,7 @@ export default function SwagramaPrivacyPolicy() {
                 >
                   <Typography
                     sx={{
-                      fontFamily: "'Playfair Display', serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: { xs: "0.72rem", md: "0.82rem" },
                       letterSpacing: "0.38em",
                       color: "rgba(255,255,255,0.7)",
@@ -1204,7 +1203,7 @@ export default function SwagramaPrivacyPolicy() {
                   <Typography
                     component="h1"
                     sx={{
-                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: { xs: "3rem", md: "5rem", lg: "6.2rem" },
                       fontWeight: 700,
                       color: "#fff",
@@ -1224,7 +1223,7 @@ export default function SwagramaPrivacyPolicy() {
                 >
                   <Typography
                     sx={{
-                      fontFamily: "'Cormorant Garamond', Georgia, serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: { xs: "1.1rem", md: "1.3rem" },
                       color: "rgba(255,255,255,0.88)",
                       maxWidth: 560,
@@ -1319,7 +1318,7 @@ export default function SwagramaPrivacyPolicy() {
                   </motion.div>
                   <Typography
                     sx={{
-                      fontFamily: "'Playfair Display', Georgia, serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: { xs: "1.6rem", md: "2.2rem" },
                       fontWeight: 700,
                       color: p.td,
@@ -1330,7 +1329,7 @@ export default function SwagramaPrivacyPolicy() {
                   </Typography>
                   <Typography
                     sx={{
-                      fontFamily: "'Cormorant Garamond', Georgia, serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: { xs: "1.05rem", md: "1.18rem" },
                       color: p.tm,
                       lineHeight: 1.9,
@@ -1371,7 +1370,7 @@ export default function SwagramaPrivacyPolicy() {
                           background: `${p.sage}10`,
                           color: p.tm,
                           border: `1px solid ${p.sage}24`,
-                          fontFamily: "'Cormorant Garamond', serif",
+                          fontFamily: "Inter, sans-serif",
                           fontSize: "0.9rem",
                         }}
                       />

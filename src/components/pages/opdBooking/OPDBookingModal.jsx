@@ -208,6 +208,7 @@ export default function OPDBookingModal({
   };
 
   const initiatePayment = async () => {
+    if (isPaymentPending) return;
     try {
       const userId = user?.userId;
 
@@ -786,6 +787,7 @@ export default function OPDBookingModal({
             : "Are you sure you want to book this appointment?"
         }
         confirmationButtonMsg={isPaymentPending ? "Waiting..." : "Confirm"}
+        disabled={isPaymentPending}
       />
 
       <style jsx global>{`

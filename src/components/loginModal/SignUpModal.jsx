@@ -209,8 +209,8 @@ export default function SignUpModal({ open, handleClose }) {
       setOpenConfirmationModal(false);
       setIsLoading(true);
       const response = await signupJYA(formData);
-      console.log("response",response);
-      
+      console.log("response", response);
+
       const apiData = response?.data;
       if (response.status === 200 && apiData) {
         successAlert(apiData);
@@ -222,8 +222,8 @@ export default function SignUpModal({ open, handleClose }) {
         setIsLoading(false);
       }
     } catch (error) {
-      console.log("errorMassage",error);
-      
+      console.log("errorMassage", error);
+
       const errorMessage = error?.response?.data?.message || error?.message;
       errorAlert(errorMessage);
     } finally {
@@ -370,7 +370,13 @@ export default function SignUpModal({ open, handleClose }) {
 
                   <Box
                     className="custom-green-scrollbar"
-                    sx={{ p: 4, pt: 3, overflowY: "auto", flex: 1, overscrollBehavior: "contain" }}
+                    sx={{
+                      p: 4,
+                      pt: 3,
+                      overflowY: "auto",
+                      flex: 1,
+                      overscrollBehavior: "contain",
+                    }}
                   >
                     <div className="flex justify-center">
                       <img

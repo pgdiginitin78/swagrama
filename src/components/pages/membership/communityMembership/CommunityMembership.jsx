@@ -20,7 +20,7 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import CommunityMembershipImg from "../../../assets/membership/communityMembership.png";
+import CommunityMembershipImg from "../../../assets/membership/communityMembership.webp";
 import MembershipRegistrationModal from "./MembershipRegistrationModal";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 

@@ -29,7 +29,6 @@ import ResetPassword from "./ResetPassword";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import OTPVerificationModal from "./OTPVerificationModal";
 
-
 const ModalStyle = {
   position: "absolute",
   top: "50%",
@@ -620,7 +619,7 @@ export default function LoginModal({ open, handleClose }) {
           open={openResetModal}
           handleClose={() => setOpenResetModal(false)}
           otpEmailForVerification={otpEmailForVerification}
-                  setOtpEmailForVerification={setOtpEmailForVerification}
+          setOtpEmailForVerification={setOtpEmailForVerification}
         />
       )}
 

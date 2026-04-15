@@ -16,8 +16,7 @@ const startPaymentStatusPolling = (
 
       if (
         status?.status === 200 &&
-        status?.paymentStatus === "Success" &&
-        status?.isUsed === false
+        status?.paymentStatus === "Success"
       ) {
         clearInterval(interval);
 

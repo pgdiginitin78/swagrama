@@ -50,14 +50,27 @@ export const AddPatient = (saveObj) => {
 };
 
 export const InitiatePayment = (ClinicId, userId, postObj) => {
-  return AxiosInstance.post(
-    `InitiatePayment?ClinicId=${ClinicId}&userId=${userId}`,
-    postObj,
-  );
+  const params = new URLSearchParams();
+
+  params.append("userId", userId);
+
+  if (ClinicId !== null && ClinicId !== undefined) {
+    params.append("ClinicId", ClinicId);
+  }
+
+  return AxiosInstance.post(`InitiatePayment?${params.toString()}`, postObj);
 };
 
 export const CheckPaymentStatus = (clinicId, clientTxnId) => {
-  return AxiosInstance.get(
-    `CheckPaymentStatus?clinicId=${clinicId}&clientTxnId=${clientTxnId}`,
-  );
+  const params = new URLSearchParams();
+
+  if (clinicId !== null && clinicId !== undefined) {
+    params.append("clinicId", clinicId);
+  }
+
+  if (clientTxnId !== null && clientTxnId !== undefined) {
+    params.append("clientTxnId", clientTxnId);
+  }
+
+  return AxiosInstance.get(`CheckPaymentStatus?${params.toString()}`);
 };

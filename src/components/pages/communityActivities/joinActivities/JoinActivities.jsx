@@ -26,14 +26,14 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { MdEco } from "react-icons/md";
-import samaskarasImg from "../../../assets/samaskaras.jpg";
-import swagramaFoodImg from "../../../assets/swagramaFoodMenu.png";
-import swagramaMainImg from "../../../assets/landing-page/swagramaMain.png";
-import swagramaPricingImg from "../../../assets/swagramaPricing.jpg";
-import swagramaServicesImg from "../../../assets/swagramaServices.png";
-import termsconditionsImg from "../../../assets/terms&conditions.jpg";
-import weddingCultureImg from "../../../assets/weddingCulture.jpg";
-import tranditionalWeddingImg from "../../../assets/tranditionalWedding.png"
+import samaskarasImg from "../../../assets/samaskaras.webp";
+import swagramaFoodImg from "../../../assets/swagramaFoodMenu.webp";
+import swagramaMainImg from "../../../assets/landing-page/swagramaMain.webp";
+import swagramaPricingImg from "../../../assets/swagramaPricing.webp";
+import swagramaServicesImg from "../../../assets/swagramaServices.webp";
+import termsconditionsImg from "../../../assets/terms&conditions.webp";
+import weddingCultureImg from "../../../assets/weddingCulture.webp";
+import tranditionalWeddingImg from "../../../assets/tranditionalWedding.webp";
 
 import BusinessIcon from "@mui/icons-material/Business";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -54,6 +54,8 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import SpaIcon from "@mui/icons-material/Spa";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import CommonButton from "../../../common/button/CommonButton";
+import EnquiryFormModal from "../../EnquiryFormModal";
 
 const getServiceIcon = (service) => {
   if (service.includes("Ayurvedic")) return <SpaIcon />;
@@ -66,6 +68,7 @@ const getServiceIcon = (service) => {
 const JoinActivities = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -1521,19 +1524,19 @@ const JoinActivities = () => {
       transition={{ duration: 0.3 }}
       className="space-y-4"
     >
-<div
-  className="relative w-full max-h-[400px] rounded-lg overflow-hidden
+      <div
+        className="relative w-full max-h-[400px] rounded-lg overflow-hidden
              backdrop-blur-xl
              bg-gray-500/25
              border border-black/30
              shadow-lg"
->
-  <img
-    src={tabImages[4]}
-    alt="Services"
-    className="w-full h-auto block"
-  />
-</div>
+      >
+        <img
+          src={tabImages[4]}
+          alt="Services"
+          className="w-full h-auto block"
+        />
+      </div>
 
       <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
         <h2 className="text-lg font-semibold text-green-800 mb-3">
@@ -3124,21 +3127,38 @@ const JoinActivities = () => {
         </AnimatePresence>
       </main>
 
+      <div className="flex justify-center">
+        <CommonButton
+          type="button"
+          label="Book a Visit"
+          onClick={() => {
+            setOpenEnquiryModal(true);
+          }}
+          className="bg-ayuMid text-white"
+        />
+      </div>
+
       <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3 }}
-        className="bg-green-800 text-white py-4 mt-8"
+        className="bg-green-800 text-white py-4 mt-4"
       >
         <div className="max-w-6xl mx-auto px-3 text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <MdEco className="text-lime-400 animate-bounce" />
-          </div>
+         
           <p className="text-xs text-green-200">
             Climate Positive • Ayurvedic • Natural Lifestyle
           </p>
         </div>
       </motion.footer>
+
+      {openEnquiryModal && (
+        <EnquiryFormModal
+          open={openEnquiryModal}
+          handleClose={() => setOpenEnquiryModal(false)}
+
+        />
+      )}
     </div>
   );
 };

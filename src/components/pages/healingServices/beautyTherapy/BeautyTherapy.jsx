@@ -26,18 +26,18 @@ import {
   Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import BodySkinCleansingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinCleansingFemale.png";
-import BodySkinPackFemale from "../../../assets/healingServices/beuty-therapy/BodySkinPackFemale.png";
-import BodySkinScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinScrubbingFemale.png";
-import BodySkinSteamingFemale from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingFemale.png";
-import वदनबाष्पकFaceSteamingMaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingMale.png";
-import ScalpConditionerImg from "../../../assets/healingServices/beuty-therapy/ScalpConditioner.png";
-import वदनअवघर्षणFaceScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनअवघर्षण Face Scrubbing.png";
-import वदनबन्धFacePacFemale from "../../../assets/healingServices/beuty-therapy/वदनबन्ध Face Pack.png";
-import वदनबाष्पकFaceSteamingFemale from "../../../assets/healingServices/beuty-therapy/वदनबाष्पकFaceSteamingFemale.png";
-import वदनभ्यङ्गFaceUnguentFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनभ्यङ्ग Face Unguent.png";
-import वदनवर्ण्यFacePowderFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनवर्ण्यFacePowderFemale.png";
-import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.jpg";
+import BodySkinCleansingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinCleansingFemale.webp";
+import BodySkinPackFemale from "../../../assets/healingServices/beuty-therapy/BodySkinPackFemale.webp";
+import BodySkinScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinScrubbingFemale.webp";
+import BodySkinSteamingFemale from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingFemale.webp";
+import वदनबाष्पकFaceSteamingMaleImg from "../../../assets/healingServices/beuty-therapy/BodySkinSteamingMale.webp";
+import ScalpConditionerImg from "../../../assets/healingServices/beuty-therapy/ScalpConditioner.webp";
+import वदनअवघर्षणFaceScrubbingFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनअवघर्षण Face Scrubbing.webp";
+import वदनबन्धFacePacFemale from "../../../assets/healingServices/beuty-therapy/वदनबन्ध Face Pack.webp";
+import वदनबाष्पकFaceSteamingFemale from "../../../assets/healingServices/beuty-therapy/वदनबाष्पकFaceSteamingFemale.webp";
+import वदनभ्यङ्गFaceUnguentFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनभ्यङ्ग Face Unguent.webp";
+import वदनवर्ण्यFacePowderFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनवर्ण्यFacePowderFemale.webp";
+import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.webp";
 import BeautyTherapyBookingModal from "./BeautyTherapyBookingModal";
 
 const beautyData = [

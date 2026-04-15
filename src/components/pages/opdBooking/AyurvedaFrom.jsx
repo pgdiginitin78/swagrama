@@ -32,22 +32,22 @@ import {
 import { Clock, Stethoscope } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import abhyangaImg from "../../../assets/images/ayurveda/ayurveda_abhyanga.png";
-import herbsImg from "../../../assets/images/ayurveda/ayurveda_herbs.png";
-import kizhiImg from "../../../assets/images/ayurveda/ayurveda_kizhi.png";
-import nasyaImg from "../../../assets/images/ayurveda/ayurveda_nasya.png";
-import panchakarmaImg from "../../../assets/images/ayurveda/ayurveda_panchakarma.png";
-import shirodharaImg from "../../../assets/images/ayurveda/ayurveda_shirodhara.png";
-import panchakarmaAsset from "../../../assets/images/ayurveda/panchakarma.png";
-import shirodharaAsset from "../../../assets/images/ayurveda/shirodhara.png";
-import homeopathyBottlesImg from "../../../assets/images/homeopathy/homeopathy_bottles_pills.png";
-import homeopathyConsultationImg from "../../../assets/images/homeopathy/homeopathy_consultation.png";
-import homeopathyHerbsImg from "../../../assets/images/homeopathy/homeopathy_herbs.png";
-import yogaBreathImg from "../../../assets/images/yoga/yoga_breath_meditation.png";
-import yogaBridgeImg from "../../../assets/images/yoga/yoga_bridge_pose.png";
-import yogaLotusImg from "../../../assets/images/yoga/yoga_lotus_meditation.png";
-import yogaTreeImg from "../../../assets/images/yoga/yoga_tree_pose.png";
-import yogaWarriorImg from "../../../assets/images/yoga/yoga_warrior_group.png";
+import abhyangaImg from "../../../assets/images/ayurveda/ayurveda_abhyanga.webp";
+import herbsImg from "../../../assets/images/ayurveda/ayurveda_herbs.webp";
+import kizhiImg from "../../../assets/images/ayurveda/ayurveda_kizhi.webp";
+import nasyaImg from "../../../assets/images/ayurveda/ayurveda_nasya.webp";
+import panchakarmaImg from "../../../assets/images/ayurveda/ayurveda_panchakarma.webp";
+import shirodharaImg from "../../../assets/images/ayurveda/ayurveda_shirodhara.webp";
+import panchakarmaAsset from "../../../assets/images/ayurveda/panchakarma.webp";
+import shirodharaAsset from "../../../assets/images/ayurveda/shirodhara.webp";
+import homeopathyBottlesImg from "../../../assets/images/homeopathy/homeopathy_bottles_pills.webp";
+import homeopathyConsultationImg from "../../../assets/images/homeopathy/homeopathy_consultation.webp";
+import homeopathyHerbsImg from "../../../assets/images/homeopathy/homeopathy_herbs.webp";
+import yogaBreathImg from "../../../assets/images/yoga/yoga_breath_meditation.webp";
+import yogaBridgeImg from "../../../assets/images/yoga/yoga_bridge_pose.webp";
+import yogaLotusImg from "../../../assets/images/yoga/yoga_lotus_meditation.webp";
+import yogaTreeImg from "../../../assets/images/yoga/yoga_tree_pose.webp";
+import yogaWarriorImg from "../../../assets/images/yoga/yoga_warrior_group.webp";
 import { useAuth } from "../../../context/AuthContext";
 import {
   bookAppointment,
@@ -56,14 +56,14 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
-import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.jpg";
-import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.jpg";
-import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
-import PradipTawareImg from "../../assets/landing-page/ourexperts/PradipTaware.jpg";
-import SandipMehetreImg from "../../assets/landing-page/ourexperts/SandipMahetre.jpg";
-import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
-import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.jpg";
-import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
+import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.webp";
+import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.webp";
+import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
+import PradipTawareImg from "../../assets/landing-page/ourexperts/PradipTaware.webp";
+import SandipMehetreImg from "../../assets/landing-page/ourexperts/SandipMahetre.webp";
+import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
+import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
+import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import DatePickerField from "../../common/formFields/DatePickerField";
@@ -719,6 +719,7 @@ function AyurvedaForm({
   });
 
   const initiatePayment = async () => {
+    if (isPaymentPending) return;
     try {
       const userId = user?.userId;
       const tempObj = {
@@ -1557,6 +1558,7 @@ function AyurvedaForm({
         confirmationLabel="Payment in Progress"
         confirmationMsg="Please complete the transaction in the new tab to book your appointment. Do not close this window."
         confirmationButtonMsg="Waiting..."
+        disabled={isPaymentPending}
       />
     </>
   );

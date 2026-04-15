@@ -18,17 +18,17 @@ import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState, isValidElement } from "react";
-import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.png";
-import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.png";
-import MorningVisionWholeMealImg from "../../../assets/community-activities/Morning Vision Whole Meal.png";
-import MorningVisionImg from "../../../assets/community-activities/MorningVision.png";
-import DailyBarterImg from "../../../assets/healingServices/vision/DailyBarter.jpg";
-import eveningMealImg from "../../../assets/healingServices/vision/eveningMeal.png";
-import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.png";
-import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.png";
-import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.png";
+import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.webp";
+import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.webp";
+import MorningVisionWholeMealImg from "../../../assets/community-activities/Morning Vision Whole Meal.webp";
+import MorningVisionImg from "../../../assets/community-activities/MorningVision.webp";
+import DailyBarterImg from "../../../assets/healingServices/vision/DailyBarter.webp";
+import eveningMealImg from "../../../assets/healingServices/vision/eveningMeal.webp";
+import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.webp";
+import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.webp";
+import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.webp";
 import VisitorsFormModal from "./VisitorsFormModal";
-import MainPageImg from "../../../assets/community-activities/mainPage.png";
+import MainPageImg from "../../../assets/community-activities/mainPage.webp";
 import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
 
 const walkInServices = [
@@ -318,7 +318,7 @@ const OurVision = () => {
             <button
               onClick={() => {
                 setSelectedEnquiryDetails(generalService);
-                setOpenEnquiryModal(true);
+                setOpenWalkInServiceBookingModal(true);
               }}
               className="group relative bg-gradient-to-br from-[#8bc34a] to-[#5d9e28] text-[#0f2415] font-bold rounded-full text-sm sm:text-base md:text-lg px-8 sm:px-10 md:px-14 py-3 sm:py-3.5 md:py-4 w-full sm:w-auto min-w-[200px] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_40px_rgba(139,195,74,0.55)] active:scale-95"
               style={{
@@ -462,7 +462,7 @@ const OurVision = () => {
             <button
               onClick={() => {
                 setSelectedEnquiryDetails(generalService);
-                setOpenEnquiryModal(true);
+                setOpenWalkInServiceBookingModal(true);
               }}
               className="bg-gradient-to-br from-[#8bc34a] to-[#689f38] hover:from-[#9ccc65] hover:to-[#7cb342] text-[#1a3a25] font-bold text-sm sm:text-base md:text-lg px-6 sm:px-8 md:px-10 lg:px-12 py-2.5 sm:py-3 md:py-4 rounded-full hover:-translate-y-1 transition-all duration-300"
               style={{ boxShadow: "0 8px 32px rgba(139, 195, 74, 0.4)" }}
@@ -586,8 +586,7 @@ const OurVision = () => {
                         }}
                         className="w-full bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-600 hover:to-green-700 text-white font-semibold py-2 sm:py-2.5 md:py-3 px-4 sm:px-6 rounded-lg sm:rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 group text-xs sm:text-sm md:text-base"
                       >
-                        <span>Enquire Now</span>
-                        <ArrowForwardIcon className="text-sm sm:text-base group-hover:translate-x-1 transition-transform duration-300" />
+                        <span>Book Now</span>
                       </motion.button>
                     </div>
                   </div>

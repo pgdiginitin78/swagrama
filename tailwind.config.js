@@ -91,7 +91,7 @@ module.exports = {
         earth: "0 10px 40px -10px rgba(139, 69, 19, 0.3)",
       },
       fontFamily: {
-        display: ["Playfair Display", "serif"],
+        display: ["Inter", "sans-serif"],
         sans: ["Inter", "sans-serif"],
       },
       borderRadius: {

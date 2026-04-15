@@ -10,17 +10,21 @@ import { store } from "./components/redux/Store.jsx";
 import { LoaderProvider } from "./components/common/commonLoader/LoaderContext.jsx";
 import CommonLoader from "./components/common/commonLoader/CommonLoader.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { ThemeProvider } from "@mui/material/styles";
+import theme from "./theme.js";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <BrowserRouter>
       <ScrollToTop />
-      <AuthProvider>
-        <LoaderProvider>
-          <CommonLoader />
-          <App />
-        </LoaderProvider>
-      </AuthProvider>
+      <ThemeProvider theme={theme}>
+        <AuthProvider>
+          <LoaderProvider>
+            <CommonLoader />
+            <App />
+          </LoaderProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </Provider>,
 );

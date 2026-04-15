@@ -7,9 +7,9 @@ import AccessTime from "@mui/icons-material/AccessTime";
 import ArrowForward from "@mui/icons-material/ArrowForward";
 import CheckCircle from "@mui/icons-material/CheckCircle";
 
-import ipdSinglePng from "../../../assets/membership/community/ipdSingle.jpg";
-import OutDoorLivingPng from "../../../assets/membership/community/outDoor.jpg";
-import wellHouseSinglePng from "../../../assets/membership/community/wellHouseSingle.jpg";
+import ipdSinglePng from "../../../assets/membership/community/ipdSingle.webp";
+import OutDoorLivingPng from "../../../assets/membership/community/outDoor.webp";
+import wellHouseSinglePng from "../../../assets/membership/community/wellHouseSingle.webp";
 import { useState, useRef } from "react";
 import OPDBookingModal from "../../healingServices/opdClinic/OPDBookingModal";
 

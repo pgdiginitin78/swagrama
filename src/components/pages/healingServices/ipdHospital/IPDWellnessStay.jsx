@@ -12,7 +12,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getRoomList } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
-import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.jpg";
+import OutdoorLeavingImg from "../../../assets/healingServices/ipd/OutdoorLeaving.webp";
 import StayBookingModal from "./StayBookingModal";
 
 const staggerContainer = {

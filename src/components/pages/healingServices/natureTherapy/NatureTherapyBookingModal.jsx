@@ -1,9 +1,8 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import CloseIcon from "@mui/icons-material/Close";
 import Event from "@mui/icons-material/Event";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Box, Modal } from "@mui/material";
-import { differenceInDays, format } from "date-fns";
+import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { Banknote, Calendar, Clock, User } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,29 +10,25 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
 import {
-  getClinicList,
-  getDoctorAvailableSlots,
-  getDoctorsByClinicId,
-  getLocationList,
   getPatientDataByMobileNo,
   getServicesByClinicId,
+  InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
+import { useLoader } from "../../../common/commonLoader/LoaderContext";
+import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
+import {
+  BookNatureTherapy,
+  GetNatureTherapySlotsByUser,
+} from "../../../../services/healingServices/natureTherapyServices/NatureTherapyServices";
+import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
 import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
-
-const dropdownObjectSchema = yup
-  .object()
-  .shape({
-    id: yup.mixed().required(),
-    label: yup.string().required(),
-  })
-  .nullable();
 
 const schema = yup.object().shape({
   serviceFid: yup.object().nullable().required("Therapy is required"),
@@ -111,16 +106,13 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
 const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
-
-  const [locationListOptions, setLocationListOptions] = useState([]);
-  const [clinicsOptions, setClinicOptions] = useState([]);
-  const [patientOptions, setPatientOptions] = useState([]);
-  const [doctorOptions, setDoctorOptions] = useState([]);
   const [servicesOptions, setServicesOptions] = useState([]);
   const [doctorSlots, setDoctorSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
 
@@ -134,9 +126,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
-      location: null,
-      clinicFid: null,
-      doctorFid: null,
       serviceFid: null,
       fromDate: null,
       noOfPerson: 1,
@@ -152,9 +141,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     mode: "onChange",
   });
 
-  const locationValue = watch("location");
-  const clinicFidValue = watch("clinicFid");
-  const doctorValue = watch("doctorFid");
   const fromDate = watch("fromDate");
   const noOfPerson = watch("noOfPerson");
 
@@ -188,79 +174,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   }, [noOfPerson, therapy, setValue]);
 
   useEffect(() => {
-    getLocationList()
-      .then((res) => {
-        const data = res?.data?.data;
-        if (data?.length) {
-          const formatted = data.map((item) => ({
-            ...item,
-            id: item.fid,
-            value: item.fid,
-            label: item.locationName,
-          }));
-          setLocationListOptions(formatted);
-          const filterLocation = formatted.filter(
-            (item) => item.label === "Lavale",
-          );
-          setValue("location", filterLocation[0]);
-        }
-      })
-      .catch((error) => console.error(error));
-  }, [setValue]);
-
-  useEffect(() => {
-    if (locationValue?.id > 0) {
-      getClinicList(locationValue?.id)
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setClinicOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.clinicid,
-                value: item.clinicid,
-                label: item.clinicName,
-              })),
-            );
-          }
-        })
-        .catch((err) => console.log(err.message));
-    }
-  }, [locationValue]);
-
-  useEffect(() => {
-    if (clinicsOptions?.length > 0) {
-      const filterClinic = clinicsOptions.filter(
-        (item) => item.label === "Swagram Community",
-      );
-      setValue("clinicFid", filterClinic[0]);
-    }
-  }, [clinicsOptions, setValue]);
-
-  useEffect(() => {
-    setValue("doctorFid", null);
-    setDoctorSlots([]);
     setSelectedTimeSlot(null);
     setSlotError("");
-
-    getDoctorsByClinicId(5)
-      .then((res) => {
-        const data = res?.data?.data;
-        if (data?.length) {
-          const formatted = data.map((item) => ({
-            ...item,
-            id: item.userId,
-            value: item.userId,
-            label: `${item.firstName} ${item.lName}`,
-          }));
-          setDoctorOptions(formatted);
-          if (formatted.length > 0) {
-            setValue("doctorFid", formatted[0]);
-          }
-        }
-      })
-      .catch((error) => console.error(error));
-
     getServicesByClinicId(5)
       .then((res) => {
         const data = res?.data?.data;
@@ -281,29 +196,42 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
           const data = res?.data?.data || [];
-          const filterData = data.find((item) => String(item.userId) === String(user?.userId));
-          
-          if (data.length > 0) {
-            setPatientOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.userId,
-                value: item.userId,
-                label: `${item.firstName} ${item.lastName}`,
-              })),
-            );
-          }
-
+          const filterData = data.find(
+            (item) => String(item.userId) === String(user?.userId),
+          );
           if (filterData) {
-            setValue("fullName", `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(), { shouldValidate: true, shouldDirty: true });
-            setValue("email", filterData.emailId || "", { shouldValidate: true, shouldDirty: true });
-            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true, shouldDirty: true });
-            setValue("city", filterData.city || "", { shouldValidate: true, shouldDirty: true });
+            setValue(
+              "fullName",
+              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+              { shouldValidate: true, shouldDirty: true },
+            );
+            setValue("email", filterData.emailId || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("mobile", String(filterData.mobileNo || ""), {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("city", filterData.city || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           } else if (user) {
-            console.log("Using user context fallback");
-            setValue("fullName", `${user.firstName || ""} ${user.lastName || ""}`.trim(), { shouldValidate: true, shouldDirty: true });
-            setValue("email", user.emailId || "", { shouldValidate: true, shouldDirty: true });
-            setValue("mobile", String(user.mobileNo || ""), { shouldValidate: true, shouldDirty: true });
+
+            setValue(
+              "fullName",
+              `${user.firstName || ""} ${user.lastName || ""}`.trim(),
+              { shouldValidate: true, shouldDirty: true },
+            );
+            setValue("email", user.emailId || "", {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            setValue("mobile", String(user.mobileNo || ""), {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
           }
         })
         .catch((error) => console.error(error));
@@ -330,14 +258,13 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   }, [servicesOptions, therapy, setValue]);
 
   useEffect(() => {
-    if (doctorValue?.id && fromDate && clinicFidValue?.id) {
+    if (user?.userId && fromDate) {
       setSelectedTimeSlot(null);
       setSlotError("");
       setLoading(true);
-      getDoctorAvailableSlots(
-        doctorValue.id,
+      GetNatureTherapySlotsByUser(
+        user.userId,
         format(new Date(fromDate), "yyyy-MM-dd"),
-        clinicFidValue.id,
       )
         .then((res) => {
           const data = res?.data?.data;
@@ -353,7 +280,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       setDoctorSlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [doctorValue?.id, fromDate, clinicFidValue]);
+  }, [user?.userId, fromDate]);
 
   const onSubmit = (data) => {
     if (!selectedTimeSlot) {
@@ -362,22 +289,81 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     }
     setSlotError("");
     const saveObj = {
-      ...data,
-      slotStartTime: selectedTimeSlot?.slotStartTime,
-      slotEndTime: selectedTimeSlot?.slotEndTime,
-      therapyName: therapy?.nameEnglish,
-      appointmentDate: format(new Date(data.fromDate), "yyyy-MM-dd"),
+      userId: user?.userId || null,
+      TherapyName: therapy?.nameEnglish,
+      PatientName: data.fullName,
+      Mobile: data.mobile,
+      City: data.city,
+      email: data.email,
+      Appointmentdate: format(new Date(data.fromDate), "yyyy-MM-dd"),
+      slotTime: selectedTimeSlot?.slotStartTime,
+      No_of_person: data.noOfPerson,
+      SpecificRequest: data.specialRequest,
+      Amount: watch("totalAmount"),
     };
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
 
-  const handleConfirmBooking = () => {
-    console.log("Nature Therapy Booking Confirmed:", formData);
-    // Here you would typically call your booking service
-    setOpenConfirmation(false);
-    reset();
-    handleClose();
+  const handleConfirmBooking = async () => {
+    if (isPaymentPending || !formData) return;
+    try {
+      setIsLoading(true);
+      const bookingRes = await BookNatureTherapy(formData);
+      const bookingData = bookingRes?.data;
+
+      if (bookingData?.message) {
+        const bookingId = bookingData?.bookingId || bookingData?.data;
+
+        const tempObj = {
+          amount: formData.Amount,
+          appointmentDate: formData.Appointmentdate,
+          SloteStartTime: formData.slotTime,
+          SloteEndTime: formData.slotTime,
+          userId: user?.userId,
+          paymentFor: "NatureTherapyBooking",
+          bookingId: bookingId,
+        };
+
+        const res = await InitiatePayment(null, user?.userId, tempObj);
+        const data = res?.data;
+
+        if (data?.status === 200) {
+          setIsLoading(false);
+          setIsPaymentPending(true);
+
+          RedirectToSabPaisa(
+            data,
+            null,
+            data.clientTxnId,
+            async () => {
+              successAlert(bookingData.message);
+              setOpenConfirmation(false);
+              setIsPaymentPending(false);
+              reset();
+              handleClose();
+            },
+            (errorStatus) => {
+              const msg =
+                errorStatus?.message || "Payment failed or cancelled.";
+              errorAlert(msg);
+              setOpenConfirmation(false);
+              setIsPaymentPending(false);
+            },
+          );
+        } else {
+          setIsLoading(false);
+          errorAlert(data?.message || "Failed to initiate payment");
+        }
+      } else {
+        setIsLoading(false);
+        errorAlert(bookingData?.message || "Booking failed");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      errorAlert("An unexpected error occurred during the booking process.");
+      console.error(error);
+    }
   };
 
   return (
@@ -565,9 +551,9 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                                 <div className="flex flex-col items-center justify-center h-40 text-center p-4 bg-slate-50 rounded-[9px] border border-dashed border-slate-200">
                                   <Clock className="w-8 h-8 text-slate-300 mb-2" />
                                   <p className="text-[10px] text-slate-500 font-medium">
-                                    {doctorValue && fromDate
+                                    {fromDate
                                       ? "No slots available for this date"
-                                      : "Select therapist and date to view slots"}
+                                      : "Select date to view available slots"}
                                   </p>
                                 </div>
                               )}
@@ -601,7 +587,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                                 </span>
                                 <span>x {watch("noOfPerson")}</span>
                               </div>
-                                      <div className="flex justify-between text-xs font-medium">
+                              <div className="flex justify-between text-xs font-medium">
                                 <span className="text-emerald-300">
                                   GST & TC
                                 </span>

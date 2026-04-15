@@ -65,9 +65,13 @@ function StayBookingModal({
   handleGetRoomList,
 }) {
   const [checkIn, setCheckIn] = useState(null);
-  const [checkInTime, setCheckInTime] = useState(format(new Date(), "HH:mm"));
+  const [checkInTime, setCheckInTime] = useState(
+    format(new Date(), "HH:mm:ss"),
+  );
   const [checkOut, setCheckOut] = useState(null);
-  const [checkOutTime, setCheckOutTime] = useState(format(new Date(), "HH:mm"));
+  const [checkOutTime, setCheckOutTime] = useState(
+    format(new Date(), "HH:mm:ss"),
+  );
 
   const [inTimeAnchorEl, setInTimeAnchorEl] = useState(null);
   const [outTimeAnchorEl, setOutTimeAnchorEl] = useState(null);
@@ -107,7 +111,7 @@ function StayBookingModal({
   const outTimeRef = useRef(null);
   const guestInputRef = useRef(null);
 
-  const { control, watch, setValue,reset } = useForm({
+  const { control, watch, setValue, reset } = useForm({
     defaultValues: {
       fullName: "",
       email: "",
@@ -269,6 +273,9 @@ function StayBookingModal({
     checkRoomAvailability(
       selectedService.roomTypeId,
       format(new Date(checkIn), "yyyy-MM-dd"),
+      checkInTime,
+      format(new Date(checkOut), "yyyy-MM-dd"),
+      checkOutTime,
     )
       .then((res) => {
         setRoomStatus(res.data);
@@ -279,14 +286,16 @@ function StayBookingModal({
         setIsSearching(false);
       });
   };
+  console.log("selectedService", selectedService);
 
   const handleConfirmBooking = () => {
     const saveObj = {
       userId: user?.userId || 1,
-      resortId: null,
+      resortId: 1,
       roomTypeId: selectedService.roomTypeId,
-      stayType: "Seperate",
+      stayType: selectedService?.maxOcc === 1 ? "Seperate" : "Double",
       checkInDate: format(new Date(checkIn), "yyyy-MM-dd"),
+      CheckoutDate: format(new Date(checkOut), "yyyy-MM-dd"),
       checkInTime: checkInTime,
       checkOutTime: checkOutTime,
       noOfPersons: guests.adults,
@@ -296,7 +305,7 @@ function StayBookingModal({
       totalAmount: costs.total,
       guestFullName: formValues.fullName,
       emailId: formValues.email,
-      mobile: formValues.mobile,
+      mobile: String(formValues.mobile),
       city: formValues.city,
     };
 
@@ -305,6 +314,7 @@ function StayBookingModal({
   };
 
   const initiateBookingPayment = async () => {
+    if (isPaymentPending) return;
     try {
       const userId = user?.userId || 1;
       const clinicId = 5;
@@ -313,9 +323,10 @@ function StayBookingModal({
 
       const bookingRes = await wellnessStayBooking(finalSaveObj);
       const bookingData = bookingRes?.data;
+      console.log("bookingData", bookingData);
 
-      if (bookingData?.status === 200) {
-        const bookingId = bookingData?.data?.id || bookingData?.bookingId || "";
+      if (bookingData?.message) {
+        const bookingId = bookingData?.data;
 
         const tempObj = {
           amount: costs.total,
@@ -327,7 +338,7 @@ function StayBookingModal({
           bookingId: bookingId,
         };
 
-        const res = await InitiatePayment(clinicId, userId, tempObj);
+        const res = await InitiatePayment(null, userId, tempObj);
         const data = res?.data;
 
         if (data?.status === 200) {
@@ -336,7 +347,7 @@ function StayBookingModal({
 
           cancelPaymentRef.current = RedirectToSabPaisa(
             data,
-            clinicId,
+            null,
             data.clientTxnId,
             async () => {
               successAlert(bookingData.message || "Booking Successful!");
@@ -654,8 +665,10 @@ function StayBookingModal({
                     </div>
                     <div className="p-2">
                       <TimeClock
-                        value={parse(checkInTime, "HH:mm", new Date())}
-                        onChange={(val) => setCheckInTime(format(val, "HH:mm"))}
+                        value={parse(checkInTime, "HH:mm:ss", new Date())}
+                        onChange={(val) =>
+                          setCheckInTime(format(val, "HH:mm:ss"))
+                        }
                         ampm={false}
                         sx={{
                           "& .MuiClock-pin": { backgroundColor: "#263d21" },
@@ -710,9 +723,9 @@ function StayBookingModal({
                     </div>
                     <div className="p-2">
                       <TimeClock
-                        value={parse(checkOutTime, "HH:mm", new Date())}
+                        value={parse(checkOutTime, "HH:mm:ss", new Date())}
                         onChange={(val) =>
-                          setCheckOutTime(format(val, "HH:mm"))
+                          setCheckOutTime(format(val, "HH:mm:ss"))
                         }
                         ampm={false}
                         sx={{
@@ -1386,7 +1399,7 @@ function StayBookingModal({
                     }
                     label={"Book Now"}
                     onClick={handleConfirmBooking}
-                    className={`w-full py-3.5 rounded-[5px] font-bold text-sm transition-all active:scale-[0.98] uppercase tracking-widest ${
+                    className={`w-full  text-sm transition-all active:scale-[0.98] uppercase tracking-widest ${
                       selectedService &&
                       checkIn &&
                       checkOut &&
@@ -1456,6 +1469,7 @@ function StayBookingModal({
         confirmationButtonMsg={
           isPaymentPending ? "Waiting..." : "Confirm & Pay"
         }
+        disabled={isPaymentPending}
       />
     </>
   );

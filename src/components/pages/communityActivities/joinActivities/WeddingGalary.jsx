@@ -46,21 +46,21 @@ const maharashtrianWeddings = {
           photos: [
             {
               id: "h1",
-              url: "https://www.bollywoodshaadis.com/img/article-2021410116461460374000.JPG",
+              url: "https://www.bollywoodshaadis.com/img/article-2021410116461460374000.webp",
               title: "हळदी विधी",
               sanskrit: "हरिद्रा-संस्कारः",
               desc: "महाराष्ट्रीयन हळदी विधी",
             },
             {
               id: "h2",
-              url: "https://marathaheritage.com/wp-content/uploads/2024/07/haldi-blog-1024x628.jpg",
+              url: "https://marathaheritage.com/wp-content/uploads/2024/07/haldi-blog-1024x628.webp",
               title: "वधू तयारी",
               sanskrit: "कन्या-सज्जीकरणम्",
               desc: "नऊवारी साडीतील वधू",
             },
             {
               id: "h3",
-              url: "https://images.timesnowhindi.com/photo/msid-153197475/153197475.jpg",
+              url: "https://images.timesnowhindi.com/photo/msid-153197475/153197475.webp",
               title: "मेहंदी रचना",
               sanskrit: "मेहेन्दी-अलङ्कारः",
               desc: "भारतीय मेहंदी डिझाइन",
@@ -75,21 +75,21 @@ const maharashtrianWeddings = {
           photos: [
             {
               id: "c1",
-              url: "https://img.freepik.com/free-photo/amazing-look-traditional-ritual-with-fire_8353-10619.jpg?t=st=1768561801~exp=1768565401~hmac=7a228c0f45b7da49abc6f23f6e132a82d7199d9c1441a8ef6b3a29f1c071bb74&w=1480",
+              url: "https://img.freepik.com/free-photo/amazing-look-traditional-ritual-with-fire_8353-10619.webp?t=st=1768561801~exp=1768565401~hmac=7a228c0f45b7da49abc6f23f6e132a82d7199d9c1441a8ef6b3a29f1c071bb74&w=1480",
               title: "सप्तपदी",
               sanskrit: "सप्तपदी-गमनम्",
               desc: "सप्तपदी विवाह विधी",
             },
             {
               id: "c2",
-              url: "https://t3.ftcdn.net/jpg/06/70/05/62/240_F_670056298_iXoXdsldwX0R21jTpxbBq0p7Xnyh3Gkg.jpg",
+              url: "https://t3.ftcdn.net/jpg/06/70/05/62/240_F_670056298_iXoXdsldwX0R21jTpxbBq0p7Xnyh3Gkg.webp",
               title: "मंगलसूत्र",
               sanskrit: "मङ्गलसूत्र-धारणम्",
               desc: "मंगलसूत्र विधी",
             },
             {
               id: "c3",
-              url: "https://i.pinimg.com/1200x/3d/d6/ac/3dd6accc0302ef879b9aee973907f3ee.jpg",
+              url: "https://i.pinimg.com/1200x/3d/d6/ac/3dd6accc0302ef879b9aee973907f3ee.webp",
               title: "वरमाला",
               sanskrit: "वरमाला-आदानम्",
               desc: "वरमाला देवाणघेवाण",
@@ -104,21 +104,21 @@ const maharashtrianWeddings = {
           photos: [
             {
               id: "p1",
-              url: "https://i.pinimg.com/736x/7d/2d/12/7d2d12169b96ab6901b90e871c07cbcf.jpg",
+              url: "https://i.pinimg.com/736x/7d/2d/12/7d2d12169b96ab6901b90e871c07cbcf.webp",
               title: "प्रेमळ क्षण",
               sanskrit: "प्रेम-क्षणः",
               desc: "महाराष्ट्रीयन विवाह जोडपे",
             },
             {
               id: "p2",
-              url: "https://i.pinimg.com/474x/31/2d/1e/312d1eb27f5ee4d5b12ab5291ba8efcc.jpg",
+              url: "https://i.pinimg.com/474x/31/2d/1e/312d1eb27f5ee4d5b12ab5291ba8efcc.webp",
               title: "पारंपरिक पोशाख",
               sanskrit: "पारम्परिक-वेषः",
               desc: "नऊवारी व पेशवाई पगडी",
             },
             {
               id: "p3",
-              url: "https://i.pinimg.com/736x/c9/62/af/c962af1118ca04572f1ceb86e6265492.jpg",
+              url: "https://i.pinimg.com/736x/c9/62/af/c962af1118ca04572f1ceb86e6265492.webp",
               title: "आशीर्वाद",
               sanskrit: "आशीर्वादः",
               desc: "कुटुंबीयांचे आशीर्वाद",

@@ -123,7 +123,7 @@ const MembershipRegistrationModal = ({
   if (!membershipDetails) return null;
 
   return (
-    <Modal open={open} onClose={handleClose} closeAfterTransition>
+    <Modal open={open} >
       <Box
         sx={{
           position: "absolute",
@@ -151,22 +151,31 @@ const MembershipRegistrationModal = ({
                   <p className="text-white/80 text-sm sm:text-lg font-semibold">
                     {membershipDetails?.serviceName} (
                     {membershipDetails?.membershipNameHi ||
-                      membershipDetails?.nameHindi}
+                      membershipDetails?.nameHindi ||
+                      membershipDetails?.programmeNameHindi ||
+                      membershipDetails?.season}
                     )
-                  </p>
+                  </p>      
 
                   <p className="text-white/80 text-xs sm:text-sm font-medium">
-                    {membershipDetails?.benifits !== undefined && (
-                      <span className="border rounded-full py-0.5 border-green-400 bg-green-100 text-green-700 px-3 text-[10px">
-                        {(membershipDetails?.benifits?.length || 0) === 1
+                    {(membershipDetails?.benifits || membershipDetails?.info) !==
+                      undefined && (
+                      <span className="border rounded-full py-0.5 border-green-400 bg-green-100 text-green-700 px-3 text-[10px]">
+                        {(membershipDetails?.benifits?.length ||
+                          membershipDetails?.info?.length ||
+                          0) === 1
                           ? "Individual"
                           : "Per Person"}
                       </span>
                     )}
                     &nbsp;
-                    <span>₹ {membershipDetails?.price}</span>{" "}
-                    {membershipDetails?.duration !== undefined ? "/ " : ""}
-                    {membershipDetails?.duration}
+                    <span>₹ {membershipDetails?.price?.toLocaleString("en-IN")}</span>{" "}
+                    {(membershipDetails?.duration ||
+                      membershipDetails?.durationRange) !== undefined
+                      ? "/ "
+                      : ""}
+                    {membershipDetails?.duration ||
+                      membershipDetails?.durationRange}
                   </p>
                 </div>
               </div>
@@ -288,7 +297,7 @@ const MembershipRegistrationModal = ({
                     <CheckBoxField
                       control={control}
                       name="termsAccepted"
-                      label="I agree  to be contacted by rhe Swagarama Community team regarding this membership enquiry and wellness updates."
+                      label="I agree  to be contacted by the Swagarama Community team regarding this membership enquiry and wellness updates."
                       error={errors.termsAccepted}
                     />
                   </div>

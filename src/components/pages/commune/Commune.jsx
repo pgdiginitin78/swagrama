@@ -15,7 +15,7 @@ import {
   Timer,
 } from "lucide-react";
 import { useState } from "react";
-import OPDBookingModal from "../opdBooking/OPDBookingModal";
+import MembershipRegistrationModal from "../membership/communityMembership/MembershipRegistrationModal";
 
 const academyData = [
   {
@@ -26,7 +26,7 @@ const academyData = [
     price: "1,26,000",
     Icon: Sun,
     iconColor: "text-amber-600",
-    img: "https://img.freepik.com/free-photo/flourishing-vegetation-sunny-day_1160-201.jpg?t=st=1768223043~exp=1768226643~hmac=07e8e4536ea16c407748ecd3edd5f66dadbae34b1f4a57c2ffa456c4d2efa312&w=1480",
+    img: "https://img.freepik.com/free-photo/flourishing-vegetation-sunny-day_1160-201.webp?t=st=1768223043~exp=1768226643~hmac=07e8e4536ea16c407748ecd3edd5f66dadbae34b1f4a57c2ffa456c4d2efa312&w=1480",
     gradient: "from-green-700 via-emerald-600 to-lime-500",
     bgGlow: "rgba(251, 146, 60, 0.2)",
   },
@@ -38,7 +38,7 @@ const academyData = [
     price: "1,26,000",
     Icon: Droplets,
     iconColor: "text-emerald-600",
-    img: "https://img.freepik.com/free-photo/cloud-forest-landscape_23-2151794773.jpg?t=st=1768222647~exp=1768226247~hmac=289584922ca6e8557f428047a09912654ee65a617214e0843ecf7d6703e3f3ee&w=1480",
+    img: "https://img.freepik.com/free-photo/cloud-forest-landscape_23-2151794773.webp?t=st=1768222647~exp=1768226247~hmac=289584922ca6e8557f428047a09912654ee65a617214e0843ecf7d6703e3f3ee&w=1480",
     gradient: "from-green-700 via-emerald-600 to-lime-500",
     bgGlow: "rgba(16, 185, 129, 0.2)",
   },
@@ -51,24 +51,11 @@ const academyData = [
     price: "1,26,000",
     Icon: Snowflake,
     iconColor: "text-green-600",
-    img: "https://img.freepik.com/free-photo/beautiful-forest-winter_23-2147741925.jpg?t=st=1768222925~exp=1768226525~hmac=980113d34c2c3d608ca57dcad5f55e70abb65fd7e24eb3ce16296e69b6d9ed90&w=1480",
+    img: "https://img.freepik.com/free-photo/beautiful-forest-winter_23-2147741925.webp?t=st=1768222925~exp=1768226525~hmac=980113d34c2c3d608ca57dcad5f55e70abb65fd7e24eb3ce16296e69b6d9ed90&w=1480",
     gradient: "from-green-700 via-emerald-600 to-lime-500",
     bgGlow: "rgba(96, 165, 250, 0.2)",
   },
 ];
-
-export default function CommuneTabs() {
-  const [innocenceAcademyDays, setInnocenceAcademyDays] = useState(0);
-  const [liberatedAcademyDays, setLiberatedAcademyDays] = useState(0);
-  const [selectedService, setSelectedService] = useState(null);
-  const [openAppointementModal, setOpenAppointmentModal] = useState(false);
-  const innocenceAcademyPricePerDay = 2000;
-  const liberatedAcademyPricePerDay = 2500;
-
-  const calculateInnocenceAcademyTotal = () =>
-    innocenceAcademyDays * innocenceAcademyPricePerDay;
-  const calculateLiberatedAcademyTotal = () =>
-    liberatedAcademyDays * liberatedAcademyPricePerDay;
 
   const academyProgrammes = [
     {
@@ -77,8 +64,8 @@ export default function CommuneTabs() {
       programmeNameHindi: "स्वमुग्धविहार",
       durationRange: "0 to N days",
       eligibilityCriteria: "Gurukul Students",
-      selectedDays: innocenceAcademyDays,
-      pricePerDay: innocenceAcademyPricePerDay,
+
+      pricePerDay: 2000,
       tagline:
         "Customized short-term stays for those who have completed 3S स्वऋतुविहार / Seasonal Academy and wish to extend their experience",
       info: [
@@ -99,14 +86,11 @@ export default function CommuneTabs() {
           desc: "Contribute as a volunteer while staying.",
         },
       ],
-      totalPrice: calculateInnocenceAcademyTotal(),
-      price: calculateInnocenceAcademyTotal(),
+      price: 2000,
       gradient: "from-green-600 via-lime-600 to-lime-700",
       accentColor: "#65a30d",
       lightBg: "bg-lime-100",
-      onIncrement: () => setInnocenceAcademyDays((prev) => prev + 1),
-      onDecrement: () =>
-        setInnocenceAcademyDays((prev) => (prev > 1 ? prev - 1 : 0)),
+
     },
     {
       programmeId: 2,
@@ -114,24 +98,26 @@ export default function CommuneTabs() {
       programmeNameHindi: "निर्मुक्तविहार",
       durationRange: "0 to N days",
       eligibilityCriteria: "Anyone",
-      selectedDays: liberatedAcademyDays,
-      pricePerDay: liberatedAcademyPricePerDay,
+      pricePerDay: 2500,
       info: [
         "No projects or courses.",
         "Experience lifestyle freely, 365 days a year.",
         "Ideal for those seeking solitude, self-study, or work-from-home experience.",
         "Focus on calm, quiet living and personal growth through स्वग्राम.",
       ],
-      totalPrice: calculateLiberatedAcademyTotal(),
-      price: calculateLiberatedAcademyTotal(),
+      price: 2500,
       gradient: "from-[#882E2E] via-[#a03838] to-[#b84242]",
       accentColor: "#882E2E",
       lightBg: "bg-[#882E2E]/5",
-      onIncrement: () => setLiberatedAcademyDays((prev) => prev + 1),
-      onDecrement: () =>
-        setLiberatedAcademyDays((prev) => (prev > 1 ? prev - 1 : 0)),
+
     },
   ];
+
+export default function CommuneTabs() {
+  const [selectedService, setSelectedService] = useState(null);
+  const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-amber-50 to-teal-50 relative overflow-hidden md:px-12">
@@ -198,13 +184,16 @@ export default function CommuneTabs() {
                 village-based ecosystems rooted in Indian traditions. Our vision
                 is to help revive India’s strength as a nation of self-reliant
                 villages.
-                <p>With this purpose, we have launched the   <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg text-white font-bold text-base shadow-lg">
-                  'हर ग्राम स्वग्राम'
-                </span>
-                &nbsp; campaign. To support this movement and turn the vision
-                into reality, we have established the<br/>
-                <strong> Swagram Academy.</strong></p>
-              
+                <p>
+                  With this purpose, we have launched the{" "}
+                  <span className="inline-block px-3 py-1 bg-gradient-to-r from-green-500 to-lime-500 rounded-lg text-white font-bold text-base shadow-lg">
+                    'हर ग्राम स्वग्राम'
+                  </span>
+                  &nbsp; campaign. To support this movement and turn the vision
+                  into reality, we have established the
+                  <br />
+                  <strong> Swagram Academy.</strong>
+                </p>
               </p>
             </div>
           </div>
@@ -294,7 +283,7 @@ export default function CommuneTabs() {
                           type="button"
                           onClick={() => {
                             setSelectedService(item);
-                            setOpenAppointmentModal(true);
+                            setOpenEnquiryModal(true);
                           }}
                           className={`w-full sm:w-auto px-4 sm:px-5 py-2 bg-gradient-to-r ${item.gradient} rounded-lg text-white text-sm font-bold shadow-lg transform transition-all duration-300 hover:scale-105 active:scale-95`}
                         >
@@ -366,7 +355,6 @@ export default function CommuneTabs() {
                           </p>
                         </div>
                       </div>
-                
                     </div>
                   </div>
                 </div>
@@ -504,47 +492,7 @@ export default function CommuneTabs() {
                         )}
                     </div>
                   </div>
-                  <div className="relative overflow-hidden rounded-xl border border-gray-200/70 shadow-lg">
-                    <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-white/95"></div>
-                    <div className="relative p-3">
-                      <p className="text-xs text-gray-700 font-bold mb-3 text-center uppercase tracking-wider">
-                        Select Number of Days
-                      </p>
-                      <div className="flex items-center justify-center gap-4">
-                        <button
-                          onClick={programme.onDecrement}
-                          className={`relative w-10 h-10 rounded-xl bg-gradient-to-br ${programme.gradient} text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 transition-all duration-300 overflow-hidden group/btn`}
-                        >
-                          <div className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/20 transition-colors duration-300"></div>
-                          <RemoveSharp className="relative w-4 h-4 mx-auto" />
-                        </button>
 
-                        <div className="text-center min-w-[60px] relative">
-                          <div
-                            className="absolute inset-0 blur-xl opacity-20"
-                            style={{ backgroundColor: programme.accentColor }}
-                          ></div>
-                          <div
-                            className="relative text-4xl font-black tracking-tighter"
-                            style={{ color: programme.accentColor }}
-                          >
-                            {programme.selectedDays}
-                          </div>
-                          <div className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-0.5">
-                            {programme.selectedDays === 1 ? "Day" : "Days"}
-                          </div>
-                        </div>
-
-                        <button
-                          onClick={programme.onIncrement}
-                          className={`relative w-10 h-10 rounded-xl bg-gradient-to-br ${programme.gradient} text-white font-bold shadow-lg hover:shadow-xl transform hover:scale-110 active:scale-95 transition-all duration-300 overflow-hidden group/btn`}
-                        >
-                          <div className="absolute inset-0 bg-white/0 group-hover/btn:bg-white/20 transition-colors duration-300"></div>
-                          <AddSharp className="relative w-4 h-4 mx-auto" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
                   <div
                     className="relative overflow-hidden rounded-xl border-2 shadow-lg"
                     style={{ borderColor: `${programme.accentColor}30` }}
@@ -591,43 +539,22 @@ export default function CommuneTabs() {
                           ₹{programme.pricePerDay.toLocaleString("en-IN")}
                         </p>
                       </div>
-
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-black text-gray-900 uppercase tracking-wide">
-                            Total Amount
-                          </p>
-                          <p className="text-xs text-gray-500 font-medium">
-                            कुल शुल्क • {programme.selectedDays}
-                            {programme.selectedDays === 1 ? "day" : "days"}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className="text-3xl font-black tracking-tighter"
-                            style={{ color: programme.accentColor }}
-                          >
-                            ₹{programme.totalPrice.toLocaleString("en-IN")}
-                          </p>
-                        </div>
-                      </div>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => {
                       setSelectedService(programme);
-                      setOpenAppointmentModal(true);
+                      setOpenEnquiryModal(true);
                     }}
                     className={`relative w-full py-3 bg-gradient-to-r ${programme.gradient} rounded-xl text-white font-black text-sm shadow-xl transform hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 overflow-hidden group/cta`}
-                  >                    
+                  >
                     <div
                       className="absolute inset-0 opacity-0 group-hover/cta:opacity-100 transition-opacity duration-500 blur-xl"
                       style={{ backgroundColor: programme.accentColor }}
                     ></div>
                     <span className="relative flex items-center justify-center gap-2 uppercase tracking-wider">
                       Book Programme Now
-                 
                     </span>
                   </button>
                 </div>
@@ -696,132 +623,15 @@ export default function CommuneTabs() {
         }
       `}</style>
 
-      <style jsx>{`
-        @keyframes slideInScale {
-          from {
-            opacity: 0;
-            transform: translateY(30px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
 
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes shimmer {
-          0%,
-          100% {
-            opacity: 0.3;
-          }
-          50% {
-            opacity: 0.8;
-          }
-        }
-
-        @keyframes pulse-slow {
-          0%,
-          100% {
-            opacity: 0.2;
-          }
-          50% {
-            opacity: 0.4;
-          }
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}</style>
-
-      <style jsx>{`
-        @keyframes slideInScale {
-          from {
-            opacity: 0;
-            transform: translateY(30px) scale(0.95);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes fadeInLeft {
-          from {
-            opacity: 0;
-            transform: translateX(-15px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-
-        @keyframes shimmer {
-          0%,
-          100% {
-            opacity: 0.3;
-          }
-          50% {
-            opacity: 0.8;
-          }
-        }
-
-        @keyframes pulse-slow {
-          0%,
-          100% {
-            opacity: 0.2;
-          }
-          50% {
-            opacity: 0.4;
-          }
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-      `}</style>
-
-      {openAppointementModal && (
-        <OPDBookingModal
-          open={openAppointementModal}
+      {openEnquiryModal && (
+        <MembershipRegistrationModal
+          open={openEnquiryModal}
           handleClose={() => {
-            setOpenAppointmentModal(false);
+            setOpenEnquiryModal(false);
             setSelectedService(null);
           }}
-          selectedService={selectedService}
+          membershipDetails={selectedService}
         />
       )}
       <style>{`

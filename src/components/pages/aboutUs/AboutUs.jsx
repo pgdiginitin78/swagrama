@@ -1,15 +1,15 @@
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
 import { ArrowRight, Award, Briefcase, User } from "lucide-react";
 import { useRef, useState } from "react";
-import heroImage from "../../assets/landing-page/aboutUs/hero-swagrama.jpg";
-import farmImage from "../../assets/landing-page/aboutUs/organic-farm.jpg";
-import wellnessImage from "../../assets/landing-page/aboutUs/wellness-center.jpg";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
-import PradipTaware from "../../assets/landing-page/ourexperts/PradipTaware.jpg";
-import SandipMehetre from "../../assets/landing-page/ourexperts/SandipMahetre.jpg";
-import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
-import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
-import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.jpg";
+import heroImage from "../../assets/landing-page/aboutUs/hero-swagrama.webp";
+import farmImage from "../../assets/landing-page/aboutUs/organic-farm.webp";
+import wellnessImage from "../../assets/landing-page/aboutUs/wellness-center.webp";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
+import PradipTaware from "../../assets/landing-page/ourexperts/PradipTaware.webp";
+import SandipMehetre from "../../assets/landing-page/ourexperts/SandipMahetre.webp";
+import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
+import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
+import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
 import {
   Hospital,
   BookOpen,

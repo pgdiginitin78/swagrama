@@ -32,20 +32,20 @@ import {
 import { AnimatePresence, motion, useInView } from "framer-motion";
 import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AgroWellness from "../assets/landing-page/ayurvedaservices/Agro_wellness.png";
-import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.png";
-import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.png";
-import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.png";
-import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.png";
+import AgroWellness from "../assets/landing-page/ayurvedaservices/Agro_wellness.webp";
+import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.webp";
+import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.webp";
+import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.webp";
+import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.webp";
 import landigPageS1 from "../assets/landing-page/landigPageS1.webm";
-import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.jpg";
-import PradipTaware from "../assets/landing-page/ourexperts/PradipTaware.jpg";
-import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.jpg";
-import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawanshi.jpg";
-import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.jpg";
-import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.jpg";
-import SwagarmaMainImg from "../assets/landing-page/swagramaMain.png";
-import StoryImg from "../assets/landing-page/topStories/Self-Dependence Village.png";
+import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
+import PradipTaware from "../assets/landing-page/ourexperts/PradipTaware.webp";
+import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.webp";
+import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
+import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.webp";
+import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
+import SwagarmaMainImg from "../assets/landing-page/swagramaMain.webp";
+import StoryImg from "../assets/landing-page/topStories/Self-Dependence Village.webp";
 import CancelButtonModal from "../common/button/CancelButtonModal";
 import { errorAlert } from "../common/toast/CustomToast";
 import BookEventForm from "../pages/bookEventForm/BookEventForm";
@@ -554,9 +554,9 @@ export default function AyurvedaLanding({ userData }) {
           >
             Upcoming Events
             <motion.span
-              className="block h-1 w-24 sm:w-32 bg-gradient-to-r from-green-600 to-lime-500 mt-2 rounded-full"
+              className="block h-1 w-24 sm:w-28 bg-gradient-to-r from-green-600 to-lime-500 mt-2 rounded-full"
               initial={{ width: 0 }}
-              whileInView={{ width: "19rem" }}
+              whileInView={{ width: "16rem" }}
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.8 }}
             />

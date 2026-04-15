@@ -62,18 +62,18 @@ function TermCard({ term, index }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 5 }}>
           <span style={{
-            fontFamily: "'DM Sans',sans-serif", fontSize: 9, fontWeight: 700,
+            fontFamily: "Inter, sans-serif", fontSize: 9, fontWeight: 700,
             letterSpacing: "0.2em", color: accent, textTransform: "uppercase",
           }}>§ {term.id}</span>
           <div style={{ flex: 1, height: 1, background: "rgba(0,0,0,0.06)" }} />
         </div>
         <h3 style={{
-          fontFamily: "'Fraunces',Georgia,serif",
+          fontFamily: "Inter, sans-serif",
           fontSize: "clamp(13.5px,1.45vw,15px)", fontWeight: 700,
           color: "#1c0a00", margin: "0 0 6px", lineHeight: 1.3,
         }}>{term.title}</h3>
         <p style={{
-          fontFamily: "'DM Sans',sans-serif",
+          fontFamily: "Inter, sans-serif",
           fontSize: "clamp(12.5px,1.25vw,13.5px)",
           lineHeight: 1.72, color: "#7a4e18", margin: 0,
         }}>{term.body}</p>
@@ -121,7 +121,6 @@ export default function TermsAndCondition() {
   return (
     <div style={{ minHeight: "100vh", background: "#f9f6ef" }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
         *,*::before,*::after{box-sizing:border-box;}
         html{scroll-behavior:smooth;}
         body{margin:0;background:#f9f6ef;}
@@ -175,7 +174,7 @@ export default function TermsAndCondition() {
                 <BadgeCheck size={11} color="#84cc16" strokeWidth={2.5} />
                 <span style={{
                   fontSize: 10, fontWeight: 600, color: "#84cc16",
-                  letterSpacing: "0.1em", fontFamily: "'DM Sans',sans-serif",
+                  letterSpacing: "0.1em", fontFamily: "Inter, sans-serif",
                 }}>OFFICIAL PAYMENT TERMS</span>
               </motion.div>
 
@@ -184,7 +183,7 @@ export default function TermsAndCondition() {
                 initial={{ opacity: 0, y: 22 }} animate={heroInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
                 style={{
-                  fontFamily: "'Fraunces',serif",
+                  fontFamily: "Inter, sans-serif",
                   fontSize: "clamp(46px,6.5vw,82px)",
                   fontWeight: 900, lineHeight: 1.0,
                   color: "#fff", margin: "0 0 6px",
@@ -202,7 +201,7 @@ export default function TermsAndCondition() {
                 initial={{ opacity: 0, y: 16 }} animate={heroInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.58, delay: 0.2 }}
                 style={{
-                  fontFamily: "'DM Sans',sans-serif",
+                  fontFamily: "Inter, sans-serif",
                   fontSize: "clamp(13.5px,1.5vw,15.5px)", color: "rgba(255,255,255,0.5)",
                   lineHeight: 1.78, margin: "18px 0 0", maxWidth: 460,
                 }}
@@ -225,7 +224,7 @@ export default function TermsAndCondition() {
               }}
             >
               <div style={{
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 10, fontWeight: 600, color: "#84cc16",
                 letterSpacing: "0.14em", marginBottom: 14,
               }}>DOCUMENT DETAILS</div>
@@ -245,10 +244,10 @@ export default function TermsAndCondition() {
                     borderBottom: i < 3 ? "1px solid rgba(255,255,255,0.06)" : "none",
                   }}
                 >
-                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12.5, color: "rgba(255,255,255,0.38)" }}>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: "rgba(255,255,255,0.38)" }}>
                     {item.l}
                   </span>
-                  <span style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 12.5, color: "#fff", fontWeight: 600 }}>
+                  <span style={{ fontFamily: "Inter, sans-serif", fontSize: 12.5, color: "#fff", fontWeight: 600 }}>
                     {item.v}
                   </span>
                 </motion.div>
@@ -279,7 +278,7 @@ export default function TermsAndCondition() {
                 background: "linear-gradient(180deg,#84cc16,#65a30d)",
               }} />
               <h2 style={{
-                fontFamily: "'Fraunces',serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: "clamp(17px,2.1vw,21px)", fontWeight: 700,
                 color: "#1c0a00", margin: 0,
               }}>Payment Terms</h2>
@@ -287,7 +286,7 @@ export default function TermsAndCondition() {
                 padding: "3px 10px", borderRadius: 100,
                 background: "rgba(132,204,22,0.1)",
                 border: "1px solid rgba(132,204,22,0.25)",
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 11, fontWeight: 600, color: "#65a30d",
               }}>7 clauses</div>
             </motion.div>
@@ -320,10 +319,10 @@ export default function TermsAndCondition() {
                 background: "linear-gradient(135deg,#84cc16,#65a30d)",
                 padding: "15px 18px",
               }}>
-                <div style={{ fontFamily: "'Fraunces',serif", fontSize: 14, fontWeight: 700, color: "#fff" }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 14, fontWeight: 700, color: "#fff" }}>
                   Quick Summary
                 </div>
-                <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: "rgba(255,255,255,0.75)", marginTop: 2 }}>
+                <div style={{ fontFamily: "Inter, sans-serif", fontSize: 11, color: "rgba(255,255,255,0.75)", marginTop: 2 }}>
                   Key points to remember
                 </div>
               </div>
@@ -340,7 +339,7 @@ export default function TermsAndCondition() {
                   <div key={i} style={{ display: "flex", gap: 8, alignItems: "flex-start" }}>
                     <CheckCircle2 size={13} color="#84cc16" strokeWidth={2.5} style={{ flexShrink: 0, marginTop: 2 }} />
                     <span style={{
-                      fontFamily: "'DM Sans',sans-serif",
+                      fontFamily: "Inter, sans-serif",
                       fontSize: 12.5, color: "#5c3a10", lineHeight: 1.48,
                     }}>{pt}</span>
                   </div>
@@ -359,11 +358,11 @@ export default function TermsAndCondition() {
             >
               <Lock size={18} color="#84cc16" strokeWidth={1.9} />
               <div style={{
-                fontFamily: "'Fraunces',serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 13.5, fontWeight: 700, color: "#fff", margin: "9px 0 5px",
               }}>Secured by SabPaisa</div>
               <p style={{
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.6, margin: "0 0 12px",
               }}>
                 All transactions processed through RBI-compliant infrastructure.
@@ -371,7 +370,7 @@ export default function TermsAndCondition() {
               <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
                 {["PCI DSS", "SSL", "256-bit"].map((tag, i) => (
                   <span key={i} style={{
-                    fontFamily: "'DM Sans',sans-serif",
+                    fontFamily: "Inter, sans-serif",
                     fontSize: 10, fontWeight: 600, color: "#84cc16",
                     padding: "3px 9px", borderRadius: 100,
                     background: "rgba(132,204,22,0.1)",
@@ -394,11 +393,11 @@ export default function TermsAndCondition() {
             >
               <Globe size={17} color="#92400e" strokeWidth={1.9} />
               <div style={{
-                fontFamily: "'Fraunces',serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 13.5, fontWeight: 700, color: "#1c0a00", margin: "9px 0 5px",
               }}>Governing Law</div>
               <p style={{
-                fontFamily: "'DM Sans',sans-serif",
+                fontFamily: "Inter, sans-serif",
                 fontSize: 12, color: "#78450f", lineHeight: 1.6, margin: 0,
               }}>
                 Subject to laws of the <strong>Republic of India</strong> and jurisdiction of relevant courts.

@@ -8,13 +8,13 @@ export default function ConfirmationModal({
   confirmationMsg,
   confirmationButtonMsg,
   confirmationLabel,
+  disabled, // Add this
 }) {
   return (
-    <AnimatePresence mode="wait">
+    <>
       {confirmationOpen && (
         <Modal
           open={confirmationOpen}
-          onClose={confirmationHandleClose}
           aria-labelledby="confirmation-modal-title"
           aria-describedby="confirmation-modal-description"
           closeAfterTransition
@@ -119,7 +119,7 @@ export default function ConfirmationModal({
                     className="text-center text-2xl font-semibold mb-3"
                     style={{
                       color: "#212121",
-                      fontFamily: "Georgia, serif",
+                      fontFamily: "'Inter', sans-serif",
                       letterSpacing: "0.5px",
                     }}
                   >
@@ -181,9 +181,10 @@ export default function ConfirmationModal({
 
                     <motion.button
                       type="button"
+                      disabled={disabled}
                       onClick={confirmationSubmitFunc}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
+                      whileHover={disabled ? {} : { scale: 1.02 }}
+                      whileTap={disabled ? {} : { scale: 0.98 }}
                       transition={{
                         duration: 0.2,
                         ease: [0.25, 0.1, 0.25, 1],
@@ -193,24 +194,31 @@ export default function ConfirmationModal({
                         fontSize: "15px",
                         fontWeight: "500",
                         color: "#FFFFFF",
-                        background:
-                          "linear-gradient(135deg,#22c55e 0%,#84cc16 100%)",
+                        background: disabled
+                          ? "#cccccc"
+                          : "linear-gradient(135deg,#22c55e 0%,#84cc16 100%)",
                         border: "none",
                         borderRadius: "8px",
-                        cursor: "pointer",
+                        cursor: disabled ? "not-allowed" : "pointer",
                         minWidth: "120px",
-                        boxShadow: "0 4px 12px rgba(25, 118, 210, 0.3)",
+                        boxShadow: disabled
+                          ? "none"
+                          : "0 4px 12px rgba(25, 118, 210, 0.3)",
                         transition:
-                          "box-shadow 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)",
+                          "all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1)",
                         willChange: "transform",
                       }}
                       onMouseEnter={(e) => {
-                        e.target.style.boxShadow =
-                          "0 6px 16px rgba(25, 118, 210, 0.4)";
+                        if (!disabled) {
+                          e.target.style.boxShadow =
+                            "0 6px 16px rgba(25, 118, 210, 0.4)";
+                        }
                       }}
                       onMouseLeave={(e) => {
-                        e.target.style.boxShadow =
-                          "0 4px 12px rgba(25, 118, 210, 0.3)";
+                        if (!disabled) {
+                          e.target.style.boxShadow =
+                            "0 4px 12px rgba(25, 118, 210, 0.3)";
+                        }
                       }}
                     >
                       {confirmationButtonMsg}
@@ -222,6 +230,6 @@ export default function ConfirmationModal({
           </Box>
         </Modal>
       )}
-    </AnimatePresence>
+    </>
   );
 }

@@ -96,9 +96,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails }) => {
   const termsAccepted = watch("termsAccepted");
 
   // Price Calculation Logic
-  const getNumericPrice = (priceStr) => {
-    if (!priceStr || priceStr === "Free") return 0;
-    return parseInt(priceStr.replace(/[^0-9]/g, "")) || 0;
+  const getNumericPrice = (priceVal) => {
+    if (!priceVal || priceVal === "Free") return 0;
+    if (typeof priceVal === "number") return priceVal;
+    return parseInt(priceVal.toString().replace(/[^0-9]/g, "")) || 0;
   };
 
   const basePrice = getNumericPrice(serviceDetails?.price);

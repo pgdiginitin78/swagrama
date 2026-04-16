@@ -7,7 +7,12 @@ import Navbar from "./components/navbar/Navbar";
 import { useAuth } from "./context/AuthContext";
 import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
-import SwagramaRefundPolicy from "./components/pages/refund-policy/RefundPolicy";
+import Feeds from "./components/pages/feeds/Feeds";
+
+
+const SwagramaRefundPolicy = lazy(
+  () => import("./components/pages/refund-policy/RefundPolicy"),
+);
 
 const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
@@ -27,8 +32,12 @@ const EventCalander = lazy(
   () => import("./components/pages/eventsCalander/EventCalander"),
 );
 const AboutUs = lazy(() => import("./components/pages/aboutUs/AboutUs"));
-const SwagramaPrivacyPolicy = lazy(() => import("./components/pages/privacypolicy/PrivacyPolicyNew"));
-const TermsAndConditon = lazy(() => import("./components/pages/terms&conditon/TermsAndConditon"));
+const SwagramaPrivacyPolicy = lazy(
+  () => import("./components/pages/privacypolicy/PrivacyPolicyNew"),
+);
+const TermsAndConditon = lazy(
+  () => import("./components/pages/terms&conditon/TermsAndConditon"),
+);
 
 function PageSkeleton() {
   return (
@@ -50,11 +59,10 @@ export default function App() {
   const { user: userData } = useAuth();
   useTokenRefresh();
 
-
   return (
     <>
       <Navbar />
-      <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#D8EEFF]/60 outline-none">
+      <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
         <Suspense fallback={<PageSkeleton />}>
           <Routes location={location} key={location.pathname}>
             <Route path="/" element={<HomePage userData={userData} />} />
@@ -82,7 +90,8 @@ export default function App() {
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/termsAndConditions" element={<TermsAndConditon />} />
             <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
-            <Route path="refundPolicy" element={<SwagramaRefundPolicy/>}  />
+            <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
+            <Route path="feeds" element={<Feeds />} />
           </Routes>
         </Suspense>
         <ToastContainer

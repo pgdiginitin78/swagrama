@@ -79,6 +79,7 @@ import WorldAidsDayImg from "../../assets/calendarEvent/World AIDS Day.webp";
 import VivahPanchamiImg from "../../assets/calendarEvent/विवाह पंचमी.webp";
 import GeetaJayantiImg from "../../assets/calendarEvent/GeetaJayanti.webp";
 import DattatreyaJayantiImg from "../../assets/calendarEvent/दत्तात्रय जयंती.webp";
+import VisitorsFormModal from "../communityActivities/vision/VisitorsFormModal";
 
 const EventCalendar = () => {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -290,23 +291,11 @@ const EventCalendar = () => {
           className="text-center mb-3 sm:mb-4"
         >
           <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-1 sm:mb-2">
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-lime-700"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
-            </svg>
+
             <h1 className="text-xl sm:text-2xl md:text-3xl py-1 font-bold bg-gradient-to-r from-lime-700 via-green-700 to-lime-800 bg-clip-text text-transparent">
               स्ववर्षपद Calendar 2026
             </h1>
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-lime-700"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
-            </svg>
+   
           </div>
           <p className="text-stone-600 text-[10px] sm:text-xs md:text-sm font-medium">
             Discover wellness and cultural events
@@ -572,13 +561,13 @@ const EventCalendar = () => {
         </div>
       </div>
       {openBookEventModal && (
-        <BookEventForm
+        <VisitorsFormModal
           open={openBookEventModal}
           handleClose={() => {
             setOpenEventBookModal(false);
             setCurrentEvent(null);
           }}
-          eventDetails={currentEvent}
+          serviceDetails={currentEvent}
         />
       )}
     </div>
@@ -594,7 +583,7 @@ export const eventsData2026 = [
     serviceName: "नवीन वर्ष",
     description: "New Year celebrations",
     benefits: "Joy, wellness, community bonding",
-    value: 2000,
+    price: 2000,
     image: NewYearImg,
   },
   {
@@ -604,7 +593,7 @@ export const eventsData2026 = [
     description:
       "Celebrations of Swami Vivekananda Jayanti & National Youth Day",
     benefits: "Youth empowerment, cultural learning",
-    value: 2000,
+    price: 2000,
     image: SwamiVivekAnnandImg,
   },
   {
@@ -613,7 +602,7 @@ export const eventsData2026 = [
     serviceName: "लोहडी Lohri",
     description: "Lohri festival celebration",
     benefits: "Cultural awareness, community bonding",
-    value: 2000,
+    price: 2000,
     image: LoahariImg,
   },
   {
@@ -622,7 +611,7 @@ export const eventsData2026 = [
     serviceName: "मकर संक्रांत Makar Sankranti",
     description: "Harvest festival celebrations",
     benefits: "Cultural learning, seasonal wellness",
-    value: 2000,
+    price: 2000,
     image: MakarSankrantiImg,
   },
   {
@@ -631,7 +620,7 @@ export const eventsData2026 = [
     serviceName: "वसन्त पञ्चमी सरस्वती पूजन",
     description: "Vasant Panchami & Saraswati Puja",
     benefits: "Education, cultural learning",
-    value: 2000,
+    price: 2000,
     image: SarvastiJayanti,
   },
   {
@@ -640,7 +629,7 @@ export const eventsData2026 = [
     serviceName: "बालकपालक Youth Guardian Family Camp",
     description: "Family camp + Sun Bath festival",
     benefits: "Wellness, cultural awareness",
-    value: 2000,
+    price: 2000,
     image: BalakPalakImg,
   },
   {
@@ -649,7 +638,7 @@ export const eventsData2026 = [
     serviceName: "गणतंत्र दिन Republic Day",
     description: "National Republic Day celebrations",
     benefits: "Civic awareness, cultural pride",
-    value: 2000,
+    price: 2000,
     image: RepublicDayImg,
   },
   {
@@ -658,7 +647,7 @@ export const eventsData2026 = [
     serviceName: "गांधी पुण्यतिथि",
     description: "Mahatma Gandhi remembrance",
     benefits: "Cultural learning, reflection",
-    value: 2000,
+    price: 2000,
     image: GandhiPunyatithiImg,
   },
   {
@@ -667,7 +656,7 @@ export const eventsData2026 = [
     serviceName: "गुरु रविदास जयंती",
     description: "Celebration of Guru Ravidas Jayanti",
     benefits: "Cultural, Spiritual",
-    value: null,
+    price: null,
     image: GuruRavidasJayanti,
   },
   {
@@ -676,7 +665,7 @@ export const eventsData2026 = [
     serviceName: "Cancer Awareness Day",
     description: "Awareness and health-focused activities",
     benefits: "Educational, Wellness",
-    value: 2000,
+    price: 2000,
     image: CancerAwernessImg,
   },
   {
@@ -685,7 +674,7 @@ export const eventsData2026 = [
     serviceName: "महर्षि दयानंद सरस्वती जयंती",
     description: "Commemoration of Maharshi Dayanand Saraswati",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:MaharshiDayanandImg
   },
   {
@@ -694,7 +683,7 @@ export const eventsData2026 = [
     serviceName: "महाशिवरात्रि Mahashivaratri",
     description: "Spiritual celebration of Lord Shiva",
     benefits: "Spiritual",
-    value: 2000,
+    price: 2000,
     image:MahashivratriImg
   },
   {
@@ -703,7 +692,7 @@ export const eventsData2026 = [
     serviceName: "शिवाजी महाराज जयंती Shivaji Jayanti",
     description: "Celebration of Shivaji Maharaj Jayanti",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:ShivajiMaharajJayanti
   },
   {
@@ -712,7 +701,7 @@ export const eventsData2026 = [
     serviceName: "होलिका दहन Holika Dahan",
     description: "Celebration of Holika Dahan",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image: HoliDahanImg,
   },
   {
@@ -721,7 +710,7 @@ export const eventsData2026 = [
     serviceName: "स्वधूलिवन्दन Holi Festival",
     description: "Ash worship and Holi rituals",
     benefits: "Cultural, Spiritual",
-    value: 2000,
+    price: 2000,
     image: HoliFestivalImg,
   },
   {
@@ -730,7 +719,7 @@ export const eventsData2026 = [
     serviceName: "छत्रपती शिवाजी महाराज जयंती",
     description: "Traditional healing commune & Shivaji Jayanti ",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image: ShivajiMaharajJayanti,
   },
   {
@@ -739,7 +728,7 @@ export const eventsData2026 = [
     serviceName: "स्वरङ्गपञ्चमी Colour Festival/ International Women's Day ",
     description: "Healing commune with festivals and awareness.",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image:InternationalWomensDay
   },
   {
@@ -748,7 +737,7 @@ export const eventsData2026 = [
     serviceName: "स्वनववर्ष गुढी पाडवा युगादी",
     description: "New Year celebrations with traditional rituals",
     benefits: "Cultural, Wellness",
-    value: 2000,
+    price: 2000,
     image:GudiPadwaImg
   },
   {
@@ -757,7 +746,7 @@ export const eventsData2026 = [
     serviceName: "गण गौर Chaitra Gauri Gangauri",
     description: "Traditional festival celebration",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:ChaitraGauriGangauriImg
   },
   {
@@ -766,7 +755,7 @@ export const eventsData2026 = [
     serviceName: "स्वएकवचन उत्सव : राम नवमी ",
     description: "Celebration of Ram Navami",
     benefits: "Cultural, Spiritual",
-    value: 2000,
+    price: 2000,
     image:RamNavamiImg
   },
   {
@@ -775,7 +764,7 @@ export const eventsData2026 = [
     serviceName: "Banking Detox आर्थिक वर्ष",
     description: "Financial year start with wellness",
     benefits: "Wellness, Educational",
-    value: 2000,
+    price: 2000,
     image:BankingDetoxImg
   },
   {
@@ -784,7 +773,7 @@ export const eventsData2026 = [
     serviceName: "सामर्थ्यदिन / Hanuman Jayanti / चैत्र पोर्णिमा",
     description: "Hanuman Jayanti celebrations",
     benefits: "Cultural, Spiritual",
-    value: 2000,
+    price: 2000,
     image:HanumanJayantiImg
   },
   {
@@ -793,7 +782,7 @@ export const eventsData2026 = [
     serviceName: "Solar New Year आंबेडकर जयंती बैसाखी",
     description: "Celebration of Solar New Year and Ambedkar Jayanti ",
     benefits: "Cultural, Educational",
-    value: null,
+    price: null,
     image:AmbedakarJayantiImg
   },
   {
@@ -802,7 +791,7 @@ export const eventsData2026 = [
     serviceName: "शंकराचार्य सूरदास जयंती",
     description: "Commemoration of Shankaracharya and Surdas Jayanti.",
     benefits: "Cultural, Spiritual",
-    value: null,
+    price: null,
     image:ShankracharyaSurdasJayantiImg
   },
   {
@@ -811,7 +800,7 @@ export const eventsData2026 = [
     serviceName: "Earth Day पृथ्वी दिन",
     description: "Celebration and awareness of Earth Day",
     benefits: "Educational, Wellness",
-    value: 2000,
+    price: 2000,
     image:EarthDayImg
   },
   {
@@ -820,7 +809,7 @@ export const eventsData2026 = [
     serviceName: "सीता नवमी Sita Navami",
     description: "Celebration of Sita Navami",
     benefits: "Cultural, Spiritual",
-    value: 2000,
+    price: 2000,
     image:SitaNavamiImg
   },
   {
@@ -830,7 +819,7 @@ export const eventsData2026 = [
     description:
       "Observance of Buddha Poornima and International Workers' Day ",
     benefits: "Cultural, Educational",
-    value: 2000,
+    price: 2000,
     image:WorkersDayImg
   },
   {
@@ -839,7 +828,7 @@ export const eventsData2026 = [
     serviceName: "विश्व हास्य दिवस ",
     description: "Healing commune combined with International Humor Day.",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image:WorldLaughterDayImg
   },
   {
@@ -849,7 +838,7 @@ export const eventsData2026 = [
     description:
       "Physician wellness program and life knowledge sessions on Ayurveda with Mother's Day celebration.",
     benefits: "Wellness, Educational",
-    value: 2000,
+    price: 2000,
     image:MothersDayImg
   },
   {
@@ -858,7 +847,7 @@ export const eventsData2026 = [
     serviceName: "बकरी ईद Eid",
     description: "Celebration of Bakri Eid",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:BakariEidImg
   },
   {
@@ -867,7 +856,7 @@ export const eventsData2026 = [
     serviceName: "विश्व तंबाखू निषेध दिन ",
     description: "World No Tobacco Day observance.",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image:WorldNoTobaccoDayImg
   },
   {
@@ -876,7 +865,7 @@ export const eventsData2026 = [
     serviceName: "विश्व पर्यावरण दिन ",
     description: "Healing commune and World Environment Day",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image:WorldEnvironmentDayImg
   },
   {
@@ -885,7 +874,7 @@ export const eventsData2026 = [
     serviceName: "महाराणा प्रताप जयंती, इस्लामी नव वर्ष अल हिज्रा ",
     description: "Commemorative celebrations.",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:MaharanaPratapJayantiImg
   },
   {
@@ -894,7 +883,7 @@ export const eventsData2026 = [
     serviceName: "पितृ दिन / आंतरराष्ट्रीय योग दिन / मोठा दिवस",
     description: "Observance of ancestors and International Yoga Day ",
     benefits: "Wellness, Cultural",
-    value: 2000,
+    price: 2000,
     image:FathersDayImg
   },
   {
@@ -903,7 +892,7 @@ export const eventsData2026 = [
     serviceName: "मुहर्रम",
     description: "Religious observance",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:MohramImg
   },
   {
@@ -912,7 +901,7 @@ export const eventsData2026 = [
     serviceName: "वट पोर्णिमा, कबीरदास जयंती ",
     description: "Religious and cultural celebration ",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:VatPurnimaKabirDasJayantiImg
   },
   {
@@ -921,7 +910,7 @@ export const eventsData2026 = [
     serviceName: "जगन्नाथ रथयात्रा",
     description: "Rath Yatra festival",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:RathYatraImg
   },
   {
@@ -930,7 +919,7 @@ export const eventsData2026 = [
     serviceName: "गुरु पोर्णिमा",
     description: "Guru Purnima observance",
     benefits: "Cultural, Spiritual",
-    value: null,
+    price: null,
     image:GuruPurnimaImg
   },
   {
@@ -939,7 +928,7 @@ export const eventsData2026 = [
     serviceName: "मैत्रेय दिन",
     description: "Friendship/Compassion Day",
     benefits: "Cultural, Wellness",
-    value: null,
+    price: null,
     image:FridshipDayImg
   },
   {
@@ -948,7 +937,7 @@ export const eventsData2026 = [
     serviceName: "स्वतंत्रता दिवस/Independence Day",
     description: "National celebration",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:IndependenceDayImg
   },
   {
@@ -957,7 +946,7 @@ export const eventsData2026 = [
     serviceName: "नागपंचमी",
     description: "Religious festival",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:NagpanchamiImg
   },
   {
@@ -966,7 +955,7 @@ export const eventsData2026 = [
     serviceName: "तुलसीदास जयंती",
     description: "Birth anniversary celebration",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:TulsidasJayanti
   },
   {
@@ -975,7 +964,7 @@ export const eventsData2026 = [
     serviceName: "ओणम / ईद ए मिलाद ",
     description: "Religious and cultural celebration",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:OnamImg
   },
   {
@@ -984,7 +973,7 @@ export const eventsData2026 = [
     serviceName: "रक्षाबंधन",
     description: "Sibling bonding festival",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:RakshaBandhanImg
   },
   {
@@ -993,7 +982,7 @@ export const eventsData2026 = [
     serviceName: "कृष्ण जन्माष्टमी, अगस्त्य अर्ध्य",
     description: "Birth of Lord Krishna celebration",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:LordKrishanaBirthdayImg
   },
   {
@@ -1002,7 +991,7 @@ export const eventsData2026 = [
     serviceName: "गोपाल काला दही हंडी, शिक्षक दिन",
     description: "Dahi Handi and Teacher's Day",
     benefits: "Cultural, Educational",
-    value: 2000,
+    price: 2000,
     image:GopalKalaDahiHandiImg
   },
   {
@@ -1011,7 +1000,7 @@ export const eventsData2026 = [
     serviceName: "बेंदूर - बैल पोळा - स्ववृषभोत्सव / BullFestival",
     description: "Traditional bull festival",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:BailPolaImg
   },
   {
@@ -1020,7 +1009,7 @@ export const eventsData2026 = [
     serviceName: "हरतालिका गौरी, मंगळा, मंगळा गौर, गणेश स्थापना, हिन्दी दिवस ",
     description: "Religious and national celebrations",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image: HartalikaImg
   },
   {
@@ -1029,7 +1018,7 @@ export const eventsData2026 = [
     serviceName: "ऋषि पंचमी, अभियंता दिन, विश्वेश्वरैया जयंती",
     description: "Observances of Rishi Panchami and Engineers' Day",
     benefits: "Cultural, Educational",
-    value: 2000,
+    price: 2000,
     image:HrushiPanchamiImg
   },
   {
@@ -1038,7 +1027,7 @@ export const eventsData2026 = [
     serviceName: "गौरी आवाहन, राधाष्टमी",
     description: "Religious festival",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:RadhaAshtamiImg
   },
   {
@@ -1047,7 +1036,7 @@ export const eventsData2026 = [
     serviceName: "जेष्ठ गौरी पूजा",
     description: "Religious festival",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:GouriPoojaImg
   },
   {
@@ -1056,7 +1045,7 @@ export const eventsData2026 = [
     serviceName: "जेष्ठ गौरी विसर्जन",
     description: "Festival conclusion",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:GouriVisarjanImg
   },
   {
@@ -1065,7 +1054,7 @@ export const eventsData2026 = [
     serviceName: "स्वग्राम गणेश विसर्जन",
     description: "Ganesh Visarjan",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:SwagramGaneshVisarjanImg
   },
   {
@@ -1074,7 +1063,7 @@ export const eventsData2026 = [
     serviceName: "अनंत चतुर्थी गणेश विसर्जन",
     description: "Ganesh festival",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:AnantChaturthiImg
   },
   {
@@ -1083,7 +1072,7 @@ export const eventsData2026 = [
     serviceName: "पितृ पक्ष प्रारंभ Ancestor Week",
     description: "Ancestor observance",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:AncestorWeekImg
   },
   {
@@ -1092,7 +1081,7 @@ export const eventsData2026 = [
     serviceName: "गांधी जयंती Gandhi Jayanti",
     description: "National celebration",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:GandhiJayantiImg
   },
   {
@@ -1101,7 +1090,7 @@ export const eventsData2026 = [
     serviceName: "सर्वपितृ अमावस्या",
     description: "Ancestor observance",
     benefits: "Cultural",
-    value: null,
+    price: null,
     image:AncestorObservanceImg
   },
   {
@@ -1111,7 +1100,7 @@ export const eventsData2026 = [
       "नवरात्री प्रारंभ भोंडला / Navratri, घटस्थापना / Ghatsthapana, मृत्तिका पूजन / Mruttika Pujan",
     description: "Navratri festival start",
     benefits: "Cultural, Spiritual",
-    value: 2000,
+    price: 2000,
     image:NavratriCelebration
   },
   {
@@ -1120,7 +1109,7 @@ export const eventsData2026 = [
     serviceName: "सरस्वती आवाहन & पूजा",
     description: "Worship of Goddess Saraswati",
     benefits: "Cultural, Educational",
-    value: null,
+    price: null,
     image:MaaSarasvatiPoojanImg
   },
   {
@@ -1129,7 +1118,7 @@ export const eventsData2026 = [
     serviceName: "दुर्गाष्टमी / महानवमी",
     description: "Navratri festival celebration",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:DurgaAshtamiImg
   },
   {
@@ -1138,7 +1127,7 @@ export const eventsData2026 = [
     serviceName: "विजयादशमी / दसरा / Vijayadashami-Dasara, मध्वाचार्य जयंती",
     description: "Festival and scholar observance",
     benefits: "Cultural, Educational",
-    value: 2000,
+    price: 2000,
     image:LordRavanaDeathImg
   },
   {
@@ -1147,7 +1136,7 @@ export const eventsData2026 = [
     serviceName: "मध्वाचार्य जयंती",
     description: "Scholar observance",
     benefits: "Educational",
-    value: 2000,
+    price: 2000,
     image:MadhavacharyaJayantiImg
   },
   {
@@ -1156,7 +1145,7 @@ export const eventsData2026 = [
     serviceName: "कोजागिरी / Kojagiri Pornima, शरद पोर्णिमा",
     description: "Full moon observance",
     benefits: "Cultural",
-    value: 2000,
+    price: 2000,
     image:KojagiriPornimaImg
   },
   {
@@ -1165,7 +1154,7 @@ export const eventsData2026 = [
     serviceName: "वाल्मीकी मीराबाई जयंती",
     description: "Saints' birth anniversaries",
     benefits: "Cultural, Spiritual",
-    value: null,
+    price: null,
     image:ValmikiMirabaiJayntiImg
   },
   {
@@ -1174,7 +1163,7 @@ export const eventsData2026 = [
     serviceName: "करवा चौथ",
     description: "Couple fasting and rituals",
     benefits: "Cultural, Wellness",
-    value: null,
+    price: null,
     image:KarvaChauthImg
   },
   {
@@ -1183,7 +1172,7 @@ export const eventsData2026 = [
     serviceName: "दुर्ग बांधणी Fort Construction",
     description: "Traditional fort construction activity at Swagrama",
     benefits: "Cultural engagement, teamwork, historical learning ",
-    value: 2000,
+    price: 2000,
     image:SwagramaFortConstructionImg
   },
   {
@@ -1192,7 +1181,7 @@ export const eventsData2026 = [
     serviceName: "गौवत्सद्वादशी Cow Calf Ceremony / वसू बारस VasuBaras ",
     description: "Ritual celebrating cow and calf; auspicious ceremonies ",
     benefits: "Strengthens connection with cows, cultural learning",
-    value: 2000,
+    price: 2000,
     image:VasuBarasImg
   },
   {
@@ -1201,7 +1190,7 @@ export const eventsData2026 = [
     serviceName: "धनोत्रयोदशी Dhanotrayodashi",
     description: "Observance of Dhanteras / festival rituals",
     benefits: "Spiritual benefits, prosperity rituals",
-    value: 2000,
+    price: 2000,
     image:DhantreyodashiImg
   },
   {
@@ -1210,7 +1199,7 @@ export const eventsData2026 = [
     serviceName: "Dipavali – Lakshmi Pujan नरक चतुर्दशी ",
     description: "Diwali – Lakshmi Puja and rituals ",
     benefits: "Spiritual cleansing, prosperity, wellness ",
-    value: 2000,
+    price: 2000,
     image:LaxshamiPoojanImg
   },
 
@@ -1220,7 +1209,7 @@ export const eventsData2026 = [
     serviceName: "Dipavali Padwa / Balipratipada / Govardhan Puja ",
     description: "Diwali festival rituals and Govardhan celebration ",
     benefits: "Spiritual benefits, prosperity",
-    value: 2000,
+    price: 2000,
     image:GovardhanPoojaImg
   },
   {

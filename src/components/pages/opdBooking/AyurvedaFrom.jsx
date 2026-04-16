@@ -15,7 +15,7 @@ import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import YardIcon from "@mui/icons-material/Yard";
 import { Dialog, DialogContent, Divider, Fade } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import CompostIcon from "@mui/icons-material/Compost";
@@ -147,16 +147,18 @@ function DateCard({ date, isSelected, onClick, disabled }) {
       className={`
         relative flex flex-col items-center justify-center min-w-[56px] py-1.5 rounded-[5px] border transition-all duration-300
         ${
-          isSelected || isToday
+          isSelected
             ? "bg-gradient-to-br from-emerald-600 to-teal-700 border-emerald-500 text-white shadow-md shadow-emerald-200/40"
-            : disabled
-              ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
-              : "bg-white border-slate-100 text-slate-600 hover:border-emerald-200 hover:shadow-sm"
+            : isToday
+              ? "bg-emerald-50 border-emerald-500 text-emerald-700 shadow-sm"
+              : disabled
+                ? "bg-gray-50 border-gray-100 text-gray-300 cursor-not-allowed"
+                : "bg-white border-slate-100 text-slate-600 hover:border-emerald-200 hover:shadow-sm"
         }
       `}
     >
       <span
-        className={`text-[9px] font-bold uppercase tracking-tight ${isSelected ? "text-emerald-100" : disabled ? "text-gray-200" : "text-slate-400"}`}
+        className={`text-[9px] font-bold uppercase tracking-tight ${isSelected ? "text-emerald-100" : isToday ? "text-emerald-600" : disabled ? "text-gray-200" : "text-slate-400"}`}
       >
         {dayName}
       </span>
@@ -508,9 +510,11 @@ function AyurvedaForm({
   const [visibleCount, setVisibleCount] = useState(1);
   const [servicesOptions, setServicesOptions] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
-  const [slotError, setSlotError] = useState("");
-  const [doctorSlots, setDoctorSlots] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [slotData, setSlotData] = useState({
+    slots: [],
+    loading: false,
+    error: "",
+  });
   const [patientOptions, setPatientOptions] = useState([]);
   const [openAddPatientModal, setOpenAddPatientModal] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -518,6 +522,7 @@ function AyurvedaForm({
   const [ipAddress, setIpAddress] = useState(null);
   const [finalObj, setFinalObj] = useState(null);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const scrollRef = useRef(null);
   const cancelPaymentRef = useRef(null);
 
   const { user } = useAuth();
@@ -601,6 +606,25 @@ function AyurvedaForm({
     currentIndex + visibleCount,
   );
 
+  useEffect(() => {
+    if (scrollRef.current && appointmentDate) {
+      const selectedEl = scrollRef.current.querySelector(
+        '[data-selected="true"]',
+      );
+      if (selectedEl) {
+        const container = scrollRef.current;
+        const scrollLeft =
+          selectedEl.offsetLeft -
+          container.offsetWidth / 2 +
+          selectedEl.offsetWidth / 2;
+        container.scrollTo({
+          left: scrollLeft,
+          behavior: "smooth",
+        });
+      }
+    }
+  }, [appointmentDate]);
+
   const getDoctorName = (doc) =>
     [doc.firstName?.trim(), doc.lName?.trim()].filter(Boolean).join(" ");
 
@@ -662,37 +686,71 @@ function AyurvedaForm({
     }
   }, [user]);
 
-  useEffect(() => {
-    if (selectedDoctorId && appointmentDate) {
-      setSelectedTimeSlot(null);
-      setSlotError("");
-      setLoading(true);
-      getDoctorAvailableSlots(
-        selectedDoctorId?.userId,
-        format(new Date(appointmentDate), "yyyy-MM-dd"),
-        5,
-      )
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setDoctorSlots(data);
-          } else {
-            setDoctorSlots([]);
-          }
-          setLoading(false);
-        })
-        .catch(() => setLoading(false));
-    } else {
-      setDoctorSlots([]);
-      setSelectedTimeSlot(null);
+  // Create stable primitive dependencies to prevent unwanted re-render loops
+  const docId = selectedDoctorId?.userId;
+  const memoDate = useMemo(() => {
+    if (!appointmentDate) return "";
+    try {
+      return format(new Date(appointmentDate), "yyyy-MM-dd");
+    } catch (e) {
+      return "";
     }
-  }, [selectedDoctorId, appointmentDate]);
+  }, [appointmentDate]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (docId && memoDate) {
+      setSelectedTimeSlot(null);
+      setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
+
+      getDoctorAvailableSlots(docId, memoDate, 5)
+        .then((res) => {
+          if (!isMounted) return;
+          const data = res?.data;
+          console.log("the time slots are", res);
+
+          if (data?.status == 200) {
+            const fetchedSlots = data?.data || [];
+            console.log(`[Slots] Fetched ${fetchedSlots.length} slots. Setting loading to false.`);
+            setSlotData({
+              slots: fetchedSlots,
+              loading: false,
+              error: fetchedSlots.length === 0 ? "No slots available" : "",
+            });
+          } else {
+            console.log(`[Slots] API returned status ${data?.status}. Setting loading to false.`);
+            setSlotData({
+              slots: [],
+              loading: false,
+              error: data?.message || "No slots available",
+            });
+          }
+        })
+        .catch((err) => {
+          if (!isMounted) return;
+          console.error("Error fetching slots:", err);
+          setSlotData({
+            slots: [],
+            loading: false,
+            error: "Failed to fetch slots",
+          });
+        });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [docId, memoDate]);
 
   const handleConfirmBooking = handleSubmit((data) => {
     if (user === null) {
       errorAlert("Please Login First !");
     } else if (selectedTimeSlot === null) {
-      setSlotError("Please select a time slot to continue.");
+      setSlotData((prev) => ({
+        ...prev,
+        error: "Please select a time slot to continue.",
+      }));
       return;
     }
 
@@ -1081,7 +1139,7 @@ function AyurvedaForm({
                                   size={8}
                                   className="sm:w-[9px] sm:h-[9px]"
                                 />
-                                {doctor?.sessions[0]?.timeSlot} min
+                                {doctor?.sessions?.[0]?.timeSlot || "15"} min
                               </span>
                             </div>
 
@@ -1122,13 +1180,13 @@ function AyurvedaForm({
                                 className="text-gray-400"
                               />
                               <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                {doctor?.sessions[0]?.morning}
+                                {doctor?.sessions?.[0]?.morning || "—"}
                               </p>
                               <span className="text-[9px] text-gray-400">
                                 -
                               </span>
                               <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                {doctor?.sessions[0]?.evening}
+                                {doctor?.sessions?.[0]?.evening || "—"}
                               </p>
                             </div>
                           </div>
@@ -1240,7 +1298,10 @@ function AyurvedaForm({
                 </div>
               </div>
 
-              <div className="flex gap-1.5 overflow-x-auto pb-2 ayur-scroll sm:gap-2">
+              <div
+                ref={scrollRef}
+                className="flex gap-1.5 overflow-x-auto pb-2 ayur-scroll sm:gap-2"
+              >
                 {(() => {
                   const today = startOfDay(new Date());
                   const baseDate = appointmentDate
@@ -1250,19 +1311,22 @@ function AyurvedaForm({
                     start: startOfMonth(baseDate),
                     end: endOfMonth(baseDate),
                   });
-                  return monthDays.map((d, i) => (
-                    <DateCard
-                      key={i}
-                      date={d}
-                      disabled={isBefore(startOfDay(d), today)}
-                      isSelected={
-                        appointmentDate &&
-                        format(new Date(appointmentDate), "yyyy-MM-dd") ===
-                          format(d, "yyyy-MM-dd")
-                      }
-                      onClick={() => setValue("appointmentDate", d)}
-                    />
-                  ));
+                  return monthDays.map((d, i) => {
+                    const isSelected =
+                      appointmentDate &&
+                      format(new Date(appointmentDate), "yyyy-MM-dd") ===
+                        format(d, "yyyy-MM-dd");
+                    return (
+                      <div key={i} data-selected={isSelected}>
+                        <DateCard
+                          date={d}
+                          disabled={isBefore(startOfDay(d), today)}
+                          isSelected={isSelected}
+                          onClick={() => setValue("appointmentDate", d)}
+                        />
+                      </div>
+                    );
+                  });
                 })()}
               </div>
             </div>
@@ -1275,52 +1339,31 @@ function AyurvedaForm({
                 </span>
               </div>
 
-              <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
-                <AnimatePresence mode="wait">
+                <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
                   {selectedDoctorId === null ? (
-                    <motion.div
-                      key="no-doctor"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
-                    >
+                    <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
                       <Stethoscope className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
                       <p className="text-slate-500 font-bold text-[11px]">
                         Select a Consultant
                       </p>
-                    </motion.div>
-                  ) : loading ? (
-                    <motion.div
-                      key="loading"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col items-center justify-center py-5 sm:py-6"
-                    >
+                    </div>
+                  ) : slotData.loading ? (
+                    <div className="flex flex-col items-center justify-center py-5 sm:py-6">
                       <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
                       <p className="text-slate-400 text-[10px] font-bold mt-2">
                         Checking slots...
                       </p>
-                    </motion.div>
-                  ) : doctorSlots.length === 0 ? (
-                    <motion.div
-                      key="no-slots"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="flex flex-col items-center justify-center py-5 text-center sm:py-6"
-                    >
+                    </div>
+                  ) : slotData.slots.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
                       <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
                       <p className="text-slate-400 font-bold text-[11px]">
-                        No slots this day
+                        {slotData.error || "No slots this day"}
                       </p>
-                    </motion.div>
+                    </div>
                   ) : (
-                    <motion.div
-                      key="slots"
-                      initial={{ opacity: 0, y: 5 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8"
-                    >
-                      {doctorSlots.map((slot, index) => (
+                    <div className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8">
+                      {slotData.slots.map((slot, index) => (
                         <TimeSlotChip
                           key={index}
                           slot={slot}
@@ -1330,19 +1373,19 @@ function AyurvedaForm({
                           }
                           onSelect={() => {
                             setSelectedTimeSlot(slot);
-                            setSlotError("");
+                            setSlotData((prev) => ({ ...prev, error: "" }));
                           }}
                         />
                       ))}
-                    </motion.div>
+                    </div>
                   )}
-                </AnimatePresence>
-                {slotError && (
-                  <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
-                    {slotError}
-                  </p>
-                )}
-              </div>
+
+                  {slotData.error && !slotData.loading && (
+                    <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
+                      {slotData.error}
+                    </p>
+                  )}
+                </div>
             </div>
           </div>
         </motion.div>
@@ -1510,14 +1553,14 @@ function AyurvedaForm({
                 <button
                   type="button"
                   onClick={() => reset()}
-                  className="w-full h-10 px-5 rounded-xl border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 sm:rounded-[9px]"
+                  className="w-full h-10 px-5 rounded-[9px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 sm:rounded-[9px]"
                 >
                   Reset
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBooking}
-                  className="w-full h-10 px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 sm:rounded-[9px]"
+                  className="w-full h-10 px-6 rounded-[9px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 sm:rounded-[9px]"
                 >
                   <EventAvailableIcon sx={{ fontSize: 16 }} />
                   Confirm Booking

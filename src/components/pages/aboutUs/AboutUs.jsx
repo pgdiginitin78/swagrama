@@ -10,6 +10,7 @@ import SandipMehetre from "../../assets/landing-page/ourexperts/SandipMahetre.we
 import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
 import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
 import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
+import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
 import {
   Hospital,
   BookOpen,
@@ -86,8 +87,7 @@ const healers = [
     name: "Vaidya Avanti Nitsure",
     qualification: "MD Ayurveda",
     specialty: "Ayurveda",
-    image:
-      "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop",
+    image:AvantiNitsure,
     color: "#10b981",
   },
   {
@@ -981,3 +981,4 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
+

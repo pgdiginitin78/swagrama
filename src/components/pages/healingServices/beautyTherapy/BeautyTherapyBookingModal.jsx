@@ -10,11 +10,11 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
 import {
-  getDoctorAvailableSlots,
-  getDoctorsByClinicId,
   getPatientDataByMobileNo,
-  getServicesByClinicId
+  getServicesByClinicId,
+  InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
+import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -23,7 +23,12 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
-import { errorAlert } from "../../../common/toast/CustomToast";
+import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
+import {
+  BookBeautyTherapy,
+  GetBeautyTherapySlots,
+} from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
+import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
 const dropdownObjectSchema = yup
   .object()
@@ -103,15 +108,13 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const [formData, setFormData] = useState(null);
 
   // API specific states
-  const [locationListOptions, setLocationListOptions] = useState([]);
-  const [clinicsOptions, setClinicOptions] = useState([]);
-  const [patientOptions, setPatientOptions] = useState([]);
-  const [doctorOptions, setDoctorOptions] = useState([]);
   const [servicesOptions, setServicesOptions] = useState([]);
   const [doctorSlots, setDoctorSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
 
@@ -144,45 +147,22 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const bookingDate = watch("bookingDate");
   const selectedServiceValue = watch("serviceFid");
 
-  // Calculate Total Price with GST (18%)
   useEffect(() => {
     const price = selectedServiceValue?.charges || 0;
     const gst = Math.round(price * 0.18);
     setValue("perDayAmount", price);
-    setValue("totalAmount", price + 0);
+    setValue("totalAmount", price + gst);
   }, [selectedServiceValue, setValue]);
 
-  // Hardcode Swagram Community Clinic (ID: 5)
   useEffect(() => {
     setValue("clinicFid", { id: 5, value: 5, label: "Swagram Community" });
     setValue("location", { id: 1, value: 1, label: "Lavale" });
   }, [setValue]);
 
-  // Fetch Doctors, Services & Patients
   useEffect(() => {
-    setValue("doctorFid", null);
     setDoctorSlots([]);
     setSelectedTimeSlot(null);
     setSlotError("");
-
-    getDoctorsByClinicId(5)
-      .then((res) => {
-        const data = res?.data?.data || [];
-        if (data.length) {
-          const formatted = data.map((item) => ({
-            ...item,
-            id: item.userId,
-            value: item.userId,
-            label: `${item.firstName} ${item.lName || item.lastName || ""}`.trim(),
-          }));
-          setDoctorOptions(formatted);
-          // Auto-select first doctor to unblock slot fetching
-          if (formatted.length > 0) {
-            setValue("doctorFid", formatted[0]);
-          }
-        }
-      })
-      .catch((error) => console.error(error));
 
     getServicesByClinicId(5)
       .then((res) => {
@@ -203,20 +183,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     if (user !== null) {
       getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
-          const data = res?.data?.data;
+          const data = res?.data?.data || [];
           const filterData = data.find(
             (item) => String(item.userId) === String(user?.userId),
           );
-          if (data?.length) {
-            setPatientOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.userId,
-                value: item.userId,
-                label: `${item.firstName} ${item.lastName}`,
-              })),
-            );
-          }
           if (filterData) {
             setValue(
               "fullName",
@@ -236,7 +206,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               shouldDirty: true,
             });
           } else if (user) {
-            console.log("Using user context fallback");
             setValue(
               "fullName",
               `${user.firstName || ""} ${user.lastName || ""}`.trim(),
@@ -258,7 +227,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
 
 
-  // Patch Pre-selected Service based on eventDetails
   useEffect(() => {
     if (servicesOptions?.length > 0 && eventDetails?.serviceName) {
       const matchedService = servicesOptions.find(
@@ -278,16 +246,14 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     }
   }, [servicesOptions, eventDetails, setValue]);
 
-  // Fetch Time Slots using bookingDate
   useEffect(() => {
-    if (doctorValue?.id && bookingDate) {
+    if (user?.userId && bookingDate) {
       setSelectedTimeSlot(null);
       setSlotError("");
       setLoading(true);
-      getDoctorAvailableSlots(
-        doctorValue.id,
-        format(new Date(bookingDate), "yyyy-MM-dd"),
-        5, // Hardcoded clinic ID
+      GetBeautyTherapySlots(
+        user.userId,
+        format(new Date(bookingDate), "yyyy-MM-dd")
       )
         .then((res) => {
           const data = res?.data?.data || [];
@@ -302,7 +268,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       setDoctorSlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [doctorValue?.id, bookingDate]);
+  }, [user?.userId, bookingDate]);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -315,20 +281,82 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     }
     setSlotError("");
     const saveObj = {
-      ...data,
+      userId: user?.userId || null,
+      therapyName: eventDetails?.serviceName || data.serviceFid?.label,
+      patientName: data.fullName,
+      mobile: data.mobile,
+      email: data.email,
+      city: data.city,
       bookingDate: format(new Date(data.bookingDate), "yyyy-MM-dd"),
-      SloteEndTime: selectedTimeSlot?.slotEndTime,
-      SloteStartTime: selectedTimeSlot?.slotStartTime,
+      specificRequest: data.specialRequest,
+      slotStartTime: selectedTimeSlot?.slotStartTime,
+      slotEndTime: selectedTimeSlot?.slotEndTime,
+      amount: watch("totalAmount"),
+      paymentStatus: "Pending",
     };
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
 
-  const handleConfirmBooking = () => {
-    console.log("Beauty Therapy Booking Confirmed:", formData);
-    setOpenConfirmation(false);
-    reset();
-    handleClose();
+  const handleConfirmBooking = async () => {
+    if (isPaymentPending || !formData) return;
+    try {
+      setIsLoading(true);
+      const bookingRes = await BookBeautyTherapy(formData);
+      const bookingData = bookingRes?.data;
+
+      if (bookingData?.message) {
+        const bookingId = bookingData?.bookingId || bookingData?.data;
+
+        const tempObj = {
+          amount: formData.amount,
+          appointmentDate: formData.bookingDate,
+          SloteStartTime: formData.slotStartTime,
+          SloteEndTime: formData.slotEndTime,
+          userId: user?.userId,
+          paymentFor: "BeautyTherapy",
+          bookingId: bookingId,
+        };
+
+        const res = await InitiatePayment(null, user?.userId, tempObj);
+        const data = res?.data;
+
+        if (data?.status === 200) {
+          setIsLoading(false);
+          setIsPaymentPending(true);
+
+          RedirectToSabPaisa(
+            data,
+            null,
+            data.clientTxnId,
+            async () => {
+              successAlert(bookingData.message);
+              setOpenConfirmation(false);
+              setIsPaymentPending(false);
+              reset();
+              handleClose();
+            },
+            (errorStatus) => {
+              const msg =
+                errorStatus?.message || "Payment failed or cancelled.";
+              errorAlert(msg);
+              setOpenConfirmation(false);
+              setIsPaymentPending(false);
+            }
+          );
+        } else {
+          setIsLoading(false);
+          errorAlert(data?.message || "Failed to initiate payment");
+        }
+      } else {
+        setIsLoading(false);
+        errorAlert(bookingData?.message || "Booking failed");
+      }
+    } catch (error) {
+      setIsLoading(false);
+      errorAlert("An unexpected error occurred during the booking process.");
+      console.error(error);
+    }
   };
 
   return (
@@ -537,7 +565,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                 animate={{ opacity: 1 }}
                                 className="flex flex-col items-center justify-center h-full text-center p-6 bg-slate-50 rounded-[9px] border border-dashed border-slate-200"
                               >
-                                {doctorValue && bookingDate ? (
+                                {bookingDate ? (
                                   <>
                                     <div className="w-12 h-12 bg-booking-primaryLight rounded-full flex items-center justify-center mb-3">
                                       <Clock className="w-6 h-6 text-booking-primary" />
@@ -586,7 +614,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               <div className="flex justify-between text-[11px] font-medium">
                                 <span className="text-slate-500">GST (18%)</span>
                                 <span className="text-slate-700 font-bold">
-                                  ₹{Math.round((selectedServiceValue?.charges || 0) * 0)}
+                                  ₹{Math.round((selectedServiceValue?.charges || 0) * 0.18)}
                                 </span>
                               </div>
                               <div className="pt-2 mt-2 border-t border-booking-primary/10 flex justify-between items-end">
@@ -595,14 +623,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                     Total Payable
                                   </p>
                                   <p className="text-xl font-black text-booking-primaryDark leading-none">
-                                    ₹
-                                    {(
-                                      (selectedServiceValue?.charges || 0) +
-                                      Math.round(
-                                        (selectedServiceValue?.charges || 0) *
-                                          0.18,
-                                      )
-                                    ).toLocaleString()}
+                                    ₹{watch("totalAmount")?.toLocaleString()}
                                   </p>
                                 </div>
                                 <div className="text-[8px] text-slate-400 font-medium italic">

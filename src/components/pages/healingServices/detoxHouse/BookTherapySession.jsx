@@ -66,6 +66,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
   const [therapySlots, setTherapySlots] = useState([]);
+  const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
@@ -135,13 +136,19 @@ export default function BookTherapySession({ open, onClose, item }) {
     const activeSession = schedules[activePickerIndex];
     if (activeSession?.date) {
       const formattedDate = format(activeSession.date, "yyyy-MM-dd");
+      setIsSlotsLoading(true);
       GetDetoxTherapySlotsByUser(user.userId, formattedDate)
         .then((res) => {
           const data = res?.data;
-          setTherapySlots(Array.isArray(data) ? data : []);
+          console.log("GetDetoxTherapySlotsByUser", data);
+
+          setTherapySlots(Array.isArray(data?.data) ? data?.data : []);
         })
         .catch(() => {
           setTherapySlots([]);
+        })
+        .finally(() => {
+          setIsSlotsLoading(false);
         });
     } else {
       setTherapySlots([]);
@@ -539,25 +546,33 @@ export default function BookTherapySession({ open, onClose, item }) {
                                 <span className="text-[#6d8a7c] text-[10px] font-bold mb-2 block uppercase tracking-widest">
                                   Available Slots
                                 </span>
-                                <div className="flex flex-wrap gap-2">
-                                  {therapySlots.length > 0 ? (
+                                <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
+                                  {isSlotsLoading ? (
+                                    <div className="w-full flex flex-col items-center justify-center py-4">
+                                      <div className="w-6 h-6 border-2 border-ayuMid/20 border-t-ayuMid rounded-full animate-spin" />
+                                      <span className="text-[10px] font-bold text-ayuMid/60 mt-2 uppercase tracking-tight">
+                                        Loading Slots...
+                                      </span>
+                                    </div>
+                                  ) : therapySlots.length > 0 ? (
                                     therapySlots.map((slot, i) => {
                                       const t = slot.sessionTime;
-                                      const isAvailable = slot.isAvailable;
-                                      const isTaken = schedules.some((s, sIdx) => {
-                                        if (
-                                          sIdx === idx ||
-                                          !s.date ||
-                                          !schedule.date ||
-                                          !s.time
-                                        )
-                                          return false;
-                                        // Standardized comparison
-                                        return (
-                                          isSameDay(s.date, schedule.date) &&
-                                          s.time === t
-                                        );
-                                      });
+                                      const isAvailable = slot.isAvailable || !slot?.isBookedByUser;
+                                      const isTaken = schedules.some(
+                                        (s, sIdx) => {
+                                          if (
+                                            sIdx === idx ||
+                                            !s.date ||
+                                            !schedule.date ||
+                                            !s.time
+                                          )
+                                            return false;
+                                          return (
+                                            isSameDay(s.date, schedule.date) &&
+                                            s.time === t
+                                          );
+                                        },
+                                      );
                                       return (
                                         <button
                                           key={i}
@@ -581,7 +596,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                       );
                                     })
                                   ) : (
-                                    <div className="text-[10px] text-gray-400 font-bold italic py-2">
+                                    <div className="text-[10px] text-gray-400 font-bold italic text-center py-2 w-full">
                                       {schedule.date
                                         ? "No slots available for this date"
                                         : "Please select a date first"}

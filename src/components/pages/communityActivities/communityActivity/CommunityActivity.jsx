@@ -109,7 +109,7 @@ const CommunityActivities = () => {
               alt="Swagrama community"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-[#1a3a0a]/40 via-[#1a3a0a]/20 to-[#92af95]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#1a3a0a]/40 via-[#1a3a0a]/20 to-[#49584a]" />
           </motion.div>
           <motion.div style={{ opacity: heroOpacity }} className="ca-hero-overlay absolute inset-0 flex flex-col items-center  justify-center px-4 text-center">
             <motion.div 

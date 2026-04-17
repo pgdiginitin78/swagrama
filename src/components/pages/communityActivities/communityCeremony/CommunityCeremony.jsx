@@ -451,7 +451,7 @@ const CommunityCeremony = () => {
         )}
 
         {/* Month Selector Carousel */}
-        <div className="mb-10 -mt-6">
+        <div className="mb-10 mt-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Select Month</h2>
             <div className="flex items-center gap-3">
@@ -516,9 +516,7 @@ const CommunityCeremony = () => {
                     `}
                   >
                     <span className="relative z-10">{month}</span>
-                    {isCurrentMonth && (
-                      <span className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border-2 border-white ${isActive ? "bg-cream" : "bg-forest animate-pulse"}`} />
-                    )}
+
                     {isActive && (
                       <motion.div
                         layoutId="activeMonth"

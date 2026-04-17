@@ -83,7 +83,7 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
     <button
       type="button"
       onClick={onSelect}
-      disabled={!slot.slotStartTime}
+      disabled={!slot.isAvailable || slot.isBookedByUser}
       className={`
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
@@ -281,7 +281,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       setSelectedTimeSlot(null);
     }
   }, [user?.userId, fromDate]);
-  
+
 console.log("selectedTimeSlot",selectedTimeSlot);
 
   const onSubmit = (data) => {
@@ -328,7 +328,7 @@ console.log("selectedTimeSlot",selectedTimeSlot);
           SloteStartTime: formData.slotTime,
           SloteEndTime: formData.slotTime,
           userId: user?.userId,
-          paymentFor: "NatureTherapyBooking",
+          paymentFor: "NatureTherapy",
           bookingId: bookingId,
         };
 

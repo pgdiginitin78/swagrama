@@ -105,9 +105,7 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
 const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
-
-  // API specific states
-  const [locationListOptions, setLocationListOptions] = useState([]);
+   const [locationListOptions, setLocationListOptions] = useState([]);
   const [clinicsOptions, setClinicOptions] = useState([]);
   const [patientOptions, setPatientOptions] = useState([]);
   const [doctorOptions, setDoctorOptions] = useState([]);
@@ -153,7 +151,6 @@ const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
   const selectedServiceValue = watch("serviceFid");
 console.log("selectedServiceValue",selectedServiceValue);
 
-  // Calculate Days and Total Price
   useEffect(() => {
     let days = 0;
     if (fromDate && toDate) {
@@ -208,7 +205,6 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [locationValue]);
 
-  // Auto-select Swagram Community Clinic
   useEffect(() => {
     if (clinicsOptions?.length > 0) {
       const filterClinic = clinicsOptions.filter(
@@ -218,7 +214,6 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [clinicsOptions, setValue]);
 
-  // Fetch Doctors, Services & Patients
   useEffect(() => {
     if (clinicFidValue?.id > 0) {
       setValue("doctorFid", null);
@@ -278,7 +273,6 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [clinicFidValue, user, setValue]);
 
-  // Auto-Select Patient
   useEffect(() => {
     if (patientOptions?.length > 0 && user?.userId) {
       const filterPatient = patientOptions.filter(
@@ -288,7 +282,6 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [patientOptions, user, setValue]);
 
-  // Patch Pre-selected Service based on eventDetails
   useEffect(() => {
     if (servicesOptions?.length > 0 && eventDetails?.serviceName) {
       const matchedService = servicesOptions.find(
@@ -308,7 +301,6 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [servicesOptions, eventDetails, setValue]);
 
-  // Fetch Time Slots using fromDate
   useEffect(() => {
     if (doctorValue?.id && fromDate && clinicFidValue?.id) {
       setSelectedTimeSlot(null);

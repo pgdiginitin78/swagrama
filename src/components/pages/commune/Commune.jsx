@@ -259,14 +259,7 @@ function SeasonCard({ item, index, onBook }) {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-        <div className="absolute top-3 left-3">
-          <span
-            className={`inline-flex items-center gap-1 text-xs font-semibold px-3 py-1 rounded-full ${item.tagBg}`}
-          >
-            <IconComp className="w-3 h-3" />
-            {item.tag}
-          </span>
-        </div>
+    
 
         <div className="absolute bottom-3 left-3 right-3">
           <p
@@ -522,6 +515,7 @@ export default function CommuneTabs() {
   const [selectedService, setSelectedService] = useState(null);
   const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
   const heroRef = useRef(null);
+  const nextSectionRef = useRef(null);
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -606,7 +600,12 @@ export default function CommuneTabs() {
             transition={{ delay: 1.3, duration: 0.8 }}
             className="mt-8 flex justify-center gap-4"
           >
-            <button className="px-6 py-2.5 rounded-full bg-amber-400 text-stone-900 text-xs font-bold uppercase tracking-wider hover:bg-amber-300 transition-colors">
+            <button
+              onClick={() =>
+                nextSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="px-6 py-2.5 rounded-full bg-amber-400 text-stone-900 text-xs font-bold uppercase tracking-wider hover:bg-amber-300 transition-colors"
+            >
               Discover More
             </button>
           </motion.div>
@@ -624,13 +623,20 @@ export default function CommuneTabs() {
           <motion.div
             animate={{ y: [0, 6, 0] }}
             transition={{ repeat: Infinity, duration: 1.6 }}
+            onClick={() =>
+              nextSectionRef.current?.scrollIntoView({ behavior: "smooth" })
+            }
+            className="cursor-pointer"
           >
             <ChevronDown className="w-5 h-5 text-white/50" />
           </motion.div>
         </motion.div>
       </section>
 
-      <section className="relative py-16 md:py-24 px-4 md:px-12 max-w-6xl mx-auto">
+      <section
+        ref={nextSectionRef}
+        className="relative py-16 md:py-24 px-4 md:px-12 max-w-6xl mx-auto"
+      >
         <div
           className="absolute -top-4 right-0 text-[120px] md:text-[200px] font-black leading-none select-none pointer-events-none opacity-[0.04] text-stone-900"
           style={{ fontFamily: "'Cormorant Garamond', serif" }}
@@ -804,8 +810,8 @@ export default function CommuneTabs() {
               className="w-full h-48 md:h-96 object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-            <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12">
-              <p className="text-amber-300 text-xs uppercase tracking-widest mb-2 font-semibold">
+            <div className="absolute inset-0 flex flex-col text-center justify-center p-6 md:p-12">
+              <p className="text-amber-300 text-lg uppercase tracking-widest mb-2 font-semibold">
                 स्वऋतुविहार
               </p>
               <h3
@@ -816,7 +822,7 @@ export default function CommuneTabs() {
                 <br className="hidden md:block" />
                 Learn the Land.
               </h3>
-              <p className="text-white/70 text-xs md:text-sm max-w-xs">
+              <p className="text-white/70 text-xs md:text-sm text-center">
                 120+ days of immersive village living, farming & traditional
                 wisdom
               </p>
@@ -863,7 +869,7 @@ export default function CommuneTabs() {
           </motion.blockquote>
         </AnimSection>
       </div>
-      <section className="py-16 md:py-24 px-4 md:px-12">
+      <section className="py-16  px-4 md:px-12">
         <AnimSection className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} className="text-center mb-10 md:mb-14">
             <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-amber-600 mb-3">

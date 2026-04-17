@@ -106,6 +106,10 @@ const EnquiryFormModal = ({ open, handleClose }) => {
   }, [open, user, reset, setValue]);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     console.log("Visitor Enquiry Data:", {
       ...data,
     });

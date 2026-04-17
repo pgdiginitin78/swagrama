@@ -110,6 +110,10 @@ const MembershipRegistrationModal = ({
   }, [open, user, reset, setValue]);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     console.log("Visitor Enquiry Data:", {
       membershipDetails,
       ...data,

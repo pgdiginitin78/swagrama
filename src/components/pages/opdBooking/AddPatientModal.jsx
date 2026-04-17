@@ -29,6 +29,7 @@ import InputArea from "../../common/formFields/InputArea";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
 import DropdownField from "../../common/formFields/DropdownField";
+import { useAuth } from "../../../context/AuthContext";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -56,16 +57,13 @@ const patientSchema = yup.object().shape({
     .min(2, "Minimum 2 characters")
     .max(50, "Maximum 50 characters")
     .matches(/^[A-Za-z\s]+$/, "Letters only"),
-  bloodGroup: dropdownObjectSchema.typeError("Blood group is required"),
+
+  bloodGroup: yup.object().nullable().required("Blood group is required"),
+
   mobileNO: yup
     .string()
     .required("Contact number is required")
-    .matches(
-      /^[+]?[(]?[0-9]{1,4}[)]?[-\s.]?[(]?[0-9]{1,4}[)]?[-\s.]?[0-9]{1,9}$/,
-      "Enter a valid contact number",
-    )
-    .min(10, "Minimum 10 digits")
-    .max(15, "Maximum 15 digits"),
+    .matches(/^[6-9][0-9]{9}$/, "Enter a valid 10-digit mobile number"),
 
   dob: yup
     .date()
@@ -102,13 +100,14 @@ const patientSchema = yup.object().shape({
 
   address: yup
     .string()
-    .required("Address is required")
     .max(200, "Maximum 200 characters"),
 
   pinCode: yup
     .string()
-    .required("Pin code is required")
-    .matches(/^[A-Za-z0-9\s-]{3,10}$/, "Enter a valid pin code"),
+    .test("pincode-format", "Enter a valid 6-digit pin code", (value) => {
+      if (!value) return true; // allow empty
+      return /^[1-9][0-9]{5}$/.test(value);
+    }),
 });
 
 const formatDateToYYYYMMDD = (date) => {
@@ -195,6 +194,7 @@ function SectionHeader({ icon: Icon, label, children }) {
 }
 
 export default function AddPatientModal({ open, handleClose }) {
+  const { user } = useAuth();
   const [ipAddress, setIpAddress] = useState(null);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
@@ -206,7 +206,7 @@ export default function AddPatientModal({ open, handleClose }) {
     pinCode: "",
   });
 
-  const userData = JSON.parse(localStorage.getItem("user") || "null");
+
 
   const { setIsLoading } = useLoader();
 
@@ -235,6 +235,10 @@ export default function AddPatientModal({ open, handleClose }) {
   const watchedAge = useWatch({ control, name: "age" });
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     const saveObj = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -246,7 +250,7 @@ export default function AddPatientModal({ open, handleClose }) {
       pinCode: data.pinCode,
       macIp: ipAddress ?? "",
       macId: "",
-      bloodGroup:data.bloodGroup.value
+      bloodGroup: data.bloodGroup?.value ?? "",
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -257,14 +261,14 @@ export default function AddPatientModal({ open, handleClose }) {
       setOpenConfirmationModal(false);
       setIsLoading(true);
       const response = await AddPatient(finalSaveObj);
-      const apiData = response?.data;
+      const apiData = response?.data?.data || response?.data;
 
-      if (response?.status === 200 && apiData?.userId) {
-        successAlert(apiData.message);
+      if (response?.status === 200 && (apiData?.userId || apiData?.success)) {
+        successAlert(apiData.message || "Patient registered successfully!");
         handleClose();
         reset();
       } else {
-        errorAlert("Registration failed!");
+        errorAlert(apiData?.message || "Registration failed!");
       }
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
@@ -338,19 +342,19 @@ export default function AddPatientModal({ open, handleClose }) {
   }, [watchedAge, setValue, isUpdatingFromDOB]);
 
   useEffect(() => {
-    if (userData !== null) {
-      setValue("mobileNO", userData?.mobileNo);
+    if (user !== null) {
+      setValue("mobileNO", user?.mobileNo);
     } else {
       fetch("https://api.ipify.org?format=json")
         .then((res) => res.json())
         .then((data) => setIpAddress(data.ip))
         .catch((err) => console.error("IP fetch error:", err));
     }
-  }, [userData, setValue]);
+  }, [user, setValue]);
 
   useEffect(() => {
-    if (userData) {
-      getUserDetails(userData?.userId)
+    if (user) {
+      getUserDetails(user?.userId)
         .then((res) => {
           const data = res?.data?.data;
           const address = data?.address ?? "";
@@ -361,7 +365,7 @@ export default function AddPatientModal({ open, handleClose }) {
         })
         .catch((err) => err);
     }
-  }, [setValue]);
+  }, [user, setValue]);
 
   return (
     <>
@@ -382,81 +386,86 @@ export default function AddPatientModal({ open, handleClose }) {
           },
         }}
       >
-        <DialogTitle
-          sx={{
-            background:
-              "linear-gradient(135deg, #166534 0%, #16a34a 60%, #22c55e 100%)",
-            color: "white",
-            py: 2,
-            px: 3,
-            flexShrink: 0,
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          id="patient-form"
+          noValidate
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            overflow: "hidden",
           }}
         >
-          <Box
+          <DialogTitle
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
+              background:
+                "linear-gradient(135deg, #166534 0%, #16a34a 60%, #22c55e 100%)",
+              color: "white",
+              py: 2,
+              px: 3,
+              flexShrink: 0,
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <Box
-                sx={{
-                  width: 42,
-                  height: 42,
-                  bgcolor: "rgba(255,255,255,0.18)",
-                  borderRadius: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                  flexShrink: 0,
-                }}
-              >
-                <PersonAddAltIcon sx={{ fontSize: 24 }} />
-              </Box>
-              <Box>
-                <Typography
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Box
                   sx={{
-                    fontWeight: 800,
-                    fontSize: { xs: "1rem", sm: "1.1rem" },
-                    lineHeight: 1.2,
+                    width: 42,
+                    height: 42,
+                    bgcolor: "rgba(255,255,255,0.18)",
+                    borderRadius: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "1px solid rgba(255,255,255,0.25)",
+                    flexShrink: 0,
                   }}
                 >
-                  Patient Registration
-                </Typography>
-                <Typography
-                  sx={{ fontSize: "0.75rem", opacity: 0.8, fontWeight: 400 }}
-                >
-                  Fill in the patient details below
-                </Typography>
+                  <PersonAddAltIcon sx={{ fontSize: 24 }} />
+                </Box>
+                <Box>
+                  <Typography
+                    sx={{
+                      fontWeight: 800,
+                      fontSize: { xs: "1rem", sm: "1.1rem" },
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    Patient Registration
+                  </Typography>
+                  <Typography
+                    sx={{ fontSize: "0.75rem", opacity: 0.8, fontWeight: 400 }}
+                  >
+                    Fill in the patient details below
+                  </Typography>
+                </Box>
               </Box>
+              <CancelButtonModal onClick={handleCancel} />
             </Box>
-            <CancelButtonModal onClick={handleCancel} />
-          </Box>
-        </DialogTitle>
+          </DialogTitle>
 
-        <DialogContent
-          sx={{
-            px: { xs: 2, sm: 3 },
-            pt: 3,
-            pb: 3,
-            bgcolor: "#f0fdf4",
-            overflowY: "auto",
-            flexGrow: 1,
-            "&::-webkit-scrollbar": { width: 6 },
-            "&::-webkit-scrollbar-track": { bgcolor: "#dcfce7" },
-            "&::-webkit-scrollbar-thumb": {
-              background: "linear-gradient(#16a34a, #22c55e)",
-              borderRadius: 10,
-            },
-          }}
-        >
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            id="patient-form"
-            noValidate
-            className="pt-1"
+          <DialogContent
+            sx={{
+              px: { xs: 2, sm: 3 },
+              pt: 3,
+              pb: 3,
+              bgcolor: "#f0fdf4",
+              overflowY: "auto",
+              flexGrow: 1,
+              "&::-webkit-scrollbar": { width: 6 },
+              "&::-webkit-scrollbar-track": { bgcolor: "#dcfce7" },
+              "&::-webkit-scrollbar-thumb": {
+                background: "linear-gradient(#16a34a, #22c55e)",
+                borderRadius: 10,
+              },
+            }}
           >
             <Box sx={{ mb: 3 }}>
               <SectionHeader
@@ -494,7 +503,7 @@ export default function AddPatientModal({ open, handleClose }) {
                   control={control}
                   label="Date of Birth"
                   error={errors.dob}
-                  maxDate={today}
+                  maxDate={new Date()}
                   dob={true}
                 />
                 <InputField
@@ -601,38 +610,37 @@ export default function AddPatientModal({ open, handleClose }) {
                 </Box>
               </Box>
             </Box>
-          </form>
-        </DialogContent>
-
-        <Box
-          sx={{
-            flexShrink: 0,
-            display: "flex",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            gap: 1.5,
-            px: { xs: 2, sm: 3 },
-            py: 2,
-            bgcolor: "#f0fdf4",
-            borderTop: "1px solid #bbf7d0",
-          }}
-        >
-          <CommonButton
-            label="Reset"
-            onClick={() => {
-              reset();
-              setValue("mobileNO", userData?.mobileNo);
+          </DialogContent>
+          <Box
+            sx={{
+              flexShrink: 0,
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: 1.5,
+              px: { xs: 2, sm: 3 },
+              py: 2,
+              bgcolor: "#f0fdf4",
+              borderTop: "1px solid #bbf7d0",
             }}
-            className={"border border-red-600 text-red-600"}
-          />
+          >
+            <CommonButton
+              label="Reset"
+              onClick={() => {
+                reset();
+                setValue("mobileNO", user?.mobileNo);
+              }}
+              className={"border border-red-600 text-red-600"}
+            />
 
-          <CommonButton
-            label="Register Patient"
-            type="submit"
-            className={"bg-green-600 text-white"}
-            disabled={isSubmitting}
-          />
-        </Box>
+            <CommonButton
+              label="Register Patient"
+              type="submit"
+              className={"bg-green-600 text-white"}
+              disabled={isSubmitting}
+            />
+          </Box>
+        </form>
       </Dialog>
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}

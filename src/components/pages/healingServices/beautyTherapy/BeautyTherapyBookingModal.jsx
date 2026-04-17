@@ -23,6 +23,7 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
+import { errorAlert } from "../../../common/toast/CustomToast";
 
 const dropdownObjectSchema = yup
   .object()
@@ -82,8 +83,8 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
           isSelected
-            ? "bg-ayuMid text-white shadow-nature"
-            : "bg-ayuHerbal text-ayuTulsi hover:bg-ayuLight hover:text-white border border-ayuLight/30"
+            ? "bg-booking-primary text-white shadow-md"
+            : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -123,11 +124,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     reset,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      location: null,
-      clinicFid: null,
-      patientFid: null,
-      doctorFid: null,
+    defaultValues: {  
+      fullName: "",
+      email: "",
+      mobile: "",
+      city: "",
       serviceFid: null,
       bookingDate: null,
       termsAccepted: false,
@@ -304,6 +305,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   }, [doctorValue?.id, bookingDate]);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
       return;
@@ -346,11 +351,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-[9px] shadow-2xl border border-emerald-100 overflow-hidden">
-                <div className="sticky top-0 z-20 bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
-                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                    <span className="bg-white/20 p-1.5 rounded-[9px] flex items-center justify-center">
-                      <Event sx={{ fontSize: 20 }} />
+              <div className="relative bg-booking-bg rounded-[9px] shadow-2xl border border-booking-border overflow-hidden">
+                <div className="sticky top-0 z-20 bg-white border-b border-booking-border px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
+                  <h2 className="text-lg sm:text-xl font-bold text-booking-text flex items-center gap-2">
+                    <span className="bg-booking-primary/10 p-1.5 rounded-[9px] flex items-center justify-center">
+                      <Event sx={{ fontSize: 20, color: "var(--booking-primary)" }} className="text-booking-primary" />
                     </span>
                     Book Beauty Therapy
                   </h2>
@@ -365,9 +370,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         className="lg:col-span-2 space-y-5"
                       >
                         {/* Patient & Therapy Info */}
-                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 py-2 flex items-center gap-2 font-bold text-white">
-                            <div className="p-1.5 bg-white/20 rounded-[9px]">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2 font-bold text-booking-primary">
+                            <div className="p-1.5 bg-booking-primary/10 rounded-[9px]">
                               <User className="w-5 h-5" />
                             </div>
                             <h2 className="text-base sm:text-lg">
@@ -417,9 +422,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         </div>
 
                         {/* Schedule Info */}
-                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-lime to-ayuMid px-4 py-2 flex items-center gap-2 text-white font-bold">
-                            <div className="p-1.5 bg-white/20 rounded-lg">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2 text-booking-primary font-bold">
+                            <div className="p-1.5 bg-booking-primary/10 rounded-lg">
                               <Calendar className="w-5 h-5" />
                             </div>
                             <h2 className="text-base sm:text-lg">
@@ -464,7 +469,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         </div>
 
                         {/* Additional Info */}
-                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 overflow-hidden p-4 sm:p-5">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden p-4 sm:p-5">
                           <InputArea
                             name="specialRequest"
                             control={control}
@@ -487,9 +492,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         variants={sectionVariants}
                         className="lg:col-span-1"
                       >
-                        <div className="bg-white rounded-[9px] shadow-md border border-slate-200 lg:sticky lg:top-0 h-full flex flex-col">
-                          <div className="bg-gradient-to-r from-ayuMid to-ayuTulsi px-4 py-2 flex items-center gap-2 rounded-t-[9px] text-white font-bold">
-                            <div className="p-1.5 bg-white/20 rounded-[9px]">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border lg:sticky lg:top-0 h-full flex flex-col">
+                          <div className="bg-booking-secondaryLight px-4 py-2 flex items-center gap-2 rounded-t-[9px] text-booking-secondary font-bold">
+                            <div className="p-1.5 bg-booking-secondary/10 rounded-[9px]">
                               <Clock className="w-5 h-5" />
                             </div>
                             <h2 className="text-base sm:text-lg">
@@ -534,8 +539,8 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               >
                                 {doctorValue && bookingDate ? (
                                   <>
-                                    <div className="w-12 h-12 bg-ayuHerbal rounded-full flex items-center justify-center mb-3">
-                                      <Clock className="w-6 h-6 text-ayuMid" />
+                                    <div className="w-12 h-12 bg-booking-primaryLight rounded-full flex items-center justify-center mb-3">
+                                      <Clock className="w-6 h-6 text-booking-primary" />
                                     </div>
                                     <p className="text-slate-600 font-medium">
                                       No slots available
@@ -543,8 +548,8 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   </>
                                 ) : (
                                   <>
-                                    <div className="w-12 h-12 bg-lime-light rounded-full flex items-center justify-center mb-3">
-                                      <Calendar className="w-6 h-6 text-ayuTulsi" />
+                                    <div className="w-12 h-12 bg-booking-primaryLight rounded-full flex items-center justify-center mb-3">
+                                      <Calendar className="w-6 h-6 text-booking-primary" />
                                     </div>
                                     <p className="text-slate-500 font-medium text-sm">
                                       Select Booking Date to view slots.
@@ -562,10 +567,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                           )}
 
                           {/* Bill Summary Section */}
-                          <div className="bg-gradient-to-br from-ayuHerbal to-white mx-4 mb-4 p-4 rounded-[9px] border border-ayuMid/20 shadow-nature">
-                            <div className="flex items-center gap-2 mb-3 border-b border-ayuMid/10 pb-2">
-                              <Banknote className="w-4 h-4 text-ayuMid" />
-                              <h3 className="text-[11px] font-bold uppercase tracking-widest text-ayuTulsi">
+                          <div className="bg-booking-primaryLight mx-4 mb-4 p-4 rounded-[9px] border border-booking-primary/20 shadow-sm">
+                            <div className="flex items-center gap-2 mb-3 border-b border-booking-primary/10 pb-2">
+                              <Banknote className="w-4 h-4 text-booking-primary" />
+                              <h3 className="text-[11px] font-bold uppercase tracking-widest text-booking-primaryDark">
                                 Bill Summary
                               </h3>
                             </div>
@@ -584,12 +589,12 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   ₹{Math.round((selectedServiceValue?.charges || 0) * 0)}
                                 </span>
                               </div>
-                              <div className="pt-2 mt-2 border-t border-ayuMid/10 flex justify-between items-end">
+                              <div className="pt-2 mt-2 border-t border-booking-primary/10 flex justify-between items-end">
                                 <div>
-                                  <p className="text-[9px] text-ayuMid font-bold uppercase tracking-tighter">
+                                  <p className="text-[9px] text-booking-primary font-bold uppercase tracking-tighter">
                                     Total Payable
                                   </p>
-                                  <p className="text-xl font-black text-ayuTulsi leading-none">
+                                  <p className="text-xl font-black text-booking-primaryDark leading-none">
                                     ₹
                                     {(
                                       (selectedServiceValue?.charges || 0) +
@@ -614,13 +619,13 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         type="button"
                         onClick={handleClose}
                         label="Cancel"
-                        className=" border border-red-200 text-red-600 font-semibold hover:bg-red-50 transition-colors w-full sm:w-auto"
+                        className=" border border-slate-200 text-slate-600 font-semibold hover:bg-slate-50 transition-colors w-full sm:w-auto"
                       />
                       <CommonButton
                         type="submit"
                         label="Book Now"
                         onClick={handleSubmit(onSubmit)}
-                        className="bg-ayuMid hover:bg-ayuTulsi text-white shadow-nature font-semibold px-8 transition-transform w-full sm:w-auto"
+                        className="bg-booking-primary hover:bg-booking-primaryDark text-white font-semibold px-8 transition-transform w-full sm:w-auto"
                       />
                     </div>
                   </form>

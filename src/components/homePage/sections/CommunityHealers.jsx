@@ -1,8 +1,8 @@
-import React, { memo, useState } from "react";
-import { motion } from "framer-motion";
-import { Container, Card, Avatar } from "@mui/material";
 import { MedicalServices } from "@mui/icons-material";
-import { healers, containerVariants, cardVariants, getIcon } from "../HomePageConstants";
+import { Card, Container } from "@mui/material";
+import { motion } from "framer-motion";
+import { memo, useState } from "react";
+import { cardVariants, containerVariants, healers } from "../HomePageConstants";
 
 const CommunityHealers = () => {
   const [hoveredId, setHoveredId] = useState(null);
@@ -93,26 +93,7 @@ const CommunityHealers = () => {
                       </div>
                     </motion.div>
 
-                    <div className="relative w-full">
-                      <motion.div
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{ delay: 0.4, type: "spring" }}
-                        className="absolute -bottom-8 left-0 right-0 z-10 flex justify-center"
-                      >
-                        <Avatar
-                          sx={{
-                            width: 64,
-                            height: 64,
-                            border: "4px solid white",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                            background: `linear-gradient(135deg, ${healer.color} 0%, ${healer.color}dd 100%)`,
-                          }}
-                        >
-                          {getIcon(healer.specialty)}
-                        </Avatar>
-                      </motion.div>
-                    </div>
+         
                   </div>
 
                   <div className="mt-10 pb-6 px-6 text-center">

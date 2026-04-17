@@ -30,7 +30,9 @@ import { styled } from "@mui/material/styles";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
+import { useAuth } from "../../../context/AuthContext";
 import { useForm } from "react-hook-form";
+import { errorAlert } from "../../common/toast/CustomToast";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
 import CheckBoxField from "../../common/formFields/CheckBoxField";
@@ -49,13 +51,13 @@ const PremiumConnector = styled(StepConnector)(({ theme }) => ({
   },
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      background: "linear-gradient(90deg, #10b981 0%, #059669 100%)",
+      backgroundColor: "var(--booking-primary)",
       boxShadow: "0 2px 6px rgba(16, 185, 129, 0.3)",
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      background: "linear-gradient(90deg, #10b981 0%, #059669 100%)",
+      backgroundColor: "var(--booking-primary)",
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
@@ -69,7 +71,7 @@ const PremiumConnector = styled(StepConnector)(({ theme }) => ({
 
 const PremiumStepIconRoot = styled("div")(({ theme, ownerState }) => ({
   backgroundColor:
-    ownerState.completed || ownerState.active ? "#10b981" : "#e5e7eb",
+    ownerState.completed || ownerState.active ? "var(--booking-primary)" : "#e5e7eb",
   zIndex: 1,
   color: "#fff",
   width: 36,
@@ -83,10 +85,10 @@ const PremiumStepIconRoot = styled("div")(({ theme, ownerState }) => ({
   border: ownerState.active ? "2px solid #d1fae5" : "none",
   transform: ownerState.active ? "scale(1.05)" : "scale(1)",
   ...(ownerState.completed && {
-    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    backgroundColor: "var(--booking-primaryDark)",
   }),
   ...(ownerState.active && {
-    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+    backgroundColor: "var(--booking-primary)",
     animation: "pulse 2s ease-in-out infinite",
   }),
   "@keyframes pulse": {
@@ -232,6 +234,7 @@ const buttonHoverVariants = {
 };
 
 export default function BookEventForm({ open, handleClose, eventDetails }) {
+  const { user } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [direction, setDirection] = useState(1);
   const [formData, setFormData] = useState(null);
@@ -372,6 +375,10 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
   };
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     const finalData = {
       ...formData,
       ...data,
@@ -404,7 +411,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
     >
       <Box
         sx={style}
-        className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[65%] 2xl:w-[55%] max-h-[85vh] md:max-h-[95vh] overflow-y-auto bg-gradient-to-b from-gray-50 to-white"
+        className="w-[95%] sm:w-[90%] md:w-[85%] lg:w-[75%] xl:w-[65%] 2xl:w-[55%] max-h-[85vh] md:max-h-[95vh] overflow-y-auto bg-booking-bg"
       >
         <div className="flex items-center justify-between  w-full">
           <div className="relative z-10 p-2">
@@ -414,14 +421,14 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
               transition={{ delay: 0.2 }}
               className="flex items-center gap-2"
             >
-              <div className="bg-white/20 backdrop-blur-sm p-1.5 rounded-lg">
-                <EventNoteIcon className="text-ayuDark text-xl" />
+              <div className="bg-booking-primary/10 backdrop-blur-sm p-1.5 rounded-lg">
+                <EventNoteIcon className="text-booking-primary text-xl" />
               </div>
               <div>
-                <h1 className="font-bold text-lg md:text-xl text-ayuDark drop-shadow-lg">
+                <h1 className="font-bold text-lg md:text-xl text-booking-text">
                   Book Service
                 </h1>
-                <p className="text-xs sm:text-sm text-ayuDark font-medium">
+                <p className="text-xs sm:text-sm text-booking-label font-medium">
                   {eventDetails?.name || "Complete the booking process"}
                 </p>
               </div>
@@ -431,7 +438,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
             <CancelButtonModal onClick={handleModalClose} />
           </div>
         </div>
-        <Divider sx={{ borderColor: "#4a7c2c", borderWidth: 1.5 }} />
+        <Divider sx={{ borderColor: "var(--booking-border)", borderWidth: 1 }} />
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 50 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -462,11 +469,11 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                       "& .MuiStepLabel-label": {
                         fontSize: { xs: "0.7rem", sm: "0.8rem" },
                         fontWeight: activeStep === index ? 700 : 500,
-                        color: activeStep === index ? "#059669" : "#6b7280",
+                        color: activeStep === index ? "var(--booking-primary)" : "#6b7280",
                         transition: "all 0.3s ease",
                       },
                       "& .MuiStepLabel-label.Mui-completed": {
-                        color: "#059669",
+                        color: "var(--booking-primaryDark)",
                         fontWeight: 600,
                       },
                     }}
@@ -484,16 +491,16 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
             transition={{ delay: 0.4 }}
             className="px-4 sm:px-6 py-3"
           >
-            <div className="p-3 bg-gradient-to-br from-green-50 to-green-50 border border-ayuMid rounded-xl">
+            <div className="p-3 bg-booking-primaryLight border border-booking-primary/10 rounded-xl">
               <div className="flex items-start gap-2">
-                <div className="bg-ayuMid p-1.5 rounded-lg mt-0.5">
+                <div className="bg-booking-primary p-1.5 rounded-lg mt-0.5">
                   <InfoOutlinedIcon className="text-white text-base" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-bold text-gray-900 mb-2">
+                  <h3 className="text-sm font-bold text-booking-primaryDark mb-2">
                     Important Rules
                   </h3>
-                  <ul className="space-y-1.5 text-xs text-gray-700">
+                  <ul className="space-y-1.5 text-xs text-booking-label">
                     <li className="flex items-start gap-1.5">
                       <span>
                         Primary guest must be at least 18 years of age
@@ -509,7 +516,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                   <div className="flex justify-end mt-2">
                     <a
                       // href="#"
-                      className="text-ayuMid hover:text-ayuMid text-xs font-semibold flex items-center gap-1 transition-all hover:gap-1.5"
+                      className="text-booking-primary hover:text-booking-primary text-xs font-semibold flex items-center gap-1 transition-all hover:gap-1.5"
                     >
                       View All Rules
                       <ArrowForwardIcon sx={{ fontSize: 14 }} />
@@ -608,7 +615,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                     ${
                       activeStep === 0
                         ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                        : "bg-white border border-emerald-500 text-emerald-600 hover:bg-emerald-50 shadow-sm hover:shadow-md"
+                        : "bg-white border border-booking-primary text-booking-primary hover:bg-booking-primaryLight shadow-sm hover:shadow-md"
                     }
                   `}
                   label={
@@ -630,7 +637,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                   <CommonButton
                     onClick={handleSubmit(onSubmit)}
                     type="submit"
-                    className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
+                    className="px-6 py-2 bg-booking-primary hover:bg-booking-primaryDark text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
                     label={
                       <span className="flex items-center gap-1.5">
                         <CheckCircleOutlineIcon sx={{ fontSize: 18 }} />
@@ -642,7 +649,7 @@ export default function BookEventForm({ open, handleClose, eventDetails }) {
                   <CommonButton
                     type="button"
                     onClick={handleNext}
-                    className="px-6 py-2 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
+                    className="px-6 py-2 bg-booking-primary hover:bg-booking-primaryDark text-white rounded-lg font-bold shadow-md hover:shadow-lg transition-all duration-300 text-sm"
                     label={
                       <span className="flex items-center gap-1.5">
                         Next Step
@@ -676,13 +683,13 @@ function StepOnePrimaryGuest({
       <motion.div variants={itemVariants}>
         <Paper
           elevation={0}
-          className="p-4 bg-gradient-to-br from-amber-100 to-amber-100 border border-ayuBrown rounded-xl"
+          className="p-4 bg-booking-primaryLight border border-booking-primary/10 rounded-xl"
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="bg-ayuBrown p-1.5 rounded-lg">
+            <div className="bg-booking-primary p-1.5 rounded-lg">
               <PersonOutlineIcon className="text-white text-base" />
             </div>
-            <h3 className="text-sm font-bold text-gray-800">
+            <h3 className="text-sm font-bold text-booking-primaryDark">
               Who is this booking for?
             </h3>
           </div>
@@ -701,13 +708,13 @@ function StepOnePrimaryGuest({
       <motion.div variants={itemVariants}>
         <Paper
           elevation={0}
-          className="p-4 bg-green-100 border border-green-200 rounded-xl shadow-sm hover:shadow-md transition-shadow"
+          className="p-4 bg-booking-surface border border-booking-border rounded-xl shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center gap-2 mb-2">
-            <div className="bg-emerald-600 p-1.5 rounded-lg">
+            <div className="bg-booking-primary p-1.5 rounded-lg">
               <PersonOutlineIcon className="text-white text-base" />
             </div>
-            <h3 className="text-sm font-bold text-gray-800">
+            <h3 className="text-sm font-bold text-booking-primaryDark">
               Primary Guest Information
             </h3>
           </div>
@@ -1687,7 +1694,7 @@ function StepFiveReviewConfirm({
           className="p-4 bg-white border border-gray-200 rounded-xl mb-3 shadow-sm"
         >
           <div className="flex items-center gap-2 mb-3">
-            <div className="bg-ayuMid p-1.5 rounded-lg">
+            <div className="bg-booking-primary p-1.5 rounded-lg">
               <EmailOutlinedIcon className="text-white text-xs" />
             </div>
             <h4 className="font-bold text-gray-800 text-sm">

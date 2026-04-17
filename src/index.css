@@ -6,6 +6,10 @@
   html, body {
     font-family: 'Inter', sans-serif;
   }
+  *:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
 }
 
 

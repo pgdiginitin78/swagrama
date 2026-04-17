@@ -745,7 +745,7 @@ function AyurvedaForm({
 
   const handleConfirmBooking = handleSubmit((data) => {
     if (user === null) {
-      errorAlert("Please Login First !");
+      errorAlert("login first");
     } else if (selectedTimeSlot === null) {
       setSlotData((prev) => ({
         ...prev,
@@ -1553,14 +1553,14 @@ function AyurvedaForm({
                 <button
                   type="button"
                   onClick={() => reset()}
-                  className="w-full h-10 px-5 rounded-[9px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 sm:rounded-[9px]"
+                  className="w-full h-10 px-5 rounded-[5px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 "
                 >
                   Reset
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBooking}
-                  className="w-full h-10 px-6 rounded-[9px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 sm:rounded-[9px]"
+                  className="w-full h-10 px-6 rounded-[5px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 "
                 >
                   <EventAvailableIcon sx={{ fontSize: 16 }} />
                   Confirm Booking

@@ -129,6 +129,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails }) => {
   }, [open, user, setValue]);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     console.log("Visitor Booking Data:", {
       service: serviceDetails?.serviceName,
       totalAmount: total,

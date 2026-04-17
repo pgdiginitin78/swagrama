@@ -23,6 +23,8 @@ import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
 import SearchDropdown from "../../../common/formFields/SearchDropdown";
 import TimePickerField from "../../../common/formFields/TimePickerField";
+import { useAuth } from "../../../../context/AuthContext";
+import { errorAlert } from "../../../common/toast/CustomToast";
 
 const schema = yup.object().shape({
   diseaseAllotted: yup
@@ -173,6 +175,7 @@ const modalStyle = {
 };
 
 const TherapyForm = ({ open, handleClose }) => {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
 
   const steps = [
@@ -250,6 +253,10 @@ const TherapyForm = ({ open, handleClose }) => {
   const stayType = watch("stayType");
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     console.log("Form Data:", data);
     alert("Form submitted successfully! Check console for data.");
     handleClose();

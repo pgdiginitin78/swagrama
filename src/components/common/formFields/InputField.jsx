@@ -51,18 +51,13 @@ const InputField = ({
               multiline={multiline}
               accept={accept}
               InputLabelProps={InputLabelProps}
-              inputProps={
-                // dontCapitalize
-                //   ?
-                (inputProps,
-                {
-                  style: {
-                    fontSize: tableInputField ? "12px" : "14px",
-                    height: tableInputField ? "10px" : "20px",
-                  },
-                })
-
-              }
+              inputProps={{
+                ...inputProps,
+                style: {
+                  fontSize: tableInputField ? "12px" : "14px",
+                  height: tableInputField ? "10px" : "20px",
+                },
+              }}
               sx={{
                 "& .MuiFormLabel-root": {
                   fontSize: tableInputField ? "12px" : "14px",
@@ -92,6 +87,10 @@ const InputField = ({
               {...field}
               size="small"
               shrink={false}
+              helperText={error?.message}
+              FormHelperTextProps={{
+                sx: { fontSize: "10px", mt: 0, ml: 0 },
+              }}
             />
           );
         }}

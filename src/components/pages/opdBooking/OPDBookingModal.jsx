@@ -102,8 +102,8 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
           isSelected
-            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
-            : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
+            ? "bg-booking-primary text-white shadow-md"
+            : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -183,6 +183,10 @@ export default function OPDBookingModal({
   };
 
   const handleBookAppointment = (dataObj) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
       return;
@@ -218,14 +222,15 @@ export default function OPDBookingModal({
         SloteStartTime: selectedTimeSlot?.slotStartTime,
         appointmentDate: format(new Date(appointmentDate), "yyyy-MM-dd"),
         userId: userId,
+        paymentFor:"OPD"
       };
       setIsLoading(true);
       const res = await InitiatePayment(clinicFidValue?.id, userId, tempObj);
       const data = res?.data;
 
       if (data?.status === 200) {
-        setIsLoading(false); // Stop full screen loading so user can use the modal
-        setIsPaymentPending(true); // Show the waiting mode in the confirmation modal
+        setIsLoading(false); 
+        setIsPaymentPending(true);
 
         cancelPaymentRef.current = RedirectToSabPaisa(
           data,
@@ -273,7 +278,7 @@ export default function OPDBookingModal({
           }));
           setLocationListOptions(formatted);
           const filterLocation = formatted.filter(
-            (item) => item.label === "Lavale",
+            (item) => item.label === "Narhe",
           );
           setValue("location", filterLocation[0]);
         }
@@ -438,8 +443,8 @@ export default function OPDBookingModal({
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
-                <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-emerald-100 px-4 sm:px-6 py-4 shadow-sm">
+              <div className="relative bg-booking-bg rounded-2xl shadow-2xl border border-booking-border overflow-hidden">
+                <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-booking-border px-4 sm:px-6 py-4 shadow-sm">
                   <div className="flex items-center justify-between w-full">
                     <div className="flex items-center gap-3 w-full">
                       <motion.div
@@ -450,7 +455,7 @@ export default function OPDBookingModal({
                           stiffness: 200,
                           damping: 15,
                         }}
-                        className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                        className="w-11 h-11 rounded-xl bg-booking-primary flex items-center justify-center shadow-md"
                       >
                         <svg
                           className="w-6 h-6 text-white"
@@ -465,10 +470,10 @@ export default function OPDBookingModal({
                         </svg>
                       </motion.div>
                       <div>
-                        <h1 className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent whitespace-nowrap">
+                        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-booking-text whitespace-nowrap">
                           Book an Appointment
                         </h1>
-                        <p className="text-xs text-slate-500 hidden sm:block">
+                        <p className="text-xs text-booking-label hidden sm:block">
                           Schedule your visit with our healthcare professionals
                         </p>
                       </div>
@@ -487,12 +492,12 @@ export default function OPDBookingModal({
                         variants={sectionVariants}
                         className="lg:col-span-2 space-y-5"
                       >
-                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-slate-200">
-                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                              <User className="w-5 h-5 text-white" />
+                        <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
+                            <div className="p-1.5 bg-booking-primary/10 rounded-lg">
+                              <User className="w-5 h-5 text-booking-primary" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg font-bold text-booking-primary">
                               Patient Information
                             </h2>
                           </div>
@@ -539,12 +544,12 @@ export default function OPDBookingModal({
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-slate-200">
-                          <div className="bg-gradient-to-r from-lime-400 to-emerald-400 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                              <Calendar className="w-5 h-5 text-white" />
+                        <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
+                            <div className="p-1.5 bg-booking-primary/10 rounded-lg">
+                              <Calendar className="w-5 h-5 text-booking-primary" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg font-bold text-booking-primary">
                               Schedule Details
                             </h2>
                           </div>
@@ -587,12 +592,12 @@ export default function OPDBookingModal({
                         variants={sectionVariants}
                         className="lg:col-span-1"
                       >
-                        <div className="bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden border border-slate-200 lg:sticky lg:top-0">
-                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 flex items-center gap-2">
-                            <div className="p-1.5 bg-white/20 backdrop-blur-sm rounded-lg">
-                              <Clock className="w-5 h-5 text-white" />
+                        <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border lg:sticky lg:top-0">
+                          <div className="bg-booking-secondaryLight px-4 py-2 flex items-center gap-2">
+                            <div className="p-1.5 bg-booking-secondary/10 rounded-lg">
+                              <Clock className="w-5 h-5 text-booking-secondary" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg font-bold text-booking-secondary">
                               Available Slots
                             </h2>
                           </div>
@@ -700,12 +705,12 @@ export default function OPDBookingModal({
                                           <p className="text-xs text-emerald-600 font-semibold mb-1 uppercase tracking-wide">
                                             Selected Time
                                           </p>
-                                          <p className="text-base font-bold text-emerald-900">
+                                          <p className="text-base font-bold text-booking-primaryDark">
                                             {selectedTimeSlot.slotStartTime} To{" "}
                                             {selectedTimeSlot.slotEndTime}
                                           </p>
                                         </div>
-                                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full flex items-center justify-center">
+                                        <div className="w-10 h-10 bg-booking-primary rounded-full flex items-center justify-center">
                                           <svg
                                             className="w-5 h-5 text-white"
                                             fill="none"
@@ -741,14 +746,14 @@ export default function OPDBookingModal({
                     >
                       <CommonButton
                         type="button"
-                        label="Reset1"
+                        label="Reset"
                         onClick={handleReset}
-                        className="bg-white border px-5 border-red-500 text-red-600 hover:bg-red-50 transition-all duration-200"
+                        className="bg-white border px-5 border-slate-200 text-slate-600 hover:bg-slate-50 transition-all duration-200"
                       />
                       <CommonButton
                         type="submit"
                         label="Book Appointment"
-                        className="bg-gradient-to-r from-emerald-500 to-green-500 text-white transition-all duration-200"
+                        className="bg-booking-primary hover:bg-booking-primaryDark text-white transition-all duration-200"
                       />
                     </motion.div>
                   </form>

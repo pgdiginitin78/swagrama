@@ -25,6 +25,7 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
+import { errorAlert } from "../../../common/toast/CustomToast";
 
 const dropdownObjectSchema = yup
   .object()
@@ -87,7 +88,7 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         ${
           isSelected
             ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
-            : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
+            : "bg-slate-100 text-booking-label hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -335,6 +336,10 @@ console.log("selectedServiceValue",selectedServiceValue);
   }, [doctorValue?.id, fromDate, clinicFidValue]);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
       return;
@@ -376,10 +381,10 @@ console.log("selectedServiceValue",selectedServiceValue);
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
-                <div className="sticky top-0 z-20 bg-emerald-600 px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
-                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                    <span className="bg-white/20 p-1.5 rounded-lg flex items-center justify-center">
+              <div className="relative bg-booking-bg rounded-2xl shadow-2xl border border-emerald-100 overflow-hidden">
+                <div className="sticky top-0 z-20 bg-white border-b border-booking-border px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
+                  <h2 className="text-lg sm:text-xl font-bold text-booking-text flex items-center gap-2">
+                    <span className="bg-booking-primary/10 p-1.5 rounded-lg flex items-center justify-center">
                       <Event sx={{ fontSize: 20 }} />
                     </span>
                     Book Detox Therapy
@@ -401,8 +406,8 @@ console.log("selectedServiceValue",selectedServiceValue);
                         className="lg:col-span-2 space-y-5"
                       >
                         {/* Patient & Therapy Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-2 flex items-center gap-2">
+                        <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-white/20 rounded-lg">
                               <User className="w-5 h-5 text-white" />
                             </div>
@@ -448,8 +453,8 @@ console.log("selectedServiceValue",selectedServiceValue);
                         </div>
 
                         {/* Schedule Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
-                          <div className="bg-gradient-to-r from-lime-400 to-emerald-400 px-4 py-2 flex items-center gap-2">
+                        <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-white/20 rounded-lg">
                               <Calendar className="w-5 h-5 text-white" />
                             </div>
@@ -487,9 +492,9 @@ console.log("selectedServiceValue",selectedServiceValue);
                             </div>
 
                             {/* Calculated Price Section */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-booking-primaryLight p-4 rounded-xl border border-booking-primary/10">
                               <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                                <span className="text-booking-label text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
                                   <Banknote className="w-3.5 h-3.5" /> Per Day
                                   Amount
                                 </span>
@@ -501,7 +506,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                                 />
                               </div>
                               <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                                <span className="text-booking-label text-xs font-bold uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                                   <Calendar className="w-3.5 h-3.5" /> Total
                                   Amount
                                 </span>
@@ -517,7 +522,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                         </div>
 
                         {/* Additional Info */}
-                        <div className="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden p-4 sm:p-5">
+                        <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden p-4 sm:p-5">
                           <InputArea
                             name="specialRequest"
                             control={control}
@@ -542,7 +547,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                         className="lg:col-span-1"
                       >
                         <div className="bg-white rounded-xl shadow-md border border-slate-200 lg:sticky lg:top-0 h-full flex flex-col">
-                          <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2 flex items-center gap-2 rounded-t-lg">
+                          <div className="bg-booking-secondaryLight px-4 py-2 flex items-center gap-2 rounded-t-lg">
                             <div className="p-1.5 bg-white/20 rounded-lg">
                               <Clock className="w-5 h-5 text-white" />
                             </div>
@@ -635,7 +640,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                         type="submit"
                         label="Book Now"
                         onClick={handleSubmit(onSubmit)}
-                        className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-md font-semibold px-8 transition-transform w-full sm:w-auto"
+                        className="bg-booking-primary hover:bg-booking-primaryDark text-white shadow-md font-semibold px-8 transition-transform w-full sm:w-auto"
                       />
                     </div>
                   </form>

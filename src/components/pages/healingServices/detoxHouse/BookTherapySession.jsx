@@ -223,6 +223,10 @@ export default function BookTherapySession({ open, onClose, item }) {
     selectedGuest;
 
   const handleConfirmBooking = () => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     if (isPaymentPending) return;
     const saveObj = {
       TherapyName: item?.serviceName || "Therapy",

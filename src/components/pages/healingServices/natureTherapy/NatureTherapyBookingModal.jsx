@@ -88,8 +88,8 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
           isSelected
-            ? "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30"
-            : "bg-slate-100 text-slate-700 hover:bg-emerald-50 hover:shadow-md border border-slate-200 hover:border-emerald-300"
+            ? "bg-booking-primary text-white shadow-md"
+            : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -281,8 +281,14 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       setSelectedTimeSlot(null);
     }
   }, [user?.userId, fromDate]);
+  
+console.log("selectedTimeSlot",selectedTimeSlot);
 
   const onSubmit = (data) => {
+    if (!user) {
+      errorAlert("login first");
+      return;
+    }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
       return;
@@ -296,7 +302,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       City: data.city,
       email: data.email,
       Appointmentdate: format(new Date(data.fromDate), "yyyy-MM-dd"),
-      slotTime: selectedTimeSlot?.slotStartTime,
+      slotStartTime : selectedTimeSlot?.slotStartTime,
+      slotEndTime :selectedTimeSlot?.slotEndTime,
       No_of_person: data.noOfPerson,
       SpecificRequest: data.specialRequest,
       Amount: watch("totalAmount"),
@@ -386,11 +393,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
               exit="hidden"
               className="w-[95vw] sm:w-[85vw] md:w-[75vw] lg:w-[900px] xl:w-[1000px] max-w-[1200px]"
             >
-              <div className="relative bg-gradient-to-br from-white via-emerald-50/30 to-white rounded-[9px] shadow-2xl border border-emerald-100 overflow-hidden">
-                <div className="sticky top-0 z-20 bg-emerald-600 px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
-                  <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                    <span className="bg-white/20 p-1.5 rounded-lg flex items-center justify-center">
-                      <Event sx={{ fontSize: 20 }} />
+              <div className="relative bg-booking-bg rounded-[9px] shadow-2xl border border-booking-border overflow-hidden">
+                <div className="sticky top-0 z-20 bg-white border-b border-booking-border px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
+                  <h2 className="text-lg sm:text-xl font-bold text-booking-text flex items-center gap-2">
+                    <span className="bg-booking-primary/10 p-1.5 rounded-lg flex items-center justify-center">
+                      <Event sx={{ fontSize: 20, color: "var(--booking-primary)" }} className="text-booking-primary" />
                     </span>
                     Book Nature Therapy
                   </h2>
@@ -405,10 +412,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                         variants={sectionVariants}
                         className="lg:col-span-8 space-y-6"
                       >
-                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden">
-                          <div className="bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-3 flex items-center gap-3">
-                            <User className="w-5 h-5 text-white" />
-                            <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-5 py-3 flex items-center gap-3">
+                            <User className="w-5 h-5 text-booking-primary" />
+                            <h2 className="text-base font-bold text-booking-primary uppercase tracking-wider">
                               Patient Information
                             </h2>
                           </div>
@@ -454,10 +461,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden">
-                          <div className="bg-gradient-to-r from-lime-500 to-emerald-500 px-5 py-3 flex items-center gap-3">
-                            <Calendar className="w-5 h-5 text-white" />
-                            <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
+                          <div className="bg-booking-primaryLight px-5 py-3 flex items-center gap-3">
+                            <Calendar className="w-5 h-5 text-booking-primary" />
+                            <h2 className="text-base font-bold text-booking-primary uppercase tracking-wider">
                               Therapy & Schedule
                             </h2>
                           </div>
@@ -493,7 +500,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
                         </div>
 
-                        <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden p-5">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden p-5">
                           <InputArea
                             name="specialRequest"
                             control={control}
@@ -517,10 +524,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                         className="lg:col-span-4 lg:sticky lg:top-0 h-fit"
                       >
                         <div className="space-y-6">
-                          <div className="bg-white rounded-[9px] shadow-sm border border-emerald-100 overflow-hidden flex flex-col">
-                            <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 flex items-center gap-3">
-                              <Clock className="w-5 h-5 text-white" />
-                              <h2 className="text-base font-bold text-white uppercase tracking-wider">
+                          <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden flex flex-col">
+                            <div className="bg-booking-secondaryLight px-5 py-3 flex items-center gap-3">
+                              <Clock className="w-5 h-5 text-booking-secondary" />
+                              <h2 className="text-base font-bold text-booking-secondary uppercase tracking-wider">
                                 Slots
                               </h2>
                             </div>
@@ -528,7 +535,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                             <div className="p-4 flex-1 min-h-[220px]">
                               {loading ? (
                                 <div className="flex flex-col items-center justify-center h-40">
-                                  <div className="w-8 h-8 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
+                                  <div className="w-8 h-8 border-4 border-booking-primaryLight border-t-booking-primary rounded-full animate-spin"></div>
                                 </div>
                               ) : doctorSlots?.length > 0 ? (
                                 <div className="grid grid-cols-2 gap-2">
@@ -565,47 +572,47 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                             </div>
                           </div>
 
-                          <div className="bg-emerald-900 rounded-[9px] shadow-xl p-5 text-white">
-                            <div className="flex items-center gap-2 mb-4 border-b border-white/10 pb-3">
-                              <Banknote className="w-5 h-5 text-lime-400" />
-                              <h3 className="font-bold text-sm tracking-widest uppercase">
+                          <div className="bg-booking-primaryLight rounded-[9px] shadow-sm p-5 text-booking-text border border-booking-primary/10">
+                            <div className="flex items-center gap-2 mb-4 border-b border-booking-primary/10 pb-3">
+                              <Banknote className="w-5 h-5 text-booking-primary" />
+                              <h3 className="font-bold text-sm tracking-widest uppercase text-booking-primaryDark">
                                 Bill Summary
                               </h3>
                             </div>
                             <div className="space-y-3">
                               <div className="flex justify-between text-xs font-medium">
-                                <span className="text-emerald-300">
+                                <span className="text-booking-label">
                                   Price / Person
                                 </span>
-                                <span>
+                                <span className="font-bold">
                                   ₹{watch("perDayAmount")?.toLocaleString()}
                                 </span>
                               </div>
                               <div className="flex justify-between text-xs font-medium">
-                                <span className="text-emerald-300">
+                                <span className="text-booking-label">
                                   Persons
                                 </span>
-                                <span>x {watch("noOfPerson")}</span>
+                                <span className="font-bold">x {watch("noOfPerson")}</span>
                               </div>
                               <div className="flex justify-between text-xs font-medium">
-                                <span className="text-emerald-300">
+                                <span className="text-booking-label">
                                   GST & TC
                                 </span>
-                                <span>0</span>
+                                <span className="font-bold">0</span>
                               </div>
-                              <div className="pt-3 border-t border-white/10 flex justify-between items-end">
+                              <div className="pt-3 border-t border-booking-primary/10 flex justify-between items-end">
                                 <div>
-                                  <p className="text-[10px] text-emerald-400 font-bold uppercase tracking-tighter">
+                                  <p className="text-[10px] text-booking-primary font-bold uppercase tracking-tighter">
                                     Total Amount
                                   </p>
-                                  <p className="text-2xl font-black tracking-tight">
+                                  <p className="text-2xl font-black tracking-tight text-booking-primaryDark">
                                     ₹{watch("totalAmount")?.toLocaleString()}
                                   </p>
                                 </div>
                                 <CommonButton
                                   type="submit"
                                   label="Book Now"
-                                  className="bg-lime-500 hover:bg-lime-600 text-white font-black px-6 py-2 rounded-[5px] transition-all shadow-lg active:scale-95 text-xs truncate"
+                                  className="bg-booking-primary hover:bg-booking-primaryDark text-white font-black px-6 py-2 rounded-[5px] transition-all shadow-md active:scale-95 text-xs truncate"
                                 />
                               </div>
                             </div>

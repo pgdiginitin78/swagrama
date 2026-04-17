@@ -625,7 +625,7 @@ const AboutUs = () => {
                 key={index}
                 variants={cardVariants}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-[#1E8E7A]"
+                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-[#1E8E7A]"
               >
                 <div className="relative h-56 overflow-hidden  bg-gradient-to-tr from-emerald-100 via-green-100 to-emerald-200">
                   <img
@@ -735,10 +735,11 @@ const AboutUs = () => {
                 variants={cardVariants}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
                 onHoverStart={() => setHoveredId(healer.id)}
-                onHoverEnd={() => setHoveredId(null)}
+                onHoverEnd={() => setHoveredId(null)} 
+                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100"
               >
                 <Card
-                  className="h-full overflow-hidden border"
+                  className="h-full overflow-hidden border "
                   sx={{
                     borderRadius: 3,
                     boxShadow:
@@ -746,8 +747,7 @@ const AboutUs = () => {
                         ? "0 20px 40px rgba(0,0,0,0.15)"
                         : "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "box-shadow 0.3s ease",
-                    background:
-                      "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
+          
                     border: "1px solid brown",
                   }}
                 >
@@ -777,26 +777,7 @@ const AboutUs = () => {
                         </div>
                       </motion.div>
 
-                      <div className="relative w-full">
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          transition={{ delay: 0.4, type: "spring" }}
-                          className="absolute -bottom-8 left-0 right-0 z-10 flex justify-center"
-                        >
-                          <Avatar
-                            sx={{
-                              width: 64,
-                              height: 64,
-                              border: "4px solid white",
-                              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                              background: `linear-gradient(135deg, ${healer.color} 0%, ${healer.color}dd 100%)`,
-                            }}
-                          >
-                            {getIcon(healer.specialty)}
-                          </Avatar>
-                        </motion.div>
-                      </div>
+              
                     </div>
 
                     <CardContent className="mt-5 pb-6 px-6 text-center">

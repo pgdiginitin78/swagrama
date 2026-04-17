@@ -39,7 +39,7 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
               key={index}
               variants={cardVariants}
               whileHover={{ y: -10 }}
-              className="bg-white/80 backdrop-blur-xl rounded-[2rem] p-6 shadow-soft hover:shadow-elevated transition-all duration-500 border border-white/50 group"
+              className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 backdrop-blur-xl rounded-[2rem] p-6 shadow-soft hover:shadow-elevated transition-all duration-500 border border-white/50 group"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="relative mb-6">

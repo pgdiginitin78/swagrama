@@ -29,14 +29,14 @@ const ProfileDropdown = ({ user, onManage, onLogout, onClose, setOpenManageMembe
     </div>
     <button
       onClick={onManage}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
     >
       <EditIcon fontSize="small" style={{ color: "#10b981" }} />
       Manage Profile
     </button>
     <button
       onClick={() => { setOpenManageMembers(true); onClose(); }}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
     >
       <EditIcon fontSize="small" style={{ color: "#10b981" }} />
       Manage Members
@@ -44,7 +44,7 @@ const ProfileDropdown = ({ user, onManage, onLogout, onClose, setOpenManageMembe
     <div className="border-t border-gray-100" />
     <button
       onClick={onLogout}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
     >
       <LogoutIcon fontSize="small" />
       Logout
@@ -170,6 +170,8 @@ const Navbar = () => {
           transition: all 0.3s ease;
         }
         .store-btn:hover { transform: translateY(-2px) scale(1.05); }
+        button, a, img, .nav-link { outline: none !important; }
+        button:focus, a:focus, .nav-link:focus { outline: none !important; box-shadow: none !important; }
       `}</style>
 
       <nav
@@ -182,7 +184,7 @@ const Navbar = () => {
         <div className="w-full px-3 sm:px-5 lg:px-8 xl:px-10">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18 xl:h-20">
 
-            <Link to="/" className="flex-shrink-0 z-10">
+            <Link to="/" className="flex-shrink-0 z-10 focus:outline-none">
               <img
                 src={SwagramaLogo}
                 className="h-12 lg:h-16 xl:h-20 w-auto object-contain cursor-pointer"
@@ -199,7 +201,7 @@ const Navbar = () => {
                     <Link
                       key={item.name}
                       to={item.path}
-                      className={`nav-link group font-semibold transition-all leading-tight ${active ? "active" : ""}`}
+                      className={`nav-link group font-semibold transition-all leading-tight focus:outline-none ${active ? "active" : ""}`}
                     >
                       <span
                         className={`block text-[11px] xl:text-[12px] 2xl:text-[14px] transition-colors ${
@@ -249,7 +251,7 @@ const Navbar = () => {
 
               <button
                 onClick={() => setOpenStore(true)}
-                className="store-btn relative flex items-center justify-center px-3 py-1.5 text-white rounded-lg font-medium shadow-md"
+                className="store-btn relative flex items-center justify-center px-3 py-1.5 text-white rounded-lg font-medium shadow-md focus:outline-none"
               >
                 <Badge badgeContent={cartCount} color="success" overlap="circular" invisible={cartCount === 0} sx={cartBadgeStyles}>
                   <ShoppingCartIcon fontSize="small" />
@@ -285,7 +287,7 @@ const Navbar = () => {
 
               <button
                 onClick={() => setOpenStore(true)}
-                className="store-btn relative flex items-center justify-center p-2 text-white rounded-lg shadow-md active:scale-95"
+                className="store-btn relative flex items-center justify-center p-2 text-white rounded-lg shadow-md active:scale-95 focus:outline-none"
               >
                 <Badge badgeContent={cartCount} color="success" overlap="circular" invisible={cartCount === 0} sx={cartBadgeStyles}>
                   <ShoppingCartIcon sx={{ fontSize: 20 }} />
@@ -293,7 +295,7 @@ const Navbar = () => {
               </button>
 
               <button
-                className="flex items-center justify-center p-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors active:scale-95"
+                className="flex items-center justify-center p-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors active:scale-95 focus:outline-none"
                 onClick={() => setOpen(true)}
                 aria-label="Open menu"
               >
@@ -319,7 +321,7 @@ const Navbar = () => {
             </h2>
             <button
               onClick={() => setOpen(false)}
-              className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors"
+              className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors focus:outline-none"
             >
               <CloseIcon sx={{ fontSize: 18 }} />
             </button>
@@ -358,11 +360,11 @@ const Navbar = () => {
                   to={item.path}
                   onClick={() => setOpen(false)}
                   style={{ animationDelay: `${index * 40}ms` }}
-                  className={`flex flex-col  px-3 py-3 rounded-xl transition-all active:scale-[0.98] ${
-                    active
-                      ? "bg-green-100 border-l-4 border-green-600 pl-2"
-                      : "hover:bg-green-50 hover:translate-x-1"
-                  }`}
+                    className={`flex flex-col  px-3 py-3 rounded-xl transition-all active:scale-[0.98] focus:outline-none ${
+                      active
+                        ? "bg-green-100 border-l-4 border-green-600 pl-2"
+                        : "hover:bg-green-50 hover:translate-x-1"
+                    }`}
                 >
                   <span className={`text-sm font-semibold ${active ? "text-green-700" : "text-gray-800"}`}>
                     {en}
@@ -377,7 +379,7 @@ const Navbar = () => {
             {user ? (
               <button
                 onClick={() => { setOpen(false); handleLogout(); }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors active:scale-[0.98]"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors active:scale-[0.98] focus:outline-none"
               >
                 <LogoutIcon fontSize="small" />
                 Logout
@@ -385,7 +387,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => { setOpen(false); setOpenLoginModal(true); }}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors active:scale-[0.98]"
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors active:scale-[0.98] focus:outline-none"
               >
                 <LoginIcon fontSize="small" />
                 Login

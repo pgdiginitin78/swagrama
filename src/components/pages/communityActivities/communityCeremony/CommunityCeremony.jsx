@@ -70,7 +70,7 @@ const EventCard = ({
   setOpenEventBookModal,
   setSelectedEvent,
 }) => {
-  const isPremium = event.value && event.value >= 9000;
+  const isPremium = event.price && event.price >= 9000;
   const past = isEventPast(event);
   const isToday = isEventToday(event);
 
@@ -137,19 +137,18 @@ const EventCard = ({
           </div>
 
           <div className="flex items-center justify-between gap-3 mt-auto">
-            {event.value ? (
+            {event.price ? (
               <div className="flex items-center gap-1">
                 <IndianRupee className="w-5 h-5 text-forest" />
                 <span
                   className={`font-display text-xl font-bold ${isPremium ? "text-earth" : "text-forest"}`}
                 >
-                  {event.value.toLocaleString()}
+                  {event.price.toLocaleString()}
                 </span>
               </div>
             ) : (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-lime/20 rounded-[9px]">
-                <Leaf className="w-4 h-4 text-forest" />
-                <span className="text-sm font-semibold text-forest">Free</span>
+              <div>
+         
               </div>
             )}
 
@@ -568,7 +567,7 @@ const CommunityCeremony = () => {
           }}
           serviceDetails={{
             ...selectedEvent,
-            price: selectedEvent.value ? `₹${selectedEvent.value}` : "Free",
+            price: selectedEvent.price ? `₹${selectedEvent.price}` : "",
             checkIn: "",
             checkOut: "",
             nameHindi: selectedEvent.serviceName,

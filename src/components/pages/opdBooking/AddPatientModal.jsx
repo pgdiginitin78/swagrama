@@ -1,35 +1,32 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
-import CloseIcon from "@mui/icons-material/Close";
 import BadgeOutlinedIcon from "@mui/icons-material/BadgeOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import {
   Box,
   Dialog,
   DialogContent,
   DialogTitle,
   Divider,
-  Typography,
-  IconButton,
-  Button,
-  Switch,
   FormControlLabel,
+  Switch,
+  Typography
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as yup from "yup";
-import DatePickerField from "../../common/formFields/DatePickerField";
-import InputField from "../../common/formFields/InputField";
+import { useAuth } from "../../../context/AuthContext";
 import { AddPatient } from "../../../services/bookAppointment/BookAppointmentServices";
-import { errorAlert, successAlert } from "../../common/toast/CustomToast";
-import { useLoader } from "../../common/commonLoader/LoaderContext";
-import ConfirmationModal from "../../common/ConfirmationModal";
 import { getUserDetails } from "../../../services/login/LoginServices";
-import InputArea from "../../common/formFields/InputArea";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
+import { useLoader } from "../../common/commonLoader/LoaderContext";
+import ConfirmationModal from "../../common/ConfirmationModal";
+import DatePickerField from "../../common/formFields/DatePickerField";
 import DropdownField from "../../common/formFields/DropdownField";
-import { useAuth } from "../../../context/AuthContext";
+import InputArea from "../../common/formFields/InputArea";
+import InputField from "../../common/formFields/InputField";
+import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -96,16 +93,19 @@ const patientSchema = yup.object().shape({
       return Number(value) <= 120;
     }),
 
+  emailId: yup
+    .string()
+    .required("emailId is required")
+    .emailId("Enter a valid emailId address"),
+
   relation: yup.string().max(50, "Maximum 50 characters"),
 
-  address: yup
-    .string()
-    .max(200, "Maximum 200 characters"),
+  address: yup.string().max(200, "Maximum 200 characters"),
 
   pinCode: yup
     .string()
     .test("pincode-format", "Enter a valid 6-digit pin code", (value) => {
-      if (!value) return true; // allow empty
+      if (!value) return true; 
       return /^[1-9][0-9]{5}$/.test(value);
     }),
 });
@@ -206,8 +206,6 @@ export default function AddPatientModal({ open, handleClose }) {
     pinCode: "",
   });
 
-
-
   const { setIsLoading } = useLoader();
 
   const {
@@ -224,15 +222,18 @@ export default function AddPatientModal({ open, handleClose }) {
       mobileNO: "",
       dob: null,
       age: "",
+      emailId: "",
       bloodGroup: null,
       relation: "",
       address: "",
       pinCode: "",
+      city:""
     },
   });
 
   const watchedDOB = useWatch({ control, name: "dob" });
   const watchedAge = useWatch({ control, name: "age" });
+  
 
   const onSubmit = (data) => {
     if (!user) {
@@ -243,6 +244,7 @@ export default function AddPatientModal({ open, handleClose }) {
       firstName: data.firstName,
       lastName: data.lastName,
       mobileNO: data.mobileNO,
+      emailId: data.emailId,
       dob: formatDateToYYYYMMDD(data.dob),
       age: Number(data.age),
       relation: data.relation ?? "",
@@ -251,6 +253,7 @@ export default function AddPatientModal({ open, handleClose }) {
       macIp: ipAddress ?? "",
       macId: "",
       bloodGroup: data.bloodGroup?.value ?? "",
+      city:data.city
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -482,13 +485,13 @@ export default function AddPatientModal({ open, handleClose }) {
                 <InputField
                   name="firstName"
                   control={control}
-                  label="First Name"
+                  label="First Name *"
                   error={errors.firstName}
                 />
                 <InputField
                   name="lastName"
                   control={control}
-                  label="Last Name"
+                  label="Last Name *"
                   error={errors.lastName}
                 />
                 <InputField
@@ -501,7 +504,7 @@ export default function AddPatientModal({ open, handleClose }) {
                 <DatePickerField
                   name="dob"
                   control={control}
-                  label="Date of Birth"
+                  label="Date of Birth *"
                   error={errors.dob}
                   maxDate={new Date()}
                   dob={true}
@@ -509,10 +512,16 @@ export default function AddPatientModal({ open, handleClose }) {
                 <InputField
                   name="age"
                   control={control}
-                  label="Age"
+                  label="Age *"
                   error={errors.age}
                   inputProps={{ maxLength: 3 }}
                   onInput={handleAgeInput}
+                />
+                <InputField
+                  name="emailId"
+                  control={control}
+                  label="emailId *"
+                  error={errors.emailId}
                 />
                 <div>
                   <DropdownField

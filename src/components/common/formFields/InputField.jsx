@@ -87,7 +87,7 @@ const InputField = ({
               {...field}
               size="small"
               shrink={false}
-              helperText={error?.message}
+              // helperText={error?.message}
               FormHelperTextProps={{
                 sx: { fontSize: "10px", mt: 0, ml: 0 },
               }}

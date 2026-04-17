@@ -189,9 +189,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails }) => {
                 onSubmit={handleSubmit(onSubmit)}
                 className="grid lg:grid-cols-12 gap-7"
               >
-                {/* Main Form Area (Left Column) */}
                 <div className="lg:col-span-7 space-y-6">
-                  {/* Service Top Info Section */}
                   <div className="bg-gradient-to-br from-green-50 to-white p-5 rounded-2xl border border-green-100 shadow-sm">
                     <div className="flex justify-between items-start mb-4">
                       <div>

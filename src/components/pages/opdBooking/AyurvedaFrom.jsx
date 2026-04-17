@@ -559,10 +559,10 @@ function AyurvedaForm({
     mode: "onChange",
   });
 
-  console.log("activeDeptactiveDeptactiveDept", activeDept);
-
+  
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
+  console.log("activeDeptactiveDeptactiveDept", patientFid);
 
   const updateVisibleCount = useCallback(() => {
     const w = window.innerWidth;
@@ -650,6 +650,24 @@ function AyurvedaForm({
     return null;
   };
 
+  const handleGetPatientData = () => {
+    getPatientDataByMobileNo(user?.mobileNo, 5)
+      .then((res) => {
+        const data = res?.data?.data;
+        if (data?.length) {
+          setPatientOptions(
+            data.map((item) => ({
+              ...item,
+              id: item.userId,
+              value: item.userId,
+              label: `${item.firstName} ${item.lastName}`,
+            })),
+          );
+        }
+      })
+      .catch((error) => error);
+  };
+
   useEffect(() => {
     getServicesByClinicId(5)
       .then((res) => {
@@ -668,25 +686,10 @@ function AyurvedaForm({
       .catch((error) => error);
 
     if (user !== null) {
-      getPatientDataByMobileNo(user?.mobileNo, 5)
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setPatientOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.userId,
-                value: item.userId,
-                label: `${item.firstName} ${item.lastName}`,
-              })),
-            );
-          }
-        })
-        .catch((error) => error);
+      handleGetPatientData();
     }
   }, [user]);
 
-  // Create stable primitive dependencies to prevent unwanted re-render loops
   const docId = selectedDoctorId?.userId;
   const memoDate = useMemo(() => {
     if (!appointmentDate) return "";
@@ -712,14 +715,18 @@ function AyurvedaForm({
 
           if (data?.status == 200) {
             const fetchedSlots = data?.data || [];
-            console.log(`[Slots] Fetched ${fetchedSlots.length} slots. Setting loading to false.`);
+            console.log(
+              `[Slots] Fetched ${fetchedSlots.length} slots. Setting loading to false.`,
+            );
             setSlotData({
               slots: fetchedSlots,
               loading: false,
               error: fetchedSlots.length === 0 ? "No slots available" : "",
             });
           } else {
-            console.log(`[Slots] API returned status ${data?.status}. Setting loading to false.`);
+            console.log(
+              `[Slots] API returned status ${data?.status}. Setting loading to false.`,
+            );
             setSlotData({
               slots: [],
               loading: false,
@@ -769,7 +776,7 @@ function AyurvedaForm({
       taxDeatils: data.taxDetails,
       EncounterStatus: data?.EncounterStatus,
       reason: data.reasonForVisit,
-      paymentFor: "OPD",
+ 
     };
     setFinalObj(saveObj);
     setPreviewData({ ...data, selectedTimeSlot });
@@ -1339,53 +1346,52 @@ function AyurvedaForm({
                 </span>
               </div>
 
-                <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
-                  {selectedDoctorId === null ? (
-                    <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
-                      <Stethoscope className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
-                      <p className="text-slate-500 font-bold text-[11px]">
-                        Select a Consultant
-                      </p>
-                    </div>
-                  ) : slotData.loading ? (
-                    <div className="flex flex-col items-center justify-center py-5 sm:py-6">
-                      <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
-                      <p className="text-slate-400 text-[10px] font-bold mt-2">
-                        Checking slots...
-                      </p>
-                    </div>
-                  ) : slotData.slots.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
-                      <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
-                      <p className="text-slate-400 font-bold text-[11px]">
-                        {slotData.error || "No slots this day"}
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8">
-                      {slotData.slots.map((slot, index) => (
-                        <TimeSlotChip
-                          key={index}
-                          slot={slot}
-                          isSelected={
-                            selectedTimeSlot?.slotStartTime ===
-                            slot.slotStartTime
-                          }
-                          onSelect={() => {
-                            setSelectedTimeSlot(slot);
-                            setSlotData((prev) => ({ ...prev, error: "" }));
-                          }}
-                        />
-                      ))}
-                    </div>
-                  )}
-
-                  {slotData.error && !slotData.loading && (
-                    <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
-                      {slotData.error}
+              <div className="bg-slate-50/50 rounded-xl p-2.5 border border-slate-100 min-h-[120px] sm:p-3 sm:min-h-[140px]">
+                {selectedDoctorId === null ? (
+                  <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
+                    <Stethoscope className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
+                    <p className="text-slate-500 font-bold text-[11px]">
+                      Select a Consultant
                     </p>
-                  )}
-                </div>
+                  </div>
+                ) : slotData.loading ? (
+                  <div className="flex flex-col items-center justify-center py-5 sm:py-6">
+                    <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
+                    <p className="text-slate-400 text-[10px] font-bold mt-2">
+                      Checking slots...
+                    </p>
+                  </div>
+                ) : slotData.slots.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
+                    <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
+                    <p className="text-slate-400 font-bold text-[11px]">
+                      {slotData.error || "No slots this day"}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8">
+                    {slotData.slots.map((slot, index) => (
+                      <TimeSlotChip
+                        key={index}
+                        slot={slot}
+                        isSelected={
+                          selectedTimeSlot?.slotStartTime === slot.slotStartTime
+                        }
+                        onSelect={() => {
+                          setSelectedTimeSlot(slot);
+                          setSlotData((prev) => ({ ...prev, error: "" }));
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                {slotData.error && !slotData.loading && (
+                  <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
+                    {slotData.error}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </motion.div>
@@ -1574,7 +1580,10 @@ function AyurvedaForm({
       {openAddPatientModal && (
         <AddPatientModal
           open={openAddPatientModal}
-          handleClose={() => setOpenAddPatientModal(false)}
+          handleClose={() => {
+            setOpenAddPatientModal(false);
+            handleGetPatientData()
+          }}
         />
       )}
 

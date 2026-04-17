@@ -1,10 +1,10 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Call, Email, WhatsApp } from "@mui/icons-material";
 import CardMembershipIcon from "@mui/icons-material/CardMembership";
-import { Box, Modal } from "@mui/material";
+import { Box, Modal, CircularProgress } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { User as UserIcon } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
@@ -14,7 +14,9 @@ import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
-import { errorAlert } from "../../../common/toast/CustomToast";
+import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
+import ConfirmationModal from "../../../common/ConfirmationModal";
+import { SaveEnquiry } from "../../../../services/membershipServices/MembershipServices";
 
 const schema = yup.object().shape({
   fullName: yup
@@ -60,6 +62,9 @@ const MembershipRegistrationModal = ({
   membershipDetails,
 }) => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [formData, setFormData] = useState(null);
   const {
     control,
     handleSubmit,
@@ -110,16 +115,47 @@ const MembershipRegistrationModal = ({
   }, [open, user, reset, setValue]);
 
   const onSubmit = (data) => {
-    if (!user) {
-      errorAlert("login first");
+    if (!user || !user?.userId) {
+      errorAlert("Please login first to submit your enquiry.");
       return;
     }
-    console.log("Visitor Enquiry Data:", {
-      membershipDetails,
-      ...data,
-    });
-    handleClose();
-    reset();
+    const finalSaveObj = {
+      membershipName: membershipDetails?.serviceName || membershipDetails?.membershipName || "",
+      duration: membershipDetails?.duration || membershipDetails?.durationRange || "",
+      userId: user?.userId,
+      fullName: data.fullName,
+      email: data.email,
+      contactMode: data.contactMode,
+      mobile: data.mobileNumber,
+      city: data.city,
+      state: data.state,
+      message: data.specialRequests,
+      origin: "Membership",
+    };
+    setFormData(finalSaveObj);
+    setConfirmationOpen(true);
+  };
+
+  const handleConfirmSubmit = async () => {
+    if (!user || !user?.userId) {
+      errorAlert("Authentication lost. Please login again.");
+      setConfirmationOpen(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await SaveEnquiry(formData);
+      console.log("SaveEnquiry", res);
+      successAlert(res?.data?.message || "Enquiry submitted successfully!");
+      handleClose();
+      reset();
+      setConfirmationOpen(false);
+    } catch (error) {
+      console.error("Error saving enquiry:", error);
+      errorAlert(error?.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   console.log("membershipDetails", membershipDetails);
@@ -127,7 +163,8 @@ const MembershipRegistrationModal = ({
   if (!membershipDetails) return null;
 
   return (
-    <Modal open={open} >
+    <>
+      <Modal open={open} >
       <Box
         sx={{
           position: "absolute",
@@ -227,6 +264,14 @@ const MembershipRegistrationModal = ({
                         error={errors.city}
                       />
                     </div>
+                    <div className="col-span-2">
+                      <InputField
+                        control={control}
+                        name="state"
+                        label="State *"
+                        error={errors.state}
+                      />
+                    </div>
                   </div>
                 </motion.section>
                 <motion.section
@@ -315,10 +360,11 @@ const MembershipRegistrationModal = ({
                   />
                   <CommonButton
                     type="submit"
-                    label="Submit Enquiry Request"
-                    disabled={!termsAcceptedValue}
+                    label={loading ? "Submitting..." : "Submit Enquiry Request"}
+                    icon={loading && <CircularProgress size={16} color="inherit" />}
+                    disabled={!termsAcceptedValue || loading}
                     className={` text-white transition-all ${
-                      termsAcceptedValue
+                      termsAcceptedValue && !loading
                         ? "bg-gradient-to-r from-green-700 to-green-600  hover:shadow-xl hover:-translate-y-0.5"
                         : "bg-slate-300 pointer-events-none"
                     }`}
@@ -330,7 +376,18 @@ const MembershipRegistrationModal = ({
         </AnimatePresence>
       </Box>
     </Modal>
-  );
+
+    <ConfirmationModal
+      confirmationOpen={confirmationOpen}
+      confirmationHandleClose={() => setConfirmationOpen(false)}
+      confirmationSubmitFunc={handleConfirmSubmit}
+      confirmationLabel="Confirm Enquiry"
+      confirmationMsg="Are you sure you want to submit this membership enquiry? Our team will contact you soon."
+      confirmationButtonMsg={loading ? "Submitting..." : "Submit Now"}
+      disabled={loading}
+    />
+  </>
+);
 };
 
 export default MembershipRegistrationModal;

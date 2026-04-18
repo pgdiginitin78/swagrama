@@ -470,7 +470,7 @@ export default function AddPatientModal({ open, handleClose }) {
               },
             }}
           >
-            <Box sx={{ mb: 3 }}>
+            <Box sx={{ my: 2 }}>
               <SectionHeader
                 icon={BadgeOutlinedIcon}
                 label="Personal Information"

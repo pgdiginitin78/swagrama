@@ -93,10 +93,10 @@ const patientSchema = yup.object().shape({
       return Number(value) <= 120;
     }),
 
-  emailId: yup
-    .string()
-    .required("emailId is required")
-    .emailId("Enter a valid emailId address"),
+emailId: yup
+  .string()
+  .required("EmailId is required")
+  .email("Enter a valid email address"),
 
   relation: yup.string().max(50, "Maximum 50 characters"),
 

@@ -60,6 +60,7 @@ const MembershipRegistrationModal = ({
   open,
   handleClose,
   membershipDetails,
+  origin
 }) => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -130,7 +131,7 @@ const MembershipRegistrationModal = ({
       city: data.city,
       state: data.state,
       message: data.specialRequests,
-      origin: "Membership",
+      origin: origin,
     };
     setFormData(finalSaveObj);
     setConfirmationOpen(true);
@@ -360,7 +361,7 @@ const MembershipRegistrationModal = ({
                   />
                   <CommonButton
                     type="submit"
-                    label={loading ? "Submitting..." : "Submit Enquiry Request"}
+                    label={loading ? "Submitting..." : "Enquir Now"}
                     icon={loading && <CircularProgress size={16} color="inherit" />}
                     disabled={!termsAcceptedValue || loading}
                     className={` text-white transition-all ${

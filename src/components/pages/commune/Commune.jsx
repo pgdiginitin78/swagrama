@@ -914,6 +914,7 @@ export default function CommuneTabs() {
             setSelectedService(null);
           }}
           membershipDetails={selectedService}
+          origin={"Seasonal Academy"}
         />
       )}
     </div>

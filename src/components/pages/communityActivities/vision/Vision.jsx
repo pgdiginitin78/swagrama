@@ -735,6 +735,7 @@ const OurVision = () => {
               setOpenWalkInServiceBookingModal(false);
             }}
             membershipDetails={selectedEnquiryDetails}
+            origin={"Swagrama Visit"}
           />
         )}
       </AnimatePresence>

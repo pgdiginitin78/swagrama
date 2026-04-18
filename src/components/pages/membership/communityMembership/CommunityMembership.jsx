@@ -701,6 +701,7 @@ const CommunityMembership = () => {
               setOpenEventRegistrationModal(false);
             }}
             membershipDetails={selectedMembership}
+            origin={"Membership"}
           />
         )}
       </AnimatePresence>

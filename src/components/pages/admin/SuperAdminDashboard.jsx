@@ -342,6 +342,7 @@ const SuperAdminDashboard = () => {
         background: "#f7f8f5",
         fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
       }}
+      className="px-4 md:px-9"
     >
       <main
         style={{ maxWidth: 1600, margin: "0 auto", padding: "20px 16px 40px" }}
@@ -403,16 +404,7 @@ const SuperAdminDashboard = () => {
                   year: "numeric",
                 })}
               </p>
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "#3a4a30",
-                }}
-              >
-                System Administrator <span style={{ color: G2 }}>• Live</span>
-              </p>
+     
             </div>
             <div
               style={{
@@ -430,22 +422,7 @@ const SuperAdminDashboard = () => {
             >
               SA
             </div>
-            <button
-              style={{
-                width: 36,
-                height: 36,
-                border: "1px solid #e0e8d8",
-                borderRadius: 10,
-                background: "#fff",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "#666",
-              }}
-            >
-              <Download sx={{ fontSize: 17 }} />
-            </button>
+     
           </div>
         </header>
 

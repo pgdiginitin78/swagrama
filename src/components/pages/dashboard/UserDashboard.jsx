@@ -1,9 +1,11 @@
 import {
+  ArrowForward as ArrowForwardIcon,
   EventNote as BookingIcon,
   CalendarMonth as CalendarIcon,
   CheckCircle as CheckCircleIcon,
   Close as CloseIcon,
   SpaceDashboard as DashboardIcon,
+  Diamond as DiamondIcon,
   History as HistoryIcon,
   Logout as LogoutIcon,
   CardMembership as MembershipIcon,
@@ -12,17 +14,15 @@ import {
   LocalShipping as ShippingIcon,
   Spa as SpaIcon,
   AutoAwesome as SparkleIcon,
-  AccessTime as TimeIcon,
-  ArrowForward as ArrowForwardIcon,
   Star as StarIcon,
-  WorkspacePremium as PremiumIcon,
-  Diamond as DiamondIcon,
-  EmojiEvents as TrophyIcon,
+  AccessTime as TimeIcon,
+  EmojiEvents as TrophyIcon
 } from "@mui/icons-material";
 import { Avatar, Drawer, IconButton, Step, StepLabel, Stepper } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
+import TherapyIcon from "../../../assets/TherapyIcon.svg"
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -167,7 +167,7 @@ const UserDashboard = () => {
           data.type === "order" ? "bg-amber-50 text-amber-600" :
           "bg-blue-50 text-blue-600"
         }`}>
-          {data.type === "therapy" ? <SpaIcon sx={{ fontSize: 16 }} /> :
+          {data.type === "therapy" ? <img src={TherapyIcon} alt="Therapy" style={{ width: 20, height: 20 }} /> :
            data.type === "order" ? <ShippingIcon sx={{ fontSize: 16 }} /> :
            <BookingIcon sx={{ fontSize: 16 }} />}
         </div>
@@ -230,10 +230,7 @@ const UserDashboard = () => {
             <span>View Schedule</span>
             <ArrowForwardIcon sx={{ fontSize: 13 }} />
           </button>
-        </div>
-        <div className="absolute right-0 top-0 w-48 h-full opacity-5">
-          <SpaIcon sx={{ fontSize: 240, position: "absolute", right: -40, top: -20, color: "white" }} />
-        </div>
+        </div>      
       </div>
 
       <StatsBar />
@@ -391,7 +388,7 @@ const UserDashboard = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#f8f8f6] md:flex-row">
-      <aside className="hidden md:flex w-[220px] lg:w-[240px] sticky top-0 h-screen flex-shrink-0 z-20">
+      <aside className="hidden md:flex w-[220px] lg:w-[200px] sticky top-0 h-screen flex-shrink-0 z-20">
         <SidebarContent />
       </aside>
 
@@ -424,7 +421,7 @@ const UserDashboard = () => {
           </div>
         </div>
 
-        <div className="p-4 sm:p-6">
+        <div className="p-4">
           <AnimatePresence mode="wait">
             <div key={activeTab}>
               {activeTab === "overview" && renderOverview()}
@@ -512,11 +509,8 @@ const UserDashboard = () => {
               )}
             </div>
 
-            <div className="p-5 border-t border-gray-100 grid grid-cols-2 gap-3">
-              <button className="py-3 bg-[#0f1f0f] text-white font-bold text-xs rounded-xl hover:bg-[#1a3a1a] active:scale-95 transition-all">
-                Get E-Pass
-              </button>
-              <button className="py-3 border-2 border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
+            <div className="p-5 border-t border-gray-100">
+              <button className="w-full py-3 border-2 border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
                 Need Help?
               </button>
             </div>

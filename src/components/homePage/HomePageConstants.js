@@ -14,8 +14,8 @@ import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farm
 import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.webp";
 import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.webp";
 import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import PradipTaware from "../assets/landing-page/ourexperts/PradipTaware.webp";
-import SandipMehetre from "../assets/landing-page/ourexperts/SandipMahetre.webp";
+import PradipTaware from "../assets/landing-page/ourexperts/Pradip Taware.webp";
+import SandipMehetre from "../assets/landing-page/ourexperts/Sandip Mehetre.webp";
 import SantoshSuryavanshi from "../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
 import SmitaMehetre from "../assets/landing-page/ourexperts/SmitaMahetre.webp";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";

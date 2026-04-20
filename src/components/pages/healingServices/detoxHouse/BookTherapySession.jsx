@@ -100,7 +100,6 @@ export default function BookTherapySession({ open, onClose, item }) {
         return next;
       });
 
-      // Synchronize activePickerIndex if it's now out of bounds
       if (activePickerIndex !== null && activePickerIndex >= sessionsCount) {
         setActivePickerIndex(sessionsCount - 1);
       }
@@ -242,7 +241,7 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
     if (isPaymentPending) return;
     const saveObj = {
-      TherapyName: item?.serviceName || "Therapy",
+      TherapyName: item?.serviceName || "",
       SlotTime: "45min",
       FirstTimeTaking: isFirstTime,
       No_Of_Sessions: sessionsCount,

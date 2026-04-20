@@ -76,7 +76,7 @@ const ServicesTabs = () => {
       <h1 className="text-xl md:text-2xl font-semibold text-center text-green-800 mb-4">
         स्वउपचारसेवा Healing Services
       </h1>
-      <div className="max-w-6xl mx-auto">
+      <div className="w-full mx-auto px-2 md:px-12">
         <Box
           sx={{
             background: "rgba(255, 255, 255, 0.7)",

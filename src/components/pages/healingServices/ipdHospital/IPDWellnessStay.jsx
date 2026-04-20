@@ -13,12 +13,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getRoomList } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import StayBookingModal from "./StayBookingModal";
-import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.png";
-import InfiniteRoom from "../../../assets/rooms/InfiniteRoom.png";
-import WellHouse from "../../../assets/rooms/WellHouse.png";
-import EternityRoom from "../../../assets/rooms/EternityRoom.png";
-import EternalRoom from "../../../assets/rooms/EternalRoom.png";
-import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.png";
+import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.webp";
+import InfiniteRoom from "../../../assets/rooms/InfiniteRoom.webp";
+import WellHouse from "../../../assets/rooms/WellHouse.webp";
+import EternityRoom from "../../../assets/rooms/EternityRoom.webp";
+import EternalRoom from "../../../assets/rooms/EternalRoom.webp";
+import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.webp";
 import OutdoorLeavingImg from "../../../assets/rooms/OutdoorLeaving.webp";
 
 const staggerContainer = {

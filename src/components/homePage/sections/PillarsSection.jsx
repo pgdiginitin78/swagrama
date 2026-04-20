@@ -49,9 +49,7 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
                     alt={healer.name}
                     className="relative w-32 h-32 rounded-2xl object-cover object-top shadow-md"
                   />
-                  <div className="absolute -bottom-3 -right-3 bg-white p-2 rounded-xl shadow-lg text-green-600">
-                    {getIcon(healer.specialty)}
-                  </div>
+      
                 </div>
 
                 <h3 className="font-serif text-xl text-[#111827] mb-1 group-hover:text-green-700 transition-colors">

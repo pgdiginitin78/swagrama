@@ -1,5 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
+import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
@@ -27,6 +28,14 @@ const ProfileDropdown = ({ user, onManage, onLogout, onClose, setOpenManageMembe
         {user?.email || (user?.userName ? `@${user.userName}` : "")}
       </p>
     </div>
+    <Link
+      to="/dashboard"
+      onClick={onClose}
+      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
+    >
+      <DashboardIcon fontSize="small" style={{ color: "#10b981" }} />
+      My Dashboard
+    </Link>
     <button
       onClick={onManage}
       className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
@@ -125,6 +134,7 @@ const Navbar = () => {
     { name: "स्वविपणि E Shop", path: "/eShop" },
     { name: "स्वप्राप्त Feeds", path: "/feeds" },
     { name: "स्ववर्षपद Calendar", path: "/calendar" },
+    { name: "स्वफलक Dashboard", path: "/dashboard" },
   ];
 
   const splitTitle = (text) => {

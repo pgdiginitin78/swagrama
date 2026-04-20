@@ -572,6 +572,7 @@ const CommunityCeremony = () => {
             checkOut: "",
             nameHindi: selectedEvent.serviceName,
           }}
+          origin={"AnnualEvents"}
         />
       )}
     </motion.div>

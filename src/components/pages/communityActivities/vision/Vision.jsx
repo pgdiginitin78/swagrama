@@ -31,20 +31,20 @@ import VisitorsFormModal from "./VisitorsFormModal";
 import MainPageImg from "../../../assets/community-activities/mainPage.webp";
 import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
 
-import img1 from "../../../assets/community-activities/visionImages/20231111_111902.jpg";
-import img2 from "../../../assets/community-activities/visionImages/20231111_112006.jpg";
-import img3 from "../../../assets/community-activities/visionImages/20231225_224343.jpg";
-import img4 from "../../../assets/community-activities/visionImages/20240410_082533.jpg";
-import img5 from "../../../assets/community-activities/visionImages/IMG_20180106_110559.jpg";
-import img6 from "../../../assets/community-activities/visionImages/IMG_20180106_122141.jpg";
-import img7 from "../../../assets/community-activities/visionImages/IMG_20220103_115609.jpg";
-import img8 from "../../../assets/community-activities/visionImages/IMG_20220103_123219~2.jpg";
-import img9 from "../../../assets/community-activities/visionImages/IMG_20220107_085632.jpg";
-import img10 from "../../../assets/community-activities/visionImages/IMG_20220121_165741~2.jpg";
-import img11 from "../../../assets/community-activities/visionImages/IMG_20220713_100044~2.jpg";
-import img12 from "../../../assets/community-activities/visionImages/IMG_20220713_105048~2.jpg";
-import img13 from "../../../assets/community-activities/visionImages/IMG_20230923_094519.jpg";
-import img14 from "../../../assets/community-activities/visionImages/DSC_0310-1.jpg";
+import img1 from "../../../assets/community-activities/visionImages/20231111_111902.webp";
+import img2 from "../../../assets/community-activities/visionImages/20231111_112006.webp";
+import img3 from "../../../assets/community-activities/visionImages/20231225_224343.webp";
+import img4 from "../../../assets/community-activities/visionImages/20240410_082533.webp";
+import img5 from "../../../assets/community-activities/visionImages/IMG_20180106_110559.webp";
+import img6 from "../../../assets/community-activities/visionImages/IMG_20180106_122141.webp";
+import img7 from "../../../assets/community-activities/visionImages/IMG_20220103_115609.webp";
+import img8 from "../../../assets/community-activities/visionImages/IMG_20220103_123219~2.webp";
+import img9 from "../../../assets/community-activities/visionImages/IMG_20220107_085632.webp";
+import img10 from "../../../assets/community-activities/visionImages/IMG_20220121_165741~2.webp";
+import img11 from "../../../assets/community-activities/visionImages/IMG_20220713_100044~2.webp";
+import img12 from "../../../assets/community-activities/visionImages/IMG_20220713_105048~2.webp";
+import img13 from "../../../assets/community-activities/visionImages/IMG_20230923_094519.webp";
+import img14 from "../../../assets/community-activities/visionImages/DSC_0310-1.webp";
 
 const carouselImages = [
   img1,
@@ -365,8 +365,8 @@ const OurVision = () => {
       </div>
 
       {/* 3. THE JOURNEY INCLUDES */}
-      <div className="py-10 sm:py-16 bg-gradient-to-b from-[#c8e6c9] to-[#e8f5e9]">
-        <div className="max-w-screen-2xl mx-auto px-4">
+      <div className="py-10 px-2 md:px-12 sm:py-16 bg-gradient-to-b from-[#c8e6c9] to-[#e8f5e9]">
+        <div className="w-full mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -508,7 +508,7 @@ const OurVision = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 px-2 md:px-12 "
             >
               {visitorServices.map((service, index) => (
                 <motion.div

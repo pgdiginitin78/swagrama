@@ -96,7 +96,7 @@ const OPDClinic = () => {
         .shimmer         { animation: shimmer 0.6s ease-in-out; }
       `}</style>
 
-      <div className="relative max-w-6xl mx-auto">
+      <div className="relative w-full mx-auto px-2 ">
         <div className="text-center mb-4 slide-in">
           <h1 className="text-xl md:text-2xl py-2 font-black bg-gradient-to-r from-green-700 via-emerald-600 to-green-600 bg-clip-text text-transparent drop-shadow-sm">
             स्वचिचित्सालय OPD Clinic

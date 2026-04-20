@@ -59,8 +59,8 @@ import {
 import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.webp";
 import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.webp";
 import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import PradipTawareImg from "../../assets/landing-page/ourexperts/PradipTaware.webp";
-import SandipMehetreImg from "../../assets/landing-page/ourexperts/SandipMahetre.webp";
+import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.webp";
+import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.webp";
 import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
 import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
 import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
@@ -1051,11 +1051,6 @@ function AyurvedaForm({
                       .join("")
                       .toUpperCase();
 
-                    const days =
-                      doctor?.sessions[0]?.weekDays
-                        ?.split(",")
-                        .filter((d) => d.trim())
-                        .map((d) => d.trim().substring(0, 3)) ?? [];
 
                     return (
                       <motion.div
@@ -1137,7 +1132,7 @@ function AyurvedaForm({
                                   size={8}
                                   className="sm:w-[9px] sm:h-[9px]"
                                 />
-                                {doctor?.sessions?.[0]?.timeSlot || "15"} min
+                                {doctor?.sessions?.[idx]?.timeSlot || ""} min
                               </span>
                             </div>
 
@@ -1151,41 +1146,87 @@ function AyurvedaForm({
                               {doctor?.clinicName}
                             </p>
 
-                            {days?.length > 0 && (
-                              <div className="flex items-center gap-1 flex-wrap mt-1">
-                                <CalendarMonthIcon
-                                  style={{ fontSize: 13 }}
-                                  className="text-gray-400"
-                                />
-                                {days.map((d, di) => (
-                                  <span
-                                    key={di}
-                                    className={`text-[9px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
-                                      isSelected
-                                        ? "bg-emerald-100 text-emerald-700"
-                                        : "bg-gray-100 text-gray-600"
-                                    }`}
-                                  >
-                                    {d}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
+                            {/* Unified Days Row */}
+                            {(() => {
+                              const allUniqueDays = Array.from(
+                                new Set(
+                                  doctor?.sessions?.flatMap(
+                                    (s) =>
+                                      s.weekDays
+                                        ?.split(",")
+                                        .map((d) => d.trim().substring(0, 3))
+                                        .filter(Boolean) || [],
+                                  ),
+                                ),
+                              );
 
-                            <div className="flex flex-wrap items-center gap-1 mt-1">
-                              <EventAvailableIcon
-                                style={{ fontSize: 13 }}
-                                className="text-gray-400"
-                              />
-                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                {doctor?.sessions?.[0]?.morning || "—"}
-                              </p>
-                              <span className="text-[9px] text-gray-400">
-                                -
-                              </span>
-                              <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                {doctor?.sessions?.[0]?.evening || "—"}
-                              </p>
+                              if (allUniqueDays.length === 0) return null;
+
+                              return (
+                                <div className="flex items-center gap-1 flex-wrap mt-1">
+                                  <CalendarMonthIcon
+                                    style={{ fontSize: 13 }}
+                                    className="text-gray-400"
+                                  />
+                                  {allUniqueDays.map((day, di) => (
+                                    <span
+                                      key={di}
+                                      className={`text-[9px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
+                                        isSelected
+                                          ? "bg-emerald-100 text-emerald-700"
+                                          : "bg-gray-100 text-gray-600"
+                                      }`}
+                                    >
+                                      {day}
+                                    </span>
+                                  ))}
+                                </div>
+                              );
+                            })()}
+
+                            {/* Combined Times Section */}
+                            <div className="mt-1 space-y-1">
+                              {doctor?.sessions?.map((session, sIdx) => (
+                                <div
+                                  key={sIdx}
+                                  className="flex flex-wrap items-center gap-1"
+                                >
+                                  <EventAvailableIcon
+                                    style={{ fontSize: 13 }}
+                                    className="text-gray-400"
+                                  />
+                                  {session.morning && (
+                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
+                                      {session.morning}
+                                    </p>
+                                  )}
+                                  {session.morning && session.evening && (
+                                    <span className="text-[9px] text-gray-400">
+                                      -
+                                    </span>
+                                  )}
+                                  {session.evening && (
+                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
+                                      {session.evening}
+                                    </p>
+                                  )}
+                                  {!session.morning && !session.evening && (
+                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
+                                      —
+                                    </p>
+                                  )}
+                                  {doctor.sessions.length > 1 && (
+                                    <span className="text-[8px] text-gray-400 italic ml-1">
+                                      (
+                                      {session.weekDays
+                                        ?.split(",")
+                                        .map((d) => d.trim().substring(0, 3))
+                                        .join(", ")}
+                                      )
+                                    </span>
+                                  )}
+                                </div>
+                              ))}
                             </div>
                           </div>
                         </div>

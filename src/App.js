@@ -32,6 +32,7 @@ const EventCalander = lazy(
   () => import("./components/pages/eventsCalander/EventCalander"),
 );
 const AboutUs = lazy(() => import("./components/pages/aboutUs/AboutUs"));
+const UserDashboard = lazy(() => import("./components/pages/dashboard/UserDashboard"));
 const SwagramaPrivacyPolicy = lazy(
   () => import("./components/pages/privacypolicy/PrivacyPolicyNew"),
 );
@@ -93,6 +94,7 @@ export default function App() {
               <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
               <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
               <Route path="feeds" element={<Feeds />} />
+              <Route path="/dashboard" element={<UserDashboard />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>

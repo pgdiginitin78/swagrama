@@ -130,7 +130,7 @@ const CommunityActivities = () => {
           </motion.div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-3 sm:px-5 -mt-2">
+        <section className="max-w-7xl mx-auto px-3 sm:px-5 -mt-2">
           <div className="ca-activity-grid grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
             {activities.map(({ icon: Icon, label, color }, idx) => (
               <motion.div
@@ -156,7 +156,7 @@ const CommunityActivities = () => {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-3 sm:px-5 mt-10 sm:mt-14">
+        <section className="max-w-7xl mx-auto px-3 sm:px-5 mt-10 sm:mt-14">
           <div className="grid lg:grid-cols-5 gap-4 sm:gap-5 items-stretch">
             <motion.div
               {...fadeInUp}
@@ -339,7 +339,7 @@ const CommunityActivities = () => {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-3 sm:px-5 mt-8 sm:mt-12">
+        <section className="max-w-7xl mx-auto px-3 sm:px-5 mt-8 sm:mt-12">
           <div className="grid lg:grid-cols-5 gap-4 sm:gap-5 items-stretch">
             <div className="lg:col-span-2 flex flex-col gap-4 order-2 lg:order-1">
               <motion.div {...fadeInUp} className="bg-[#fdf6ee] rounded-[9px] border border-[#e8d8c0] p-4 sm:p-5 flex-1 flex flex-col gap-3">
@@ -473,7 +473,7 @@ const CommunityActivities = () => {
           </div>
         </section>
 
-        <section className="max-w-5xl mx-auto px-3 sm:px-5 mt-8 sm:mt-12">
+        <section className="max-w-7xl mx-auto px-3 sm:px-5 mt-8 sm:mt-12">
           <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.45 }} className="ca-section-divider flex items-center gap-3 mb-5">
             <div className="h-px flex-1 bg-[#d4e8b4]" />
             <div className="flex items-center gap-2">
@@ -740,6 +740,7 @@ const CommunityActivities = () => {
               ...selectedEvent,
               price: selectedEvent?.price || "Free",
             }}
+            origin={"CommunityActivity"}
           />
         )}
       </div>

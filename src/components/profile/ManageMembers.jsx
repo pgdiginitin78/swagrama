@@ -1,27 +1,26 @@
-import React, { useEffect, useState } from "react";
-import { getPatientDataByMobileNo } from "../../services/bookAppointment/BookAppointmentServices";
-import { Modal, Box } from "@mui/material";
-import { motion, AnimatePresence } from "framer-motion";
+import { Box, Modal } from "@mui/material";
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-  X,
-  User,
-  Phone,
+  ArrowLeft,
   Calendar,
   Heart,
   Pencil,
-  ArrowLeft,
+  Phone,
+  User
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import InputField from "../common/formFields/InputField";
-import InputArea from "../common/formFields/InputArea";
-import DatePickerField from "../common/formFields/DatePickerField";
-import DropdownField from "../common/formFields/DropdownField";
+import { getPatientDataByMobileNo } from "../../services/bookAppointment/BookAppointmentServices";
+import { updatePatient } from "../../services/login/LoginServices";
+import ConfirmationModal from "../common/ConfirmationModal";
 import CancelButtonModal from "../common/button/CancelButtonModal";
 import CommonButton from "../common/button/CommonButton";
-import { updatePatient } from "../../services/login/LoginServices";
-import { format } from "date-fns";
-import ConfirmationModal from "../common/ConfirmationModal";
 import { useLoader } from "../common/commonLoader/LoaderContext";
+import DatePickerField from "../common/formFields/DatePickerField";
+import DropdownField from "../common/formFields/DropdownField";
+import InputArea from "../common/formFields/InputArea";
+import InputField from "../common/formFields/InputField";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 
 const modalStyle = {
@@ -120,16 +119,20 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   };
 
   const onSubmit = (data) => {
+    if (!data.relation) {
+      errorAlert("Please select relationship");
+      return;
+    }
     const payload = {
       userId: editingId,
       firstName: data.firstName,
       lastName: data.lastName,
-      DOB: format(new Date(data.dob), "yyyy-MM-dd"),
+      DOB: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
       address: data.address,
       pinCode: data.pinCode,
       macId: "",
       macIp: ipAddress ?? "",
-      Relation: data.relation.value,
+      Relation: data.relation?.value || "",
     };
     setFinalSaveObj(payload);
     setOpenConfirmationModal(open);
@@ -140,23 +143,28 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
     setOpenConfirmationModal(false);
     updatePatient(finalSaveObj)
       .then((res) => {
-        successAlert(res.data.message);
-        setIsLoading(false);
-        reset();
-        onClose();
-        setView("list");
-        setOpen(false);
+        if (res?.data) {
+          successAlert(res.data.message || "Updated successfully");
+          setIsLoading(false);
+          reset();
+          onClose();
+          setView("list");
+          setOpen(false);
+        } else {
+          errorAlert("Update failed: No response from server");
+          setIsLoading(false);
+        }
       })
       .catch((error) => {
         setIsLoading(false);
-        errorAlert(error.message);
+        errorAlert(error?.message || "An error occurred during update");
       });
   };
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
-      .then((data) => setIpAddress(data.ip))
+      .then((data) => setIpAddress(data?.ip))
       .catch((err) => console.error("IP fetch error:", err));
   }, []);
 
@@ -165,10 +173,17 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       setLoading(true);
       getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
-          setMemberList(res.data.data);
+          if (res?.data?.data) {
+            setMemberList(res.data.data);
+          } else {
+            setMemberList([]);
+          }
           setLoading(false);
         })
-        .catch(() => setLoading(false));
+        .catch(() => {
+          setMemberList([]);
+          setLoading(false);
+        });
     }
   }, [user, open]);
 

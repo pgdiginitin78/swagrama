@@ -429,7 +429,7 @@ function BookingPreviewModal({
             <PreviewRow
               label="Doctor"
               value={
-                selectedDoctorId?.firstName + " " + selectedDoctorId?.lName
+                selectedDoctorId ? `${selectedDoctorId.firstName} ${selectedDoctorId.lName}` : "—"
               }
             />
             <PreviewRow
@@ -562,7 +562,7 @@ function AyurvedaForm({
   
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
-  console.log("activeDeptactiveDeptactiveDept", patientFid);
+
 
   const updateVisibleCount = useCallback(() => {
     const w = window.innerWidth;
@@ -665,7 +665,7 @@ function AyurvedaForm({
           );
         }
       })
-      .catch((error) => error);
+      .catch((error) => console.error(error));
   };
 
   useEffect(() => {
@@ -711,22 +711,14 @@ function AyurvedaForm({
         .then((res) => {
           if (!isMounted) return;
           const data = res?.data;
-          console.log("the time slots are", res);
-
           if (data?.status == 200) {
             const fetchedSlots = data?.data || [];
-            console.log(
-              `[Slots] Fetched ${fetchedSlots.length} slots. Setting loading to false.`,
-            );
             setSlotData({
               slots: fetchedSlots,
               loading: false,
               error: fetchedSlots.length === 0 ? "No slots available" : "",
             });
           } else {
-            console.log(
-              `[Slots] API returned status ${data?.status}. Setting loading to false.`,
-            );
             setSlotData({
               slots: [],
               loading: false,
@@ -763,12 +755,12 @@ function AyurvedaForm({
 
     const saveObj = {
       macId: "",
-      macIp: ipAddress,
+      macIp: ipAddress || "",
       clinicFid: selectedDoctorId?.clinicId,
-      patientFid: data.patientFid.id,
+      patientFid: data.patientFid?.id,
       doctorFid: selectedDoctorId?.userId,
-      serviceFid: String(data.serviceFid.id),
-      appoinmentDate: format(new Date(data.appointmentDate), "yyyy-MM-dd"),
+      serviceFid: data.serviceFid?.id ? String(data.serviceFid.id) : "",
+      appoinmentDate: data.appointmentDate ? format(new Date(data.appointmentDate), "yyyy-MM-dd") : "",
       Status: data.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
@@ -776,7 +768,6 @@ function AyurvedaForm({
       taxDeatils: data.taxDetails,
       EncounterStatus: data?.EncounterStatus,
       reason: data.reasonForVisit,
- 
     };
     setFinalObj(saveObj);
     setPreviewData({ ...data, selectedTimeSlot });
@@ -872,23 +863,23 @@ function AyurvedaForm({
   };
 
   useEffect(() => {
-    if (patientFid !== null) {
-      setValue("fullName", patientFid.label);
-      setValue("mobileNumber", patientFid.mobileNo);
-      setValue("age", patientFid?.age);
+    if (patientFid) {
+      setValue("fullName", patientFid.label || "");
+      setValue("mobileNumber", patientFid.mobileNo || "");
+      setValue("age", patientFid?.age || "");
       const bloodGroupFilter = bloodGroupOptions.find(
         (list) => list.label === patientFid.bloodGroup,
       );
       const filterGender = genderOptions.find(
-        (list) => list.label.toLowerCase() === patientFid.gender,
+        (list) => list.label?.toLowerCase() === patientFid.gender?.toLowerCase(),
       );
 
       setValue("bloodGroup", bloodGroupFilter);
       setValue("gender", filterGender);
-      setValue("city", patientFid.city);
-      setValue("emailAddress", patientFid.emailId);
+      setValue("city", patientFid.city || "");
+      setValue("emailAddress", patientFid.emailId || "");
     }
-  }, [patientFid]);
+  }, [patientFid, setValue]);
 
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
@@ -1414,7 +1405,7 @@ function AyurvedaForm({
             <button
               type="button"
               onClick={() => setOpenAddPatientModal(true)}
-              className="flex items-center gap-1 text-[10px] font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-2.5 py-1.5 rounded-lg transition-all duration-200 sm:text-xs sm:px-3 sm:rounded-[9px]"
+              className="flex items-center gap-1 text-[10px] font-semibold text-white bg-white/15 hover:bg-white/25 border border-white/20 px-2.5 py-1.5 rounded transition-all duration-200 sm:text-xs sm:px-3 "
             >
               + Add Patient
             </button>

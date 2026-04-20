@@ -8,7 +8,7 @@ import { useAuth } from "./context/AuthContext";
 import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
 import Feeds from "./components/pages/feeds/Feeds";
-
+import ErrorBoundary from "./components/common/ErrorBoundary";
 
 const SwagramaRefundPolicy = lazy(
   () => import("./components/pages/refund-policy/RefundPolicy"),
@@ -63,37 +63,39 @@ export default function App() {
     <>
       <Navbar />
       <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
-        <Suspense fallback={<PageSkeleton />}>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<HomePage userData={userData} />} />
-            <Route
-              path="/healing"
-              element={<ServicesTabs userData={userData} />}
-            />
-            <Route
-              path="/membership"
-              element={<CommunityMembership userData={userData} />}
-            />
-            <Route
-              path="/community-activities"
-              element={<CommunityActivitiesTabs userData={userData} />}
-            />
-            <Route
-              path="/commune"
-              element={<CommuneTabs userData={userData} />}
-            />
-            <Route path="/eShop" element={<EShop userData={userData} />} />
-            <Route
-              path="/calendar"
-              element={<EventCalander userData={userData} />}
-            />
-            <Route path="/aboutUs" element={<AboutUs />} />
-            <Route path="/termsAndConditions" element={<TermsAndConditon />} />
-            <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
-            <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
-            <Route path="feeds" element={<Feeds />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<PageSkeleton />}>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<HomePage userData={userData} />} />
+              <Route
+                path="/healing"
+                element={<ServicesTabs userData={userData} />}
+              />
+              <Route
+                path="/membership"
+                element={<CommunityMembership userData={userData} />}
+              />
+              <Route
+                path="/community-activities"
+                element={<CommunityActivitiesTabs userData={userData} />}
+              />
+              <Route
+                path="/commune"
+                element={<CommuneTabs userData={userData} />}
+              />
+              <Route path="/eShop" element={<EShop userData={userData} />} />
+              <Route
+                path="/calendar"
+                element={<EventCalander userData={userData} />}
+              />
+              <Route path="/aboutUs" element={<AboutUs />} />
+              <Route path="/termsAndConditions" element={<TermsAndConditon />} />
+              <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
+              <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
+              <Route path="feeds" element={<Feeds />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
         <ToastContainer
           position="top-right"
           autoClose={5000}

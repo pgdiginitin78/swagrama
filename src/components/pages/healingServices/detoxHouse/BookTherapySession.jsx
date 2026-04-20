@@ -37,6 +37,7 @@ import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import { InitiatePayment } from "../../../../services/bookAppointment/BookAppointmentServices";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import AddPatientModal from "../../opdBooking/AddPatientModal";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
@@ -70,6 +71,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
   const cancelPaymentRef = useRef(null);
 
   const { user } = useAuth();
@@ -108,8 +110,7 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
   }, [sessionsCount]);
 
-  useEffect(() => {
-    if (!user) return;
+  const handleGetPatientData = () => {
     getPatientDataByMobileNo(user?.mobileNo, 5)
       .then((res) => {
         const data = res?.data?.data;
@@ -124,7 +125,12 @@ export default function BookTherapySession({ open, onClose, item }) {
           );
         }
       })
-      .catch(() => {});
+      .catch((err) => err);
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    handleGetPatientData();
   }, [user]);
 
   useEffect(() => {
@@ -199,7 +205,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const handleDateSelect = (date, idx) => {
     setSchedules((prev) => {
       const next = [...prev];
-      next[idx] = { ...next[idx], date, time: null }; 
+      next[idx] = { ...next[idx], date, time: null };
       return next;
     });
   };
@@ -557,7 +563,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   ) : therapySlots.length > 0 ? (
                                     therapySlots.map((slot, i) => {
                                       const t = slot.sessionTime;
-                                      const isAvailable = slot.isAvailable || !slot?.isBookedByUser;
+                                      const isAvailable =
+                                        slot.isAvailable ||
+                                        !slot?.isBookedByUser;
                                       const isTaken = schedules.some(
                                         (s, sIdx) => {
                                           if (
@@ -648,6 +656,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                   <div className="w-9 h-9 rounded-full bg-[#d4e8c2] flex items-center justify-center text-ayuMid flex-shrink-0">
                     <PersonOutline fontSize="small" />
                   </div>
+
                   <div>
                     <span className="font-bold text-ayuTulsi text-sm block">
                       Guest Info
@@ -655,6 +664,14 @@ export default function BookTherapySession({ open, onClose, item }) {
                     <span className="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">
                       Please select from profile
                     </span>
+                  </div>
+                  <div className="flex justify-end flex-1">
+                    <CommonButton
+                      type="button"
+                      onClick={() => setOpenAddPatient(true)}
+                      label="+ Add Guest"
+                      className="bg-booking-primary text-white  hover:bg-booking-primaryDark transition-all shadow-sm shrink-0"
+                    />
                   </div>
                 </div>
                 <div className="mt-3">
@@ -814,7 +831,15 @@ export default function BookTherapySession({ open, onClose, item }) {
           </div>
         </Box>
       </Modal>
-
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationLabel="Confirm Therapy Booking"

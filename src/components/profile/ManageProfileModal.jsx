@@ -251,8 +251,8 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
-      .then((data) => setIpAddress(data.ip))
-      .catch((error) => console.error("Error:", error));
+      .then((data) => setIpAddress(data?.ip))
+      .catch((error) => console.error("Error fetching IP:", error));
   }, []);
 
   return (

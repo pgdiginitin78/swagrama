@@ -21,6 +21,7 @@ import {
   GetNatureTherapySlotsByUser,
 } from "../../../../services/healingServices/natureTherapyServices/NatureTherapyServices";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+import AddPatientModal from "../../opdBooking/AddPatientModal";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -112,6 +113,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
+  const [patientOptions, setPatientOptions] = useState([]);
   const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
@@ -137,9 +140,12 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       email: "",
       mobile: "",
       city: "",
+      patientFid: null,
     },
     mode: "onChange",
   });
+
+  const patientFid = watch("patientFid");
 
   const fromDate = watch("fromDate");
   const noOfPerson = watch("noOfPerson");
@@ -191,52 +197,52 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
         }
       })
       .catch((error) => console.error(error));
+  }, [setValue]);
 
-    if (user !== null) {
-      getPatientDataByMobileNo(user?.mobileNo, 5)
-        .then((res) => {
-          const data = res?.data?.data || [];
-          const filterData = data.find(
-            (item) => String(item.userId) === String(user?.userId),
+  const handleGetPatientData = () => {
+    getPatientDataByMobileNo(user?.mobileNo, 5)
+      .then((res) => {
+        const data = res?.data?.data || [];
+        const filterData = data.find(
+          (item) => String(item.userId) === String(user?.userId),
+        );
+        if (data?.length) {
+          setPatientOptions(
+            data.map((d) => ({
+              ...d,
+              id: d.userId,
+              value: d.userId,
+              label: `${d.firstName || ""} ${d.lastName || ""}`.trim(),
+            })),
           );
           if (filterData) {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
-              { shouldValidate: true, shouldDirty: true },
             );
-            setValue("email", filterData.emailId || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("mobile", String(filterData.mobileNo || ""), {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("city", filterData.city || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-          } else if (user) {
-
-            setValue(
-              "fullName",
-              `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-              { shouldValidate: true, shouldDirty: true },
-            );
-            setValue("email", user.emailId || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("mobile", String(user.mobileNo || ""), {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
+            setValue("email", filterData.emailId || "");
+            setValue("mobile", String(filterData.mobileNo || ""));
+            setValue("city", filterData.city || "");
           }
-        })
-        .catch((error) => console.error(error));
+        }
+      })
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    if (patientFid !== null) {
+      setValue("fullName", patientFid.label);
+      setValue("mobile", String(patientFid.mobileNo || ""));
+      setValue("email", patientFid.emailId || "");
+      setValue("city", patientFid.city || "");
     }
-  }, [user, setValue]);
+  }, [patientFid, setValue]);
+
+  useEffect(() => {
+    if (user !== null) {
+      handleGetPatientData();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (servicesOptions?.length > 0 && therapy?.nameEnglish) {
@@ -282,7 +288,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     }
   }, [user?.userId, fromDate]);
 
-console.log("selectedTimeSlot",selectedTimeSlot);
+  console.log("selectedTimeSlot", selectedTimeSlot);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -302,8 +308,8 @@ console.log("selectedTimeSlot",selectedTimeSlot);
       City: data.city,
       email: data.email,
       Appointmentdate: format(new Date(data.fromDate), "yyyy-MM-dd"),
-      slotStartTime : selectedTimeSlot?.slotStartTime,
-      slotEndTime :selectedTimeSlot?.slotEndTime,
+      slotStartTime: selectedTimeSlot?.slotStartTime,
+      slotEndTime: selectedTimeSlot?.slotEndTime,
       No_of_person: data.noOfPerson,
       SpecificRequest: data.specialRequest,
       Amount: watch("totalAmount"),
@@ -397,7 +403,10 @@ console.log("selectedTimeSlot",selectedTimeSlot);
                 <div className="sticky top-0 z-20 bg-white border-b border-booking-border px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
                   <h2 className="text-lg sm:text-xl font-bold text-booking-text flex items-center gap-2">
                     <span className="bg-booking-primary/10 p-1.5 rounded-lg flex items-center justify-center">
-                      <Event sx={{ fontSize: 20, color: "var(--booking-primary)" }} className="text-booking-primary" />
+                      <Event
+                        sx={{ fontSize: 20, color: "var(--booking-primary)" }}
+                        className="text-booking-primary"
+                      />
                     </span>
                     Book Nature Therapy
                   </h2>
@@ -415,11 +424,27 @@ console.log("selectedTimeSlot",selectedTimeSlot);
                         <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
                           <div className="bg-booking-primaryLight px-5 py-3 flex items-center gap-3">
                             <User className="w-5 h-5 text-booking-primary" />
-                            <h2 className="text-base font-bold text-booking-primary uppercase tracking-wider">
+                            <h2 className="text-base font-bold text-booking-primary uppercase tracking-wider flex-1">
                               Patient Information
                             </h2>
+                            <CommonButton
+                              type="button"
+                              onClick={() => setOpenAddPatient(true)}
+                              label="+ Add Patient"
+                              className="bg-green-50 border border-green-600 text-booking-primary  hover:bg-emerald-50 transition-all shadow-sm shrink-0"
+                            />
                           </div>
                           <div className="p-5">
+                            <div className="mb-4">
+                              <DropdownField
+                                control={control}
+                                name="patientFid"
+                                placeholder="Select Patient"
+                                dataArray={patientOptions}
+                                isClearable={true}
+                                searchIcon={true}
+                              />
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-2">
                                 <InputField
@@ -592,7 +617,9 @@ console.log("selectedTimeSlot",selectedTimeSlot);
                                 <span className="text-booking-label">
                                   Persons
                                 </span>
-                                <span className="font-bold">x {watch("noOfPerson")}</span>
+                                <span className="font-bold">
+                                  x {watch("noOfPerson")}
+                                </span>
                               </div>
                               <div className="flex justify-between text-xs font-medium">
                                 <span className="text-booking-label">
@@ -650,6 +677,16 @@ console.log("selectedTimeSlot",selectedTimeSlot);
         confirmationMsg="Are you sure you want to book this nature therapy for the selected slot?"
         confirmationButtonMsg="Confirm Booking"
       />
+
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
     </>
   );
 };

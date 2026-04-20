@@ -259,6 +259,9 @@ export default function AddPatientModal({ open, handleClose }) {
     setOpenConfirmationModal(true);
   };
 
+
+  
+
   const handleUserRegister = async () => {
     try {
       setOpenConfirmationModal(false);
@@ -267,14 +270,14 @@ export default function AddPatientModal({ open, handleClose }) {
       const apiData = response?.data?.data || response?.data;
 
       if (response?.status === 200 && (apiData?.userId || apiData?.success)) {
-        successAlert(apiData.message || "Patient registered successfully!");
+        successAlert(apiData?.message || "Patient registered successfully!");
         handleClose();
         reset();
       } else {
         errorAlert(apiData?.message || "Registration failed!");
       }
     } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message;
+      const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
       errorAlert(errorMessage);
     } finally {
       setIsLoading(false);
@@ -347,12 +350,11 @@ export default function AddPatientModal({ open, handleClose }) {
   useEffect(() => {
     if (user !== null) {
       setValue("mobileNO", user?.mobileNo);
-    } else {
       fetch("https://api.ipify.org?format=json")
         .then((res) => res.json())
-        .then((data) => setIpAddress(data.ip))
+        .then((data) => setIpAddress(data?.ip))
         .catch((err) => console.error("IP fetch error:", err));
-    }
+    } 
   }, [user, setValue]);
 
   useEffect(() => {
@@ -520,7 +522,7 @@ export default function AddPatientModal({ open, handleClose }) {
                 <InputField
                   name="emailId"
                   control={control}
-                  label="emailId *"
+                  label="Email *"
                   error={errors.emailId}
                 />
                 <div>

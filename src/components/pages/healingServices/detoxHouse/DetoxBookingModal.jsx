@@ -26,6 +26,7 @@ import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
 import { errorAlert } from "../../../common/toast/CustomToast";
+import AddPatientModal from "../../opdBooking/AddPatientModal";
 
 const dropdownObjectSchema = yup
   .object()
@@ -114,6 +115,7 @@ const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
 
   const { user } = useAuth();
 
@@ -214,6 +216,26 @@ console.log("selectedServiceValue",selectedServiceValue);
     }
   }, [clinicsOptions, setValue]);
 
+  const handleGetPatientData = () => {
+    if (user !== null && clinicFidValue?.id > 0) {
+      getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
+        .then((res) => {
+          const data = res?.data?.data;
+          if (data?.length) {
+            setPatientOptions(
+              data.map((item) => ({
+                ...item,
+                id: item.userId,
+                value: item.userId,
+                label: `${item.firstName} ${item.lastName}`,
+              }))
+            );
+          }
+        })
+        .catch((error) => console.error(error));
+    }
+  };
+
   useEffect(() => {
     if (clinicFidValue?.id > 0) {
       setValue("doctorFid", null);
@@ -253,23 +275,7 @@ console.log("selectedServiceValue",selectedServiceValue);
         })
         .catch((error) => console.error(error));
 
-      if (user !== null) {
-        getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
-          .then((res) => {
-            const data = res?.data?.data;
-            if (data?.length) {
-              setPatientOptions(
-                data.map((item) => ({
-                  ...item,
-                  id: item.userId,
-                  value: item.userId,
-                  label: `${item.firstName} ${item.lastName}`,
-                })),
-              );
-            }
-          })
-          .catch((error) => console.error(error));
-      }
+      handleGetPatientData();
     }
   }, [clinicFidValue, user, setValue]);
 
@@ -403,9 +409,15 @@ console.log("selectedServiceValue",selectedServiceValue);
                             <div className="p-1.5 bg-white/20 rounded-lg">
                               <User className="w-5 h-5 text-white" />
                             </div>
-                            <h2 className="text-base sm:text-lg font-bold text-white">
+                            <h2 className="text-base sm:text-lg font-bold text-white flex-1">
                               Patient & Therapy Details
                             </h2>
+                            <CommonButton
+                              type="button"
+                              onClick={() => setOpenAddPatient(true)}
+                              label="+ Add Patient"
+                              className="bg-white text-booking-primary  hover:bg-emerald-50 transition-all shadow-sm shrink-0"
+                            />
                           </div>
                           <div className="p-4 sm:p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -651,6 +663,16 @@ console.log("selectedServiceValue",selectedServiceValue);
         confirmationMsg="Are you sure you want to book this detox therapy for the selected slot?"
         confirmationButtonMsg="Confirm Booking"
       />
+
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
     </>
   );
 };

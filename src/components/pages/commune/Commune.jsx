@@ -323,7 +323,7 @@ function SeasonCard({ item, index, onBook }) {
           className="mt-auto w-full py-3 rounded-[5px] text-white text-sm font-bold tracking-wide shadow-md transition-all duration-300"
           style={{ backgroundColor: item.accent }}
         >
-          Book Now →
+          Enquire Now →
         </motion.button>
       </div>
     </motion.div>
@@ -501,10 +501,10 @@ function ProgrammeCard({ programme, index, onBook }) {
           whileTap={{ scale: 0.97 }}
           whileHover={{ scale: 1.02 }}
           onClick={() => onBook(programme)}
-          className="w-full py-3 rounded-[5px] text-white text-sm font-bold tracking-widest uppercase shadow-lg"
+          className="w-full py-3 rounded-[5px] text-white text-sm font-bold tracking-widest  shadow-lg"
           style={{ backgroundColor: programme.accent }}
         >
-          Book Programme Now
+          Enquire Now
         </motion.button>
       </div>
     </motion.div>

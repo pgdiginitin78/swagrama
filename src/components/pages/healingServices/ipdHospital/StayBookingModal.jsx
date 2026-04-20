@@ -57,6 +57,7 @@ import { wellnessStayBooking } from "../../../../services/healingServices/wellne
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import AddPatientModal from "../../opdBooking/AddPatientModal";
 
 function StayBookingModal({
   open,
@@ -96,6 +97,8 @@ function StayBookingModal({
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
+  const [patientOptions, setPatientOptions] = useState([]);
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
@@ -118,14 +121,16 @@ function StayBookingModal({
       mobile: "",
       city: "",
       bringingPet: false,
+      patientFid:null,
       twinSharing: true,
       mealPreference: {
         label: "Organic Full Board (Included)",
         value: "Organic Full Board (Included)",
       },
     },
+    mode: "onChange",
   });
-
+  const patientFid = watch("patientFid");
   const formValues = watch();
 
   const scrollCarousel = (direction) => {
@@ -271,17 +276,18 @@ function StayBookingModal({
     setIsSearching(true);
     setRoomStatus(null);
     checkRoomAvailability(
-      selectedService.roomTypeId,
+      selectedService?.roomTypeId,
       format(new Date(checkIn), "yyyy-MM-dd"),
       checkInTime,
       format(new Date(checkOut), "yyyy-MM-dd"),
       checkOutTime,
     )
       .then((res) => {
-        setRoomStatus(res.data);
+        setRoomStatus(res?.data);
         setIsSearching(false);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Check availability error:", err);
         setRoomStatus("error");
         setIsSearching(false);
       });
@@ -296,21 +302,21 @@ function StayBookingModal({
     const saveObj = {
       userId: user?.userId || 1,
       resortId: 1,
-      roomTypeId: selectedService.roomTypeId,
+      roomTypeId: selectedService?.roomTypeId,
       stayType: selectedService?.maxOcc === 1 ? "Seperate" : "Double",
-      checkInDate: format(new Date(checkIn), "yyyy-MM-dd"),
-      CheckoutDate: format(new Date(checkOut), "yyyy-MM-dd"),
+      checkInDate: checkIn ? format(new Date(checkIn), "yyyy-MM-dd") : "",
+      CheckoutDate: checkOut ? format(new Date(checkOut), "yyyy-MM-dd") : "",
       checkInTime: checkInTime,
       checkOutTime: checkOutTime,
-      noOfPersons: guests.adults,
-      noOfChildren: guests.children,
-      isPet: formValues.bringingPet,
-      twinSharing: formValues.twinSharing,
-      totalAmount: costs.total,
-      guestFullName: formValues.fullName,
-      emailId: formValues.email,
-      mobile: String(formValues.mobile),
-      city: formValues.city,
+      noOfPersons: guests?.adults || 0,
+      noOfChildren: guests?.children || 0,
+      isPet: formValues?.bringingPet || false,
+      twinSharing: formValues?.twinSharing || false,
+      totalAmount: costs?.total || 0,
+      guestFullName: formValues?.fullName || "",
+      emailId: formValues?.email || "",
+      mobile: String(formValues?.mobile || ""),
+      city: formValues?.city || "",
     };
 
     setFinalSaveObj(saveObj);
@@ -382,23 +388,47 @@ function StayBookingModal({
     }
   };
 
-  useEffect(() => {
-    if (user !== null) {
-      getPatientDataByMobileNo(user?.mobileNo, 5)
-        .then((res) => {
-          const data = res?.data?.data;
-          const filterData = data.find((item) => item.userId === user?.userId);
-          setValue(
-            "fullName",
-            `${filterData?.firstName} ${filterData?.lastName}`,
+  const handleGetPatientData = () => {
+    getPatientDataByMobileNo(user?.mobileNo, 5)
+      .then((res) => {
+        const dataArray = res?.data?.data;
+        if (Array.isArray(dataArray) && dataArray.length > 0) {
+          const filterData = dataArray.find((item) => item.userId === user?.userId);
+          setPatientOptions(
+            dataArray.map((d) => ({
+              ...d,
+              id: d.userId,
+              value: d.userId,
+              label: `${d.firstName} ${d.lastName}`,
+            })),
           );
-          setValue("email", filterData?.emailId);
-          setValue("mobile", filterData?.mobileNo);
-          setValue("city", filterData?.city);
-        })
-        .catch((err) => err);
+          if (filterData) {
+            setValue("fullName", `${filterData.firstName} ${filterData.lastName}`);
+            setValue("email", filterData.emailId || "");
+            setValue("mobile", filterData.mobileNo || "");
+            setValue("city", filterData.city || "");
+          }
+        }
+      })
+      .catch((err) => console.error("Error fetching patient data:", err));
+  };
+
+console.log("patientFid",patientFid);
+
+    useEffect(() => {
+    if (patientFid !== null) {
+      setValue("fullName", patientFid.label);
+      setValue("mobileNumber", patientFid.mobileNo);
+      setValue("age", patientFid?.age);
+      setValue("city", patientFid.city);
+      setValue("emailAddress", patientFid.emailId);
     }
-  }, []);
+  }, [patientFid]);
+
+  useEffect(() => {
+    if (!user) return;
+    handleGetPatientData();
+  }, [user]);
 
   return (
     <>
@@ -565,7 +595,6 @@ function StayBookingModal({
                             : "bg-booking-primary hover:bg-booking-primaryDark shadow-md"
                         }`}
                       />
-        
                     </div>
                   </div>
                 </motion.div>
@@ -1247,9 +1276,27 @@ function StayBookingModal({
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
-                    Guest Information
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
+                      Guest Information
+                    </p>
+                    <CommonButton
+                      type="button"
+                      onClick={() => setOpenAddPatient(true)}
+                      label="+ Add Guest"
+                      className="bg-booking-primary text-white  hover:bg-booking-primaryDark transition-all shadow-sm shrink-0"
+                    />
+                  </div>
+                  <div className="mt-3">
+                    <DropdownField
+                      control={control}
+                      name="patientFid"
+                      placeholder="Select Patient"
+                      dataArray={patientOptions}
+                      isClearable={true}
+                      searchIcon={true}
+                    />
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <InputField
                       control={control}
@@ -1490,6 +1537,15 @@ function StayBookingModal({
         }
         disabled={isPaymentPending}
       />
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
     </>
   );
 }

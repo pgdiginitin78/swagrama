@@ -194,12 +194,12 @@ export default function OPDBookingModal({
     setSlotError("");
     const saveObj = {
       macId: "",
-      macIp: ipAddress,
-      clinicFid: dataObj.clinicFid.id,
-      patientFid: dataObj.patientFid.id,
-      doctorFid: dataObj?.doctorFid.id,
-      serviceFid: String(dataObj.serviceFid.id),
-      appoinmentDate: format(new Date(dataObj.appointmentDate), "yyyy-MM-dd"),
+      macIp: ipAddress || "",
+      clinicFid: dataObj.clinicFid?.id,
+      patientFid: dataObj.patientFid?.id,
+      doctorFid: dataObj?.doctorFid?.id,
+      serviceFid: dataObj.serviceFid?.id ? String(dataObj.serviceFid.id) : "",
+      appoinmentDate: dataObj.appointmentDate ? format(new Date(dataObj.appointmentDate), "yyyy-MM-dd") : "",
       Status: dataObj.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
@@ -261,7 +261,7 @@ export default function OPDBookingModal({
       }
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
+      errorAlert(error?.message || "Payment initiation failed");
     }
   };
 
@@ -283,7 +283,7 @@ export default function OPDBookingModal({
           setValue("location", filterLocation[0]);
         }
       })
-      .catch((error) => error);
+      .catch((error) => console.error("Error fetching locations:", error));
   }, [setValue]);
 
   useEffect(() => {
@@ -302,7 +302,7 @@ export default function OPDBookingModal({
             );
           }
         })
-        .catch((err) => console.log(err.message));
+        .catch((err) => console.error("Error fetching clinics:", err.message));
     }
   }, [locationValue]);
 
@@ -425,7 +425,7 @@ export default function OPDBookingModal({
     }
   }, [selectedTherapy, doctorOptions, setValue]);
 
-  console.log("selectedTherapy", selectedTherapy);
+
 
   return (
     <>

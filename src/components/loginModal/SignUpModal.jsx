@@ -267,19 +267,21 @@ export default function SignUpModal({ open, handleClose }) {
 
   useEffect(() => {
     const fetchPinData = async () => {
-      if (pinCodeValue.length !== 6) return;
+      if (pinCodeValue?.length !== 6) return;
       try {
         const res = await axios.get(
           `https://api.postalpincode.in/pincode/${pinCodeValue}`,
         );
-        const pinCodeData = res.data[0]?.PostOffice[0];
-        setValue("pinCode", pinCodeData.Pincode);
-        setValue("locality", pinCodeData.Name);
-        setValue("city", pinCodeData.District);
-        setValue("state", pinCodeData.State);
-        setValue("country", pinCodeData.Country);
+        const pinCodeData = res.data?.[0]?.PostOffice?.[0];
+        if (pinCodeData) {
+          setValue("pinCode", pinCodeData.Pincode);
+          setValue("locality", pinCodeData.Name);
+          setValue("city", pinCodeData.District);
+          setValue("state", pinCodeData.State);
+          setValue("country", pinCodeData.Country);
+        }
       } catch (error) {
-        console.log(error);
+        console.log("PIN Fetch Error:", error);
       }
     };
     fetchPinData();
@@ -288,8 +290,8 @@ export default function SignUpModal({ open, handleClose }) {
   useEffect(() => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
-      .then((data) => setIpAddress(data.ip))
-      .catch((error) => console.error("Error:", error));
+      .then((data) => setIpAddress(data?.ip))
+      .catch((error) => console.error("Error fetching IP:", error));
   }, []);
 
   const textFieldSx = {

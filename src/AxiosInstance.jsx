@@ -99,6 +99,12 @@ AxiosInstance.interceptors.response.use(
       }
     }
 
+    if (error.response?.status >= 500) {
+      toast.error("A server error occurred. Please try again later.");
+    } else if (error.message === "Network Error") {
+      toast.error("Network error. Please check your internet connection.");
+    }
+
     return Promise.reject(error);
   },
 );

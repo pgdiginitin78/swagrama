@@ -29,6 +29,7 @@ import {
   GetBeautyTherapySlots,
 } from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+import AddPatientModal from "../../opdBooking/AddPatientModal";
 
 const dropdownObjectSchema = yup
   .object()
@@ -113,6 +114,8 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
+  const [patientOptions, setPatientOptions] = useState([]);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const { setIsLoading } = useLoader();
 
@@ -132,6 +135,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       email: "",
       mobile: "",
       city: "",
+      patientFid: null,
       serviceFid: null,
       bookingDate: null,
       termsAccepted: false,
@@ -142,8 +146,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     mode: "onChange",
   });
 
+  const patientFid = watch("patientFid");
 
-  const doctorValue = watch("doctorFid");
+
   const bookingDate = watch("bookingDate");
   const selectedServiceValue = watch("serviceFid");
 
@@ -179,53 +184,52 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
         }
       })
       .catch((error) => console.error(error));
+  }, [setValue]);
 
-    if (user !== null) {
-      getPatientDataByMobileNo(user?.mobileNo, 5)
-        .then((res) => {
-          const data = res?.data?.data || [];
-          const filterData = data.find(
-            (item) => String(item.userId) === String(user?.userId),
+  const handleGetPatientData = () => {
+    getPatientDataByMobileNo(user?.mobileNo, 5)
+      .then((res) => {
+        const data = res?.data?.data || [];
+        const filterData = data.find(
+          (item) => String(item.userId) === String(user?.userId)
+        );
+        if (data?.length) {
+          setPatientOptions(
+            data.map((d) => ({
+              ...d,
+              id: d.userId,
+              value: d.userId,
+              label: `${d.firstName || ""} ${d.lastName || ""}`.trim(),
+            }))
           );
           if (filterData) {
             setValue(
               "fullName",
-              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
-              { shouldValidate: true, shouldDirty: true },
+              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim()
             );
-            setValue("email", filterData.emailId || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("mobile", String(filterData.mobileNo || ""), {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("city", filterData.city || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-          } else if (user) {
-            setValue(
-              "fullName",
-              `${user.firstName || ""} ${user.lastName || ""}`.trim(),
-              { shouldValidate: true, shouldDirty: true },
-            );
-            setValue("email", user.emailId || "", {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
-            setValue("mobile", String(user.mobileNo || ""), {
-              shouldValidate: true,
-              shouldDirty: true,
-            });
+            setValue("email", filterData.emailId || "");
+            setValue("mobile", String(filterData.mobileNo || ""));
+            setValue("city", filterData.city || "");
           }
-        })
-        .catch((error) => console.error(error));
+        }
+      })
+      .catch((error) => console.error(error));
+  };
+
+  useEffect(() => {
+    if (patientFid !== null) {
+      setValue("fullName", patientFid.label);
+      setValue("mobile", String(patientFid.mobileNo || ""));
+      setValue("email", patientFid.emailId || "");
+      setValue("city", patientFid.city || "");
     }
-  }, [user, setValue]);
+  }, [patientFid, setValue]);
 
-
+  useEffect(() => {
+    if (user !== null) {
+      handleGetPatientData();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (servicesOptions?.length > 0 && eventDetails?.serviceName) {
@@ -403,11 +407,27 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                             <div className="p-1.5 bg-booking-primary/10 rounded-[9px]">
                               <User className="w-5 h-5" />
                             </div>
-                            <h2 className="text-base sm:text-lg">
+                            <h2 className="text-base sm:text-lg flex-1">
                               Patient & Therapy Details
                             </h2>
+                            <CommonButton
+                              type="button"
+                              onClick={() => setOpenAddPatient(true)}
+                              label="+ Add Patient"
+                              className="bg-booking-primary text-white  hover:bg-booking-primaryDark transition-all shadow-sm shrink-0"
+                            />
                           </div>
                           <div className="p-4 sm:p-5">
+                            <div className="mb-4">
+                              <DropdownField
+                                control={control}
+                                name="patientFid"
+                                placeholder="Select Patient"
+                                dataArray={patientOptions}
+                                isClearable={true}
+                                searchIcon={true}
+                              />
+                            </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-2">
                                 <InputField
@@ -659,12 +679,26 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
       <ConfirmationModal
         confirmationOpen={openConfirmation}
-        confirmationHandleClose={() => setOpenConfirmation(false)}
+        confirmationHandleClose={() => {
+          setOpenConfirmation(false);
+          setIsPaymentPending(false);
+        }}
+        disabled={isPaymentPending}
         confirmationSubmitFunc={handleConfirmBooking}
         confirmationLabel="Confirm Therapy Booking"
         confirmationMsg="Are you sure you want to book this beauty therapy for the selected slot?"
         confirmationButtonMsg="Confirm Booking"
       />
+
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
     </>
   );
 };

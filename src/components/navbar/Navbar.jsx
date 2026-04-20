@@ -135,6 +135,7 @@ const Navbar = () => {
     { name: "स्वप्राप्त Feeds", path: "/feeds" },
     { name: "स्ववर्षपद Calendar", path: "/calendar" },
     { name: "स्वफलक Dashboard", path: "/dashboard" },
+    { name: "स्वप्रशासक Admin Dashboard", path: "/admin/dashboard" },
   ];
 
   const splitTitle = (text) => {

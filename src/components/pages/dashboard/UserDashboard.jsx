@@ -79,7 +79,7 @@ const UserDashboard = () => {
       current: false,
       icon: <DiamondIcon />,
       price: "₹5,999/yr",
-      color: "from-violet-500 to-purple-700",
+      color: "from-lime-500 to-green-700",
       accent: "#7c3aed",
       perks: ["40% Store Discount", "All Gold Benefits", "Unlimited Therapy Sessions", "Annual Panchakarma Retreat", "24/7 Doctor on Call", "Family Health Coverage", "VIP Lounge Access"],
     },

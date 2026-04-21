@@ -1298,7 +1298,7 @@ function StayBookingModal({
                     <DropdownField
                       control={control}
                       name="patientFid"
-                      placeholder="Select Patient"
+                      placeholder="Select Guest"
                       dataArray={patientOptions}
                       isClearable={true}
                       searchIcon={true}

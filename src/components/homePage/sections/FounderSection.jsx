@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { motion } from "framer-motion";
 import { fadeInUp, scaleIn, staggerContainer } from "../HomePageConstants";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
 
 const FounderSection = ({ foundersRef, isFoundersInView }) => {
   return (

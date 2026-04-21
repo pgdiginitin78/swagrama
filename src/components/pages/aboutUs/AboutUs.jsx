@@ -4,11 +4,11 @@ import { useRef, useState } from "react";
 import heroImage from "../../assets/landing-page/aboutUs/hero-swagrama.webp";
 import farmImage from "../../assets/landing-page/aboutUs/organic-farm.webp";
 import wellnessImage from "../../assets/landing-page/aboutUs/wellness-center.webp";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
-import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.webp";
-import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.webp";
-import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.png";
+import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
+import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
+import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
 import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
 import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
 import {

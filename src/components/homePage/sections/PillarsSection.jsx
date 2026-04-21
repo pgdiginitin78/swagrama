@@ -1,15 +1,12 @@
-import React, { memo } from "react";
 import { motion } from "framer-motion";
+import { memo } from "react";
 import {
-  fadeInUp,
-  scaleIn,
-  staggerContainer,
-  containerVariants,
   cardVariants,
-  getIcon,
+  containerVariants,
+  fadeInUp,
+  partnersData,
+  staggerContainer
 } from "../HomePageConstants";
-import { partnersData } from "../HomePageConstants";
-import { Divider } from "@mui/material";
 
 const PillarsSection = ({ healersRef, isHealersInView }) => {
   return (

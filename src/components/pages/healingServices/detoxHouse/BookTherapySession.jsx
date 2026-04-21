@@ -38,6 +38,7 @@ import { InitiatePayment } from "../../../../services/bookAppointment/BookAppoin
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
+import SummaryIcon from "../../../../assets/SummaryIcon.svg"
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
@@ -290,12 +291,9 @@ export default function BookTherapySession({ open, onClose, item }) {
 
         const tempObj = {
           amount: total,
-          appointmentDate: format(schedules[0].date, "yyyy-MM-dd"),
-          SloteStartTime: schedules[0].time,
-          SloteEndTime: schedules[0].time,
           userId: user?.userId,
           paymentFor: "TherapyBooking",
-          bookingId: bookingId,
+          bookingId: bookingId?.bookingId,
         };
 
         const res = await InitiatePayment(null, user?.userId, tempObj);
@@ -746,7 +744,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                   <h3 className="font-serif text-ayuBrown text-sm font-bold">
                     Summary
                   </h3>
-                  <ReceiptLong fontSize="small" className="text-ayuBrown" />
+                  <img src={SummaryIcon} alt="Summary" className="text-ayuBrown h-7 w-10" />
                 </div>
                 <div className="flex flex-col gap-2 text-xs font-bold text-gray-500 border-b border-ayuMid/10 pb-3 mb-3">
                   <div className="flex justify-between items-start">
@@ -845,9 +843,12 @@ export default function BookTherapySession({ open, onClose, item }) {
         confirmationMsg={`Are you sure you want to book ${sessionsCount} session(s) of ${item?.serviceName}? Total Amount: ₹${total.toLocaleString()}`}
         confirmationSubmitFunc={initiateBookingPayment}
         confirmationHandleClose={() => {
-          if (!isPaymentPending) {
-            setOpenConfirmationModal(false);
+          if (cancelPaymentRef.current) {
+            cancelPaymentRef.current();
+            cancelPaymentRef.current = null;
           }
+          setIsPaymentPending(false);
+          setOpenConfirmationModal(false);
         }}
         confirmationButtonMsg={
           isPaymentPending ? "Processing..." : "Confirm & Pay"

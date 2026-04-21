@@ -121,7 +121,7 @@ function StayBookingModal({
       mobile: "",
       city: "",
       bringingPet: false,
-      patientFid:null,
+      patientFid: null,
       twinSharing: true,
       mealPreference: {
         label: "Organic Full Board (Included)",
@@ -393,7 +393,9 @@ function StayBookingModal({
       .then((res) => {
         const dataArray = res?.data?.data;
         if (Array.isArray(dataArray) && dataArray.length > 0) {
-          const filterData = dataArray.find((item) => item.userId === user?.userId);
+          const filterData = dataArray.find(
+            (item) => item.userId === user?.userId,
+          );
           setPatientOptions(
             dataArray.map((d) => ({
               ...d,
@@ -403,7 +405,10 @@ function StayBookingModal({
             })),
           );
           if (filterData) {
-            setValue("fullName", `${filterData.firstName} ${filterData.lastName}`);
+            setValue(
+              "fullName",
+              `${filterData.firstName} ${filterData.lastName}`,
+            );
             setValue("email", filterData.emailId || "");
             setValue("mobile", filterData.mobileNo || "");
             setValue("city", filterData.city || "");
@@ -413,9 +418,9 @@ function StayBookingModal({
       .catch((err) => console.error("Error fetching patient data:", err));
   };
 
-console.log("patientFid",patientFid);
+  console.log("patientFid", patientFid);
 
-    useEffect(() => {
+  useEffect(() => {
     if (patientFid !== null) {
       setValue("fullName", patientFid.label);
       setValue("mobileNumber", patientFid.mobileNo);
@@ -429,6 +434,8 @@ console.log("patientFid",patientFid);
     if (!user) return;
     handleGetPatientData();
   }, [user]);
+
+  console.log("roomStatus", roomStatus);
 
   return (
     <>
@@ -609,7 +616,7 @@ console.log("patientFid",patientFid);
                     >
                       <div
                         className={`p-3 rounded-xl border flex items-center gap-3 ${
-                          roomStatus?.message === "Sold Out" ||
+                          roomStatus?.message === "Room is sold out" ||
                           roomStatus === "unavailable" ||
                           roomStatus === "error"
                             ? "bg-red-50 border-red-100 text-red-700"
@@ -618,14 +625,14 @@ console.log("patientFid",patientFid);
                       >
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
-                            roomStatus?.message === "Sold Out" ||
+                            roomStatus?.message === "Room is sold out" ||
                             roomStatus === "unavailable" ||
                             roomStatus === "error"
                               ? "bg-white text-red-500"
                               : "bg-white text-booking-primary"
                           }`}
                         >
-                          {roomStatus?.message === "Sold Out" ||
+                          {roomStatus?.message === "Room is sold out" ||
                           roomStatus === "unavailable" ||
                           roomStatus === "error" ? (
                             <svg
@@ -665,7 +672,7 @@ console.log("patientFid",patientFid);
                                 : "Unavailable")}
                           </p>
                           <p className="text-[10px] opacity-80 font-medium">
-                            {roomStatus?.message === "Sold Out" ||
+                            {roomStatus?.message === "Room is sold out" ||
                             roomStatus === "unavailable"
                               ? "Please try different dates"
                               : roomStatus === "error"
@@ -1454,20 +1461,20 @@ console.log("patientFid",patientFid);
                       !checkIn ||
                       !checkOut ||
                       isSearching ||
-                      roomStatus?.message === "Sold Out" ||
+                      roomStatus?.message === "Room is sold out" ||
                       roomStatus === "unavailable" ||
                       roomStatus === "error" ||
                       roomStatus === null
                     }
                     label={"Book Now"}
                     onClick={handleConfirmBooking}
-                    className={`w-full text-sm transition-all active:scale-[0.98] uppercase tracking-widest ${
+                    className={`w-full text-sm transition-all active:scale-[0.98]  tracking-widest ${
                       selectedService &&
                       checkIn &&
                       checkOut &&
                       !isSearching &&
                       roomStatus !== null &&
-                      roomStatus?.message !== "Sold Out" &&
+                      roomStatus?.message !== "Room is sold out" &&
                       roomStatus !== "unavailable" &&
                       roomStatus !== "error"
                         ? "bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white shadow-lg shadow-booking-primary/10"

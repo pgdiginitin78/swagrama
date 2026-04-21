@@ -56,14 +56,14 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
-import AvantiNitsureImg from "../../assets/landing-page/ourexperts/AvantiNitsure.webp";
+import AvantiNitsureImg from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
 import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.webp";
-import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.webp";
-import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.webp";
-import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/SantoshSuryawanshi.webp";
-import SmitaMehetreImg from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
-import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/VaishaliHolmukhe.webp";
+import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
+import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.png";
+import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
+import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
+import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import DatePickerField from "../../common/formFields/DatePickerField";

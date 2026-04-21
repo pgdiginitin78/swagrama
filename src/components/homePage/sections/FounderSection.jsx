@@ -67,8 +67,7 @@ const FounderSection = ({ foundersRef, isFoundersInView }) => {
                     <div className="flex items-start gap-2">
                       <span className="mt-2 h-2 w-2 rounded-full bg-orange-500 flex-shrink-0"></span>
                       <span>
-                        Partner: SwaGrama Ayurveda Yoga Nisarga Agro Tourism
-                        LLP
+                        Partner: SwaGrama Ayurveda Yoga Nisarga Agro Tourism LLP
                       </span>
                     </div>
 

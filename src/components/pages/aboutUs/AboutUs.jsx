@@ -87,7 +87,7 @@ const healers = [
     name: "Vaidya Avanti Nitsure",
     qualification: "MD Ayurveda",
     specialty: "Ayurveda",
-    image:AvantiNitsure,
+    image: AvantiNitsure,
     color: "#10b981",
   },
   {
@@ -624,70 +624,42 @@ const AboutUs = () => {
               <motion.div
                 key={index}
                 variants={cardVariants}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-shadow duration-300 border border-[#1E8E7A]"
+                whileHover={{ y: -10 }}
+                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 backdrop-blur-xl rounded-[2rem] p-6 shadow-soft hover:shadow-elevated transition-all duration-500 border border-white/50 group"
               >
-                <div className="relative h-56 overflow-hidden  bg-gradient-to-tr from-emerald-100 via-green-100 to-emerald-200">
-                  <img
-                    src={healer.image}
-                    alt={healer.name}
-                    className="w-full h-full object-contain object-center shadow-elevated "
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.3 + index * 0.1 }}
-                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full"
-                  >
-                    <span className="text-xs font-semibold text-[#1E8E7A] flex items-center gap-1">
-                      <Award className="w-3 h-3" />
-                      {healer.specialty}
-                    </span>
-                  </motion.div>
-                </div>
-
-                <div className="p-3">
-                  <div className="mb-2">
-                    <h3 className="text-lg font-bold text-gray-800 mb-1 flex items-center gap-2">
-                      <User className="w-5 h-5 text-[#1E8E7A]" />
-                      {healer.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 flex items-center gap-2 ml-7">
-                      <Briefcase className="w-4 h-4 text-[#1E8E7A]" />
-                      {healer.title}
-                    </p>
+                <div className="flex flex-col items-center text-center">
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-gradient-to-tr from-green-200 to-lime-200 rounded-2xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
+                    <img
+                      src={healer.image}
+                      alt={healer.name}
+                      className="relative w-32 h-32 rounded-2xl object-cover object-top shadow-md"
+                    />
                   </div>
 
-                  <div className="space-y-2">
-                    <motion.div
-                      initial={false}
-                      animate={{
-                        height: "auto",
-                        opacity: 1,
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className="overflow-hidden"
-                    >
-                      <div className="space-y-2 pt-2">
-                        {healer.roles.map((role, roleIndex) => (
-                          <motion.div
-                            key={roleIndex}
-                            initial={{ x: -10, opacity: 0 }}
-                            animate={{
-                              x: 0,
-                              opacity: 1,
-                            }}
-                            transition={{ delay: roleIndex * 0.1 }}
-                            className="flex items-start gap-2 text-xs text-gray-600 bg-green-50 p-2 rounded-lg"
-                          >
-                            <div className="w-1.5 h-1.5 rounded-full bg-[#1E8E7A] mt-1.5 flex-shrink-0" />
-                            <span className="leading-relaxed">{role}</span>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </motion.div>
+                  <h3 className="font-serif text-xl text-[#111827] mb-1 group-hover:text-green-700 transition-colors">
+                    {healer.name}
+                  </h3>
+                  <p className="text-sm font-medium text-green-600 mb-4 tracking-wide">
+                    {healer.title}
+                  </p>
+
+                  <div className="space-y-2.5 w-full">
+                    {healer.roles.map((role, roleIndex) => (
+                      <motion.div
+                        key={roleIndex}
+                        initial={{ x: -10, opacity: 0 }}
+                        animate={{
+                          x: 0,
+                          opacity: 1,
+                        }}
+                        transition={{ delay: roleIndex * 0.1 }}
+                        className="flex items-start text-left  gap-2 text-xs text-gray-600 bg-green-50 p-2 rounded-lg"
+                      >
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#1E8E7A] mt-1.5 flex-shrink-0" />
+                        <span className="leading-relaxed">{role}</span>
+                      </motion.div>
+                    ))}
                   </div>
                 </div>
               </motion.div>
@@ -735,7 +707,7 @@ const AboutUs = () => {
                 variants={cardVariants}
                 whileHover={{ y: -8, transition: { duration: 0.3 } }}
                 onHoverStart={() => setHoveredId(healer.id)}
-                onHoverEnd={() => setHoveredId(null)} 
+                onHoverEnd={() => setHoveredId(null)}
                 className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100"
               >
                 <Card
@@ -747,7 +719,7 @@ const AboutUs = () => {
                         ? "0 20px 40px rgba(0,0,0,0.15)"
                         : "0 4px 12px rgba(0,0,0,0.08)",
                     transition: "box-shadow 0.3s ease",
-          
+
                     border: "1px solid brown",
                   }}
                 >
@@ -762,25 +734,9 @@ const AboutUs = () => {
                       />
 
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="absolute top-1 right-1 z-10"
-                      >
-                        <div
-                          className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
-                                         text-xs  px-2 py-1 text-ayuDark font-semibold
-                                         shadow-2xl"
-                        >
-                          {healer.qualification}
-                        </div>
-                      </motion.div>
-
-              
                     </div>
 
-                    <CardContent className="mt-5 pb-6 px-6 text-center">
+                    <CardContent className="mt-2 pb-4 px-6 text-center">
                       <Typography
                         variant="h6"
                         component="h3"
@@ -962,4 +918,3 @@ const AboutUs = () => {
 };
 
 export default AboutUs;
-

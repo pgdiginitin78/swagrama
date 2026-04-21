@@ -18,7 +18,13 @@ import { useAuth } from "../../context/AuthContext";
 import ManageProfileModal from "../profile/ManageProfileModal";
 import ManageMembers from "../profile/ManageMembers";
 
-const ProfileDropdown = ({ user, onManage, onLogout, onClose, setOpenManageMembers }) => (
+const ProfileDropdown = ({
+  user,
+  onManage,
+  onLogout,
+  onClose,
+  setOpenManageMembers,
+}) => (
   <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999] animate-[fadeInDown_0.15s_ease_forwards]">
     <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
       <p className="text-sm font-bold text-green-800 truncate">
@@ -44,7 +50,10 @@ const ProfileDropdown = ({ user, onManage, onLogout, onClose, setOpenManageMembe
       Manage Profile
     </button>
     <button
-      onClick={() => { setOpenManageMembers(true); onClose(); }}
+      onClick={() => {
+        setOpenManageMembers(true);
+        onClose();
+      }}
       className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
     >
       <EditIcon fontSize="small" style={{ color: "#10b981" }} />
@@ -67,7 +76,11 @@ const AvatarIcon = ({ user, size = 32 }) => (
     className="rounded-full bg-green-100 border-2 border-green-300 flex items-center justify-center overflow-hidden cursor-pointer hover:ring-2 hover:ring-green-400 transition-all"
   >
     {user?.avatar ? (
-      <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+      <img
+        src={user.avatar}
+        alt="avatar"
+        className="w-full h-full object-cover"
+      />
     ) : (
       <PersonIcon sx={{ fontSize: size * 0.6, color: "#10b981" }} />
     )}
@@ -92,11 +105,15 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      const clickedOutsideDesktop = profileRef.current && !profileRef.current.contains(event.target);
-      const clickedOutsideMobile = mobileProfileRef.current && !mobileProfileRef.current.contains(event.target);
+      const clickedOutsideDesktop =
+        profileRef.current && !profileRef.current.contains(event.target);
+      const clickedOutsideMobile =
+        mobileProfileRef.current &&
+        !mobileProfileRef.current.contains(event.target);
       if (clickedOutsideDesktop && clickedOutsideMobile) setShowDropdown(false);
     };
-    if (showDropdown) document.addEventListener("mousedown", handleClickOutside);
+    if (showDropdown)
+      document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showDropdown]);
 
@@ -150,7 +167,11 @@ const Navbar = () => {
   };
 
   const cartBadgeStyles = {
-    "& .MuiBadge-badge": { fontSize: "0.6rem", minWidth: "16px", height: "16px" },
+    "& .MuiBadge-badge": {
+      fontSize: "0.6rem",
+      minWidth: "16px",
+      height: "16px",
+    },
   };
 
   return (
@@ -194,7 +215,6 @@ const Navbar = () => {
       >
         <div className="w-full px-3 sm:px-5 lg:px-8 xl:px-10">
           <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18 xl:h-20">
-
             <Link to="/" className="flex-shrink-0 z-10 focus:outline-none">
               <img
                 src={SwagramaLogo}
@@ -216,14 +236,18 @@ const Navbar = () => {
                     >
                       <span
                         className={`block text-[11px] xl:text-[12px] 2xl:text-[14px] transition-colors ${
-                          active ? "text-green-600 font-bold" : "text-green-800 group-hover:text-green-600"
+                          active
+                            ? "text-green-600 font-bold"
+                            : "text-green-800 group-hover:text-green-600"
                         }`}
                       >
                         {hi}
                       </span>
                       <span
                         className={`block text-[11px] xl:text-[12px] 2xl:text-[14px] ${
-                          active ? "text-green-600 font-semibold" : "text-green-700"
+                          active
+                            ? "text-green-600 font-semibold"
+                            : "text-green-700"
                         }`}
                       >
                         {en}
@@ -237,7 +261,11 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center gap-2 xl:gap-3 flex-shrink-0">
               {user ? (
                 <div className="relative" ref={profileRef}>
-                  <button onClick={() => setShowDropdown((v) => !v)} className="focus:outline-none" aria-label="Profile menu">
+                  <button
+                    onClick={() => setShowDropdown((v) => !v)}
+                    className="focus:outline-none"
+                    aria-label="Profile menu"
+                  >
                     <AvatarIcon user={user} size={36} />
                   </button>
                   {showDropdown && (
@@ -264,7 +292,13 @@ const Navbar = () => {
                 onClick={() => setOpenStore(true)}
                 className="store-btn relative flex items-center justify-center px-3 py-1.5 text-white rounded-lg font-medium shadow-md focus:outline-none"
               >
-                <Badge badgeContent={cartCount} color="success" overlap="circular" invisible={cartCount === 0} sx={cartBadgeStyles}>
+                <Badge
+                  badgeContent={cartCount}
+                  color="success"
+                  overlap="circular"
+                  invisible={cartCount === 0}
+                  sx={cartBadgeStyles}
+                >
                   <ShoppingCartIcon fontSize="small" />
                 </Badge>
               </button>
@@ -273,7 +307,11 @@ const Navbar = () => {
             <div className="flex lg:hidden items-center gap-2 sm:gap-3">
               {user ? (
                 <div className="relative" ref={mobileProfileRef}>
-                  <button onClick={() => setShowDropdown((v) => !v)} className="focus:outline-none" aria-label="Profile menu">
+                  <button
+                    onClick={() => setShowDropdown((v) => !v)}
+                    className="focus:outline-none"
+                    aria-label="Profile menu"
+                  >
                     <AvatarIcon user={user} size={30} />
                   </button>
                   {showDropdown && (
@@ -300,7 +338,13 @@ const Navbar = () => {
                 onClick={() => setOpenStore(true)}
                 className="store-btn relative flex items-center justify-center p-2 text-white rounded-lg shadow-md active:scale-95 focus:outline-none"
               >
-                <Badge badgeContent={cartCount} color="success" overlap="circular" invisible={cartCount === 0} sx={cartBadgeStyles}>
+                <Badge
+                  badgeContent={cartCount}
+                  color="success"
+                  overlap="circular"
+                  invisible={cartCount === 0}
+                  sx={cartBadgeStyles}
+                >
                   <ShoppingCartIcon sx={{ fontSize: 20 }} />
                 </Badge>
               </button>
@@ -341,12 +385,19 @@ const Navbar = () => {
           {user && (
             <div className="px-4 pt-4 flex-shrink-0">
               <button
-                onClick={() => { setOpen(false); setOpenProfile(true); }}
+                onClick={() => {
+                  setOpen(false);
+                  setOpenProfile(true);
+                }}
                 className="w-full flex items-center gap-3 p-3 rounded-xl bg-green-50 border border-green-200 hover:bg-green-100 transition-colors active:scale-[0.98]"
               >
                 <div className="w-10 h-10 rounded-full bg-green-100 border-2 border-green-300 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {user?.avatar ? (
-                    <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    <img
+                      src={user.avatar}
+                      alt="avatar"
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <PersonIcon sx={{ fontSize: 22, color: "#10b981" }} />
                   )}
@@ -371,13 +422,15 @@ const Navbar = () => {
                   to={item.path}
                   onClick={() => setOpen(false)}
                   style={{ animationDelay: `${index * 40}ms` }}
-                    className={`flex flex-col  px-3 py-3 rounded-xl transition-all active:scale-[0.98] focus:outline-none ${
-                      active
-                        ? "bg-green-100 border-l-4 border-green-600 pl-2"
-                        : "hover:bg-green-50 hover:translate-x-1"
-                    }`}
+                  className={`flex flex-col  px-3 py-3 rounded-xl transition-all active:scale-[0.98] focus:outline-none ${
+                    active
+                      ? "bg-green-100 border-l-4 border-green-600 pl-2"
+                      : "hover:bg-green-50 hover:translate-x-1"
+                  }`}
                 >
-                  <span className={`text-sm font-semibold ${active ? "text-green-700" : "text-gray-800"}`}>
+                  <span
+                    className={`text-sm font-semibold ${active ? "text-green-700" : "text-gray-800"}`}
+                  >
                     {en}
                   </span>
                   <span className="text-[11px] text-green-500">{hi}</span>
@@ -389,7 +442,10 @@ const Navbar = () => {
           <div className="px-4 py-4 border-t border-green-100 flex-shrink-0">
             {user ? (
               <button
-                onClick={() => { setOpen(false); handleLogout(); }}
+                onClick={() => {
+                  setOpen(false);
+                  handleLogout();
+                }}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 transition-colors active:scale-[0.98] focus:outline-none"
               >
                 <LogoutIcon fontSize="small" />
@@ -397,7 +453,10 @@ const Navbar = () => {
               </button>
             ) : (
               <button
-                onClick={() => { setOpen(false); setOpenLoginModal(true); }}
+                onClick={() => {
+                  setOpen(false);
+                  setOpenLoginModal(true);
+                }}
                 className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-medium text-green-700 bg-green-50 border border-green-200 hover:bg-green-100 transition-colors active:scale-[0.98] focus:outline-none"
               >
                 <LoginIcon fontSize="small" />

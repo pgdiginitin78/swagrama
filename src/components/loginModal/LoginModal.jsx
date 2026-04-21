@@ -113,20 +113,20 @@ export default function LoginModal({ open, handleClose }) {
       setOpenConfirmationModal(false);
 
       const response = await userLogin(formData);
-      const { data, status } = response;
-      if (status === 200 && data?.accessToken) {
-        localStorage.setItem("accessToken", data.accessToken);
-        localStorage.setItem("refreshToken", data.refreshToken);
-        localStorage.setItem("user", JSON.stringify(data.user));
-        localStorage.setItem("expiresIn", data.expiresIn);
+      console.log(response?.data.data);
+      if (response.status === 200 ) {
+        localStorage.setItem("accessToken", response.data?.data?.accessToken);
+        localStorage.setItem("refreshToken", response.data?.data?.refreshToken);
+        localStorage.setItem("user", JSON.stringify(response.data?.data?.user));
+        localStorage.setItem("expiresIn", response.data?.data?.expiresIn);
         localStorage.setItem("tokenSetTime", Date.now());
-        login(data.user);
-        successAlert(data.message || "Login successful");
+        login(response.data?.data?.user);
+        successAlert(response.data.message || "Login successful");
         handleClose();
         reset();
         setIsLoading(false);
       } else {
-        throw new Error(data?.message || "Invalid login credentials");
+        throw new Error(response.data?.message || "Invalid login credentials");
       }
     } catch (error) {
       errorAlert(

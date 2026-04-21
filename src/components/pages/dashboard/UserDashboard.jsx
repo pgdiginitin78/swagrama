@@ -8,7 +8,7 @@ import {
   Diamond as DiamondIcon,
   History as HistoryIcon,
   Logout as LogoutIcon,
-  CardMembership as MembershipIcon,
+  // CardMembership as MembershipIcon,
   Menu as MenuIcon,
   Receipt as ReceiptIcon,
   LocalShipping as ShippingIcon,
@@ -30,6 +30,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import TherapyIcon from "../../../assets/TherapyIcon.svg";
+import DoctorIcon from "../../../assets/doctorIcon.svg";
+import MembershipIcon from "../../../assets/membershipIcon.svg";
+import MembershipOutlineIcon from "../../../assets/membershipOutlineIcon.svg";
+
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -200,7 +204,7 @@ const UserDashboard = () => {
     {
       id: "membership",
       label: "Membership",
-      icon: <MembershipIcon sx={{ fontSize: 17 }} />,
+      icon: <img src={MembershipOutlineIcon} alt="Membership" className="w-6 h-6" />,
     },
   ];
 
@@ -312,11 +316,11 @@ const UserDashboard = () => {
           }`}
         >
           {data.type === "therapy" ? (
-            <img src={TherapyIcon} alt="Therapy" className="w-4 h-4" />
+            <img src={TherapyIcon} alt="Therapy" className="w-6 h-6" />
           ) : data.type === "order" ? (
             <ShippingIcon sx={{ fontSize: 16 }} />
           ) : (
-            <BookingIcon sx={{ fontSize: 16 }} />
+            <img src={DoctorIcon} alt="Shipping" className="w-6 h-6" />
           )}
         </div>
         <StatusBadge status={data.status} />
@@ -427,7 +431,7 @@ const UserDashboard = () => {
               Membership
             </p>
             <div className="p-1.5 bg-slate-100 rounded-lg text-slate-500">
-              <StarIcon sx={{ fontSize: 14 }} />
+              <img src={MembershipIcon} alt="Membership" className="w-6 h-6" />
             </div>
           </div>
           <p className="text-xl font-black text-gray-900">

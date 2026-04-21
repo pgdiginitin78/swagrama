@@ -73,6 +73,8 @@ import InputField from "../../common/formFields/InputField";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
+import bookAppointmentIcon from "../../../assets/bookAppointment.svg";
+import HolisticHealing from "../../../assets/HolisticHealing.svg";
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -194,7 +196,7 @@ const validationSchema = yup.object().shape({
 
 const ayurvedaSideContent = [
   {
-    icon: <SelfImprovementIcon fontSize="small" />,
+    icon: <img src={HolisticHealing} alt="Holistic Healing" className="h-5 w-5" />,
     gradient: "from-teal-400 to-emerald-500",
     bg: "bg-teal-50",
     border: "border-teal-100",
@@ -491,6 +493,7 @@ function AyurvedaForm({
   activeGradient = "from-emerald-600 to-green-500",
   activeDept = "Ayurveda",
 }) {
+
   const isYoga = activeDept?.toLowerCase() === "yoga";
   const isHomeopathy = activeDept?.toLowerCase() === "homeopathy";
 
@@ -1300,7 +1303,7 @@ function AyurvedaForm({
         >
           <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:gap-3">
             <div className="flex items-center gap-2">
-              <CalendarMonthIcon sx={{ color: "#fff", fontSize: 17 }} />
+              <img src={bookAppointmentIcon} alt="Book Appointment" className="h-5 w-5" />
               <h2 className="text-xs font-bold text-white uppercase tracking-wider sm:text-sm">
                 Schedule Appointment
               </h2>

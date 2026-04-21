@@ -1,8 +1,7 @@
-import React, { memo } from "react";
 import { motion } from "framer-motion";
-import { Event } from "@mui/icons-material";
+import { memo } from "react";
+import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 import landigPageS1 from "../../assets/landing-page/landigPageS1.webm";
-import { errorAlert } from "../../common/toast/CustomToast";
 
 const HeroSection = ({ userData, setOpenAppointmentModal }) => {
   return (
@@ -54,8 +53,8 @@ const HeroSection = ({ userData, setOpenAppointmentModal }) => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.7, duration: 0.8 }}
           >
-            Experience the transformative power of Ayurveda and Natural
-            Healing at Swagrama Wellness Center
+            Experience the transformative power of Ayurveda and Natural Healing
+            at Swagrama Wellness Center
           </motion.p>
         </motion.div>
 
@@ -70,14 +69,10 @@ const HeroSection = ({ userData, setOpenAppointmentModal }) => {
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              if (userData && userData !== null) {
-                setOpenAppointmentModal(true);
-              } else {
-                errorAlert("Please login to proceed.");
-              }
+              setOpenAppointmentModal(true);
             }}
           >
-            <Event className="w-4 h-4 sm:w-5 sm:h-5" />
+            <img src={BookAppointmentIcon} className="w-4 h-4 sm:w-5 sm:h-5" />
             Book Appointment
           </motion.button>
         </motion.div>

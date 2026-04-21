@@ -3,6 +3,8 @@ import { Card, Container } from "@mui/material";
 import { motion } from "framer-motion";
 import { memo, useState } from "react";
 import { cardVariants, containerVariants, healers } from "../HomePageConstants";
+import DoctorIcon from "../../../assets/communityHealers.svg";
+
 
 const CommunityHealers = () => {
   const [hoveredId, setHoveredId] = useState(null);
@@ -24,7 +26,7 @@ const CommunityHealers = () => {
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full mb-4"
           >
-            <MedicalServices className="text-white" sx={{ fontSize: 32 }} />
+            <img src={DoctorIcon} alt="Doctor Icon" className="h-10 w-10" />
           </motion.div>
 
           <h1 className="font-bold text-gray-800 text-3xl">
@@ -77,30 +79,12 @@ const CommunityHealers = () => {
                     />
 
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.2 }}
-                      className="absolute top-1 right-1 z-10"
-                    >
-                      <div
-                        className="bg-gradient-to-br from-green-500/40 to-lime-400/20 backdrop-blur-lg border border-white/20 rounded-3xl
-                      text-xs  px-2 py-1 text-ayuDark font-semibold
-                      shadow-2xl"
-                      >
-                        {healer.qualification}
-                      </div>
-                    </motion.div>
-
-         
                   </div>
 
-                  <div className="mt-10 pb-6 px-6 text-center">
+                  <div className="mt-5 pb-4 px-6 text-center">
                     <p className="font-bold text-gray-800 mb-2 whitespace-nowrap">
                       {healer.name}
                     </p>
-
                     <p className="text-gray-600 font-medium">
                       {healer.specialty}
                     </p>

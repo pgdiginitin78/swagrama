@@ -3,7 +3,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ReadMoreIcon from "@mui/icons-material/ReadMore";
 
-const UpcomingEventsSection = ({ eventsDataUpdated, setOpenRegisterModal, setSelectedEvents }) => {
+const UpcomingEventsSection = ({
+  eventsDataUpdated,
+  setOpenRegisterModal,
+  setSelectedEvents,
+}) => {
   const navigate = useNavigate();
 
   return (

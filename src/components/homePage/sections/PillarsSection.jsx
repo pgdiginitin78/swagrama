@@ -1,6 +1,13 @@
 import React, { memo } from "react";
 import { motion } from "framer-motion";
-import { fadeInUp, scaleIn, staggerContainer, containerVariants, cardVariants, getIcon } from "../HomePageConstants";
+import {
+  fadeInUp,
+  scaleIn,
+  staggerContainer,
+  containerVariants,
+  cardVariants,
+  getIcon,
+} from "../HomePageConstants";
 import { partnersData } from "../HomePageConstants";
 import { Divider } from "@mui/material";
 
@@ -49,7 +56,6 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
                     alt={healer.name}
                     className="relative w-32 h-32 rounded-2xl object-cover object-top shadow-md"
                   />
-      
                 </div>
 
                 <h3 className="font-serif text-xl text-[#111827] mb-1 group-hover:text-green-700 transition-colors">
@@ -59,19 +65,23 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
                   {healer.title}
                 </p>
 
-                <Divider className="w-12 mb-4 bg-green-100" />
+          
 
                 <div className="space-y-2.5 w-full">
-                  {healer.roles.map((role, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2 text-xs text-gray-600 group-hover:text-gray-900 transition-colors"
+                  {healer.roles.map((role, roleIndex) => (
+                    <motion.div
+                      key={roleIndex}
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{
+                        x: 0,
+                        opacity: 1,
+                      }}
+                      transition={{ delay: roleIndex * 0.1 }}
+                      className="flex items-start text-left  gap-2 text-xs text-gray-600 bg-green-50 p-2 rounded-lg"
                     >
-                      <div className="w-1 h-1 rounded-full bg-green-400 mt-1.5 shrink-0" />
-                      <span className="text-left font-medium leading-relaxed">
-                        {role}
-                      </span>
-                    </div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#1E8E7A] mt-1.5 flex-shrink-0" />
+                      <span className="leading-relaxed">{role}</span>
+                    </motion.div>
                   ))}
                 </div>
               </div>

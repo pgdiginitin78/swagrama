@@ -396,9 +396,7 @@ const SuperAdminDashboard = () => {
                 <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Earnings & Revenue Trends
                 </span>
-                <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
-                  Real-time
-                </span>
+             
               </div>
               <div className="flex bg-[#f5f6f2] rounded-[9px] p-0.5 gap-0.5">
                 {["Weekly", "Monthly"].map((p, i) => (
@@ -715,9 +713,9 @@ const SuperAdminDashboard = () => {
 
         <section
           id="live-procedures"
-          className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5"
+          className="grid gap-4 mb-5"
         >
-          <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
+          {/* <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <div className="w-7 h-7 rounded-lg bg-[#e3f2fd] text-[#1565c0] flex items-center justify-center">
@@ -784,7 +782,7 @@ const SuperAdminDashboard = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -854,60 +852,9 @@ const SuperAdminDashboard = () => {
               View All Operational Logs →
             </button>
           </div>
+ 
         </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-[#1a2a0f] rounded-[18px] p-5 text-white relative overflow-hidden">
-            <div className="absolute -bottom-5 -right-5 w-20 h-20 rounded-full bg-[#5a9e2f]/20" />
-            <p className="m-0 mb-3 text-[9px] font-extrabold text-white/35 uppercase tracking-widest">
-              Network Growth
-            </p>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-[32px] font-black tracking-tight">
-                  +14%
-                </div>
-                <div className="text-[11px] font-bold text-[#a3e635] mt-0.5">
-                  Growth this quarter
-                </div>
-              </div>
-              <TrendingUp
-                sx={{ fontSize: 38, color: "#a3e635", opacity: 0.8 }}
-              />
-            </div>
-            <button className="mt-4 text-[10px] font-extrabold bg-white/10 border border-white/10 text-white px-3.5 py-1.5 rounded-[10px] cursor-pointer uppercase tracking-[0.5px] hover:bg-white/20 transition-colors">
-              View Full Report
-            </button>
-          </div>
-          {[
-            {
-              label: "Cumulative Patients",
-              val: "12,482",
-              sub: "Life-to-date",
-            },
-            {
-              label: "Avg. Ticket Size",
-              val: "₹18,400",
-              sub: "Per transaction",
-            },
-            { label: "Store Revenue", val: "₹18.2L", sub: "This month" },
-          ].map((s) => (
-            <div
-              key={s.label}
-              className="bg-white rounded-[18px] border border-[#eef0ea] p-5"
-            >
-              <div className="text-[9px] font-extrabold text-[#9aa090] uppercase tracking-[0.5px] mb-2.5">
-                {s.label}
-              </div>
-              <div className="text-[26px] font-black text-[#1a2a0f] tracking-tight">
-                {s.val}
-              </div>
-              <div className="text-[10px] font-semibold text-[#9aa090] mt-1">
-                {s.sub}
-              </div>
-            </div>
-          ))}
-        </div>
       </main>
 
       <div

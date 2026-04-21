@@ -8,9 +8,10 @@ import {
   getDoctorListByLocationDepartment,
 } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
 import AyurvedaForm from "../../opdBooking/AyurvedaFrom";
+import AyurvedaIcon from "../../../../assets/AyurvedaIcon.svg";
 
 const iconMap = {
-  ayurveda: CompostIcon,
+
   yoga: SelfImprovementIcon,
   homeopathy: HealingIcon,
 };
@@ -31,7 +32,6 @@ const getDeptGradient = (name) => {
   return colorMap[key] ?? "from-green-600 to-emerald-500";
 };
 
-
 const OPDClinic = () => {
   const { user } = useAuth();
 
@@ -44,7 +44,6 @@ const OPDClinic = () => {
 
   const activeDept = departmentList[activeTab] ?? null;
   const activeGradient = activeDept ? getDeptGradient(activeDept) : "";
-
 
   useEffect(() => {
     setLoadingDepts(true);
@@ -67,7 +66,7 @@ const OPDClinic = () => {
       .finally(() => setLoadingDoctors(false));
   }, [activeTab, departmentList, activeDept]);
 
-    console.log("activeDept",activeDept);
+  console.log("activeDept", activeDept);
 
   return (
     <div className="min-h-screen  p-3">
@@ -134,7 +133,11 @@ const OPDClinic = () => {
                     )}
                     <span className="relative z-10 flex items-center gap-1.5">
                       <span className="text-base">
-                        <Icon fontSize="small" />
+                        {dept === "Ayurveda" ? (
+                          <img src={AyurvedaIcon} alt="Ayurveda" className="h-5 w-5" />
+                        ) : (
+                          <Icon fontSize="small" />
+                        )}
                       </span>
                       <span className="hidden sm:inline">{dept}</span>
                       <span className="sm:hidden">{dept.substring(0, 6)}</span>
@@ -147,19 +150,16 @@ const OPDClinic = () => {
         )}
 
         {/* {activeDept === "Ayurveda" && ( */}
-          <AyurvedaForm
-            doctorList={doctorList}
-            loadingDoctors={loadingDoctors}
-            selectedDoctorId={selectedDoctorId}
-            setSelectedDoctorId={setSelectedDoctorId}
-            activeGradient={activeGradient}
-            activeDept={activeDept}
-          />
+        <AyurvedaForm
+          doctorList={doctorList}
+          loadingDoctors={loadingDoctors}
+          selectedDoctorId={selectedDoctorId}
+          setSelectedDoctorId={setSelectedDoctorId}
+          activeGradient={activeGradient}
+          activeDept={activeDept}
+        />
         {/* // )} */}
-
       </div>
-
- 
     </div>
   );
 };

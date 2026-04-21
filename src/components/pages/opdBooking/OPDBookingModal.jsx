@@ -28,6 +28,11 @@ import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
 import { useAuth } from "../../../context/AuthContext";
+import TimeSlotsIcon from "../../../assets/timeSlotsIcon.svg";
+import ScheduleIcon from "../../../assets/ScheduleIcon.svg";
+import PatientInfoIcon from "../../../assets/PatientInfo.svg";
+
+import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 
 const style = {
   position: "absolute",
@@ -199,7 +204,9 @@ export default function OPDBookingModal({
       patientFid: dataObj.patientFid?.id,
       doctorFid: dataObj?.doctorFid?.id,
       serviceFid: dataObj.serviceFid?.id ? String(dataObj.serviceFid.id) : "",
-      appoinmentDate: dataObj.appointmentDate ? format(new Date(dataObj.appointmentDate), "yyyy-MM-dd") : "",
+      appoinmentDate: dataObj.appointmentDate
+        ? format(new Date(dataObj.appointmentDate), "yyyy-MM-dd")
+        : "",
       Status: dataObj.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
@@ -222,14 +229,14 @@ export default function OPDBookingModal({
         SloteStartTime: selectedTimeSlot?.slotStartTime,
         appointmentDate: format(new Date(appointmentDate), "yyyy-MM-dd"),
         userId: userId,
-        paymentFor:"OPD"
+        paymentFor: "OPD",
       };
       setIsLoading(true);
       const res = await InitiatePayment(clinicFidValue?.id, userId, tempObj);
       const data = res?.data;
 
       if (data?.status === 200) {
-        setIsLoading(false); 
+        setIsLoading(false);
         setIsPaymentPending(true);
 
         cancelPaymentRef.current = RedirectToSabPaisa(
@@ -425,8 +432,6 @@ export default function OPDBookingModal({
     }
   }, [selectedTherapy, doctorOptions, setValue]);
 
-
-
   return (
     <>
       <Modal
@@ -457,17 +462,10 @@ export default function OPDBookingModal({
                         }}
                         className="w-11 h-11 rounded-xl bg-booking-primary flex items-center justify-center shadow-md"
                       >
-                        <svg
+                        <img
+                          src={BookAppointmentIcon}
                           className="w-6 h-6 text-white"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
+                        />
                       </motion.div>
                       <div>
                         <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-booking-text whitespace-nowrap">
@@ -495,7 +493,10 @@ export default function OPDBookingModal({
                         <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border">
                           <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-booking-primary/10 rounded-lg">
-                              <User className="w-5 h-5 text-booking-primary" />
+                              <img
+                                src={PatientInfoIcon}
+                                className="w-5 h-5 text-booking-primary"
+                              />
                             </div>
                             <h2 className="text-base sm:text-lg font-bold text-booking-primary">
                               Patient Information
@@ -547,7 +548,10 @@ export default function OPDBookingModal({
                         <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border">
                           <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-booking-primary/10 rounded-lg">
-                              <Calendar className="w-5 h-5 text-booking-primary" />
+                              <img
+                                src={ScheduleIcon}
+                                className="w-5 h-5 text-booking-primary"
+                              />
                             </div>
                             <h2 className="text-base sm:text-lg font-bold text-booking-primary">
                               Schedule Details
@@ -595,7 +599,10 @@ export default function OPDBookingModal({
                         <div className="bg-booking-surface rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden border border-booking-border lg:sticky lg:top-0">
                           <div className="bg-booking-secondaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-booking-secondary/10 rounded-lg">
-                              <Clock className="w-5 h-5 text-booking-secondary" />
+                              <img
+                                src={TimeSlotsIcon}
+                                className="w-5 h-5 text-booking-secondary"
+                              />
                             </div>
                             <h2 className="text-base sm:text-lg font-bold text-booking-secondary">
                               Available Slots
@@ -748,7 +755,7 @@ export default function OPDBookingModal({
                         type="button"
                         label="Reset"
                         onClick={handleReset}
-                        className="bg-white border px-5 border-slate-200 text-slate-600 hover:bg-slate-50 transition-all duration-200"
+                        className="bg-white border px-5 border-red-500 text-red-500 hover:bg-red-50 transition-all duration-200"
                       />
                       <CommonButton
                         type="submit"

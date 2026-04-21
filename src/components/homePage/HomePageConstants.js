@@ -19,7 +19,7 @@ import SandipMehetre from "../assets/landing-page/ourexperts/Sandip Mehetre.png"
 import SantoshSuryavanshi from "../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
 import SmitaMehetre from "../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import VaishaliHolmukhe from "../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
-import AvantiNitsure from "../assets/landing-page/ourexperts/Avanti Nitsure.webp";
+import AvantiNitsure from "../assets/landing-page/ourexperts/Avanti Nitsure.png";
 
 export const healers = [
   {

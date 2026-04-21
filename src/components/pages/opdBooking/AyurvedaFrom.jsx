@@ -56,7 +56,7 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
-import AvantiNitsureImg from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
+import AvantiNitsureImg from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
 import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.webp";
 import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
 import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.png";

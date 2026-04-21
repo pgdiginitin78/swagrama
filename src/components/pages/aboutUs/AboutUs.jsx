@@ -10,7 +10,7 @@ import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.p
 import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
 import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
 import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
-import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
+import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
 import {
   Hospital,
   BookOpen,

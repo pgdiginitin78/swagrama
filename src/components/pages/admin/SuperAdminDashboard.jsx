@@ -1,63 +1,38 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
-  Box,
-  Typography,
-  Paper,
-  Avatar,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  InputAdornment,
-  IconButton,
-  Chip,
-  MenuItem,
-  Select,
-  FormControl,
-  Drawer,
-  Button,
-} from "@mui/material";
-import {
-  TrendingUp,
   AccountBalanceWallet,
-  People,
-  MedicalServices,
-  LocalHospital,
-  Search,
-  FilterList,
+  ArrowForward,
   Assignment,
   CalendarMonth,
-  Hotel,
-  Timeline,
-  MoreVert,
-  ArrowForward,
   Close,
-  Download,
+  Hotel,
+  MedicalServices,
+  People,
+  Search,
+  Timeline,
+  TrendingUp,
   Visibility,
+  Menu,
 } from "@mui/icons-material";
 import {
-  AreaChart,
   Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  BarChart,
+  AreaChart,
   Bar,
-  PieChart,
-  Pie,
+  BarChart,
+  CartesianGrid,
   Cell,
   Legend,
+  Pie,
+  PieChart,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  XAxis,
+  YAxis,
 } from "recharts";
-import { motion, AnimatePresence } from "framer-motion";
 
 const G = "#3d6b1f";
 const G2 = "#5a9e2f";
-const G3 = "#e8f5e0";
 
 const KPIData = [
   {
@@ -290,26 +265,9 @@ const bookingStatusColor = (s) => {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div
-        style={{
-          background: "#fff",
-          border: "1px solid #e8f5e0",
-          borderRadius: 12,
-          padding: "8px 14px",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-        }}
-      >
-        <p
-          style={{
-            fontSize: 10,
-            fontWeight: 700,
-            color: "#9e9e9e",
-            marginBottom: 2,
-          }}
-        >
-          {label}
-        </p>
-        <p style={{ fontSize: 13, fontWeight: 800, color: G }}>
+      <div className="bg-white border border-[#e8f5e0] rounded-xl px-3.5 py-2 shadow-lg">
+        <p className="text-[10px] font-bold text-[#9e9e9e] mb-0.5">{label}</p>
+        <p className="text-[13px] font-extrabold text-[#3d6b1f] m-0">
           ₹{(payload[0].value / 1000).toFixed(0)}k
         </p>
       </div>
@@ -321,8 +279,17 @@ const CustomTooltip = ({ active, payload, label }) => {
 const SuperAdminDashboard = () => {
   const [searchDoc, setSearchDoc] = useState("");
   const [clinicFilter, setClinicFilter] = useState("All");
-  const [selectedDetail, setSelectedDetail] = useState(null);
+  const [navOpen, setNavOpen] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const [selectedDetail, setSelectedDetail] = useState(null);
+
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      setNavOpen(false);
+    }
+  };
 
   const filteredDoctors = doctorAssignments.filter(
     (doc) =>
@@ -336,67 +303,27 @@ const SuperAdminDashboard = () => {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#f7f8f5",
-        fontFamily: "'DM Sans', 'Segoe UI', sans-serif",
-      }}
-      className="px-4 md:px-9"
-    >
-      <main
-        style={{ maxWidth: 1600, margin: "0 auto", padding: "20px 16px 40px" }}
-      >
-        <header
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            marginBottom: 24,
-            paddingBottom: 20,
-            borderBottom: "1px solid #e8ede4",
-            flexWrap: "wrap",
-            gap: 12,
-          }}
-        >
+    <div className="min-h-screen  px-4 md:px-9">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap');
+        *, body { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .pulse-dot { animation: pulse-dot 1.5s infinite; }
+      `}</style>
+
+      <main className="max-w-[1600px] mx-auto pt-5 pb-10">
+        <header className="flex items-center justify-between mb-6 pb-5 border-b border-[#e8ede4] flex-wrap gap-3">
           <div>
-            <h1
-              style={{
-                margin: 0,
-                fontSize: "clamp(20px, 3vw, 28px)",
-                fontWeight: 900,
-                color: "#1a2a0f",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              Super Admin <span style={{ color: G }}>Dashboard</span>
+            <h1 className="m-0 text-[clamp(20px,3vw,28px)] font-black text-[#1a2a0f] tracking-tight">
+              Super Admin <span className="text-[#3d6b1f]">Dashboard</span>
             </h1>
-            <p
-              style={{
-                margin: "2px 0 0",
-                fontSize: 12,
-                color: "#8a9580",
-                fontWeight: 500,
-              }}
-            >
+            <p className="mt-0.5 mb-0 text-xs text-[#8a9580] font-medium">
               Global ecosystem monitoring & financial analytics
             </p>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div
-              style={{ textAlign: "right", display: "none" }}
-              className="sm-show"
-            >
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  color: "#b0bba5",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                }}
-              >
+          <div className="flex items-center gap-2.5">
+            <div className="hidden sm:block text-right">
+              <p className="m-0 text-[10px] font-bold text-[#b0bba5] uppercase tracking-widest">
                 {new Date().toLocaleDateString("en-US", {
                   weekday: "short",
                   month: "short",
@@ -404,35 +331,14 @@ const SuperAdminDashboard = () => {
                   year: "numeric",
                 })}
               </p>
-     
             </div>
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: "50%",
-                background: G,
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 13,
-                fontWeight: 900,
-              }}
-            >
-              SA
-            </div>
-     
+           
           </div>
         </header>
 
         <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-            gap: 12,
-            marginBottom: 20,
-          }}
+          id="kpi-overview"
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-5"
         >
           {KPIData.map((kpi, i) => (
             <motion.div
@@ -442,98 +348,37 @@ const SuperAdminDashboard = () => {
               transition={{ delay: i * 0.06 }}
               whileHover={{ y: -3, transition: { duration: 0.15 } }}
               onClick={() => handleDetailClick(kpi, "stat")}
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: "14px 16px",
-                border: "1px solid #eef0ea",
-                cursor: "pointer",
-                position: "relative",
-                overflow: "hidden",
-              }}
+              className="bg-white rounded-2xl p-3.5 border border-[#eef0ea] cursor-pointer relative overflow-hidden"
             >
               <div
-                style={{
-                  position: "absolute",
-                  top: -16,
-                  right: -16,
-                  width: 56,
-                  height: 56,
-                  borderRadius: "50%",
-                  background: kpi.bg,
-                  opacity: 0.6,
-                }}
+                className="absolute -top-4 -right-4 w-14 h-14 rounded-full opacity-60"
+                style={{ background: kpi.bg }}
               />
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 10,
-                }}
-              >
+              <div className="flex items-center gap-2 mb-2.5">
                 <div
-                  style={{
-                    width: 30,
-                    height: 30,
-                    borderRadius: 9,
-                    background: kpi.bg,
-                    color: kpi.fg,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
+                  className="w-[30px] h-[30px] rounded-[9px] flex items-center justify-center flex-shrink-0"
+                  style={{ background: kpi.bg, color: kpi.fg }}
                 >
                   {kpi.icon}
                 </div>
-                <span
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 700,
-                    color: "#9aa090",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
+                <span className="text-[10px] font-bold text-[#9aa090] uppercase tracking-[0.5px] leading-tight">
                   {kpi.title}
                 </span>
               </div>
-              <div
-                style={{
-                  fontSize: "clamp(18px, 2.5vw, 22px)",
-                  fontWeight: 900,
-                  color: "#1a2a0f",
-                  letterSpacing: "-0.5px",
-                  lineHeight: 1,
-                }}
-              >
+              <div className="text-[clamp(18px,2.5vw,22px)] font-black text-[#1a2a0f] tracking-tight leading-none">
                 {kpi.value}
               </div>
-              <div
-                style={{
-                  marginTop: 6,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 5,
-                }}
-              >
+              <div className="mt-1.5 flex items-center gap-1.5">
                 <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    padding: "2px 6px",
-                    borderRadius: 5,
-                    background: kpi.trend.startsWith("+")
-                      ? "#e8f5e0"
-                      : "#f5f5f5",
-                    color: kpi.trend.startsWith("+") ? G : "#9e9e9e",
-                  }}
+                  className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-[5px] ${
+                    kpi.trend.startsWith("+")
+                      ? "bg-[#e8f5e0] text-[#3d6b1f]"
+                      : "bg-[#f5f5f5] text-[#9e9e9e]"
+                  }`}
                 >
                   {kpi.trend}
                 </span>
-                <span
-                  style={{ fontSize: 9, color: "#b0bba5", fontWeight: 500 }}
-                >
+                <span className="text-[9px] text-[#b0bba5] font-medium">
                   {kpi.sub}
                 </span>
               </div>
@@ -541,101 +386,41 @@ const SuperAdminDashboard = () => {
           ))}
         </section>
 
-        <section style={{ marginBottom: 20 }}>
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 18,
-              border: "1px solid #eef0ea",
-              padding: "18px 20px",
-              marginBottom: 12,
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 16,
-                flexWrap: "wrap",
-                gap: 8,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: "#e8f5e0",
-                    color: G,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+        <section className="mb-5">
+          <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#e8f5e0] text-[#3d6b1f] flex items-center justify-center">
                   <AccountBalanceWallet sx={{ fontSize: 15 }} />
                 </div>
-                <span
-                  style={{ fontSize: 13, fontWeight: 800, color: "#1a2a0f" }}
-                >
+                <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Earnings & Revenue Trends
                 </span>
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 700,
-                    background: "#e8f5e0",
-                    color: G,
-                    padding: "2px 7px",
-                    borderRadius: 20,
-                  }}
-                >
+                <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
                   Real-time
                 </span>
               </div>
-              <div
-                style={{
-                  display: "flex",
-                  background: "#f5f6f2",
-                  borderRadius: 9,
-                  padding: 3,
-                  gap: 2,
-                }}
-              >
+              <div className="flex bg-[#f5f6f2] rounded-[9px] p-0.5 gap-0.5">
                 {["Weekly", "Monthly"].map((p, i) => (
                   <button
                     key={p}
-                    style={{
-                      padding: "4px 10px",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      borderRadius: 7,
-                      border: "none",
-                      cursor: "pointer",
-                      background: i === 0 ? "#fff" : "transparent",
-                      color: i === 0 ? G : "#9aa090",
-                      boxShadow:
-                        i === 0 ? "0 1px 4px rgba(0,0,0,0.06)" : "none",
-                    }}
+                    className={`px-2.5 py-1 text-[10px] font-bold rounded-[7px] border-none cursor-pointer transition-all ${
+                      i === 0
+                        ? "bg-white text-[#3d6b1f] shadow-sm"
+                        : "bg-transparent text-[#9aa090]"
+                    }`}
                   >
                     {p}
                   </button>
                 ))}
               </div>
             </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-                gap: 16,
-              }}
-            >
-              <div style={{ minHeight: 220 }}>
-                <ResponsiveContainer width="100%" height={220}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
+              <div className="h-[200px] md:h-[290px]">
+                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
                     data={earningsTrend}
-                    margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
+                    margin={{ top: 5, right: 8, left: 0, bottom: 0 }}
                   >
                     <defs>
                       <linearGradient id="eg" x1="0" y1="0" x2="0" y2="1">
@@ -660,7 +445,8 @@ const SuperAdminDashboard = () => {
                       tickLine={false}
                       tick={{ fontSize: 10, fontWeight: 600, fill: "#9aa090" }}
                       tickFormatter={(v) => `₹${v / 1000}k`}
-                      width={42}
+                      width={40}
+                      domain={[30000, "auto"]}
                     />
                     <RechartsTooltip content={<CustomTooltip />} />
                     <Area
@@ -681,103 +467,97 @@ const SuperAdminDashboard = () => {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 12,
-                }}
-              >
-                <div style={{ minHeight: 220 }}>
-                  <p
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#9aa090",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                    }}
-                  >
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="flex flex-col">
+                  <p className="m-0 mb-2 text-[10px] font-bold text-[#9aa090] uppercase tracking-[0.5px]">
                     Therapy Split
                   </p>
-                  <ResponsiveContainer width="100%" height={190}>
-                    <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                      <Pie
-                        data={therapyRevenue}
-                        cx="50%"
-                        cy="45%"
-                        innerRadius="45%"
-                        outerRadius="70%"
-                        paddingAngle={4}
-                        dataKey="value"
+                  <div className="h-[250px] md:h-[290px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart
+                        margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
                       >
-                        {therapyRevenue.map((_, i) => (
-                          <Cell key={i} fill={PIE_COLORS[i]} cornerRadius={3} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip formatter={(v, n) => [`${v}%`, n]} />
-                      <Legend
-                        iconType="circle"
-                        iconSize={7}
-                        wrapperStyle={{ fontSize: 9, fontWeight: 700 }}
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
+                        <Pie
+                          data={therapyRevenue}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius="38%"
+                          outerRadius="60%"
+                          paddingAngle={4}
+                          dataKey="value"
+                        >
+                          {therapyRevenue.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={PIE_COLORS[i]}
+                              cornerRadius={3}
+                            />
+                          ))}
+                        </Pie>
+                        <RechartsTooltip formatter={(v, n) => [`${v}%`, n]} />
+                        <Legend
+                          iconType="circle"
+                          iconSize={7}
+                          wrapperStyle={{ fontSize: 9, fontWeight: 700 }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-                <div style={{ minHeight: 220 }}>
-                  <p
-                    style={{
-                      margin: "0 0 8px",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#9aa090",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.5,
-                    }}
-                  >
+                <div className="flex flex-col">
+                  <p className="m-0 mb-2 text-[10px] font-bold text-[#9aa090] uppercase tracking-[0.5px]">
                     Clinic Revenue
                   </p>
-                  <ResponsiveContainer width="100%" height={190}>
-                    <BarChart
-                      data={categoryRevenue}
-                      margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                    >
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        vertical={false}
-                        stroke="#f0f2ec"
-                      />
-                      <XAxis
-                        dataKey="name"
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 9, fontWeight: 600, fill: "#9aa090" }}
-                        dy={4}
-                      />
-                      <YAxis
-                        axisLine={false}
-                        tickLine={false}
-                        tick={{ fontSize: 9, fontWeight: 600, fill: "#9aa090" }}
-                        tickFormatter={(v) => `${v / 1000}k`}
-                        width={30}
-                      />
-                      <RechartsTooltip content={<CustomTooltip />} />
-                      <Bar
-                        dataKey="revenue"
-                        radius={[5, 5, 0, 0]}
-                        maxBarSize={24}
+                  <div className="h-[200px] md:h-[290px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart
+                        data={categoryRevenue}
+                        margin={{ top: 0, right: 4, left: 0, bottom: 0 }}
                       >
-                        {categoryRevenue.map((_, i) => (
-                          <Cell
-                            key={i}
-                            fill={i % 2 === 0 ? G : G2}
-                            opacity={0.88}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                          stroke="#f0f2ec"
+                        />
+                        <XAxis
+                          dataKey="name"
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{
+                            fontSize: 8,
+                            fontWeight: 600,
+                            fill: "#9aa090",
+                          }}
+                          dy={4}
+                        />
+                        <YAxis
+                          axisLine={false}
+                          tickLine={false}
+                          tick={{
+                            fontSize: 8,
+                            fontWeight: 600,
+                            fill: "#9aa090",
+                          }}
+                          tickFormatter={(v) => `${v / 1000}k`}
+                          width={28}
+                        />
+                        <RechartsTooltip content={<CustomTooltip />} />
+                        <Bar
+                          dataKey="revenue"
+                          radius={[5, 5, 0, 0]}
+                          maxBarSize={22}
+                        >
+                          {categoryRevenue.map((_, i) => (
+                            <Cell
+                              key={i}
+                              fill={i % 2 === 0 ? G : G2}
+                              opacity={0.88}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
               </div>
             </div>
@@ -785,92 +565,32 @@ const SuperAdminDashboard = () => {
         </section>
 
         <section
-          style={{
-            background: "#fff",
-            borderRadius: 18,
-            border: "1px solid #eef0ea",
-            overflow: "hidden",
-            marginBottom: 20,
-          }}
+          id="staff-assignments"
+          className="bg-white rounded-[18px] border border-[#eef0ea] overflow-hidden mb-5"
         >
-          <div
-            style={{
-              padding: "16px 20px",
-              borderBottom: "1px solid #f5f6f2",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 10,
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 8,
-                  background: "#ede7f6",
-                  color: "#4527a0",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
+          <div className="px-5 py-4 border-b border-[#f5f6f2] flex items-center justify-between flex-wrap gap-2.5">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-[#ede7f6] text-[#4527a0] flex items-center justify-center">
                 <Assignment sx={{ fontSize: 15 }} />
               </div>
-              <span style={{ fontSize: 13, fontWeight: 800, color: "#1a2a0f" }}>
+              <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                 Doctor Assignments & Capacity
               </span>
             </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                flexWrap: "wrap",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  background: "#f5f6f2",
-                  borderRadius: 10,
-                  padding: "6px 10px",
-                }}
-              >
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 bg-[#f5f6f2] rounded-[10px] px-2.5 py-1.5">
                 <Search sx={{ fontSize: 14, color: "#9aa090" }} />
                 <input
                   placeholder="Search by doctor..."
                   value={searchDoc}
                   onChange={(e) => setSearchDoc(e.target.value)}
-                  style={{
-                    border: "none",
-                    background: "transparent",
-                    outline: "none",
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: "#3a4a30",
-                    width: 140,
-                  }}
+                  className="border-none bg-transparent outline-none text-[11px] font-semibold text-[#3a4a30] w-[140px]"
                 />
               </div>
               <select
                 value={clinicFilter}
                 onChange={(e) => setClinicFilter(e.target.value)}
-                style={{
-                  background: "#f5f6f2",
-                  border: "none",
-                  borderRadius: 10,
-                  padding: "7px 10px",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color: "#3a4a30",
-                  outline: "none",
-                  cursor: "pointer",
-                }}
+                className="bg-[#f5f6f2] border-none rounded-[10px] px-2.5 py-2 text-[11px] font-bold text-[#3a4a30] outline-none cursor-pointer"
               >
                 <option value="All">All Clinics</option>
                 {Array.from(
@@ -883,16 +603,10 @@ const SuperAdminDashboard = () => {
               </select>
             </div>
           </div>
-          <div style={{ overflowX: "auto", width: "100%" }}>
-            <table
-              style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                minWidth: 700,
-              }}
-            >
+          <div className="overflow-x-auto w-full">
+            <table className="w-full border-collapse min-w-[700px]">
               <thead>
-                <tr style={{ background: "#fafbf8" }}>
+                <tr className="bg-[#fafbf8]">
                   {[
                     "Doctor",
                     "Therapies",
@@ -905,17 +619,7 @@ const SuperAdminDashboard = () => {
                   ].map((h) => (
                     <th
                       key={h}
-                      style={{
-                        padding: "10px 14px",
-                        textAlign: "left",
-                        fontSize: 9,
-                        fontWeight: 800,
-                        color: "#9aa090",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        whiteSpace: "nowrap",
-                        borderBottom: "1px solid #f0f2ec",
-                      }}
+                      className="px-3.5 py-2.5 text-left text-[9px] font-extrabold text-[#9aa090] uppercase tracking-[0.5px] whitespace-nowrap border-b border-[#f0f2ec]"
                     >
                       {h}
                     </th>
@@ -923,184 +627,81 @@ const SuperAdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredDoctors.map((doc, i) => (
+                {filteredDoctors.map((doc) => (
                   <tr
                     key={doc.id}
-                    style={{
-                      borderBottom: "1px solid #f5f6f2",
-                      transition: "background 0.15s",
-                    }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.background = "#fafbf8")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.background = "transparent")
-                    }
+                    className="border-b border-[#f5f6f2] hover:bg-[#fafbf8] transition-colors duration-150"
                   >
-                    <td style={{ padding: "11px 14px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 9,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 30,
-                            height: 30,
-                            borderRadius: "50%",
-                            background: G3,
-                            color: G,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: 11,
-                            fontWeight: 900,
-                            flexShrink: 0,
-                          }}
-                        >
+                    <td className="px-3.5 py-[11px]">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-[30px] h-[30px] rounded-full bg-[#e8f5e0] text-[#3d6b1f] flex items-center justify-center text-[11px] font-black flex-shrink-0">
                           {doc.name.charAt(4)}
                         </div>
                         <div>
-                          <div
-                            style={{
-                              fontSize: 12,
-                              fontWeight: 800,
-                              color: "#1a2a0f",
-                              whiteSpace: "nowrap",
-                            }}
-                          >
+                          <div className="text-[12px] font-extrabold text-[#1a2a0f] whitespace-nowrap">
                             {doc.name}
                           </div>
-                          <div
-                            style={{
-                              fontSize: 9,
-                              color: "#9aa090",
-                              fontWeight: 500,
-                            }}
-                          >
+                          <div className="text-[9px] text-[#9aa090] font-medium">
                             {doc.email}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td style={{ padding: "11px 14px" }}>
-                      <div
-                        style={{ display: "flex", flexWrap: "wrap", gap: 4 }}
-                      >
+                    <td className="px-3.5 py-[11px]">
+                      <div className="flex flex-wrap gap-1">
                         {doc.therapies.map((t) => (
                           <span
                             key={t}
-                            style={{
-                              fontSize: 9,
-                              fontWeight: 700,
-                              background: G3,
-                              color: G,
-                              padding: "2px 7px",
-                              borderRadius: 5,
-                            }}
+                            className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-[5px]"
                           >
                             {t}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td
-                      style={{
-                        padding: "11px 14px",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "#3a4a30",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <td className="px-3.5 py-[11px] text-[11px] font-bold text-[#3a4a30] whitespace-nowrap">
                       {doc.clinic}
                     </td>
-                    <td style={{ padding: "11px 14px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 6,
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: 50,
-                            height: 5,
-                            background: "#eef0ea",
-                            borderRadius: 99,
-                            overflow: "hidden",
-                          }}
-                        >
+                    <td className="px-3.5 py-[11px]">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-[50px] h-[5px] bg-[#eef0ea] rounded-full overflow-hidden">
                           <div
-                            style={{
-                              width: `${(doc.bookings / 20) * 100}%`,
-                              height: "100%",
-                              background: G,
-                              borderRadius: 99,
-                            }}
+                            className="h-full bg-[#3d6b1f] rounded-full"
+                            style={{ width: `${(doc.bookings / 20) * 100}%` }}
                           />
                         </div>
-                        <span
-                          style={{ fontSize: 11, fontWeight: 800, color: G }}
-                        >
+                        <span className="text-[11px] font-extrabold text-[#3d6b1f]">
                           {doc.bookings}/20
                         </span>
                       </div>
                     </td>
-                    <td style={{ padding: "11px 14px" }}>
+                    <td className="px-3.5 py-[11px]">
                       <span
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 800,
-                          color: doc.upcoming > 3 ? "#e65100" : "#3d6b1f",
-                        }}
+                        className={`text-[12px] font-extrabold ${
+                          doc.upcoming > 3 ? "text-[#e65100]" : "text-[#3d6b1f]"
+                        }`}
                       >
                         {doc.upcoming}
                       </span>
                     </td>
-                    <td
-                      style={{
-                        padding: "11px 14px",
-                        fontSize: 11,
-                        fontWeight: 700,
-                        color: "#9aa090",
-                      }}
-                    >
+                    <td className="px-3.5 py-[11px] text-[11px] font-bold text-[#9aa090]">
                       {doc.completed}
                     </td>
-                    <td style={{ padding: "11px 14px" }}>
+                    <td className="px-3.5 py-[11px]">
                       <span
+                        className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"
                         style={{
-                          fontSize: 9,
-                          fontWeight: 800,
-                          padding: "3px 8px",
-                          borderRadius: 20,
                           background: statusColor(doc.status).bg,
                           color: statusColor(doc.status).fg,
-                          textTransform: "uppercase",
                         }}
                       >
                         {doc.status}
                       </span>
                     </td>
-                    <td style={{ padding: "11px 14px" }}>
+                    <td className="px-3.5 py-[11px]">
                       <button
                         onClick={() => handleDetailClick(doc, "doctor")}
-                        style={{
-                          width: 28,
-                          height: 28,
-                          border: "1px solid #e8ede4",
-                          borderRadius: 8,
-                          background: "#fff",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: G,
-                        }}
+                        className="w-7 h-7 border border-[#e8ede4] rounded-lg bg-white cursor-pointer flex items-center justify-center text-[#3d6b1f] hover:bg-[#f7faf4] transition-colors"
                       >
                         <Visibility sx={{ fontSize: 14 }} />
                       </button>
@@ -1113,152 +714,60 @@ const SuperAdminDashboard = () => {
         </section>
 
         <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: 16,
-            marginBottom: 20,
-          }}
+          id="live-procedures"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-5"
         >
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 18,
-              border: "1px solid #eef0ea",
-              padding: "18px 20px",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 16,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: "#e3f2fd",
-                    color: "#1565c0",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+          <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#e3f2fd] text-[#1565c0] flex items-center justify-center">
                   <Timeline sx={{ fontSize: 15 }} />
                 </div>
-                <span
-                  style={{ fontSize: 13, fontWeight: 800, color: "#1a2a0f" }}
-                >
+                <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Live Booking Lifecycle
                 </span>
               </div>
               <button
                 onClick={() => handleDetailClick({ label: "All" }, "list")}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 4,
-                  background: "none",
-                  border: "none",
-                  fontSize: 10,
-                  fontWeight: 800,
-                  color: G,
-                  cursor: "pointer",
-                }}
+                className="flex items-center gap-1 bg-transparent border-none text-[10px] font-extrabold text-[#3d6b1f] cursor-pointer uppercase"
               >
                 MANAGE ALL <ArrowForward sx={{ fontSize: 11 }} />
               </button>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="flex flex-col gap-2.5">
               {bookingTracking.map((b) => (
                 <div
                   key={b.id}
                   onClick={() => handleDetailClick(b, "booking")}
-                  style={{
-                    padding: "12px 14px",
-                    border: "1px solid #f0f2ec",
-                    borderRadius: 13,
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#fafbf8";
-                    e.currentTarget.style.borderColor = "#d4e8c4";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#fff";
-                    e.currentTarget.style.borderColor = "#f0f2ec";
-                  }}
+                  className="p-3 border border-[#f0f2ec] rounded-[13px] cursor-pointer hover:bg-[#fafbf8] hover:border-[#d4e8c4] transition-all duration-150"
                 >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: 10,
-                    }}
-                  >
+                  <div className="flex justify-between items-start mb-2.5">
                     <div>
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 800,
-                          color: "#1a2a0f",
-                        }}
-                      >
+                      <div className="text-[12px] font-extrabold text-[#1a2a0f]">
                         {b.patient}
                       </div>
-                      <div
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          color: "#9aa090",
-                          marginTop: 2,
-                          textTransform: "uppercase",
-                        }}
-                      >
+                      <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">
                         {b.therapy} · {b.doctor}
                       </div>
                     </div>
                     <span
+                      className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase whitespace-nowrap"
                       style={{
-                        fontSize: 9,
-                        fontWeight: 800,
-                        padding: "3px 8px",
-                        borderRadius: 20,
                         background: bookingStatusColor(b.status).bg,
                         color: bookingStatusColor(b.status).fg,
-                        textTransform: "uppercase",
-                        whiteSpace: "nowrap",
                       }}
                     >
                       {b.status}
                     </span>
                   </div>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 8 }}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        height: 5,
-                        background: "#f0f2ec",
-                        borderRadius: 99,
-                        overflow: "hidden",
-                      }}
-                    >
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-[5px] bg-[#f0f2ec] rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${b.progress}%` }}
                         transition={{ duration: 0.8, delay: 0.2 }}
+                        className="h-full rounded-full"
                         style={{
-                          height: "100%",
-                          borderRadius: 99,
                           background:
                             b.progress === 100
                               ? G
@@ -1268,15 +777,7 @@ const SuperAdminDashboard = () => {
                         }}
                       />
                     </div>
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 800,
-                        color: "#9aa090",
-                        minWidth: 28,
-                        textAlign: "right",
-                      }}
-                    >
+                    <span className="text-[10px] font-extrabold text-[#9aa090] min-w-[28px] text-right">
                       {b.progress}%
                     </span>
                   </div>
@@ -1285,110 +786,35 @@ const SuperAdminDashboard = () => {
             </div>
           </div>
 
-          <div
-            style={{
-              background: "#fff",
-              borderRadius: 18,
-              border: "1px solid #eef0ea",
-              padding: "18px 20px",
-              display: "flex",
-              flexDirection: "column",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: 16,
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 8,
-                    background: "#fff3e0",
-                    color: "#e65100",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
+          <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px] flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#fff3e0] text-[#e65100] flex items-center justify-center">
                   <Hotel sx={{ fontSize: 15 }} />
                 </div>
-                <span
-                  style={{ fontSize: 13, fontWeight: 800, color: "#1a2a0f" }}
-                >
+                <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Upcoming Stays & Check-ins
                 </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: G2,
-                    display: "inline-block",
-                    animation: "pulse 1.5s infinite",
-                  }}
-                />
-                <span
-                  style={{
-                    fontSize: 9,
-                    fontWeight: 800,
-                    color: G,
-                    textTransform: "uppercase",
-                  }}
-                >
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5a9e2f] inline-block pulse-dot" />
+                <span className="text-[9px] font-extrabold text-[#3d6b1f] uppercase">
                   3 Arriving
                 </span>
               </div>
             </div>
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 10,
-                flex: 1,
-              }}
-            >
+            <div className="flex flex-col gap-2.5 flex-1">
               {checkInsData.map((c) => (
                 <div
                   key={c.id}
                   onClick={() => handleDetailClick(c, "checkin")}
-                  style={{
-                    display: "flex",
-                    gap: 12,
-                    padding: "12px 14px",
-                    border: "1px solid #f0f2ec",
-                    borderRadius: 13,
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#fafbf8";
-                    e.currentTarget.style.borderColor = "#d4e8c4";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = "#fff";
-                    e.currentTarget.style.borderColor = "#f0f2ec";
-                  }}
+                  className="flex gap-3 p-3 border border-[#f0f2ec] rounded-[13px] cursor-pointer hover:bg-[#fafbf8] hover:border-[#d4e8c4] transition-all duration-150"
                 >
                   <div
+                    className="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
                     style={{
-                      width: 44,
-                      height: 44,
-                      borderRadius: 12,
                       background: c.type === "Stay" ? "#fff3e0" : "#e8f5e0",
                       color: c.type === "Stay" ? "#e65100" : G,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
                     }}
                   >
                     {c.type === "Stay" ? (
@@ -1396,80 +822,27 @@ const SuperAdminDashboard = () => {
                     ) : (
                       <MedicalServices sx={{ fontSize: 17 }} />
                     )}
-                    <span
-                      style={{ fontSize: 7, fontWeight: 800, marginTop: 1 }}
-                    >
+                    <span className="text-[7px] font-extrabold mt-0.5">
                       {c.type.toUpperCase()}
                     </span>
                   </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "flex-start",
-                      }}
-                    >
-                      <div
-                        style={{
-                          fontSize: 12,
-                          fontWeight: 800,
-                          color: "#1a2a0f",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          maxWidth: "60%",
-                        }}
-                      >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <div className="text-[12px] font-extrabold text-[#1a2a0f] truncate max-w-[60%]">
                         {c.patient}
                       </div>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          background: "#e8f5e0",
-                          color: G,
-                          padding: "2px 7px",
-                          borderRadius: 20,
-                        }}
-                      >
+                      <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
                         {c.room}
                       </span>
                     </div>
-                    <div
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 700,
-                        color: "#9aa090",
-                        marginTop: 2,
-                        textTransform: "uppercase",
-                      }}
-                    >
+                    <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">
                       {c.therapy} · {c.doctor}
                     </div>
-                    <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          background: "#f5f6f2",
-                          color: "#5a6652",
-                          padding: "3px 7px",
-                          borderRadius: 7,
-                        }}
-                      >
+                    <div className="flex gap-1.5 mt-2">
+                      <span className="text-[9px] font-bold bg-[#f5f6f2] text-[#5a6652] px-1.5 py-0.5 rounded-[7px]">
                         🕐 {c.time}
                       </span>
-                      <span
-                        style={{
-                          fontSize: 9,
-                          fontWeight: 700,
-                          background: "#e8f5e0",
-                          color: G,
-                          padding: "3px 7px",
-                          borderRadius: 7,
-                        }}
-                      >
+                      <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-[7px]">
                         {c.duration}
                       </span>
                     </div>
@@ -1477,103 +850,24 @@ const SuperAdminDashboard = () => {
                 </div>
               ))}
             </div>
-            <button
-              style={{
-                marginTop: 14,
-                width: "100%",
-                padding: "10px",
-                border: "2px dashed #e8ede4",
-                borderRadius: 13,
-                background: "transparent",
-                fontSize: 10,
-                fontWeight: 700,
-                color: "#9aa090",
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-                transition: "all 0.15s",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = G;
-                e.currentTarget.style.color = G;
-                e.currentTarget.style.background = "#f7faf4";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#e8ede4";
-                e.currentTarget.style.color = "#9aa090";
-                e.currentTarget.style.background = "transparent";
-              }}
-            >
+            <button className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer uppercase tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150">
               View All Operational Logs →
             </button>
           </div>
         </section>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: 12,
-          }}
-        >
-          <div
-            style={{
-              background: "#1a2a0f",
-              borderRadius: 18,
-              padding: "20px 22px",
-              color: "#fff",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                bottom: -20,
-                right: -20,
-                width: 80,
-                height: 80,
-                borderRadius: "50%",
-                background: "rgba(90,158,47,0.2)",
-              }}
-            />
-            <p
-              style={{
-                margin: "0 0 12px",
-                fontSize: 9,
-                fontWeight: 800,
-                color: "rgba(255,255,255,0.35)",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-              }}
-            >
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-[#1a2a0f] rounded-[18px] p-5 text-white relative overflow-hidden">
+            <div className="absolute -bottom-5 -right-5 w-20 h-20 rounded-full bg-[#5a9e2f]/20" />
+            <p className="m-0 mb-3 text-[9px] font-extrabold text-white/35 uppercase tracking-widest">
               Network Growth
             </p>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <div className="flex items-center justify-between">
               <div>
-                <div
-                  style={{
-                    fontSize: 32,
-                    fontWeight: 900,
-                    letterSpacing: "-1px",
-                  }}
-                >
+                <div className="text-[32px] font-black tracking-tight">
                   +14%
                 </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: "#a3e635",
-                    marginTop: 3,
-                  }}
-                >
+                <div className="text-[11px] font-bold text-[#a3e635] mt-0.5">
                   Growth this quarter
                 </div>
               </div>
@@ -1581,21 +875,7 @@ const SuperAdminDashboard = () => {
                 sx={{ fontSize: 38, color: "#a3e635", opacity: 0.8 }}
               />
             </div>
-            <button
-              style={{
-                marginTop: 16,
-                fontSize: 10,
-                fontWeight: 800,
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                color: "#fff",
-                padding: "7px 14px",
-                borderRadius: 10,
-                cursor: "pointer",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-              }}
-            >
+            <button className="mt-4 text-[10px] font-extrabold bg-white/10 border border-white/10 text-white px-3.5 py-1.5 rounded-[10px] cursor-pointer uppercase tracking-[0.5px] hover:bg-white/20 transition-colors">
               View Full Report
             </button>
           </div>
@@ -1610,51 +890,19 @@ const SuperAdminDashboard = () => {
               val: "₹18,400",
               sub: "Per transaction",
             },
-            {
-              label: "Store Revenue",
-              val: "₹18.2L",
-              sub: "This month",
-            },
+            { label: "Store Revenue", val: "₹18.2L", sub: "This month" },
           ].map((s) => (
             <div
               key={s.label}
-              style={{
-                background: "#fff",
-                borderRadius: 18,
-                border: "1px solid #eef0ea",
-                padding: "20px 22px",
-              }}
+              className="bg-white rounded-[18px] border border-[#eef0ea] p-5"
             >
-              <div
-                style={{
-                  fontSize: 9,
-                  fontWeight: 800,
-                  color: "#9aa090",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                  marginBottom: 10,
-                }}
-              >
+              <div className="text-[9px] font-extrabold text-[#9aa090] uppercase tracking-[0.5px] mb-2.5">
                 {s.label}
               </div>
-              <div
-                style={{
-                  fontSize: 26,
-                  fontWeight: 900,
-                  color: "#1a2a0f",
-                  letterSpacing: "-0.5px",
-                }}
-              >
+              <div className="text-[26px] font-black text-[#1a2a0f] tracking-tight">
                 {s.val}
               </div>
-              <div
-                style={{
-                  fontSize: 10,
-                  fontWeight: 600,
-                  color: "#9aa090",
-                  marginTop: 4,
-                }}
-              >
+              <div className="text-[10px] font-semibold text-[#9aa090] mt-1">
                 {s.sub}
               </div>
             </div>
@@ -1662,58 +910,27 @@ const SuperAdminDashboard = () => {
         </div>
       </main>
 
-      <Drawer
-        anchor="right"
-        open={isDrawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: {
-            width: { xs: "100%", sm: 400 },
-            borderLeft: "none",
-            boxShadow: "-8px 0 32px rgba(0,0,0,0.06)",
-          },
-        }}
+      <div
+        className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
+          isDrawerOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setDrawerOpen(false)}
+      />
+      <div
+        className={`fixed top-0 right-0 h-full w-full sm:w-[400px] z-50 shadow-2xl transition-transform duration-300 ${
+          isDrawerOpen ? "translate-x-0" : "translate-x-full"
+        }`}
       >
         {selectedDetail && (
-          <div
-            style={{
-              height: "100%",
-              display: "flex",
-              flexDirection: "column",
-              background: "#fafbf8",
-            }}
-          >
-            <div
-              style={{
-                padding: "18px 20px",
-                borderBottom: "1px solid #eef0ea",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                background: "#fff",
-              }}
-            >
+          <div className="h-full flex flex-col bg-[#fafbf8]">
+            <div className="px-5 py-[18px] border-b border-[#eef0ea] flex items-center justify-between bg-white">
               <div>
-                <p
-                  style={{
-                    margin: 0,
-                    fontSize: 9,
-                    fontWeight: 800,
-                    color: "#9aa090",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                  }}
-                >
+                <p className="m-0 text-[9px] font-extrabold text-[#9aa090] uppercase tracking-[0.5px]">
                   {selectedDetail.dataType} details
                 </p>
-                <h2
-                  style={{
-                    margin: "3px 0 0",
-                    fontSize: 17,
-                    fontWeight: 900,
-                    color: "#1a2a0f",
-                  }}
-                >
+                <h2 className="m-0 mt-0.5 text-[17px] font-black text-[#1a2a0f]">
                   {selectedDetail.name ||
                     selectedDetail.title ||
                     selectedDetail.patient ||
@@ -1722,50 +939,14 @@ const SuperAdminDashboard = () => {
               </div>
               <button
                 onClick={() => setDrawerOpen(false)}
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 10,
-                  border: "1px solid #eef0ea",
-                  background: "#fff",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#666",
-                }}
+                className="w-8 h-8 rounded-[10px] border border-[#eef0ea] bg-white cursor-pointer flex items-center justify-center text-[#666] hover:bg-[#f5f5f5] transition-colors"
               >
                 <Close sx={{ fontSize: 16 }} />
               </button>
             </div>
-            <div style={{ flex: 1, overflowY: "auto", padding: "20px" }}>
-              <div
-                style={{
-                  background: "#fff",
-                  borderRadius: 16,
-                  padding: "16px",
-                  marginBottom: 14,
-                  border: "1px solid #eef0ea",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 14,
-                }}
-              >
-                <div
-                  style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: "50%",
-                    background: G,
-                    color: "#fff",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 20,
-                    fontWeight: 900,
-                    flexShrink: 0,
-                  }}
-                >
+            <div className="flex-1 overflow-y-auto p-5">
+              <div className="bg-white rounded-2xl p-4 mb-3.5 border border-[#eef0ea] flex items-center gap-3.5">
+                <div className="w-[52px] h-[52px] rounded-full bg-[#3d6b1f] text-white flex items-center justify-center text-[20px] font-black flex-shrink-0">
                   {(
                     selectedDetail.name ||
                     selectedDetail.patient ||
@@ -1773,204 +954,98 @@ const SuperAdminDashboard = () => {
                   ).charAt(0)}
                 </div>
                 <div>
-                  <div
-                    style={{ fontSize: 15, fontWeight: 900, color: "#1a2a0f" }}
-                  >
+                  <div className="text-[15px] font-black text-[#1a2a0f]">
                     {selectedDetail.name ||
                       selectedDetail.patient ||
                       selectedDetail.label}
                   </div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: "#9aa090",
-                      fontWeight: 600,
-                      marginTop: 2,
-                    }}
-                  >
+                  <div className="text-[10px] text-[#9aa090] font-semibold mt-0.5">
                     #{selectedDetail.id || "SYS-7711"}
                   </div>
                 </div>
               </div>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
-                  gap: 10,
-                  marginBottom: 14,
-                }}
-              >
+              <div className="grid grid-cols-2 gap-2.5 mb-3.5">
                 {[
                   {
                     label: "Category",
-                    val: selectedDetail.therapy || selectedDetail.dataType || "General",
+                    val:
+                      selectedDetail.therapy ||
+                      selectedDetail.dataType ||
+                      "General",
                   },
                   { label: "Priority", val: "HIGH", highlight: true },
                   { label: "Status", val: selectedDetail.status || "Active" },
-                  { 
-                    label: selectedDetail.dataType === 'doctor' ? "Contact" : "Time/Date", 
-                    val: selectedDetail.phone || selectedDetail.time || selectedDetail.date || "—" 
+                  {
+                    label:
+                      selectedDetail.dataType === "doctor"
+                        ? "Contact"
+                        : "Time/Date",
+                    val:
+                      selectedDetail.phone ||
+                      selectedDetail.time ||
+                      selectedDetail.date ||
+                      "—",
                   },
                 ].map((f) => (
                   <div
                     key={f.label}
-                    style={{
-                      background: "#fff",
-                      border: "1px solid #eef0ea",
-                      borderRadius: 12,
-                      padding: "12px 14px",
-                    }}
+                    className="bg-white border border-[#eef0ea] rounded-xl p-3"
                   >
-                    <div
-                      style={{
-                        fontSize: 9,
-                        fontWeight: 800,
-                        color: "#9aa090",
-                        textTransform: "uppercase",
-                        letterSpacing: 0.5,
-                        marginBottom: 4,
-                      }}
-                    >
+                    <div className="text-[9px] font-extrabold text-[#9aa090] uppercase tracking-[0.5px] mb-1">
                       {f.label}
                     </div>
                     <div
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 800,
-                        color: f.highlight ? G : "#3a4a30",
-                      }}
+                      className={`text-[12px] font-extrabold ${
+                        f.highlight ? "text-[#3d6b1f]" : "text-[#3a4a30]"
+                      }`}
                     >
                       {f.val}
                     </div>
                   </div>
                 ))}
               </div>
-              
-              {/* Detailed Context Based on Type */}
-              <div
-                style={{
-                   background: "#fff",
-                   borderRadius: 16,
-                   padding: "16px",
-                   marginBottom: 14,
-                   border: "1px solid #eef0ea",
-                }}
-              >
-                 <div style={{ fontSize: 10, fontWeight: 800, color: "#1a2a0f", textTransform: 'uppercase', marginBottom: 8 }}>
-                    Actionable Context
-                 </div>
-                 <div style={{ fontSize: 11, color: "#6a7560", lineHeight: 1.6 }}>
-                    {selectedDetail.dataType === 'booking' && `This booking for ${selectedDetail.patient} is currently at ${selectedDetail.progress}% completion. Monitor the associated staff for timely delivery.`}
-                    {selectedDetail.dataType === 'doctor' && `Assigned to ${selectedDetail.clinic}. Expertise includes ${selectedDetail.therapies?.join(', ')}. Currently maintaining efficient capacity.`}
-                    {selectedDetail.dataType === 'checkin' && `Check-in scheduled for ${selectedDetail.time} with a duration of ${selectedDetail.duration}. Room ${selectedDetail.room} is prepared.`}
-                    {selectedDetail.dataType === 'stat' && `Real-time metric reflecting ${selectedDetail.title}. Trend analysis indicates a ${selectedDetail.trend} shift compared to historical data.`}
-                 </div>
+              <div className="bg-white rounded-2xl p-4 mb-3.5 border border-[#eef0ea]">
+                <div className="text-[10px] font-extrabold text-[#1a2a0f] uppercase mb-2">
+                  Actionable Context
+                </div>
+                <div className="text-[11px] text-[#6a7560] leading-relaxed">
+                  {selectedDetail.dataType === "booking" &&
+                    `This booking for ${selectedDetail.patient} is currently at ${selectedDetail.progress}% completion. Monitor the associated staff for timely delivery.`}
+                  {selectedDetail.dataType === "doctor" &&
+                    `Assigned to ${selectedDetail.clinic}. Expertise includes ${selectedDetail.therapies?.join(", ")}. Currently maintaining efficient capacity.`}
+                  {selectedDetail.dataType === "checkin" &&
+                    `Check-in scheduled for ${selectedDetail.time} with a duration of ${selectedDetail.duration}. Room ${selectedDetail.room} is prepared.`}
+                  {selectedDetail.dataType === "stat" &&
+                    `Real-time metric reflecting ${selectedDetail.title}. Trend analysis indicates a ${selectedDetail.trend} shift compared to historical data.`}
+                </div>
               </div>
-
-              <div
-                style={{
-                  background: "#fff",
-                  border: "1px solid #eef0ea",
-                  borderRadius: 16,
-                  padding: "14px",
-                  marginBottom: 14,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 800,
-                    color: "#1a2a0f",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.5,
-                    marginBottom: 10,
-                  }}
-                >
+              <div className="bg-white border border-[#eef0ea] rounded-2xl p-3.5 mb-3.5">
+                <div className="text-[10px] font-extrabold text-[#1a2a0f] uppercase tracking-[0.5px] mb-2.5">
                   System Synchronization
                 </div>
-                <div
-                  style={{
-                    height: 120,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    background: "#f5f6f2",
-                    borderRadius: 12,
-                    border: "1px dashed #e0e5da",
-                  }}
-                >
-                  <span
-                    style={{ fontSize: 10, color: "#b0bba5", fontWeight: 600 }}
-                  >
+                <div className="h-[120px] flex items-center justify-center bg-[#f5f6f2] rounded-xl border border-dashed border-[#e0e5da]">
+                  <span className="text-[10px] text-[#b0bba5] font-semibold">
                     Fetching audit logs from {selectedDetail.dataType} module...
                   </span>
                 </div>
               </div>
-              <p
-                style={{
-                  fontSize: 10,
-                  color: "#b0bba5",
-                  fontStyle: "italic",
-                  lineHeight: 1.6,
-                }}
-              >
+              <p className="text-[10px] text-[#b0bba5] italic leading-relaxed">
                 Data source: swagrama-react/{selectedDetail.dataType}
               </p>
             </div>
-            <div
-              style={{
-                padding: "16px 20px",
-                borderTop: "1px solid #eef0ea",
-                background: "#fff",
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-              }}
-            >
-              <button
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: 12,
-                  border: "none",
-                  background: G,
-                  color: "#fff",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
+            <div className="px-5 py-4 border-t border-[#eef0ea] bg-white flex flex-col gap-2">
+              <button className="w-full py-3 rounded-xl border-none bg-[#3d6b1f] text-white text-[11px] font-extrabold cursor-pointer uppercase tracking-[0.5px] hover:bg-[#2d5015] transition-colors">
                 Execute Module Action
               </button>
-              <button
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: 12,
-                  border: "1px solid #eef0ea",
-                  background: "#fff",
-                  color: "#9aa090",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.5,
-                }}
-              >
+              <button className="w-full py-2.5 rounded-xl border border-[#eef0ea] bg-white text-[#9aa090] text-[11px] font-bold cursor-pointer uppercase tracking-[0.5px] hover:bg-[#fafbf8] transition-colors">
                 View Full Timeline
               </button>
             </div>
           </div>
         )}
-      </Drawer>
+      </div>
 
-      <style>{`
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        * { box-sizing: border-box; }
-        @media (min-width: 640px) { .sm-show { display: block !important; } }
-      `}</style>
+  
     </div>
   );
 };

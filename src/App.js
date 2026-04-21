@@ -66,7 +66,7 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <div className="md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
+      <div className="pt-16 md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
         <ErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes location={location} key={location.pathname}>

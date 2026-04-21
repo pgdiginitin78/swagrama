@@ -9,7 +9,7 @@ import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.png
 import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
 import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
 import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
-import SmitaMehetre from "../../assets/landing-page/ourexperts/SmitaMahetre.webp";
+import SmitaMehetre from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
 import {
   Hospital,

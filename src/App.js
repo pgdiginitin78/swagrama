@@ -39,8 +39,8 @@ const SwagramaPrivacyPolicy = lazy(
 const TermsAndConditon = lazy(
   () => import("./components/pages/terms&conditon/TermsAndConditon"),
 );
-const SuperAdminDashboard = lazy(
-  () => import("./components/pages/admin/SuperAdminDashboard"),
+const AdminLayout = lazy(
+  () => import("./components/pages/admin/AdminLayout"),
 );
 
 function PageSkeleton() {
@@ -98,7 +98,7 @@ export default function App() {
               <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
               <Route path="feeds" element={<Feeds />} />
               <Route path="/dashboard" element={<UserDashboard />} />
-              <Route path="/admin/dashboard" element={<SuperAdminDashboard />} />
+              <Route path="/admin/dashboard" element={<AdminLayout />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>

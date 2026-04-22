@@ -303,7 +303,7 @@ const SuperAdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen  px-4 md:px-9">
+    <div className="min-h-screen  px-4 ">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap');
         *, body { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
@@ -311,11 +311,16 @@ const SuperAdminDashboard = () => {
         .pulse-dot { animation: pulse-dot 1.5s infinite; }
       `}</style>
 
-      <main className="max-w-[1600px] mx-auto pt-5 pb-10">
+      <motion.main 
+        initial={{ opacity: 0, y: 15 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        transition={{ duration: 0.4 }}
+        className="max-w-[1600px] mx-auto pt-5 pb-10"
+      >
         <header className="flex items-center justify-between mb-6 pb-5 border-b border-[#e8ede4] flex-wrap gap-3">
           <div>
             <h1 className="m-0 text-[clamp(20px,3vw,28px)] font-black text-[#1a2a0f] tracking-tight">
-              Super Admin <span className="text-[#3d6b1f]">Dashboard</span>
+             <span className="text-[#3d6b1f]">Dashboard</span>
             </h1>
             <p className="mt-0.5 mb-0 text-xs text-[#8a9580] font-medium">
               Global ecosystem monitoring & financial analytics
@@ -715,74 +720,7 @@ const SuperAdminDashboard = () => {
           id="live-procedures"
           className="grid gap-4 mb-5"
         >
-          {/* <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#e3f2fd] text-[#1565c0] flex items-center justify-center">
-                  <Timeline sx={{ fontSize: 15 }} />
-                </div>
-                <span className="text-[13px] font-extrabold text-[#1a2a0f]">
-                  Live Booking Lifecycle
-                </span>
-              </div>
-              <button
-                onClick={() => handleDetailClick({ label: "All" }, "list")}
-                className="flex items-center gap-1 bg-transparent border-none text-[10px] font-extrabold text-[#3d6b1f] cursor-pointer uppercase"
-              >
-                MANAGE ALL <ArrowForward sx={{ fontSize: 11 }} />
-              </button>
-            </div>
-            <div className="flex flex-col gap-2.5">
-              {bookingTracking.map((b) => (
-                <div
-                  key={b.id}
-                  onClick={() => handleDetailClick(b, "booking")}
-                  className="p-3 border border-[#f0f2ec] rounded-[13px] cursor-pointer hover:bg-[#fafbf8] hover:border-[#d4e8c4] transition-all duration-150"
-                >
-                  <div className="flex justify-between items-start mb-2.5">
-                    <div>
-                      <div className="text-[12px] font-extrabold text-[#1a2a0f]">
-                        {b.patient}
-                      </div>
-                      <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">
-                        {b.therapy} · {b.doctor}
-                      </div>
-                    </div>
-                    <span
-                      className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase whitespace-nowrap"
-                      style={{
-                        background: bookingStatusColor(b.status).bg,
-                        color: bookingStatusColor(b.status).fg,
-                      }}
-                    >
-                      {b.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-[5px] bg-[#f0f2ec] rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{ width: `${b.progress}%` }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                        className="h-full rounded-full"
-                        style={{
-                          background:
-                            b.progress === 100
-                              ? G
-                              : b.progress === 0
-                                ? "#e0e0e0"
-                                : G2,
-                        }}
-                      />
-                    </div>
-                    <span className="text-[10px] font-extrabold text-[#9aa090] min-w-[28px] text-right">
-                      {b.progress}%
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div> */}
+      
 
           <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
@@ -855,7 +793,7 @@ const SuperAdminDashboard = () => {
  
         </section>
 
-      </main>
+        </motion.main>
 
       <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${

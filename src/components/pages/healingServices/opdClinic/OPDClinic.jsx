@@ -2,13 +2,12 @@ import CompostIcon from "@mui/icons-material/Compost";
 import HealingIcon from "@mui/icons-material/Healing";
 import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import { useEffect, useState } from "react";
-import { useAuth } from "../../../../context/AuthContext";
+import AyurvedaIcon from "../../../../assets/AyurvedaIcon.svg";
 import {
   getDepartmentList,
   getDoctorListByLocationDepartment,
 } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
 import AyurvedaForm from "../../opdBooking/AyurvedaFrom";
-import AyurvedaIcon from "../../../../assets/AyurvedaIcon.svg";
 
 const iconMap = {
 
@@ -33,7 +32,7 @@ const getDeptGradient = (name) => {
 };
 
 const OPDClinic = () => {
-  const { user } = useAuth();
+
 
   const [activeTab, setActiveTab] = useState(0);
   const [departmentList, setDepartmentList] = useState([]);

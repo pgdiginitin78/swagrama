@@ -606,7 +606,12 @@ const UserDashboard = () => {
   );
 
   return (
-    <div className="flex min-h-screen bg-[#f8f8f6]">
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }} 
+      animate={{ opacity: 1, y: 0 }} 
+      transition={{ duration: 0.4 }}
+      className="flex min-h-screen bg-[#f8f8f6]"
+    >
       <aside className="hidden md:flex md:w-52 lg:w-[200px] sticky top-0 h-screen flex-shrink-0 z-20">
         <div className="w-full">
           <SidebarContent />
@@ -904,7 +909,7 @@ const UserDashboard = () => {
           </div>
         )}
       </Drawer>
-    </div>
+    </motion.div>
   );
 };
 

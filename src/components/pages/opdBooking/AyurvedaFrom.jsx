@@ -714,7 +714,7 @@ function AyurvedaForm({
         .then((res) => {
           if (!isMounted) return;
           const data = res?.data;
-          if (data?.status == 200) {
+          if (data?.statusCode == 200) {
             const fetchedSlots = data?.data || [];
             setSlotData({
               slots: fetchedSlots,

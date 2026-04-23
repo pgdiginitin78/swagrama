@@ -1,258 +1,422 @@
-import React from "react";
+import ExpandLess from "@mui/icons-material/ExpandLess";
+import ExpandMore from "@mui/icons-material/ExpandMore";
+import Box from "@mui/material/Box";
+import Collapse from "@mui/material/Collapse";
+import Divider from "@mui/material/Divider";
+import MuiDrawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import { styled } from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import {
+  CalendarCheck,
+  ChevronLeft,
+  Database,
+  LayoutDashboard,
+  Menu,
+  MessageSquare,
+  Settings
+} from "lucide-react";
+import React, { useState } from "react";
 
-const DashboardIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="7" height="7" />
-    <rect x="14" y="3" width="7" height="7" />
-    <rect x="14" y="14" width="7" height="7" />
-    <rect x="3" y="14" width="7" height="7" />
-  </svg>
-);
+const drawerWidth = 240;
 
-const EnquiriesIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-    <circle cx="12" cy="12" r="0.1" />
-    <path d="M12 9v4" />
-    <path d="M12 16h.01" />
-  </svg>
-);
+const openedMixin = (theme) => ({
+  width: drawerWidth,
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.enteringScreen,
+  }),
+  overflowX: "hidden",
+  backgroundColor: "#f8f9f7",
+  borderRight: "1px solid #e5ebe0",
+  // Make it relative to work with flex layouts
+  position: "relative",
+  height: "100%",
+});
 
-const BookingsIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-    <line x1="16" y1="2" x2="16" y2="6" />
-    <line x1="8" y1="2" x2="8" y2="6" />
-    <line x1="3" y1="10" x2="21" y2="10" />
-    <path d="m9 16 2 2 4-4" />
-  </svg>
-);
+const closedMixin = (theme) => ({
+  transition: theme.transitions.create("width", {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  overflowX: "hidden",
+  width: `72px`,
+  backgroundColor: "#f8f9f7",
+  borderRight: "1px solid #e5ebe0",
+  // Make it relative to work with flex layouts
+  position: "relative",
+  height: "100%",
+});
 
-const InventoryIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="21 8 21 21 3 21 3 8" />
-    <rect x="1" y="3" width="22" height="5" />
-    <line x1="10" y1="12" x2="14" y2="12" />
-  </svg>
-);
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: theme.spacing(0, 1.5),
+  ...theme.mixins.toolbar,
+}));
 
-const MastersIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <ellipse cx="12" cy="5" rx="9" ry="3" />
-    <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-    <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-  </svg>
-);
-
-const SettingsIcon = () => (
-  <svg
-    width="18"
-    height="18"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-  </svg>
-);
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: drawerWidth,
+  flexShrink: 0,
+  whiteSpace: "nowrap",
+  boxSizing: "border-box",
+  ...(open && {
+    ...openedMixin(theme),
+    "& .MuiDrawer-paper": openedMixin(theme),
+  }),
+  ...(!open && {
+    ...closedMixin(theme),
+    "& .MuiDrawer-paper": closedMixin(theme),
+  }),
+}));
 
 const menuItems = [
-  { key: "dashboard", label: "Dashboard", Icon: DashboardIcon },
-  { key: "enquiries", label: "Enquiries", Icon: EnquiriesIcon },
-  { key: "bookings", label: "Bookings", Icon: BookingsIcon },
-  { key: "inventory", label: "Inventory", Icon: InventoryIcon },
-  { key: "masters", label: "Masters", Icon: MastersIcon },
-  { key: "settings", label: "Settings", Icon: SettingsIcon },
+  { key: "dashboard", label: "Dashboard", Icon: LayoutDashboard },
+  { key: "enquiries", label: "Enquiries", Icon: MessageSquare },
+  { key: "bookings", label: "Bookings", Icon: CalendarCheck },
+  {
+    key: "masters",
+    label: "Masters",
+    Icon: Database,
+    children: [
+      { key: "patient-master", label: "Patient Master" },
+      { key: "doctor-master", label: "Doctor Master" },
+      { key: "service-master", label: "Service Master" },
+    ],
+  },
 ];
 
-const AdminDrawer = ({
-  activeMenu,
-  onMenuChange,
-  mobileOpen,
-  onMobileClose,
-}) => {
-  return (
-    <>
-      <style>{`
-        /* Kill global leaf icons */
-        .drawer-nav-container ul li::before { content: none !important; }
-        .drawer-nav-container ul li { display: block !important; padding: 0 !important; margin: 0 !important; }
-      `}</style>
+const bottomMenuItems = [{ key: "settings", label: "Settings", Icon: Settings }];
 
-      {mobileOpen && (
-        <div
-          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
-          onClick={onMobileClose}
-        />
-      )}
+const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) => {
+  const [open, setOpen] = useState(true);
+  const [openMasters, setOpenMasters] = useState(false);
 
-      <aside
-        className={`
-    fixed top-0 left-0 z-40 flex flex-col h-screen lg:h-full
-    bg-[#f8f9f7] border-r border-[#e5ebe0]
-    transition-transform duration-300 ease-in-out
-    ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
-    lg:translate-x-0 lg:static lg:z-auto
-  `}
-        style={{ width: "200px" }}
-      >
-        <nav className="flex-1 px-3 pt-5 overflow-y-auto drawer-nav-container pb-4 flex flex-col">
-          <ul className="list-none m-0 p-0 space-y-1">
-            {menuItems
-              .filter((item) => item.key !== "settings")
-              .map(({ key, label, Icon }) => {
-                const isActive = activeMenu === key;
-                return (
-                  <li key={key}>
-                    <button
-                      onClick={() => {
-                        onMenuChange(key);
-                        if (mobileOpen) onMobileClose();
+  const handleDrawerToggle = () => {
+    setOpen(!open);
+    if (open) setOpenMasters(false); // Close submenus when collapsing drawer
+  };
+
+  const handleMastersClick = (e) => {
+    e.stopPropagation();
+    if (!open) {
+      setOpen(true);
+      setOpenMasters(true);
+    } else {
+      setOpenMasters(!openMasters);
+    }
+  };
+
+  const handleMenuClick = (key) => {
+    console.log("Navigating to:", key); // Debugging aid
+    onMenuChange(key);
+    if (mobileOpen) onMobileClose();
+  };
+
+  const isSelected = (key) => activeMenu === key;
+  const isChildSelected = (item) => 
+    item.children?.some(child => child.key === activeMenu);
+
+  const renderMenuItem = (item, isMobile = false) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const Icon = item.Icon;
+    const isParentActive = hasChildren && isChildSelected(item);
+    const isDirectActive = isSelected(item.key);
+    const active = isDirectActive || isParentActive;
+
+    // Determine if we should show labels/content
+    const showContent = isMobile || open;
+
+    return (
+      <React.Fragment key={item.key}>
+        <ListItem disablePadding sx={{ display: "block", mb: 0.5 }}>
+          <Tooltip 
+            title={
+              !showContent ? (
+                <Box sx={{ p: 0.5, color: '#fff' }}>
+                  <p style={{ 
+                    margin: '0 0 6px 0', 
+                    fontSize: '11px', 
+                    opacity: 0.9, 
+                    fontWeight: 900, 
+                    color: '#ffffff', 
+                    borderBottom: '1px solid rgba(255,255,255,0.2)', 
+                    paddingBottom: '4px',
+                    fontFamily: '"Inter", sans-serif'
+                  }}>
+                    {item.label}
+                  </p>
+                  {hasChildren && item.children.map(child => (
+                    <Box 
+                      key={child.key}
+                      onClick={(e) => { 
+                        e.stopPropagation(); 
+                        handleMenuClick(child.key); 
                       }}
-                      className={`
-                w-full flex items-center gap-4 px-5 py-3
-                border-none cursor-pointer text-left transition-all duration-150
-                rounded-xl
-                ${
-                  isActive
-                    ? "bg-white text-[#1e5d66] shadow-sm"
-                    : "bg-transparent text-[#4a5568] hover:bg-black/5"
-                }
-              `}
-                    >
-                      <span
-                        className={`flex-shrink-0 flex items-center ${
-                          isActive ? "text-[#1e5d66]" : "text-[#4a5568]"
-                        }`}
-                      >
-                        <Icon />
-                      </span>
-                      <span className="text-[14px] font-semibold leading-none">
-                        {label}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-          </ul>
-
-          <ul className="list-none m-0 p-0 space-y-1 mt-auto pt-10">
-            {menuItems
-              .filter((item) => item.key === "settings")
-              .map(({ key, label, Icon }) => {
-                const isActive = activeMenu === key;
-                return (
-                  <li key={key}>
-                    <button
-                      onClick={() => {
-                        onMenuChange(key);
-                        if (mobileOpen) onMobileClose();
+                      sx={{ 
+                        px: 1.5,
+                        py: 0.8,
+                        fontSize: '12px', 
+                        borderRadius: '6px',
+                        backgroundColor: isSelected(child.key) ? '#fff' : 'transparent',
+                        color: isSelected(child.key) ? '#1e5d66' : '#fff',
+                        cursor: 'pointer',
+                        fontWeight: isSelected(child.key) ? 800 : 500,
+                        mb: 0.5,
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          backgroundColor: isSelected(child.key) ? '#fff' : 'rgba(255,255,255,0.1)',
+                        }
                       }}
-                      className={`
-                w-full flex items-center gap-4 px-5 py-3
-                border-none cursor-pointer text-left transition-all duration-150
-                rounded-xl
-                ${
-                  isActive
-                    ? "bg-white text-[#1e5d66] shadow-sm"
-                    : "bg-transparent text-[#4a5568] hover:bg-black/5"
-                }
-              `}
                     >
-                      <span
-                        className={`flex-shrink-0 flex items-center ${
-                          isActive ? "text-[#1e5d66]" : "text-[#4a5568]"
-                        }`}
-                      >
-                        <Icon />
-                      </span>
-                      <span className="text-[14px] font-semibold leading-none">
-                        {label}
-                      </span>
-                    </button>
-                  </li>
-                );
-              })}
-          </ul>
-        </nav>
-
-        <div className="shrink-0 p-4 bg-[#f8f9f7] border-t border-[#e5ebe0]">
-          <div className="bg-white rounded-2xl p-3 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-              <img
-                src="https://media.licdn.com/dms/image/v2/C4D03AQE1V2G2lXv7zA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1623912169647?e=2147483647&v=beta&t=4G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5"
-                alt="Admin"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = "none";
-                  if (e.target.nextSibling)
-                    e.target.nextSibling.style.display = "flex";
+                      {child.label}
+                    </Box>
+                  ))}
+                </Box>
+              ) : ""
+            } 
+            placement="right" 
+            arrow
+            interactive={hasChildren}
+            enterDelay={hasChildren ? 0 : 200}
+            slotProps={{
+              popper: {
+                sx: {
+                   [`& .MuiTooltip-tooltip`]: {
+                    backgroundColor: "#1e5d66",
+                    color: "#ffffff !important",
+                    fontWeight: 700,
+                    fontSize: "12px",
+                    px: 1.5,
+                    py: 1.2,
+                    borderRadius: "12px",
+                    boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+                    border: '1px solid rgba(255,255,255,0.1)'
+                  },
+                  [`& .MuiTooltip-arrow`]: {
+                    color: "#1e5d66",
+                  },
+                },
+              },
+            }}
+          >
+            <ListItemButton
+              onClick={() => {
+                if (hasChildren && showContent) {
+                  setOpenMasters(!openMasters);
+                } else {
+                  handleMenuClick(item.key);
+                }
+              }}
+              sx={{
+                minHeight: 52,
+                justifyContent: showContent ? "initial" : "center",
+                px: 2.5,
+                mx: 1,
+                borderRadius: "12px",
+                backgroundColor: active ? "white" : "transparent",
+                boxShadow: active ? "0 4px 12px rgba(0,0,0,0.06)" : "none",
+                color: active ? "#1e5d66" : "#4a5568",
+                "& .MuiListItemIcon-root": {
+                  color: active ? "#1e5d66" : "#4a5568",
+                },
+                "&:hover": {
+                  backgroundColor: active ? "white" : "rgba(30, 93, 102, 0.06)",
+                  "& .MuiListItemIcon-root": {
+                    color: "#1e5d66",
+                  },
+                },
+              }}
+            >
+              <ListItemIcon
+                sx={{
+                  minWidth: 0,
+                  mr: showContent ? 2 : "auto",
+                  justifyContent: "center",
+                }}
+              >
+                {Icon && <Icon size={22} strokeWidth={active ? 2.5 : 2} />}
+              </ListItemIcon>
+              <ListItemText
+                primary={item.label}
+                sx={{
+                  opacity: showContent ? 1 : 0,
+                  "& .MuiTypography-root": {
+                    fontSize: "14px",
+                    fontWeight: active ? 700 : 600,
+                    fontFamily: '"Inter", sans-serif',
+                  },
                 }}
               />
-              <div className="hidden w-full h-full items-center justify-center bg-[#1e5d66] text-white font-bold text-xs">
-                SA
+              {showContent && hasChildren && (
+                openMasters ? <ExpandLess sx={{ fontSize: 18 }} /> : <ExpandMore sx={{ fontSize: 18 }} />
+              )}
+            </ListItemButton>
+          </Tooltip>
+        </ListItem>
+
+        {hasChildren && showContent && (
+          <Collapse in={openMasters} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding sx={{ mt: 0.5 }}>
+              {item.children.map((child) => {
+                const childActive = isSelected(child.key);
+                return (
+                  <ListItemButton
+                    key={child.key}
+                    onClick={() => handleMenuClick(child.key)}
+                    sx={{
+                      minHeight: 40,
+                      pl: 7,
+                      pr: 2,
+                      mx: 1,
+                      mb: 0.5,
+                      borderRadius: "10px",
+                      backgroundColor: childActive ? "rgba(30, 93, 102, 0.08)" : "transparent",
+                      color: childActive ? "#1e5d66" : "#718096",
+                      "& .MuiTypography-root": {
+                        fontSize: "13px",
+                        fontWeight: childActive ? 700 : 500,
+                        fontFamily: '"Inter", sans-serif',
+                      },
+                      "&:hover": {
+                        backgroundColor: childActive ? "rgba(30, 93, 102, 0.12)" : "rgba(0, 0, 0, 0.03)",
+                      },
+                    }}
+                  >
+                    <ListItemText primary={child.label} />
+                  </ListItemButton>
+                );
+              })}
+            </List>
+          </Collapse>
+        )}
+      </React.Fragment>
+    );
+  };
+
+  const UserProfile = ({ showLabels }) => (
+    <Box
+      sx={{
+        mx: showLabels ? 1.5 : 1,
+        p: showLabels ? 1.5 : 0.8,
+        backgroundColor: "white",
+        borderRadius: "14px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+        display: "flex",
+        alignItems: "center",
+        gap: 1.5,
+        transition: "all 0.3s ease",
+        justifyContent: showLabels ? 'flex-start' : 'center'
+      }}
+    >
+      <Box
+        sx={{
+          width: 38,
+          height: 38,
+          borderRadius: "10px",
+          overflow: "hidden",
+          backgroundColor: "#1e5d66",
+          flexShrink: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          fontWeight: 800,
+          fontSize: '12px'
+        }}
+      >
+        <img
+          src="https://media.licdn.com/dms/image/v2/C4D03AQE1V2G2lXv7zA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1623912169647?e=2147483647&v=beta&t=4G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5"
+          alt="Admin"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          onError={(e) => { e.target.style.display = "none"; }}
+        />
+        SA
+      </Box>
+      {showLabels && (
+        <Box sx={{ minWidth: 0 }}>
+          <p style={{ margin: 0, fontSize: "12px", fontWeight: 800, color: "#1e5d66", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            Swagram Admin
+          </p>
+          <p style={{ margin: 0, fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: 'uppercase' }}>
+            Superuser
+          </p>
+        </Box>
+      )}
+    </Box>
+  );
+
+  return (
+    <>
+      {/* Mobile Drawer (Temporary) */}
+      <MuiDrawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={onMobileClose}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", lg: "none" },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: drawerWidth,
+            backgroundColor: "#f8f9f7",
+            borderRight: "none",
+          },
+        }}
+      >
+        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+           <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center">
+              <Database size={18} color="white" />
+           </div>
+           <span className="font-bold text-[#1e5d66] text-lg">Swagrama</span>
+        </Box>
+        <Divider sx={{ mb: 1, opacity: 0.5 }} />
+        <List sx={{ px: 1 }}>
+          {menuItems.map(item => renderMenuItem(item, true))}
+        </List>
+        <Box sx={{ mt: 'auto', p: 1.5, pb: 3 }}>
+          <UserProfile showLabels={true} />
+        </Box>
+      </MuiDrawer>
+
+      {/* Desktop Drawer (Mini Variant) */}
+      <Drawer
+        variant="permanent"
+        open={open}
+        sx={{
+          display: { xs: "none", lg: "block" },
+        }}
+      >
+        <DrawerHeader>
+          {open ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, ml: 1 }}>
+              <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center shadow-sm">
+                <Database size={18} color="white" />
               </div>
-            </div>
-            <div className="min-w-0">
-              <p className="text-[13px] font-bold text-[#1e5d66] truncate m-0">
-                Swagram Admin
-              </p>
-              <p className="text-[10px] font-bold text-[#94a3b8] uppercase tracking-tighter m-0">
-                SUPERUSER
-              </p>
-            </div>
-          </div>
-        </div>
-      </aside>
+              <span style={{ fontWeight: 800, fontSize: '18px', color: '#1e5d66' }}>Swagrama</span>
+            </Box>
+          ) : <div />}
+          <IconButton onClick={handleDrawerToggle} sx={{ color: '#1e5d66', mr: open ? 0 : 'auto', ml: open ? 0 : 'auto' }}>
+            {open ? <ChevronLeft size={20} /> : <Menu size={20} />}
+          </IconButton>
+        </DrawerHeader>
+
+        <List sx={{ pt: 1 }}>
+          {menuItems.map(item => renderMenuItem(item, false))}
+        </List>
+
+        <Box sx={{ mt: "auto", pb: 3 }}>
+          <UserProfile showLabels={open} />
+        </Box>
+      </Drawer>
     </>
   );
 };

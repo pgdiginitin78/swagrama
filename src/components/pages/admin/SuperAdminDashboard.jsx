@@ -165,52 +165,7 @@ const doctorAssignments = [
   },
 ];
 
-const bookingTracking = [
-  {
-    id: "OPD-9921",
-    patient: "Rahul Mehta",
-    therapy: "OPD Consultation",
-    doctor: "Dr. Arvind Sharma",
-    clinic: "Wellness Wing",
-    status: "Ongoing",
-    progress: 75,
-    date: "Apr 20",
-    time: "10:30 AM",
-  },
-  {
-    id: "ORD-7790",
-    patient: "Sneha Kapur",
-    therapy: "Wellness Product Pack",
-    doctor: "E-Shop Order",
-    clinic: "Main Center",
-    status: "Upcoming",
-    progress: 30,
-    date: "Apr 21",
-    time: "Out for Delivery",
-  },
-  {
-    id: "TH-201",
-    patient: "Amit Verma",
-    therapy: "Panchakarma Detox",
-    doctor: "Dr. Rajesh Kumar",
-    clinic: "IPD Wellness",
-    status: "Completed",
-    progress: 100,
-    date: "Apr 18",
-    time: "Phase 1 Complete",
-  },
-  {
-    id: "MEM-882",
-    patient: "Priya Singh",
-    therapy: "Membership Upgrade",
-    doctor: "System Auto",
-    clinic: "Community Hub",
-    status: "Completed",
-    progress: 100,
-    date: "Apr 17",
-    time: "Silver -> Gold",
-  },
-];
+
 
 const checkInsData = [
   {
@@ -315,7 +270,7 @@ const SuperAdminDashboard = () => {
         initial={{ opacity: 0, y: 15 }} 
         animate={{ opacity: 1, y: 0 }} 
         transition={{ duration: 0.4 }}
-        className="max-w-[1600px] mx-auto pt-5 pb-10"
+        className="w-full pt-5 pb-10"
       >
         <header className="flex items-center justify-between mb-6 pb-5 border-b border-[#e8ede4] flex-wrap gap-3">
           <div>

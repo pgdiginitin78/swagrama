@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, IconButton } from '@mui/material';
 import { VisibilityOutlined as ViewIcon, EditOutlined as EditIcon, DeleteOutline as DeleteIcon, ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { StatusBadge, OriginBadge } from './BookingComponents';
+import CommonButton from '../../../common/button/CommonButton';
 
 const OPD_DATA = Array.from({ length: 15 }, (_, i) => ({
   id: `#OPD-10${i + 1}`,
@@ -23,11 +24,13 @@ const OPDBookings = ({ onSelect, selectedId }) => {
       <div className="flex justify-between items-center mb-4 px-4 pt-4 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">OPD Bookings</h1>
-          <p className="text-gray-400 text-[10px] font-normal uppercase mt-1">Manage outpatient department consultations.</p>
+          <p className="text-gray-400 text-[10px] font-normal  mt-1">Manage outpatient department consultations.</p>
         </div>
-        <button className="bg-[#003d33] text-white px-4 py-1.5 rounded-full flex items-center gap-2 text-[10.5px] font-bold shadow-sm transition-all active:scale-95">
-          <span className="text-[14px] leading-none">+</span> New OPD Booking
-        </button>
+        <CommonButton className="bg-[#003d33] text-white text-[10.5px] shadow-sm transition-all active:scale-95"
+        
+        label="+ New OPD Booking"
+        />
+      
       </div>
 
       <div className="flex-1 overflow-auto bg-white border-y border-gray-100 [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">

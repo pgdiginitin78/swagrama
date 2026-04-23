@@ -27,6 +27,9 @@ const CONTENT_MAP = {
   bookings: <BookingsDashboard />,
   inventory: <PlaceholderPage title="Inventory" />,
   masters: <PlaceholderPage title="Masters" />,
+  "patient-master": <PlaceholderPage title="Patient Master" />,
+  "doctor-master": <PlaceholderPage title="Doctor Master" />,
+  "service-master": <PlaceholderPage title="Service Master" />,
   settings: <PlaceholderPage title="Settings" />,
 };
 

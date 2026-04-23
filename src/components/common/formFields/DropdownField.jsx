@@ -88,6 +88,20 @@ const DropdownField = ({
     menuList: (provided) => ({
       ...provided,
       zIndex: 9999,
+      maxHeight: maxMenuHeight || 180,
+      "&::-webkit-scrollbar": {
+        width: "5px",
+      },
+      "&::-webkit-scrollbar-track": {
+        background: "transparent",
+      },
+      "&::-webkit-scrollbar-thumb": {
+        background: "rgba(0,0,0,0.1)",
+        borderRadius: "10px",
+      },
+      "&::-webkit-scrollbar-thumb:hover": {
+        background: "rgba(0,0,0,0.2)",
+      },
     }),
     menuPortal: (provided) => ({ ...provided, zIndex: 9999 }),
     control: (Colstyles, state) => ({
@@ -278,7 +292,7 @@ const DropdownField = ({
               onKeyDown={onKeyDown}
               isMulti={isMulti}
               closeMenuOnSelect={isMulti ? false : true}
-              maxMenuHeight={maxMenuHeight}
+              maxMenuHeight={maxMenuHeight || 180}
               options={dataArray}
               isClearable={isClearable}
               clearValue={true}

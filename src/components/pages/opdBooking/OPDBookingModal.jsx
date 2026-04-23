@@ -588,9 +588,10 @@ export default function OPDBookingModal({
                                 <DropdownField
                                   control={control}
                                   name="doctorFid"
-                                  placeholder="Select Doctor *"
+                                  placeholder="Doctor Name*"
                                   dataArray={doctorOptions}
                                   error={errors.doctorFid}
+                                  menuPlacement={"top"}
                                 />
                               </div>
                             </div>

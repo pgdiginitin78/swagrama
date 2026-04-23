@@ -10,7 +10,7 @@ import {
   Divider,
   FormControlLabel,
   Switch,
-  Typography
+  Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -93,10 +93,10 @@ const patientSchema = yup.object().shape({
       return Number(value) <= 120;
     }),
 
-emailId: yup
-  .string()
-  .required("EmailId is required")
-  .email("Enter a valid email address"),
+  emailId: yup
+    .string()
+    .required("EmailId is required")
+    .email("Enter a valid email address"),
 
   relation: yup.string().max(50, "Maximum 50 characters"),
 
@@ -105,7 +105,7 @@ emailId: yup
   pinCode: yup
     .string()
     .test("pincode-format", "Enter a valid 6-digit pin code", (value) => {
-      if (!value) return true; 
+      if (!value) return true;
       return /^[1-9][0-9]{5}$/.test(value);
     }),
 });
@@ -193,7 +193,11 @@ function SectionHeader({ icon: Icon, label, children }) {
   );
 }
 
-export default function AddPatientModal({ open, handleClose }) {
+export default function AddPatientModal({
+  open,
+  handleClose,
+  title = "Patient Registration",
+}) {
   const { user } = useAuth();
   const [ipAddress, setIpAddress] = useState(null);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
@@ -227,13 +231,12 @@ export default function AddPatientModal({ open, handleClose }) {
       relation: "",
       address: "",
       pinCode: "",
-      city:""
+      city: "",
     },
   });
 
   const watchedDOB = useWatch({ control, name: "dob" });
   const watchedAge = useWatch({ control, name: "age" });
-  
 
   const onSubmit = (data) => {
     if (!user) {
@@ -253,14 +256,11 @@ export default function AddPatientModal({ open, handleClose }) {
       macIp: ipAddress ?? "",
       macId: "",
       bloodGroup: data.bloodGroup?.value ?? "",
-      city:data.city
+      city: data.city,
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
-
-
-  
 
   const handleUserRegister = async () => {
     try {
@@ -269,7 +269,7 @@ export default function AddPatientModal({ open, handleClose }) {
       const response = await AddPatient(finalSaveObj);
       const apiData = response?.data?.data || response?.data;
 
-      if (response?.status === 200 && (apiData?.userId || apiData?.success)) {
+      if (response?.statusCode === 201 && (apiData?.userId || apiData?.success)) {
         successAlert(apiData?.message || "Patient registered successfully!");
         handleClose();
         reset();
@@ -277,7 +277,8 @@ export default function AddPatientModal({ open, handleClose }) {
         errorAlert(apiData?.message || "Registration failed!");
       }
     } catch (error) {
-      const errorMessage = error?.response?.data?.message || error?.message || "An error occurred";
+      const errorMessage =
+        error?.response?.data?.message || error?.message || "An error occurred";
       errorAlert(errorMessage);
     } finally {
       setIsLoading(false);
@@ -354,7 +355,7 @@ export default function AddPatientModal({ open, handleClose }) {
         .then((res) => res.json())
         .then((data) => setIpAddress(data?.ip))
         .catch((err) => console.error("IP fetch error:", err));
-    } 
+    }
   }, [user, setValue]);
 
   useEffect(() => {
@@ -443,12 +444,12 @@ export default function AddPatientModal({ open, handleClose }) {
                       lineHeight: 1.2,
                     }}
                   >
-                    Patient Registration
+                    {title || "Patient Registration"}
                   </Typography>
                   <Typography
                     sx={{ fontSize: "0.75rem", opacity: 0.8, fontWeight: 400 }}
                   >
-                    Fill in the patient details below
+                    Fill in the details below
                   </Typography>
                 </Box>
               </Box>

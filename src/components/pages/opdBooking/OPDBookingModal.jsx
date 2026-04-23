@@ -245,7 +245,7 @@ export default function OPDBookingModal({
           data.clientTxnId,
           async () => {
             const res = await bookAppointment(finalSaveObj, userId);
-            if (res.data.status === 200) {
+            if (res.data.statusCode === 201) {
               successAlert(res.data.message);
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
@@ -508,7 +508,13 @@ export default function OPDBookingModal({
                                 <CommonButton
                                   label="+ Add Patient"
                                   className="border border-emerald-500 hover:bg-emerald-50 text-emerald-500"
-                                  onClick={() => setOpenAddPatientModal(true)}
+                                  onClick={() => {
+                                    if (user !== null) {
+                                      setOpenAddPatientModal(true);
+                                    } else {
+                                      errorAlert("Please login first");
+                                    }
+                                  }}
                                 />
                               </div>
                               <DropdownField

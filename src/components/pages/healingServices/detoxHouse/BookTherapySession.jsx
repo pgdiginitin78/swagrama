@@ -22,6 +22,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useAuth } from "../../../../context/AuthContext";
 import { getPatientDataByMobileNo } from "../../../../services/bookAppointment/BookAppointmentServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
@@ -77,11 +79,28 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
+
+  const schema = yup.object().shape({
+    selectGuest: yup
+      .object()
+      .shape({
+        id: yup.mixed().required(),
+        label: yup.string().required(),
+      })
+      .nullable()
+      .required("Please select a guest"),
+  });
+
   const {
     control,
     watch,
+    handleSubmit,
     formState: { errors },
-  } = useForm({ defaultValues: { selectGuest: null } });
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: { selectGuest: null },
+    mode: "onChange",
+  });
   const selectedGuest = watch("selectGuest");
 
   useEffect(() => {
@@ -286,6 +305,8 @@ export default function BookTherapySession({ open, onClose, item }) {
       const bookingRes = await BookDetoxTherapy(finalSaveObj);
       const bookingData = bookingRes?.data;
 
+      console.log("bookingData", bookingData);
+
       if (bookingData?.message) {
         const bookingId = bookingData?.bookingId || bookingData?.data;
 
@@ -330,8 +351,10 @@ export default function BookTherapySession({ open, onClose, item }) {
         errorAlert(bookingData?.message || "Booking failed");
       }
     } catch (error) {
+      console.log("bookingDataError",error);
+      
       setIsLoading(false);
-      errorAlert("An unexpected error occurred during the booking process.");
+      errorAlert("This Slot is already booked. Please select another slot.");
     }
   };
 
@@ -831,6 +854,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       {openAddPatient && (
         <AddPatientModal
           open={openAddPatient}
+          title="Guest Registration"
           handleClose={() => {
             setOpenAddPatient(false);
             handleGetPatientData();

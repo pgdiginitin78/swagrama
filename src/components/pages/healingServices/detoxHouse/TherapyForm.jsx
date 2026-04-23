@@ -193,7 +193,7 @@ const TherapyForm = ({ open, handleClose }) => {
     trigger,
     formState: { errors },
   } = useForm({
-    // resolver: yupResolver(schema),
+    resolver: yupResolver(schema),
     defaultValues: {
       diseaseAllotted: "",
       serviceName: "",

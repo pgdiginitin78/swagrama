@@ -1,16 +1,11 @@
 import { Box, Modal } from "@mui/material";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowLeft,
-  Calendar,
-  Heart,
-  Pencil,
-  Phone,
-  User
-} from "lucide-react";
+import { ArrowLeft, Calendar, Heart, Pencil, Phone, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { getPatientDataByMobileNo } from "../../services/bookAppointment/BookAppointmentServices";
 import { updatePatient } from "../../services/login/LoginServices";
 import ConfirmationModal from "../common/ConfirmationModal";
@@ -22,6 +17,7 @@ import DropdownField from "../common/formFields/DropdownField";
 import InputArea from "../common/formFields/InputArea";
 import InputField from "../common/formFields/InputField";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
+import AddPatientModal from "../pages/opdBooking/AddPatientModal";
 
 const modalStyle = {
   position: "absolute",
@@ -58,6 +54,29 @@ const itemVariants = {
   },
 };
 
+const validationSchema = yup.object().shape({
+  firstName: yup.string().required("First name is required"),
+  lastName: yup.string().required("Last name is required"),
+  mobileNo: yup
+    .string()
+    .matches(/^[0-9]{10}$/, "Mobile number must be 10 digits")
+    .required("Mobile number is required"),
+  dob: yup.date().nullable().required("Date of birth is required"),
+  relation: yup
+    .object()
+    .shape({
+      value: yup.string().required(),
+      label: yup.string().required(),
+    })
+    .nullable()
+    .required("Relationship is required"),
+  pinCode: yup
+    .string()
+    .matches(/^[0-9]{6}$/, "Pin code must be 6 digits")
+    .required("Pin code is required"),
+  address: yup.string().required("Address is required"),
+});
+
 export default function ManageMembers({ open, onClose, user, setOpen }) {
   const [memberList, setMemberList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -66,6 +85,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [ipAddress, setIpAddress] = useState(null);
+  const [openAddPatient, setOpenAddPatient] = useState(false);
 
   const { setIsLoading } = useLoader();
 
@@ -80,11 +100,13 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       firstName: "",
       lastName: "",
       mobileNo: "",
-      dob: "",
+      dob: null,
       relation: null,
       address: "",
       pinCode: "",
     },
+    resolver: yupResolver(validationSchema),
+    mode: "onChange",
   });
 
   const handleEdit = (member) => {
@@ -97,32 +119,18 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
     setValue(
       "relation",
       relationOptions.find(
-        (opt) => opt.value.toLowerCase() === member.relation.toLowerCase()
-      ) || null
+        (opt) => opt.value.toLowerCase() === member.relation.toLowerCase(),
+      ) || null,
     );
     setValue("address", member.address);
     setView("form");
   };
 
   const handleAddNew = () => {
-    setEditingId(null);
-    reset({
-      firstName: "",
-      lastName: "",
-      mobileNo: "",
-      dob: null,
-      relation: null,
-      address: "",
-      pinCode: "",
-    });
-    setView("form");
+    setOpenAddPatient(true);
   };
 
   const onSubmit = (data) => {
-    if (!data.relation) {
-      errorAlert("Please select relationship");
-      return;
-    }
     const payload = {
       userId: editingId,
       firstName: data.firstName,
@@ -135,7 +143,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       Relation: data.relation?.value || "",
     };
     setFinalSaveObj(payload);
-    setOpenConfirmationModal(open);
+    setOpenConfirmationModal(true);
   };
 
   const handleUpdatePatient = () => {
@@ -168,8 +176,8 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       .catch((err) => console.error("IP fetch error:", err));
   }, []);
 
-  useEffect(() => {
-    if (user?.mobileNo && open) {
+  const fetchMembers = () => {
+    if (user?.mobileNo) {
       setLoading(true);
       getPatientDataByMobileNo(user?.mobileNo, 5)
         .then((res) => {
@@ -185,6 +193,12 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
           setLoading(false);
         });
     }
+  };
+
+  useEffect(() => {
+    if (open) {
+      fetchMembers();
+    }
   }, [user, open]);
 
   return (
@@ -197,7 +211,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       >
         <Box
           sx={modalStyle}
-          className="w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] md:w-[720px] lg:w-[950px] focus:outline-none h-full max-h-[90vh]"
+          className="w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] md:w-[720px] lg:w-[950px] focus:outline-none h-full max-h-[85vh]"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 24 }}
@@ -224,12 +238,13 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                     {view === "list"
                       ? "Manage Members"
                       : editingId
-                      ? "Edit Member"
-                      : "Add New Member"}
+                        ? "Edit Member"
+                        : "Add New Member"}
                   </h2>
                   {view === "list" && memberList.length > 0 && (
                     <p className="text-green-100 text-[10px] sm:text-xs font-medium mt-0.5">
-                      {memberList.length} member{memberList.length !== 1 ? "s" : ""} linked
+                      {memberList.length} member
+                      {memberList.length !== 1 ? "s" : ""} linked
                     </p>
                   )}
                 </div>
@@ -237,17 +252,15 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
 
               <div className="md:flex items-center gap-2 shrink-0 flex justify-end">
                 {view === "list" && (
-                  <button
+                  <CommonButton
+                    type="button"
                     onClick={handleAddNew}
-                    className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors mr-5"
-                  >
-                    <span className="text-base leading-none">+</span>
-                    <span className="hidden sm:inline">Add Member</span>
-                    <span className="sm:hidden">Add</span>
-                  </button>
+                    label={"+ Add Member"}
+                    className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 text-white text-xs font-semibold px-3 py-1.5  transition-colors mr-5"
+                  />
                 )}
-           
-                <CancelButtonModal   onClick={onClose}/>
+
+                <CancelButtonModal onClick={onClose} />
               </div>
             </div>
 
@@ -300,12 +313,22 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
 
                                 <div className="flex flex-col gap-1 mt-1.5">
                                   <div className="flex items-center text-[11px] sm:text-xs text-gray-500 gap-1.5 font-medium">
-                                    <Phone size={11} className="text-green-500 shrink-0" />
-                                    <span className="truncate">{member.mobileNo}</span>
+                                    <Phone
+                                      size={11}
+                                      className="text-green-500 shrink-0"
+                                    />
+                                    <span className="truncate">
+                                      {member.mobileNo}
+                                    </span>
                                   </div>
                                   <div className="flex items-center text-[11px] sm:text-xs text-gray-500 gap-1.5 font-medium">
-                                    <Calendar size={11} className="text-blue-400 shrink-0" />
-                                    <span>{member.dob || "DOB not available"}</span>
+                                    <Calendar
+                                      size={11}
+                                      className="text-blue-400 shrink-0"
+                                    />
+                                    <span>
+                                      {member.dob || "DOB not available"}
+                                    </span>
                                   </div>
                                 </div>
                               </div>
@@ -329,7 +352,8 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                           Build Your Family Circle
                         </h3>
                         <p className="text-gray-500 text-sm max-w-xs">
-                          Link family members to centralize health records and manage appointments seamlessly.
+                          Link family members to centralize health records and
+                          manage appointments seamlessly.
                         </p>
                         <button
                           onClick={handleAddNew}
@@ -349,7 +373,10 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                     transition={{ duration: 0.2 }}
                     className="p-3 sm:p-5 lg:p-8"
                   >
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
+                    <form
+                      onSubmit={handleSubmit(onSubmit)}
+                      className="space-y-4 sm:space-y-6"
+                    >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-x-6 sm:gap-y-5">
                         <InputField
                           name="firstName"
@@ -428,6 +455,15 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
         confirmationLabel="Confirm Registration"
         confirmationMsg="Are you sure you want to update this member?"
         confirmationButtonMsg="Confirm"
+      />
+
+      <AddPatientModal
+        open={openAddPatient}
+        title="Member Registration"
+        handleClose={() => {
+          setOpenAddPatient(false);
+          fetchMembers();
+        }}
       />
     </>
   );

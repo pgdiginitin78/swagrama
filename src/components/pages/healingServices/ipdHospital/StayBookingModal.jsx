@@ -41,6 +41,8 @@ import CommonButton from "../../../common/button/CommonButton";
 import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { Bed as BedIcon } from "@mui/icons-material";
 import { Switch } from "@mui/material";
 import DropdownField from "../../../common/formFields/DropdownField";
@@ -114,6 +116,24 @@ function StayBookingModal({
   const outTimeRef = useRef(null);
   const guestInputRef = useRef(null);
 
+const schema = yup.object().shape({
+  fullName: yup.string().required("Full name is required"),
+  email: yup.string().required("Email is required").email("Invalid email format"),
+  mobile: yup
+    .string()
+    .required("Mobile number is required")
+    .matches(/^[0-9]{10}$/, "Must be 10 digits"),
+  city: yup.string().required("City is required"),
+  patientFid: yup
+    .object()
+    .shape({
+      id: yup.mixed().required(),
+      label: yup.string().required(),
+    })
+    .nullable()
+    .required("Patient selection is required"),
+});
+
   const { control, watch, setValue, reset } = useForm({
     defaultValues: {
       fullName: "",
@@ -128,6 +148,7 @@ function StayBookingModal({
         value: "Organic Full Board (Included)",
       },
     },
+    resolver: yupResolver(schema),
     mode: "onChange",
   });
   const patientFid = watch("patientFid");
@@ -1547,6 +1568,7 @@ function StayBookingModal({
       {openAddPatient && (
         <AddPatientModal
           open={openAddPatient}
+          title="Guest Registration"
           handleClose={() => {
             setOpenAddPatient(false);
             handleGetPatientData();

@@ -27,13 +27,17 @@ import {
   Stepper,
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
 import TherapyIcon from "../../../assets/TherapyIcon.svg";
 import DoctorIcon from "../../../assets/doctorIcon.svg";
 import MembershipIcon from "../../../assets/membershipIcon.svg";
 import MembershipOutlineIcon from "../../../assets/membershipOutlineIcon.svg";
-
+import {
+  GetUpcomingActivities,
+  GetUserDashboardCounts,
+} from "../../../services/userDashboardServices/UserDashboardServices";
+import BedRoomIcon from "../../assets/bedRoomIcon.svg";
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
@@ -41,6 +45,8 @@ const UserDashboard = () => {
   const [isMobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedTier, setSelectedTier] = useState(null);
+  const [userDashboardCount, setUserDashboardCount] = useState(null);
+  const [upcomingActivities, setUpcomingActivities] = useState([]);
 
   const mockData = useMemo(
     () => ({
@@ -204,7 +210,9 @@ const UserDashboard = () => {
     {
       id: "membership",
       label: "Membership",
-      icon: <img src={MembershipOutlineIcon} alt="Membership" className="w-6 h-6" />,
+      icon: (
+        <img src={MembershipOutlineIcon} alt="Membership" className="w-6 h-6" />
+      ),
     },
   ];
 
@@ -279,6 +287,27 @@ const UserDashboard = () => {
     </div>
   );
 
+  const getActivityDisplayData = (data) => {
+    if (!data) return null;
+    return {
+      id: data.id || "N/A",
+      name: data.title || data.name,
+      expert: data.type === "Stay" ? "Wellness Stay" : data.expert || data.type,
+      date: data.date?.includes("T")
+        ? new Date(data.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })
+        : data.date,
+      time: data.startTime || data.time || data.total,
+      type: data.type?.toLowerCase(),
+      status: data.status,
+      prep: data.prep,
+      step: data.step,
+    };
+  };
+
   const StatusBadge = ({ status }) => {
     const isActive = status === "Upcoming" || status === "In Transit";
     return (
@@ -297,64 +326,86 @@ const UserDashboard = () => {
     );
   };
 
-  const ActivityCard = ({ data }) => (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -3, boxShadow: "0 12px 40px rgba(0,0,0,0.08)" }}
-      onClick={() => setSelectedItem(data)}
-      className="flex flex-col justify-between p-4 bg-white border border-gray-100 rounded-xl cursor-pointer transition-all duration-200 min-w-0"
-    >
-      <div className="flex items-start justify-between gap-2 mb-3">
-        <div
-          className={`p-2.5 rounded-lg shrink-0 ${
-            data.type === "therapy"
-              ? "bg-emerald-50 text-emerald-600"
-              : data.type === "order"
-                ? "bg-amber-50 text-amber-600"
-                : "bg-blue-50 text-blue-600"
-          }`}
-        >
-          {data.type === "therapy" ? (
-            <img src={TherapyIcon} alt="Therapy" className="w-6 h-6" />
-          ) : data.type === "order" ? (
-            <ShippingIcon sx={{ fontSize: 16 }} />
-          ) : (
-            <img src={DoctorIcon} alt="Shipping" className="w-6 h-6" />
-          )}
+  const ActivityCard = ({ data }) => {
+    const displayData = getActivityDisplayData(data);
+    console.log("displayData", displayData);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        whileHover={{ y: -3, boxShadow: "0 12px 40px rgba(0,0,0,0.08)" }}
+        onClick={() => setSelectedItem(data)}
+        className="flex flex-col justify-between p-4 bg-white border border-gray-100 rounded-xl cursor-pointer transition-all duration-200 min-w-0"
+      >
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div
+            className={`p-2.5 rounded-lg shrink-0 ${
+              displayData.type === "therapy"
+                ? "bg-emerald-50 text-emerald-600"
+                : displayData.type === "order"
+                  ? "bg-amber-50 text-amber-600"
+                  : displayData.type === "stay"
+                    ? "bg-purple-50 text-purple-600"
+                    : "bg-blue-50 text-blue-600"
+            }`}
+          >
+            {displayData.type === "therapy" ? (
+              <img src={TherapyIcon} alt="Therapy" className="w-6 h-6" />
+            ) : displayData.type === "order" ? (
+              <ShippingIcon sx={{ fontSize: 16 }} />
+            ) : displayData.type === "stay" ? (
+              // <BookingIcon sx={{ fontSize: 16 }} />
+              <img src={BedRoomIcon} alt="" className="w-6 h-6" />
+            ) : (
+              <img src={DoctorIcon} alt="Expert" className="w-6 h-6" />
+            )}
+          </div>
+          <StatusBadge status={displayData.status} />
         </div>
-        <StatusBadge status={data.status} />
-      </div>
 
-      <div className="mb-3 flex-1 min-w-0">
-        <p className="text-sm font-bold text-gray-900 leading-tight truncate">
-          {data.name}
-        </p>
-        <p className="text-[11px] text-gray-400 font-medium mt-0.5 truncate">
-          {data.expert}
-        </p>
-      </div>
+        <div className="mb-3 flex-1 min-w-0">
+          <p className="text-sm font-bold text-gray-900 leading-tight truncate">
+            {displayData.name}
+          </p>
+          <p className="text-[11px] text-gray-400 font-medium mt-0.5 truncate">
+            {displayData.expert}
+          </p>
+        </div>
 
-      <div className="flex items-center justify-between pt-3 border-t border-gray-50 gap-2">
-        <div className="flex items-center gap-1.5 text-gray-500 min-w-0">
-          <TimeIcon sx={{ fontSize: 12, color: "#4a7c2c", flexShrink: 0 }} />
-          <span className="text-[10px] font-semibold truncate">
-            {data.date}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-50 gap-2">
+          <div className="flex items-center gap-1.5 text-gray-500 min-w-0">
+            <TimeIcon sx={{ fontSize: 12, color: "#4a7c2c", flexShrink: 0 }} />
+            <span className="text-[10px] font-semibold truncate">
+              {displayData.date}
+            </span>
+          </div>
+          <span className="text-[10px] font-bold text-gray-400 shrink-0">
+            {displayData.time}
           </span>
         </div>
-        <span className="text-[10px] font-bold text-gray-400 shrink-0">
-          {data.time || data.total}
-        </span>
-      </div>
-    </motion.div>
-  );
+      </motion.div>
+    );
+  };
 
   const StatsBar = () => (
     <div className="grid grid-cols-3 gap-2 sm:gap-3">
       {[
-        { label: "Upcoming", value: "3", sub: "Sessions this month" },
-        { label: "Completed", value: "12", sub: "Lifetime visits" },
-        { label: "Orders", value: "2", sub: "Active shipments" },
+        {
+          label: "Upcoming",
+          value: userDashboardCount?.upcomingCount,
+          sub: "Sessions this month",
+        },
+        {
+          label: "Completed",
+          value: userDashboardCount?.completedCount,
+          sub: "Lifetime visits",
+        },
+        {
+          label: "Orders",
+          value: userDashboardCount?.orderCount || 0,
+          sub: "Active shipments",
+        },
       ].map((s, i) => (
         <div
           key={i}
@@ -418,10 +469,20 @@ const UserDashboard = () => {
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <ActivityCard data={mockData.appointments[0]} />
-            <ActivityCard data={mockData.therapies[0]} />
-            <ActivityCard data={mockData.orders[0]} />
-            <ActivityCard data={mockData.therapies[1]} />
+            {upcomingActivities && upcomingActivities.length > 0 ? (
+              upcomingActivities
+                .slice(0, 4)
+                .map((activity, idx) => (
+                  <ActivityCard key={activity.id || idx} data={activity} />
+                ))
+            ) : (
+              <>
+                <ActivityCard data={mockData.appointments[0]} />
+                <ActivityCard data={mockData.therapies[0]} />
+                <ActivityCard data={mockData.orders[0]} />
+                <ActivityCard data={mockData.therapies[1]} />
+              </>
+            )}
           </div>
         </div>
 
@@ -605,10 +666,30 @@ const UserDashboard = () => {
     </motion.div>
   );
 
+  useEffect(() => {
+    if (user !== null) {
+      GetUserDashboardCounts(user?.userId)
+        .then((res) => {
+          if (res.data.statusCode === 200) {
+            setUserDashboardCount(res.data.data);
+          }
+        })
+        .catch((err) => err);
+      GetUpcomingActivities(user?.userId)
+        .then((res) => {
+          if (res.data.statusCode === 200) {
+            setUpcomingActivities(res.data.data);
+          }
+        })
+        .catch((err) => err);
+    }
+  }, [user]);
+  console.log("upcomingActivities", upcomingActivities);
+
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 15 }} 
-      animate={{ opacity: 1, y: 0 }} 
+    <motion.div
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
       className="flex min-h-screen bg-[#f8f8f6]"
     >
@@ -717,119 +798,131 @@ const UserDashboard = () => {
       >
         {selectedItem && (
           <div className="flex flex-col h-full bg-white">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-              <p className="text-sm font-black text-gray-900">
-                Activity Details
-              </p>
-              <IconButton onClick={() => setSelectedItem(null)} size="small">
-                <CloseIcon sx={{ fontSize: 18 }} />
-              </IconButton>
-            </div>
+            {(() => {
+              const displayData = getActivityDisplayData(selectedItem);
+              return (
+                <>
+                  <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
+                    <p className="text-sm font-black text-gray-900">
+                      Activity Details
+                    </p>
+                    <IconButton
+                      onClick={() => setSelectedItem(null)}
+                      size="small"
+                    >
+                      <CloseIcon sx={{ fontSize: 18 }} />
+                    </IconButton>
+                  </div>
 
-            <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4">
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <div
-                  className={`p-3 rounded-xl shrink-0 ${
-                    selectedItem.type === "therapy"
-                      ? "bg-emerald-100 text-emerald-600"
-                      : selectedItem.type === "order"
-                        ? "bg-amber-100 text-amber-600"
-                        : "bg-blue-100 text-blue-600"
-                  }`}
-                >
-                  {selectedItem.type === "therapy" ? (
-                    <SpaIcon />
-                  ) : selectedItem.type === "order" ? (
-                    <ShippingIcon />
-                  ) : (
-                    <BookingIcon />
-                  )}
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-black text-gray-900 truncate">
-                    {selectedItem.name}
-                  </p>
-                  <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wide">
-                    {selectedItem.id}
-                  </p>
-                </div>
-              </div>
+                  <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4">
+                    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                      <div
+                        className={`p-3 rounded-xl shrink-0 ${
+                          displayData.type === "therapy"
+                            ? "bg-emerald-100 text-emerald-600"
+                            : displayData.type === "order"
+                              ? "bg-amber-100 text-amber-600"
+                              : displayData.type === "stay"
+                                ? "bg-purple-100 text-purple-600"
+                                : "bg-blue-100 text-blue-600"
+                        }`}
+                      >
+                        {displayData.type === "Therapy" ? (
+                          <SpaIcon />
+                        ) : displayData.type === "Order" ? (
+                          <ShippingIcon />
+                        ) : displayData.type === "Stay" ? (
+                          <BookingIcon />
+                        ) : (
+                          <BookingIcon />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-black text-gray-900 truncate">
+                          {displayData.name}
+                        </p>
+                        <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wide">
+                          {displayData.id}
+                        </p>
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                    Date
-                  </p>
-                  <p className="text-xs font-bold text-gray-800">
-                    {selectedItem.date}
-                  </p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                    Time / Amount
-                  </p>
-                  <p className="text-xs font-bold text-gray-800">
-                    {selectedItem.time || selectedItem.total}
-                  </p>
-                </div>
-              </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-4 bg-gray-50 rounded-xl">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                          Date
+                        </p>
+                        <p className="text-xs font-bold text-gray-800">
+                          {displayData.date}
+                        </p>
+                      </div>
+                      <div className="p-4 bg-gray-50 rounded-xl">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                          Time / Amount
+                        </p>
+                        <p className="text-xs font-bold text-gray-800">
+                          {displayData.time}
+                        </p>
+                      </div>
+                    </div>
 
-              <div className="p-4 bg-gray-50 rounded-xl">
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                  Status
-                </p>
-                <StatusBadge status={selectedItem.status} />
-              </div>
+                    <div className="p-4 bg-gray-50 rounded-xl">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                        Status
+                      </p>
+                      <StatusBadge status={displayData.status} />
+                    </div>
 
-              {selectedItem.expert && (
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
-                    Details
-                  </p>
-                  <p className="text-xs font-semibold text-gray-700">
-                    {selectedItem.expert}
-                  </p>
-                </div>
-              )}
+                    <div className="p-4 bg-gray-50 rounded-xl">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                        Details
+                      </p>
+                      <p className="text-xs font-semibold text-gray-700">
+                        {displayData.expert}
+                      </p>
+                    </div>
 
-              {selectedItem.prep && (
-                <div className="p-4 bg-[#f0fdf4] border border-[#dcfce7] rounded-xl">
-                  <p className="text-[9px] font-black text-[#4a7c2c] uppercase tracking-widest mb-2">
-                    Preparation Note
-                  </p>
-                  <p className="text-xs font-medium text-green-900 leading-relaxed">
-                    "{selectedItem.prep}"
-                  </p>
-                </div>
-              )}
-
-              {selectedItem.type === "order" && (
-                <div className="p-4 bg-gray-50 rounded-xl">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">
-                    Shipping Progress
-                  </p>
-                  <Stepper activeStep={selectedItem.step} alternativeLabel>
-                    {["Packed", "Picked", "In Transit", "Delivered"].map(
-                      (label) => (
-                        <Step key={label}>
-                          <StepLabel>
-                            <span className="text-[9px] font-black uppercase text-gray-500">
-                              {label}
-                            </span>
-                          </StepLabel>
-                        </Step>
-                      ),
+                    {displayData.prep && (
+                      <div className="p-4 bg-[#f0fdf4] border border-[#dcfce7] rounded-xl">
+                        <p className="text-[9px] font-black text-[#4a7c2c] uppercase tracking-widest mb-2">
+                          Preparation Note
+                        </p>
+                        <p className="text-xs font-medium text-green-900 leading-relaxed">
+                          "{displayData.prep}"
+                        </p>
+                      </div>
                     )}
-                  </Stepper>
-                </div>
-              )}
-            </div>
 
-            <div className="p-4 sm:p-5 border-t border-gray-100 shrink-0">
-              <button className="w-full py-3 border-2 border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
-                Need Help?
-              </button>
-            </div>
+                    {displayData.type === "order" && (
+                      <div className="p-4 bg-gray-50 rounded-xl">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">
+                          Shipping Progress
+                        </p>
+                        <Stepper activeStep={displayData.step} alternativeLabel>
+                          {["Packed", "Picked", "In Transit", "Delivered"].map(
+                            (label) => (
+                              <Step key={label}>
+                                <StepLabel>
+                                  <span className="text-[9px] font-black uppercase text-gray-500">
+                                    {label}
+                                  </span>
+                                </StepLabel>
+                              </Step>
+                            ),
+                          )}
+                        </Stepper>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-4 sm:p-5 border-t border-gray-100 shrink-0">
+                    <button className="w-full py-3 border-2 border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
+                      Need Help?
+                    </button>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
       </Drawer>

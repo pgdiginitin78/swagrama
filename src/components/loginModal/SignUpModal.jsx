@@ -118,6 +118,21 @@ const signupValidationSchema = yup.object().shape({
     .oneOf([true], "You must accept the terms and conditions"),
 });
 
+const calculateAgeFromDOB = (dob) => {
+  if (!dob || isNaN(new Date(dob))) return "";
+  const birthDate = new Date(dob);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (
+    monthDiff < 0 ||
+    (monthDiff === 0 && today.getDate() < birthDate.getDate())
+  ) {
+    age--;
+  }
+  return age >= 1 && age <= 120 ? String(age) : "";
+};
+
 const calculateDOBFromAge = (age) => {
   const ageNum = Number(age);
   if (
@@ -157,6 +172,7 @@ export default function SignUpModal({ open, handleClose }) {
     formState: { errors },
     reset,
     setValue,
+    getValues,
     watch,
   } = useForm({
     mode: "onChange",
@@ -164,7 +180,7 @@ export default function SignUpModal({ open, handleClose }) {
     defaultValues: {
       FirstName: "",
       lastName: "",
-      dob: "",
+      dob: null,
       age: "",
       gender: "Male",
       mobileNo: "",
@@ -196,7 +212,10 @@ export default function SignUpModal({ open, handleClose }) {
   const onSubmit = (data) => {
     const formattedData = {
       ...data,
-      dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
+      dob:
+        data.dob && !isNaN(new Date(data.dob).getTime())
+          ? format(new Date(data.dob), "yyyy-MM-dd")
+          : "",
       macIp: ipAddress,
       bloodGroup: data.bloodGroup?.value,
     };
@@ -233,37 +252,39 @@ export default function SignUpModal({ open, handleClose }) {
 
   useEffect(() => {
     if (dob) {
-      const birthDate = new Date(dob);
-      const today = new Date();
-      let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      if (
-        monthDiff < 0 ||
-        (monthDiff === 0 && today.getDate() < birthDate.getDate())
-      ) {
-        calculatedAge--;
-      }
-      if (calculatedAge >= 1 && calculatedAge <= 120) {
-        setValue("age", calculatedAge);
+      const calculatedAge = calculateAgeFromDOB(dob);
+      const currentAge = getValues("age");
+      if (calculatedAge !== "" && calculatedAge !== String(currentAge)) {
+        setValue("age", calculatedAge, { shouldValidate: true });
       }
     }
-  }, [dob, setValue]);
+  }, [dob, setValue, getValues]);
 
   useEffect(() => {
+    if (!watchedAge) {
+      if (getValues("dob") !== null) {
+        setValue("dob", null, { shouldValidate: true });
+      }
+      return;
+    }
+
     const ageNum = Number(watchedAge);
     if (
-      watchedAge &&
       !isNaN(ageNum) &&
       Number.isInteger(ageNum) &&
       ageNum >= 1 &&
       ageNum <= 120
     ) {
-      const calculatedDOB = calculateDOBFromAge(watchedAge);
-      if (calculatedDOB) {
-        setValue("dob", calculatedDOB, { shouldValidate: true });
+      const currentDob = getValues("dob");
+      const currentAgeFromDOB = calculateAgeFromDOB(currentDob);
+      if (currentAgeFromDOB !== String(watchedAge)) {
+        const calculatedDOB = calculateDOBFromAge(watchedAge);
+        if (calculatedDOB) {
+          setValue("dob", calculatedDOB, { shouldValidate: true });
+        }
       }
     }
-  }, [watchedAge, setValue]);
+  }, [watchedAge, setValue, getValues]);
 
   useEffect(() => {
     const fetchPinData = async () => {

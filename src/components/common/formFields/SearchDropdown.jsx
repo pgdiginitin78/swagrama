@@ -62,7 +62,7 @@ const SearchDropdown = ({
       fontStyle: "normal",
       fontSize: "14px",
       lineHeight: "24px",
-      minWidth: ref.current.offsetWidth,
+      minWidth: ref.current ? ref.current.offsetWidth : "auto",
       width: "fit-content",
     }),
     option: (provided, { isDisabled, isFocused, isSelected }) => ({
@@ -193,6 +193,7 @@ const SearchDropdown = ({
               styles={selectStyles}
               menuPlacement={menuPlacement}
               menuShouldBlockScroll={menuShouldBlockScroll}
+              filterOption={() => true}
               components={{
                 DropdownIndicator: () =>
                   searchIcon ? (

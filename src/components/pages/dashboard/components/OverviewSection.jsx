@@ -15,23 +15,10 @@ const OverviewSection = ({
   upcomingActivities,
   upcomingOPD,
   upcomingTherapies,
-  mockData,
   setActiveTab,
   setSelectedItem,
 }) => {
-  const hasUpcomingData = 
-    upcomingActivities?.length > 0 ||
-    upcomingOPD?.length > 0 ||
-    upcomingTherapies?.length > 0;
-
-  const activities = hasUpcomingData 
-    ? [...upcomingActivities, ...upcomingOPD, ...upcomingTherapies]
-    : [
-        mockData.appointments[0],
-        mockData.therapies[0],
-        mockData.orders[0],
-        mockData.therapies[1],
-      ];
+  const activities = [...upcomingActivities, ...upcomingOPD, ...upcomingTherapies];
 
   return (
     <motion.div
@@ -92,13 +79,18 @@ const OverviewSection = ({
             </div>
           </div>
           <p className="text-xl font-black text-gray-900">
-            {mockData.membership.rank}
+            {user?.membershipRank || "Silver Plus"}
           </p>
           <p className="text-[10px] text-gray-400 font-semibold mt-0.5">
-            Since {mockData.membership.since} · Lifetime
+            Since {user?.membershipSince || "Jan 2026"} · Lifetime
           </p>
           <div className="mt-4 space-y-2.5">
-            {mockData.membership.perks.map((p, i) => (
+            {(user?.membershipPerks || [
+              "15% Store Discount",
+              "Unlimited Yoga Access",
+              "Priority OPD Support",
+              "Full Health Record Access",
+            ]).map((p, i) => (
               <div key={i} className="flex items-center gap-2">
                 <CheckCircleIcon
                   sx={{ color: "#4a7c2c", fontSize: 13, flexShrink: 0 }}

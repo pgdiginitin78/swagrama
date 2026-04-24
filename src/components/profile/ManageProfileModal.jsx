@@ -144,7 +144,10 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   const onSubmit = (data) => {
     const formattedData = {
       ...data,
-      dob: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
+      dob:
+        data.dob && !isNaN(new Date(data.dob).getTime())
+          ? format(new Date(data.dob), "yyyy-MM-dd")
+          : "",
       macIp: ipAddress,
       userId: user?.userId,
     };

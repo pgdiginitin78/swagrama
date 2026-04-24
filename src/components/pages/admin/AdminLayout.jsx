@@ -38,7 +38,7 @@ const AdminLayout = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   return (
-    <div className="flex overflow-hidden bg-[#f7f9f5]" style={{ height: "calc(100vh - 4rem)" }}>
+    <div className="flex overflow-hidden bg-[#f7f9f5] h-[calc(100vh-64px)] md:h-[calc(100vh-80px)]">
       {/* Sidebar */}
       <AdminDrawer
         activeMenu={activeMenu}
@@ -75,7 +75,7 @@ const AdminLayout = () => {
         </div>
 
         {/* Page content */}
-        <div className="flex-1 overflow-auto h-full">
+        <div className="flex-1 overflow-hidden h-full">
           {CONTENT_MAP[activeMenu] || <PlaceholderPage title="Page Not Found" />}
         </div>
       </div>

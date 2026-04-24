@@ -24,7 +24,8 @@ import {
   Tabs,
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { MdEco } from "react-icons/md";
 import samaskarasImg from "../../../assets/samaskaras.webp";
 import swagramaFoodImg from "../../../assets/swagramaFoodMenu.webp";
@@ -54,8 +55,7 @@ import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
 import PaletteOutlinedIcon from "@mui/icons-material/PaletteOutlined";
 import SpaIcon from "@mui/icons-material/Spa";
 import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
-import CommonButton from "../../../common/button/CommonButton";
-import EnquiryFormModal from "../../EnquiryFormModal";
+import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
 
 const getServiceIcon = (service) => {
   if (service.includes("Ayurvedic")) return <SpaIcon />;
@@ -69,6 +69,26 @@ const JoinActivities = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(
+    typeof window !== "undefined" ? window.innerHeight : 800
+  );
+
+  useEffect(() => {
+    const handleScroll = () => setHasScrolled(window.scrollY > 80);
+    const handleResize = () => setWindowHeight(window.innerHeight);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const BTN_HEIGHT = 44;
+  const btnYValue = hasScrolled
+    ? windowHeight / 2 - BTN_HEIGHT / 2
+    : windowHeight - 24 - BTN_HEIGHT;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -3127,16 +3147,63 @@ const JoinActivities = () => {
         </AnimatePresence>
       </main>
 
-      <div className="flex justify-center">
-        <CommonButton
-          type="button"
-          label="Book a Visit"
-          onClick={() => {
-            setOpenEnquiryModal(true);
+      {createPortal(
+        <motion.button
+          onClick={() => setOpenEnquiryModal(true)}
+          title="Enquiry Now"
+          animate={{ y: btnYValue }}
+          initial={{ y: windowHeight - 24 - BTN_HEIGHT }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 30,
+            mass: 0.5,
           }}
-          className="bg-ayuMid text-white"
-        />
-      </div>
+          whileHover={{ scale: 1.06, x: -3 }}
+          whileTap={{ scale: 0.95 }}
+          style={{
+            position: "fixed",
+            right: 0,
+            top: 0,
+            zIndex: 9999,
+            background: "linear-gradient(135deg, #15803d 0%, #65a30d 100%)",
+            boxShadow: "-4px 0 20px rgba(21,128,61,0.4)",
+            borderRadius: "12px 0 0 12px",
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            gap: "8px",
+            padding: "12px 16px",
+            cursor: "pointer",
+            border: "none",
+            outline: "none",
+            whiteSpace: "nowrap",
+            willChange: "transform",
+          }}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18" height="18"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="white"
+            strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span
+            style={{
+              color: "white",
+              fontWeight: 700,
+              fontSize: "13px",
+              letterSpacing: "0.04em",
+            }}
+          >
+            Enquiry Now
+          </span>
+        </motion.button>,
+        document.body
+      )}
 
       <motion.footer
         initial={{ opacity: 0 }}
@@ -3145,7 +3212,6 @@ const JoinActivities = () => {
         className="bg-green-800 text-white py-4 mt-4"
       >
         <div className="max-w-6xl mx-auto px-3 text-center">
-         
           <p className="text-xs text-green-200">
             Climate Positive • Ayurvedic • Natural Lifestyle
           </p>
@@ -3153,10 +3219,11 @@ const JoinActivities = () => {
       </motion.footer>
 
       {openEnquiryModal && (
-        <EnquiryFormModal
+        <MembershipRegistrationModal
           open={openEnquiryModal}
           handleClose={() => setOpenEnquiryModal(false)}
-
+          origin="WeddingCeremony"
+          membershipDetails={{ serviceName: "Wedding Ceremony", duration: "" }}
         />
       )}
     </div>

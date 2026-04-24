@@ -270,7 +270,9 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       setLoading(true);
       GetNatureTherapySlotsByUser(
         user.userId,
-        format(new Date(fromDate), "yyyy-MM-dd"),
+        fromDate && !isNaN(new Date(fromDate).getTime())
+          ? format(new Date(fromDate), "yyyy-MM-dd")
+          : "",
       )
         .then((res) => {
           const data = res?.data?.data;
@@ -307,7 +309,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       Mobile: data.mobile,
       City: data.city,
       email: data.email,
-      Appointmentdate: format(new Date(data.fromDate), "yyyy-MM-dd"),
+      Appointmentdate:
+        data.fromDate && !isNaN(new Date(data.fromDate).getTime())
+          ? format(new Date(data.fromDate), "yyyy-MM-dd")
+          : "",
       slotStartTime: selectedTimeSlot?.slotStartTime,
       slotEndTime: selectedTimeSlot?.slotEndTime,
       No_of_person: data.noOfPerson,

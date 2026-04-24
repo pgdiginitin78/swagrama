@@ -763,7 +763,10 @@ function AyurvedaForm({
       patientFid: data.patientFid?.id,
       doctorFid: selectedDoctorId?.userId,
       serviceFid: data.serviceFid?.id ? String(data.serviceFid.id) : "",
-      appoinmentDate: data.appointmentDate ? format(new Date(data.appointmentDate), "yyyy-MM-dd") : "",
+      appoinmentDate:
+        data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
+          ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
+          : "",
       Status: data.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
@@ -785,10 +788,11 @@ function AyurvedaForm({
         amount: previewData?.serviceFid?.charges || 0,
         SloteEndTime: selectedTimeSlot?.slotEndTime,
         SloteStartTime: selectedTimeSlot?.slotStartTime,
-        appointmentDate: format(
-          new Date(previewData.appointmentDate),
-          "yyyy-MM-dd",
-        ),
+        appointmentDate:
+          previewData.appointmentDate &&
+          !isNaN(new Date(previewData.appointmentDate).getTime())
+            ? format(new Date(previewData.appointmentDate), "yyyy-MM-dd")
+            : "",
         userId: userId,
         paymentFor: "OPD",
       };
@@ -1324,7 +1328,7 @@ function AyurvedaForm({
             <div className="space-y-2">
               <div className="md:flex items-center md:justify-between px-1">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  {appointmentDate
+                  {appointmentDate && !isNaN(new Date(appointmentDate).getTime())
                     ? format(new Date(appointmentDate), "MMMM yyyy")
                     : format(new Date(), "MMMM yyyy")}
                 </span>
@@ -1356,6 +1360,7 @@ function AyurvedaForm({
                   return monthDays.map((d, i) => {
                     const isSelected =
                       appointmentDate &&
+                      !isNaN(new Date(appointmentDate).getTime()) &&
                       format(new Date(appointmentDate), "yyyy-MM-dd") ===
                         format(d, "yyyy-MM-dd");
                     return (

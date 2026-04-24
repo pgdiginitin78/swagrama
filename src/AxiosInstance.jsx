@@ -72,7 +72,7 @@ AxiosInstance.interceptors.response.use(
       return Promise.reject(error);
     }
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.statusCode === 401 && !originalRequest._retry) {
       // If a refresh is already in-flight (either from here or from the hook),
       // queue this request and wait for the result
       if (getIsRefreshing()) {
@@ -102,11 +102,13 @@ AxiosInstance.interceptors.response.use(
           refreshToken,
         });
 
+        // Handle both { data: { accessToken } } and { accessToken } response shapes
+        const payload = res.data?.data ?? res.data ?? {};
         const {
           accessToken,
           refreshToken: newRefreshToken,
           expiresIn,
-        } = res.data ?? {};
+        } = payload;
 
         // Guard: server must return an accessToken
         if (!accessToken) {
@@ -122,8 +124,9 @@ AxiosInstance.interceptors.response.use(
 
         if (expiresIn) {
           localStorage.setItem("expiresIn", String(expiresIn));
-          localStorage.setItem("tokenSetTime", String(Date.now()));
         }
+        // Always update tokenSetTime so the proactive hook schedules correctly
+        localStorage.setItem("tokenSetTime", String(Date.now()));
 
         AxiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);
@@ -141,7 +144,7 @@ AxiosInstance.interceptors.response.use(
     }
 
     // Surface non-auth errors to the user
-    if (error.response?.status >= 500) {
+    if (error.response?.statusCode >= 500) {
       toast.error("A server error occurred. Please try again later.");
     } else if (error.message === "Network Error") {
       toast.error("Network error. Please check your internet connection.");

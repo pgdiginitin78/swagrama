@@ -111,7 +111,7 @@ const patientSchema = yup.object().shape({
 });
 
 const formatDateToYYYYMMDD = (date) => {
-  if (!date) return "";
+  if (!date || isNaN(new Date(date).getTime())) return "";
   const d = new Date(date);
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, "0");
@@ -202,8 +202,6 @@ export default function AddPatientModal({
   const [ipAddress, setIpAddress] = useState(null);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
-  const [isUpdatingFromDOB, setIsUpdatingFromDOB] = useState(false);
-  const [isUpdatingFromAge, setIsUpdatingFromAge] = useState(false);
   const [sameAddress, setSameAddress] = useState(true);
   const [userAddressData, setUserAddressData] = useState({
     address: "",
@@ -217,6 +215,7 @@ export default function AddPatientModal({
     control,
     reset,
     setValue,
+    getValues,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(patientSchema),
@@ -233,6 +232,7 @@ export default function AddPatientModal({
       pinCode: "",
       city: "",
     },
+    mode: "onChange",
   });
 
   const watchedDOB = useWatch({ control, name: "dob" });
@@ -269,7 +269,10 @@ export default function AddPatientModal({
       const response = await AddPatient(finalSaveObj);
       const apiData = response?.data?.data || response?.data;
 
-      if (response?.statusCode === 201 && (apiData?.userId || apiData?.success)) {
+      if (
+        response?.statusCode === 201 &&
+        (apiData?.userId || apiData?.success)
+      ) {
         successAlert(apiData?.message || "Patient registered successfully!");
         handleClose();
         reset();
@@ -314,39 +317,45 @@ export default function AddPatientModal({
   };
 
   useEffect(() => {
-    if (isUpdatingFromAge) return;
     const dob = watchedDOB;
     if (dob && !isNaN(new Date(dob))) {
       const calculatedAge = calculateAgeFromDOB(dob);
-      if (calculatedAge !== "") {
-        setIsUpdatingFromDOB(true);
+      const currentAge = getValues("age");
+      // Only update age if it's different from the current age value
+      if (calculatedAge !== "" && calculatedAge !== currentAge) {
         setValue("age", calculatedAge, { shouldValidate: true });
-        setTimeout(() => setIsUpdatingFromDOB(false), 100);
       }
     }
-  }, [watchedDOB, setValue, isUpdatingFromAge]);
+  }, [watchedDOB, setValue, getValues]);
 
   useEffect(() => {
-    if (isUpdatingFromDOB) return;
-
     const age = watchedAge;
-    const ageNum = Number(age);
+    
+    if (age === "" || age === null || age === undefined) {
+      if (getValues("dob") !== null) {
+        setValue("dob", null, { shouldValidate: true });
+      }
+      return;
+    }
 
+    const ageNum = Number(age);
     if (
-      age &&
       !isNaN(ageNum) &&
       Number.isInteger(ageNum) &&
       ageNum >= 0 &&
       ageNum <= 120
     ) {
-      const calculatedDOB = calculateDOBFromAge(age);
-      if (calculatedDOB) {
-        setIsUpdatingFromAge(true);
-        setValue("dob", calculatedDOB, { shouldValidate: true });
-        setTimeout(() => setIsUpdatingFromAge(false), 100);
+      // ONLY update DOB if the current DOB doesn't already correspond to this age.
+      const currentDob = getValues("dob");
+      const currentAgeFromDOB = calculateAgeFromDOB(currentDob);
+      if (currentAgeFromDOB !== age) {
+        const calculatedDOB = calculateDOBFromAge(age);
+        if (calculatedDOB) {
+          setValue("dob", calculatedDOB, { shouldValidate: true });
+        }
       }
     }
-  }, [watchedAge, setValue, isUpdatingFromDOB]);
+  }, [watchedAge, setValue, getValues]);
 
   useEffect(() => {
     if (user !== null) {

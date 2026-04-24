@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Avatar,
@@ -33,6 +33,10 @@ import {
   Email as EmailIcon,
   TouchApp as TouchIcon,
 } from "@mui/icons-material";
+import {
+  GetNext24HoursArrivals,
+  GetUpcomingStays,
+} from "../../../../services/adminDashboard/AdminDashboardServices";
 
 const STAY_DATA = [
   {
@@ -213,8 +217,6 @@ const SummaryCard = ({
     </motion.div>
   );
 };
-
-
 
 const MobileBookingCard = ({ booking, index, onSelect, isSelected }) => (
   <motion.div
@@ -464,6 +466,9 @@ const FilterDrawer = ({ open, onClose, filters, onChange, activeCount }) => {
 
 export default function WellnessStayBookings({ onSelect, selectedId }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [next24HoursArrivals, setNext24HoursArrivals] = useState(null);
+  const [upcomingStays, setUpcomingStays] = useState([]);
+
   const [filters, setFilters] = useState({
     payment: "ALL",
     booking: "ALL",
@@ -485,7 +490,6 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
   const activeFilterCount = Object.values(filters).filter(
     (v) => v !== "ALL",
   ).length;
-  const selectedBooking = STAY_DATA.find((b) => b.id === selectedId) || null;
 
   const filtered = STAY_DATA.filter((b) => {
     if (filters.payment !== "ALL" && b.paymentStatus !== filters.payment)
@@ -497,6 +501,29 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
       return false;
     return true;
   });
+
+
+  console.log("next24HoursArrivals", upcomingStays);
+ 
+  const populateTable = () => {
+    GetUpcomingStays("All")
+      .then((res) => {
+
+        if (res.data.statusCode === 200) {
+          setUpcomingStays(res.data.data);
+        }
+      })
+      .catch((err) => err);
+  };
+
+  useEffect(() => {
+    GetNext24HoursArrivals()
+      .then((res) => {
+        setNext24HoursArrivals(res.data.data);
+      })
+      .catch((err) => err);
+      populateTable()
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col h-full bg-[#fbfbf8] p-3 overflow-hidden">
@@ -560,7 +587,7 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           <SummaryCard
             index={1}
             title="Upcoming Arrivals"
-            value="12"
+            value={next24HoursArrivals?.next24HoursArrivalCount || 0}
             subtitle="Next 24 hours"
             type="dark"
           />
@@ -727,23 +754,21 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
                               </td>
                               <td className="px-2 py-1.5 text-right whitespace-nowrap w-[40px]">
                                 <div className="flex items-center justify-end gap-0.5">
-                                  {[ViewIcon, EditIcon].map(
-                                    (Icon, idx) => (
-                                      <IconButton
-                                        key={idx}
-                                        size="small"
-                                        sx={{ padding: "2px" }}
-                                        onClick={(e) => e.stopPropagation()}
-                                      >
-                                        <Icon
-                                          style={{
-                                            fontSize: 11,
-                                            color: "#6a9060",
-                                          }}
-                                        />
-                                      </IconButton>
-                                    ),
-                                  )}
+                                  {[ViewIcon, EditIcon].map((Icon, idx) => (
+                                    <IconButton
+                                      key={idx}
+                                      size="small"
+                                      sx={{ padding: "2px" }}
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <Icon
+                                        style={{
+                                          fontSize: 11,
+                                          color: "#6a9060",
+                                        }}
+                                      />
+                                    </IconButton>
+                                  ))}
                                 </div>
                               </td>
                             </motion.tr>
@@ -775,9 +800,7 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
                       key={booking.id}
                       booking={booking}
                       index={i}
-                      onSelect={(b) =>
-                        onSelect(selectedId === b.id ? null : b)
-                      }
+                      onSelect={(b) => onSelect(selectedId === b.id ? null : b)}
                       isSelected={selectedId === booking.id}
                     />
                   ))

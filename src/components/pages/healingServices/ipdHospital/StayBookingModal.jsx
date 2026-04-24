@@ -298,9 +298,13 @@ const schema = yup.object().shape({
     setRoomStatus(null);
     checkRoomAvailability(
       selectedService?.roomTypeId,
-      format(new Date(checkIn), "yyyy-MM-dd"),
+      checkIn && !isNaN(new Date(checkIn).getTime())
+        ? format(new Date(checkIn), "yyyy-MM-dd")
+        : "",
       checkInTime,
-      format(new Date(checkOut), "yyyy-MM-dd"),
+      checkOut && !isNaN(new Date(checkOut).getTime())
+        ? format(new Date(checkOut), "yyyy-MM-dd")
+        : "",
       checkOutTime,
     )
       .then((res) => {
@@ -361,7 +365,10 @@ const schema = yup.object().shape({
 
         const tempObj = {
           amount: costs.total,
-          appointmentDate: format(new Date(checkIn), "yyyy-MM-dd"),
+          appointmentDate:
+            checkIn && !isNaN(new Date(checkIn).getTime())
+              ? format(new Date(checkIn), "yyyy-MM-dd")
+              : "",
           SloteStartTime: checkInTime,
           SloteEndTime: checkOutTime,
           userId: userId,

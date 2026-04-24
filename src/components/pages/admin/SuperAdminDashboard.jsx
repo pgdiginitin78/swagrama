@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import {
   AccountBalanceWallet,
@@ -30,6 +30,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { GetUpcomingStays } from "../../../services/adminDashboard/AdminDashboardServices";
 
 const G = "#3d6b1f";
 const G2 = "#5a9e2f";
@@ -165,8 +166,6 @@ const doctorAssignments = [
   },
 ];
 
-
-
 const checkInsData = [
   {
     id: 1,
@@ -237,6 +236,7 @@ const SuperAdminDashboard = () => {
   const [navOpen, setNavOpen] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
+  const [upCommingStays, setUpCommingStays] = useState([]);
 
   const scrollToSection = (id) => {
     const el = document.getElementById(id);
@@ -256,9 +256,18 @@ const SuperAdminDashboard = () => {
     setSelectedDetail({ ...item, dataType: type });
     setDrawerOpen(true);
   };
+  console.log("upCommingStays", upCommingStays);
+
+  useEffect(() => {
+    GetUpcomingStays("Confirm")
+      .then((res) => {
+        setUpCommingStays(res.data.data);
+      })
+      .catch((err) => err);
+  }, []);
 
   return (
-    <div className="min-h-screen  px-4 ">
+    <div className="h-full overflow-y-auto px-4 no-scrollbar">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap');
         *, body { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
@@ -266,16 +275,16 @@ const SuperAdminDashboard = () => {
         .pulse-dot { animation: pulse-dot 1.5s infinite; }
       `}</style>
 
-      <motion.main 
-        initial={{ opacity: 0, y: 15 }} 
-        animate={{ opacity: 1, y: 0 }} 
+      <motion.main
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="w-full pt-5 pb-10"
       >
         <header className="flex items-center justify-between mb-6 pb-5 border-b border-[#e8ede4] flex-wrap gap-3">
           <div>
             <h1 className="m-0 text-[clamp(20px,3vw,28px)] font-black text-[#1a2a0f] tracking-tight">
-             <span className="text-[#3d6b1f]">Dashboard</span>
+              <span className="text-[#3d6b1f]">Dashboard</span>
             </h1>
             <p className="mt-0.5 mb-0 text-xs text-[#8a9580] font-medium">
               Global ecosystem monitoring & financial analytics
@@ -292,7 +301,6 @@ const SuperAdminDashboard = () => {
                 })}
               </p>
             </div>
-           
           </div>
         </header>
 
@@ -356,7 +364,6 @@ const SuperAdminDashboard = () => {
                 <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Earnings & Revenue Trends
                 </span>
-             
               </div>
               <div className="flex bg-[#f5f6f2] rounded-[9px] p-0.5 gap-0.5">
                 {["Weekly", "Monthly"].map((p, i) => (
@@ -671,12 +678,7 @@ const SuperAdminDashboard = () => {
           </div>
         </section>
 
-        <section
-          id="live-procedures"
-          className="grid gap-4 mb-5"
-        >
-      
-
+        <section id="live-procedures" className="grid gap-4 mb-5">
           <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px] flex flex-col">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -695,60 +697,60 @@ const SuperAdminDashboard = () => {
               </div>
             </div>
             <div className="flex flex-col gap-2.5 flex-1">
-              {checkInsData.map((c) => (
-                <div
-                  key={c.id}
-                  onClick={() => handleDetailClick(c, "checkin")}
-                  className="flex gap-3 p-3 border border-[#f0f2ec] rounded-[13px] cursor-pointer hover:bg-[#fafbf8] hover:border-[#d4e8c4] transition-all duration-150"
-                >
+              {upCommingStays?.length > 0 &&
+                upCommingStays?.map((c) => (
                   <div
-                    className="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
-                    style={{
-                      background: c.type === "Stay" ? "#fff3e0" : "#e8f5e0",
-                      color: c.type === "Stay" ? "#e65100" : G,
-                    }}
+                    key={c.id}
+                    onClick={() => handleDetailClick(c, "checkin")}
+                    className="flex gap-3 p-3 border border-[#f0f2ec] rounded-[13px] cursor-pointer hover:bg-[#fafbf8] hover:border-[#d4e8c4] transition-all duration-150"
                   >
-                    {c.type === "Stay" ? (
-                      <Hotel sx={{ fontSize: 17 }} />
-                    ) : (
-                      <MedicalServices sx={{ fontSize: 17 }} />
-                    )}
-                    <span className="text-[7px] font-extrabold mt-0.5">
-                      {c.type.toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start">
-                      <div className="text-[12px] font-extrabold text-[#1a2a0f] truncate max-w-[60%]">
-                        {c.patient}
+                    <div
+                      className="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0"
+                      style={{
+                        background:
+                          c.staytype === "Stay" ? "#fff3e0" : "#e8f5e0",
+                        color: c.staytype === "Stay" ? "#e65100" : G,
+                      }}
+                    >
+                      {c.staytype === "Stay" ? (
+                        <Hotel sx={{ fontSize: 17 }} />
+                      ) : (
+                        <MedicalServices sx={{ fontSize: 17 }} />
+                      )}
+                      <span className="text-[7px] font-extrabold mt-0.5">
+                        {c.staytype?.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div className="text-[12px] font-extrabold text-[#1a2a0f] truncate max-w-[60%]">
+                          {c.fullName}
+                        </div>
+                        <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
+                          {c.roomType}
+                        </span>
                       </div>
-                      <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
-                        {c.room}
-                      </span>
-                    </div>
-                    <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">
-                      {c.therapy} · {c.doctor}
-                    </div>
-                    <div className="flex gap-1.5 mt-2">
-                      <span className="text-[9px] font-bold bg-[#f5f6f2] text-[#5a6652] px-1.5 py-0.5 rounded-[7px]">
-                        🕐 {c.time}
-                      </span>
-                      <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-[7px]">
-                        {c.duration}
-                      </span>
+                      <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">
+                        {c?.therapy} · {c.doctor}
+                      </div>
+                      <div className="flex gap-1.5 mt-2">
+                        <span className="text-[9px] font-bold bg-[#f5f6f2] text-[#5a6652] px-1.5 py-0.5 rounded-[7px]">
+                          🕐 {c.checkInTime}
+                        </span>
+                        <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-[7px]">
+                          {c.daysRemaining}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
             <button className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer uppercase tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150">
               View All Operational Logs →
             </button>
           </div>
- 
         </section>
-
-        </motion.main>
+      </motion.main>
 
       <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
@@ -884,8 +886,6 @@ const SuperAdminDashboard = () => {
           </div>
         )}
       </div>
-
-  
     </div>
   );
 };

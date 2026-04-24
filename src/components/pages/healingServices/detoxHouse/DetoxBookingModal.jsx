@@ -314,7 +314,9 @@ console.log("selectedServiceValue",selectedServiceValue);
       setLoading(true);
       getDoctorAvailableSlots(
         doctorValue.id,
-        format(new Date(fromDate), "yyyy-MM-dd"),
+        fromDate && !isNaN(new Date(fromDate).getTime())
+          ? format(new Date(fromDate), "yyyy-MM-dd")
+          : "",
         clinicFidValue.id,
       )
         .then((res) => {

@@ -280,7 +280,7 @@ export default function LoginModal({ open, handleClose }) {
                               <TextField
                                 {...field}
                                 fullWidth
-                                label="Email / Mobile No."
+                                label="User Name / Mobile No."
                                 size="small"
                                 inputProps={{ autoComplete: "off" }}
                                 error={!!errors.userName}

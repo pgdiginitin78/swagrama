@@ -135,7 +135,10 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       userId: editingId,
       firstName: data.firstName,
       lastName: data.lastName,
-      DOB: data.dob ? format(new Date(data.dob), "yyyy-MM-dd") : "",
+      DOB:
+        data.dob && !isNaN(new Date(data.dob).getTime())
+          ? format(new Date(data.dob), "yyyy-MM-dd")
+          : "",
       address: data.address,
       pinCode: data.pinCode,
       macId: "",

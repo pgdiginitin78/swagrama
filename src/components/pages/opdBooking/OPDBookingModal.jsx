@@ -204,9 +204,11 @@ export default function OPDBookingModal({
       patientFid: dataObj.patientFid?.id,
       doctorFid: dataObj?.doctorFid?.id,
       serviceFid: dataObj.serviceFid?.id ? String(dataObj.serviceFid.id) : "",
-      appoinmentDate: dataObj.appointmentDate
-        ? format(new Date(dataObj.appointmentDate), "yyyy-MM-dd")
-        : "",
+      appoinmentDate:
+        dataObj.appointmentDate &&
+        !isNaN(new Date(dataObj.appointmentDate).getTime())
+          ? format(new Date(dataObj.appointmentDate), "yyyy-MM-dd")
+          : "",
       Status: dataObj.Status?.label || "",
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       SloteStartTime: selectedTimeSlot?.slotStartTime,
@@ -227,7 +229,10 @@ export default function OPDBookingModal({
         amount: selectedServiceValue?.charges || 0,
         SloteEndTime: selectedTimeSlot?.slotEndTime,
         SloteStartTime: selectedTimeSlot?.slotStartTime,
-        appointmentDate: format(new Date(appointmentDate), "yyyy-MM-dd"),
+        appointmentDate:
+          appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+            ? format(new Date(appointmentDate), "yyyy-MM-dd")
+            : "",
         userId: userId,
         paymentFor: "OPD",
       };
@@ -388,7 +393,9 @@ export default function OPDBookingModal({
       setLoading(true);
       getDoctorAvailableSlots(
         doctorValue.id,
-        format(new Date(appointmentDate), "yyyy-MM-dd"),
+        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+          ? format(new Date(appointmentDate), "yyyy-MM-dd")
+          : "",
         clinicFidValue.id,
       )
         .then((res) => {

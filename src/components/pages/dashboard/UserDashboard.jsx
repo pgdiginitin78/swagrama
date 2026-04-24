@@ -18,7 +18,7 @@ import MembershipUpgradeDrawer from "./components/MembershipUpgradeDrawer";
 import OverviewSection from "./components/OverviewSection";
 
 // Hooks & Constants
-import { MEMBERSHIP_TIERS, MENU_ITEMS, MOCK_DATA } from "./constants/dashboardConstants";
+import { MEMBERSHIP_TIERS, MENU_ITEMS } from "./constants/dashboardConstants";
 import useUserDashboard from "./hooks/useUserDashboard";
 
 const UserDashboard = () => {
@@ -52,7 +52,7 @@ const UserDashboard = () => {
             activeTab={activeTab}
             setActiveTab={setActiveTab}
             logout={logout}
-            membershipRank={MOCK_DATA.membership.rank}
+            membershipRank={user?.membershipRank || "Silver Plus"}
           />
         </div>
       </aside>
@@ -74,7 +74,6 @@ const UserDashboard = () => {
                   upcomingActivities={upcomingActivities}
                   upcomingOPD={upcomingOPD}
                   upcomingTherapies={upcomingTherapies}
-                  mockData={MOCK_DATA}
                   setActiveTab={setActiveTab}
                   setSelectedItem={setSelectedItem}
                 />
@@ -83,7 +82,7 @@ const UserDashboard = () => {
                 <GenericSection
                   title="Consultations"
                   icon={<CalendarIcon sx={{ fontSize: 20 }} />}
-                  data={upcomingOPD.length > 0 ? upcomingOPD : MOCK_DATA.appointments}
+                  data={upcomingOPD}
                   setSelectedItem={setSelectedItem}
                 />
               )}
@@ -91,7 +90,7 @@ const UserDashboard = () => {
                 <GenericSection
                   title="Therapies"
                   icon={<img src={TherapyIcon} alt="Therapies" className="h-5 w-5" />}
-                  data={upcomingTherapies.length > 0 ? upcomingTherapies : MOCK_DATA.therapies}
+                  data={upcomingTherapies}
                   setSelectedItem={setSelectedItem}
                 />
               )}
@@ -99,7 +98,7 @@ const UserDashboard = () => {
                 <GenericSection
                   title="Order History"
                   icon={<ReceiptIcon sx={{ fontSize: 20 }} />}
-                  data={MOCK_DATA.orders}
+                  data={[]}
                   setSelectedItem={setSelectedItem}
                 />
               )}
@@ -128,7 +127,7 @@ const UserDashboard = () => {
           setActiveTab={setActiveTab}
           setMobileDrawerOpen={setMobileDrawerOpen}
           logout={logout}
-          membershipRank={MOCK_DATA.membership.rank}
+          membershipRank={user?.membershipRank || "Silver Plus"}
         />
       </Drawer>
 
@@ -142,7 +141,7 @@ const UserDashboard = () => {
         tier={selectedTier}
         open={!!selectedTier}
         onClose={() => setSelectedTier(null)}
-        currentRank={MOCK_DATA.membership.rank}
+        currentRank={user?.membershipRank || "Silver Plus"}
       />
 
       <style

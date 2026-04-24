@@ -42,15 +42,14 @@ function DatePickerField({
   };
 
   const allowedDayNumbers = weekDays
-    ? weekDays
-        .join(",")
-        .split(",")
+    ? (Array.isArray(weekDays) ? weekDays : String(weekDays).split(","))
         .map((d) => DAY_MAP[d.trim()])
         .filter((d) => d !== undefined)
     : null;
 
   const shouldDisableDate = (date) => {
     if (!allowedDayNumbers || allowedDayNumbers.length === 0) return false;
+    if (!date || isNaN(new Date(date).getTime())) return false;
     const dayOfWeek = new Date(date).getDay();
     return !allowedDayNumbers.includes(dayOfWeek);
   };

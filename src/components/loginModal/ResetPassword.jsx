@@ -7,16 +7,16 @@ import {
   IconButton,
   InputAdornment,
   Modal,
+  TextField,
   Typography,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import * as yup from "yup";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import CommonButton from "../../components/common/button/CommonButton";
-import InputField from "../../components/common/formFields/InputField";
 import {
   errorAlert,
   successAlert,
@@ -165,72 +165,78 @@ const ResetPassword = ({
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <motion.div variants={itemVariants} className="space-y-4">
-                  <InputField
+                  <Controller
                     name="password"
-                    label="New Password"
-                    type={showPassword ? "text" : "password"}
                     control={control}
-                    error={errors.password}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <LockOpenIcon sx={{ color: "#7aa874" }} />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                            size="small"
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        bgcolor: "#ffffff",
-                      },
-                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="New Password"
+                        type={showPassword ? "text" : "password"}
+                        size="small"
+                        fullWidth
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                        autoComplete="off"
+                        InputProps={{
+                  
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() => setShowPassword(!showPassword)}
+                                edge="end"
+                                size="small"
+                              >
+                                {showPassword ? <Visibility /> : <VisibilityOff />}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": { bgcolor: "#ffffff" },
+                        }}
+                      />
+                    )}
                   />
 
-                  <InputField
+                  <Controller
                     name="confirmPassword"
-                    label="Confirm Password"
-                    type={showConfirmPassword ? "text" : "password"}
                     control={control}
-                    error={errors.confirmPassword}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <LockOpenIcon sx={{ color: "#7aa874" }} />
-                        </InputAdornment>
-                      ),
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            onClick={() =>
-                              setShowConfirmPassword(!showConfirmPassword)
-                            }
-                            edge="end"
-                            size="small"
-                          >
-                            {showConfirmPassword ? (
-                              <VisibilityOff />
-                            ) : (
-                              <Visibility />
-                            )}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        bgcolor: "#ffffff",
-                      },
-                    }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        label="Confirm Password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        size="small"
+                        fullWidth
+                        error={!!errors.confirmPassword}
+                        helperText={errors.confirmPassword?.message}
+                        autoComplete="off"
+                        InputProps={{
+                     
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <IconButton
+                                onClick={() =>
+                                  setShowConfirmPassword(!showConfirmPassword)
+                                }
+                                edge="end"
+                                size="small"
+                              >
+                                {showConfirmPassword ? (
+                                  <Visibility />
+                                ) : (
+                                  <VisibilityOff />
+                                )}
+                              </IconButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                        sx={{
+                          "& .MuiOutlinedInput-root": { bgcolor: "#ffffff" },
+                        }}
+                      />
+                    )}
                   />
                 </motion.div>
 

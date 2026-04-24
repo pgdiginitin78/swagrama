@@ -257,7 +257,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       setLoading(true);
       GetBeautyTherapySlots(
         user.userId,
-        format(new Date(bookingDate), "yyyy-MM-dd")
+        bookingDate && !isNaN(new Date(bookingDate).getTime())
+          ? format(new Date(bookingDate), "yyyy-MM-dd")
+          : "",
       )
         .then((res) => {
           const data = res?.data?.data || [];
@@ -291,7 +293,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       mobile: data.mobile,
       email: data.email,
       city: data.city,
-      bookingDate: format(new Date(data.bookingDate), "yyyy-MM-dd"),
+      bookingDate:
+        data.bookingDate && !isNaN(new Date(data.bookingDate).getTime())
+          ? format(new Date(data.bookingDate), "yyyy-MM-dd")
+          : "",
       specificRequest: data.specialRequest,
       slotStartTime: selectedTimeSlot?.slotStartTime,
       slotEndTime: selectedTimeSlot?.slotEndTime,

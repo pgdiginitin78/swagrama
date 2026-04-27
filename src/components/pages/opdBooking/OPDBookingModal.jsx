@@ -215,6 +215,7 @@ export default function OPDBookingModal({
       ServiceDetails: dataObj.ServiceDetails,
       taxDeatils: dataObj.taxDetails,
       EncounterStatus: dataObj?.EncounterStatus,
+      bookingSource:"web"
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);

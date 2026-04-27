@@ -25,6 +25,8 @@ const ProfileDropdown = ({
   onClose,
   setOpenManageMembers,
 }) => (
+
+  console.log("user", user),
   <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999] animate-[fadeInDown_0.15s_ease_forwards]">
     <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
       <p className="text-sm font-bold text-green-800 truncate">
@@ -35,7 +37,7 @@ const ProfileDropdown = ({
       </p>
     </div>
     <Link
-      to="/dashboard"
+      to={user?.role === "Admin" ? "/admin/dashboard" : "/dashboard"}
       onClick={onClose}
       className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
     >
@@ -151,8 +153,8 @@ const Navbar = () => {
     { name: "स्वविपणि E Shop", path: "/eShop" },
     { name: "स्वप्राप्त Feeds", path: "/feeds" },
     { name: "स्ववर्षपद Calendar", path: "/calendar" },
-    { name: "स्वफलक Dashboard", path: "/dashboard" },
-    { name: "स्वप्रशासक Admin Dashboard", path: "/admin/dashboard" },
+    // { name: "स्वफलक Dashboard", path: "/dashboard" },
+    // { name: "स्वप्रशासक Admin Dashboard", path: "/admin/dashboard" },
   ];
 
   const splitTitle = (text) => {

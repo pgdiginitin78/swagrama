@@ -356,7 +356,6 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
 
   return (
     <>
-      {/* Mobile Drawer (Temporary) */}
       <MuiDrawer
         variant="temporary"
         open={mobileOpen}
@@ -386,8 +385,6 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
           <UserProfile showLabels={true} />
         </Box>
       </MuiDrawer>
-
-      {/* Desktop Drawer (Mini Variant) */}
       <Drawer
         variant="permanent"
         open={open}

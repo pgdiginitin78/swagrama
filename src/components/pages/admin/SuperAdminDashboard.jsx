@@ -39,8 +39,8 @@ const KPIData = [
   {
     id: "revenue",
     title: "Total Revenue",
-    value: "₹82,45,000",
-    trend: "+24.1%",
+    value: "₹0.00",
+    trend: "+0%",
     sub: "incl. Shop & Services",
     icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
     bg: "#e8f5e0",
@@ -89,27 +89,27 @@ const KPIData = [
 ];
 
 const earningsTrend = [
-  { name: "Mon", amount: 45000 },
-  { name: "Tue", amount: 52000 },
-  { name: "Wed", amount: 48000 },
-  { name: "Thu", amount: 61000 },
-  { name: "Fri", amount: 55000 },
-  { name: "Sat", amount: 72000 },
-  { name: "Sun", amount: 68000 },
+  { name: "Mon", amount: 0 },
+  { name: "Tue", amount: 0 },
+  { name: "Wed", amount: 0 },
+  { name: "Thu", amount: 0 },
+  { name: "Fri", amount: 0 },
+  { name: "Sat", amount: 0 },
+  { name: "Sun", amount: 0 },
 ];
 
 const categoryRevenue = [
-  { name: "OPD/Clinic", revenue: 145000 },
-  { name: "Hospital/Stay", revenue: 268000 },
-  { name: "E-Shop", revenue: 112000 },
-  { name: "Wellness", revenue: 85000 },
-  { name: "Nature/Beauty", revenue: 45000 },
+  { name: "OPD/Clinic", revenue: 0 },
+  { name: "Hospital/Stay", revenue: 0 },
+  { name: "E-Shop", revenue: 0 },
+  { name: "Wellness", revenue: 0 },
+  { name: "Nature/Beauty", revenue: 0 },
 ];
 
 const therapyRevenue = [
-  { name: "Ayurveda", value: 35 },
-  { name: "Panchakarma", value: 25 },
-  { name: "Nature Therapy", value: 20 },
+  { name: "Ayurveda", value: 0 },
+  { name: "Panchakarma", value: 0 },
+  { name: "Nature Therapy", value: 0 },
   { name: "Beauty/Detox", value: 20 },
 ];
 

@@ -581,8 +581,8 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           <SummaryCard
             index={0}
             title="Total Occupancy"
-            value="84%"
-            progress={84}
+            value="0%"
+            progress={0}
           />
           <SummaryCard
             index={1}
@@ -594,9 +594,8 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           <SummaryCard
             index={2}
             title="Peak Revenue"
-            value="₹2.48L"
-            subtitle="vs last week"
-            trend="+14%"
+            value="₹0.00"
+            trend="--"
             type="silver"
           />
         </div>

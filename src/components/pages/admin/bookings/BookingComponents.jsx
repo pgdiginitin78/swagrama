@@ -1,26 +1,19 @@
-import React from 'react';
-import { 
-  Avatar, 
-  IconButton,
-  Divider
-} from '@mui/material';
-import { 
-  Close as CloseIcon, 
-  Pets as PetIcon,
+import {
+  Close as CloseIcon,
   Restaurant as MealIcon,
-  FormatQuote as QuoteIcon
+  Pets as PetIcon
 } from '@mui/icons-material';
+import {
+  Divider,
+  IconButton
+} from '@mui/material';
 
-import { 
-  Language as WebIcon,
-  Smartphone as MobileIcon,
+import {
   Laptop as AdminIcon,
-  VisibilityOutlined as ViewIcon,
-  EditOutlined as EditIcon,
-  AccessTime as TimeIcon,
-  Bolt as IntensityIcon,
   History as HistoryIcon,
+  Smartphone as MobileIcon,
   MeetingRoom as RoomIcon,
+  Language as WebIcon
 } from '@mui/icons-material';
 
 export const StatusBadge = ({ status }) => {
@@ -153,7 +146,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
 
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden shadow-2xl">
-      {/* Header */}
       <div className="p-3.5 flex items-center justify-between border-b border-gray-50">
         <h2 className="text-[12px] font-bold text-[#002a24] uppercase tracking-widest leading-none">Stay Summary</h2>
         <IconButton size="small" onClick={onClose} className="!p-1 hover:bg-gray-100">
@@ -162,7 +154,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
       </div>
 
       <div className="flex-1 overflow-y-auto p-3.5 [&::-webkit-scrollbar]:hidden">
-        {/* Room Image */}
         <div className="relative mb-4">
           <div className="aspect-[2/1] rounded-xl overflow-hidden shadow-sm border border-gray-50">
             <img src={selectedBooking.img} alt="Room" className="w-full h-full object-cover" />
@@ -172,7 +163,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
           </div>
         </div>
 
-        {/* Name & Status Row */}
         <div className="flex flex-col mb-4 px-0.5">
           <div className="flex justify-between items-center mb-0.5">
             <h3 className="text-[14px] font-black text-[#002a24] tracking-tight">{selectedBooking.customer}</h3>
@@ -181,7 +171,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
           <p className="text-[9.5px] text-gray-400 font-bold opacity-70">Check-in: {selectedBooking.date || 'Oct 12, 2:00 PM'}</p>
         </div>
 
-        {/* Stay Experience */}
         <div className="mb-4">
           <p className="text-[7.5px] font-black text-gray-200 uppercase tracking-[0.2em] mb-2 px-0.5">Stay Experience</p>
           <div className="grid grid-cols-2 gap-2">
@@ -201,8 +190,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
             </div>
           </div>
         </div>
-
-        {/* Special Requests */}
         <div className="mb-4">
           <p className="text-[7.5px] font-black text-gray-200 uppercase tracking-[0.2em] mb-2 px-0.5">Special Requests</p>
           <div className="px-4 py-3 rounded-xl bg-[#fffef4] border border-[#f5f0d5]">
@@ -211,8 +198,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
             </p>
           </div>
         </div>
-
-        {/* Financial Overview */}
         <div className="mb-2">
           <p className="text-[7.5px] font-black text-gray-200 uppercase tracking-[0.2em] mb-3 px-0.5">Financial Overview</p>
           <div className="space-y-1.5 px-1">
@@ -236,8 +221,6 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
           </div>
         </div>
       </div>
-
-      {/* Footer Actions */}
       <div className="p-3.5 border-t border-gray-50 flex gap-2 shrink-0">
         <button className="flex-1 py-2.5 rounded-lg bg-[#003d33] text-white text-[9.5px] font-black uppercase tracking-[0.1em] transition-all active:scale-95 shadow-sm">
           CHECK-OUT

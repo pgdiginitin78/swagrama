@@ -12,6 +12,8 @@ import {
   PaymentStatusBadge,
   StatusBadge,
 } from "./BookingComponents";
+import { useState } from "react";
+import TherapyAdminBooking from "./TherapyAdminBooking";
 
 const THERAPY_DATA = [
   {
@@ -89,6 +91,7 @@ const THERAPY_DATA = [
 ];
 
 const TherapyBookings = ({ onSelect, selectedId }) => {
+  const [openTherapyBookingModal,setOpenTherapyBookingModal] = useState(false)
   return (
     <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
       <div className="flex justify-between items-center mb-4 px-5 pt-5 shrink-0">
@@ -112,6 +115,7 @@ const TherapyBookings = ({ onSelect, selectedId }) => {
             type="button"
             label="+ New Booking"
             className="bg-[#002a24] text-white  transition-all active:scale-95"
+            onClick={()=>setOpenTherapyBookingModal(true)}
           />
         </div>
       </div>
@@ -252,6 +256,13 @@ const TherapyBookings = ({ onSelect, selectedId }) => {
           </button>
         </div>
       </footer>
+
+      {openTherapyBookingModal && (
+        <TherapyAdminBooking
+          open={openTherapyBookingModal}
+          handleClose={()=>setOpenTherapyBookingModal(false)}
+        />
+      )}
     </div>
   );
 };

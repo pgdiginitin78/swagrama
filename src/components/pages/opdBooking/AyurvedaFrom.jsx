@@ -795,13 +795,13 @@ function AyurvedaForm({
           !isNaN(new Date(previewData.appointmentDate).getTime())
             ? format(new Date(previewData.appointmentDate), "yyyy-MM-dd")
             : "",
-        userId: userId,
+        userId:    patientFid !== null ? patientFid?.id : userId,
         paymentFor: "OPD",
       };
 
       const res = await InitiatePayment(
         selectedDoctorId?.clinicId,
-        userId,
+          patientFid !== null ? patientFid?.id : userId,
         tempObj,
       );
       const data = res?.data;
@@ -814,7 +814,7 @@ function AyurvedaForm({
           selectedDoctorId?.clinicId,
           data.clientTxnId,
           async () => {
-            const res = await bookAppointment(finalObj, userId);
+            const res = await bookAppointment(finalObj,    patientFid !== null ? patientFid?.id : userId);
             if (res.data.status === 200) {
               successAlert(
                 res.data.message || "Appointment booked successfully!",

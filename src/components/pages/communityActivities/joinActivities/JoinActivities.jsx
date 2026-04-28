@@ -71,7 +71,7 @@ const JoinActivities = () => {
   const [openEnquiryModal, setOpenEnquiryModal] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   const [windowHeight, setWindowHeight] = useState(
-    typeof window !== "undefined" ? window.innerHeight : 800
+    typeof window !== "undefined" ? window.innerHeight : 800,
   );
 
   useEffect(() => {
@@ -3181,7 +3181,7 @@ const JoinActivities = () => {
             willChange: "transform",
           }}
         >
-          <svg
+          {/* <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18" height="18"
             fill="none"
@@ -3190,7 +3190,14 @@ const JoinActivities = () => {
             strokeWidth={2}
           >
             <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+          </svg> */}
+
+          <lord-icon
+            src="https://cdn.lordicon.com/wtywrnoz.json"
+            trigger="loop"
+            colors="primary:#ffffff"
+            style={{ width: "24px", height: "24px" }}
+          ></lord-icon>
           <span
             style={{
               color: "white",
@@ -3201,8 +3208,9 @@ const JoinActivities = () => {
           >
             Enquiry Now
           </span>
+
         </motion.button>,
-        document.body
+        document.body,
       )}
 
       <motion.footer

@@ -19,7 +19,7 @@ import {
   LayoutDashboard,
   Menu,
   MessageSquare,
-  Settings
+  Settings,
 } from "lucide-react";
 import React, { useState } from "react";
 
@@ -46,7 +46,7 @@ const closedMixin = (theme) => ({
   }),
   overflowX: "hidden",
   width: `72px`,
-  backgroundColor: "#f8f9f7",
+  backgroundColor: "",
   borderRight: "1px solid #e5ebe0",
   // Make it relative to work with flex layouts
   position: "relative",
@@ -94,9 +94,16 @@ const menuItems = [
   },
 ];
 
-const bottomMenuItems = [{ key: "settings", label: "Settings", Icon: Settings }];
+const bottomMenuItems = [
+  { key: "settings", label: "Settings", Icon: Settings },
+];
 
-const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) => {
+const AdminDrawer = ({
+  activeMenu,
+  onMenuChange,
+  mobileOpen,
+  onMobileClose,
+}) => {
   const [open, setOpen] = useState(true);
   const [openMasters, setOpenMasters] = useState(false);
 
@@ -122,8 +129,8 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
   };
 
   const isSelected = (key) => activeMenu === key;
-  const isChildSelected = (item) => 
-    item.children?.some(child => child.key === activeMenu);
+  const isChildSelected = (item) =>
+    item.children?.some((child) => child.key === activeMenu);
 
   const renderMenuItem = (item, isMobile = false) => {
     const hasChildren = item.children && item.children.length > 0;
@@ -138,59 +145,68 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
     return (
       <React.Fragment key={item.key}>
         <ListItem disablePadding sx={{ display: "block", mb: 0.5 }}>
-          <Tooltip 
+          <Tooltip
             title={
               !showContent ? (
-                <Box sx={{ p: 0.5, color: '#fff' }}>
-                  <p style={{ 
-                    margin: '0 0 6px 0', 
-                    fontSize: '11px', 
-                    opacity: 0.9, 
-                    fontWeight: 900, 
-                    color: '#ffffff', 
-                    borderBottom: '1px solid rgba(255,255,255,0.2)', 
-                    paddingBottom: '4px',
-                    fontFamily: '"Inter", sans-serif'
-                  }}>
+                <Box sx={{ p: 0.5, color: "#fff" }}>
+                  <p
+                    style={{
+                      margin: "0 0 6px 0",
+                      fontSize: "11px",
+                      opacity: 0.9,
+                      fontWeight: 900,
+                      color: "#ffffff",
+                      borderBottom: "1px solid rgba(255,255,255,0.2)",
+                      paddingBottom: "4px",
+                      fontFamily: '"Inter", sans-serif',
+                    }}
+                  >
                     {item.label}
                   </p>
-                  {hasChildren && item.children.map(child => (
-                    <Box 
-                      key={child.key}
-                      onClick={(e) => { 
-                        e.stopPropagation(); 
-                        handleMenuClick(child.key); 
-                      }}
-                      sx={{ 
-                        px: 1.5,
-                        py: 0.8,
-                        fontSize: '12px', 
-                        borderRadius: '6px',
-                        backgroundColor: isSelected(child.key) ? '#fff' : 'transparent',
-                        color: isSelected(child.key) ? '#1e5d66' : '#fff',
-                        cursor: 'pointer',
-                        fontWeight: isSelected(child.key) ? 800 : 500,
-                        mb: 0.5,
-                        transition: 'all 0.2s',
-                        '&:hover': {
-                          backgroundColor: isSelected(child.key) ? '#fff' : 'rgba(255,255,255,0.1)',
-                        }
-                      }}
-                    >
-                      {child.label}
-                    </Box>
-                  ))}
+                  {hasChildren &&
+                    item.children.map((child) => (
+                      <Box
+                        key={child.key}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMenuClick(child.key);
+                        }}
+                        sx={{
+                          px: 1.5,
+                          py: 0.8,
+                          fontSize: "12px",
+                          borderRadius: "6px",
+                          backgroundColor: isSelected(child.key)
+                            ? "#fff"
+                            : "transparent",
+                          color: isSelected(child.key) ? "#1e5d66" : "#fff",
+                          cursor: "pointer",
+                          fontWeight: isSelected(child.key) ? 800 : 500,
+                          mb: 0.5,
+                          transition: "all 0.2s",
+                          "&:hover": {
+                            backgroundColor: isSelected(child.key)
+                              ? "#fff"
+                              : "rgba(255,255,255,0.1)",
+                          },
+                        }}
+                      >
+                        {child.label}
+                      </Box>
+                    ))}
                 </Box>
-              ) : ""
-            } 
-            placement="right" 
+              ) : (
+                ""
+              )
+            }
+            placement="right"
             arrow
             interactive={hasChildren}
             enterDelay={hasChildren ? 0 : 200}
             slotProps={{
               popper: {
                 sx: {
-                   [`& .MuiTooltip-tooltip`]: {
+                  [`& .MuiTooltip-tooltip`]: {
                     backgroundColor: "#1e5d66",
                     color: "#ffffff !important",
                     fontWeight: 700,
@@ -199,7 +215,7 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
                     py: 1.2,
                     borderRadius: "12px",
                     boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-                    border: '1px solid rgba(255,255,255,0.1)'
+                    border: "1px solid rgba(255,255,255,0.1)",
                   },
                   [`& .MuiTooltip-arrow`]: {
                     color: "#1e5d66",
@@ -256,9 +272,13 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
                   },
                 }}
               />
-              {showContent && hasChildren && (
-                openMasters ? <ExpandLess sx={{ fontSize: 18 }} /> : <ExpandMore sx={{ fontSize: 18 }} />
-              )}
+              {showContent &&
+                hasChildren &&
+                (openMasters ? (
+                  <ExpandLess sx={{ fontSize: 18 }} />
+                ) : (
+                  <ExpandMore sx={{ fontSize: 18 }} />
+                ))}
             </ListItemButton>
           </Tooltip>
         </ListItem>
@@ -279,7 +299,9 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
                       mx: 1,
                       mb: 0.5,
                       borderRadius: "10px",
-                      backgroundColor: childActive ? "rgba(30, 93, 102, 0.08)" : "transparent",
+                      backgroundColor: childActive
+                        ? "rgba(30, 93, 102, 0.08)"
+                        : "transparent",
                       color: childActive ? "#1e5d66" : "#718096",
                       "& .MuiTypography-root": {
                         fontSize: "13px",
@@ -287,7 +309,9 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
                         fontFamily: '"Inter", sans-serif',
                       },
                       "&:hover": {
-                        backgroundColor: childActive ? "rgba(30, 93, 102, 0.12)" : "rgba(0, 0, 0, 0.03)",
+                        backgroundColor: childActive
+                          ? "rgba(30, 93, 102, 0.12)"
+                          : "rgba(0, 0, 0, 0.03)",
                       },
                     }}
                   >
@@ -314,7 +338,7 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
         alignItems: "center",
         gap: 1.5,
         transition: "all 0.3s ease",
-        justifyContent: showLabels ? 'flex-start' : 'center'
+        justifyContent: showLabels ? "flex-start" : "center",
       }}
     >
       <Box
@@ -325,28 +349,48 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
           overflow: "hidden",
           backgroundColor: "#1e5d66",
           flexShrink: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: 'white',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
           fontWeight: 800,
-          fontSize: '12px'
+          fontSize: "12px",
         }}
       >
         <img
           src="https://media.licdn.com/dms/image/v2/C4D03AQE1V2G2lXv7zA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1623912169647?e=2147483647&v=beta&t=4G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5G0H0Z4Y5"
           alt="Admin"
-          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          onError={(e) => { e.target.style.display = "none"; }}
+          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          onError={(e) => {
+            e.target.style.display = "none";
+          }}
         />
         SA
       </Box>
       {showLabels && (
         <Box sx={{ minWidth: 0 }}>
-          <p style={{ margin: 0, fontSize: "12px", fontWeight: 800, color: "#1e5d66", whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "12px",
+              fontWeight: 800,
+              color: "#1e5d66",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             Swagram Admin
           </p>
-          <p style={{ margin: 0, fontSize: "10px", fontWeight: 700, color: "#94a3b8", textTransform: 'uppercase' }}>
+          <p
+            style={{
+              margin: 0,
+              fontSize: "10px",
+              fontWeight: 700,
+              color: "#94a3b8",
+              textTransform: "uppercase",
+            }}
+          >
             Superuser
           </p>
         </Box>
@@ -366,22 +410,23 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
           "& .MuiDrawer-paper": {
             boxSizing: "border-box",
             width: drawerWidth,
-            backgroundColor: "#f8f9f7",
+            backgroundColor: "transparent",
             borderRight: "none",
+            zIndex: 10,
           },
         }}
       >
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-           <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center">
-              <Database size={18} color="white" />
-           </div>
-           <span className="font-bold text-[#1e5d66] text-lg">Swagrama</span>
+        <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
+          <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center">
+            <Database size={18} color="white" />
+          </div>
+          <span className="font-bold text-[#1e5d66] text-lg">Swagrama</span>
         </Box>
         <Divider sx={{ mb: 1, opacity: 0.5 }} />
         <List sx={{ px: 1 }}>
-          {menuItems.map(item => renderMenuItem(item, true))}
+          {menuItems.map((item) => renderMenuItem(item, true))}
         </List>
-        <Box sx={{ mt: 'auto', p: 1.5, pb: 3 }}>
+        <Box sx={{ mt: "auto", p: 1.5, pb: 3 }}>
           <UserProfile showLabels={true} />
         </Box>
       </MuiDrawer>
@@ -394,20 +439,35 @@ const AdminDrawer = ({ activeMenu, onMenuChange, mobileOpen, onMobileClose }) =>
       >
         <DrawerHeader>
           {open ? (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.2, ml: 1 }}>
+            <Box
+              sx={{ display: "flex", alignItems: "center", gap: 1.2, ml: 1 }}
+            >
               <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center shadow-sm">
                 <Database size={18} color="white" />
               </div>
-              <span style={{ fontWeight: 800, fontSize: '18px', color: '#1e5d66' }}>Swagrama</span>
+              <span
+                style={{ fontWeight: 800, fontSize: "18px", color: "#1e5d66" }}
+              >
+                Swagrama
+              </span>
             </Box>
-          ) : <div />}
-          <IconButton onClick={handleDrawerToggle} sx={{ color: '#1e5d66', mr: open ? 0 : 'auto', ml: open ? 0 : 'auto' }}>
+          ) : (
+            <div />
+          )}
+          <IconButton
+            onClick={handleDrawerToggle}
+            sx={{
+              color: "#1e5d66",
+              mr: open ? 0 : "auto",
+              ml: open ? 0 : "auto",
+            }}
+          >
             {open ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </IconButton>
         </DrawerHeader>
 
         <List sx={{ pt: 1 }}>
-          {menuItems.map(item => renderMenuItem(item, false))}
+          {menuItems.map((item) => renderMenuItem(item, false))}
         </List>
 
         <Box sx={{ mt: "auto", pb: 3 }}>

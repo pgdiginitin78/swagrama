@@ -466,7 +466,7 @@ const EnquiryDashboard = () => {
         ) : (
           <>
             {!loadingSpinner && (
-              <div className="my-40 text-center flex-1">
+              <div className="my-40 text-center flex-1 text-sm font-semibold">
                 No Records Found<span className="animate-pulse">...</span>
               </div>
             )}

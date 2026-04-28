@@ -1,11 +1,7 @@
 import AxiosInstance from "../../AxiosInstance";
 
-export const GetUpcomingStays = (type, data) => {
-  if (type === "All") {
-    return AxiosInstance.post(`GetUpcomingStays`, data);
-  }
-
-  return AxiosInstance.post(`GetUpcomingStays?type=${type}`);
+export const GetUpcomingStays = (data) => {
+  return AxiosInstance.post(`GetUpcomingStays`, data);
 };
 
 export const GetEnquiryByTypeDropdown = () => {
@@ -30,4 +26,12 @@ export const GetNext24HoursArrivals = () => {
 
 export const GetOtherBookingsList = (data) => {
   return AxiosInstance.post(`GetCommunityBookings`, data);
+};
+
+export const GetTodayOPDCount = (clinicId) => {
+  return AxiosInstance.get(`GetTodayOPDCount?clinicId=${clinicId}`);
+};
+
+export const GetAllOPDBookingList = (data) => {
+  return AxiosInstance.post(`GetOPDBooking`, data);
 };

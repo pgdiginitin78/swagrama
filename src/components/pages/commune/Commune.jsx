@@ -323,7 +323,16 @@ function SeasonCard({ item, index, onBook }) {
           className="mt-auto w-full py-3 rounded-[5px] text-white text-sm font-bold tracking-wide shadow-md transition-all duration-300"
           style={{ backgroundColor: item.accent }}
         >
-          Enquire Now →
+          <div className="flex items-center justify-center gap-2">
+            <lord-icon
+              src="https://cdn.lordicon.com/wtywrnoz.json"
+              trigger="loop"
+              colors="primary:#ffffff"
+              style={{ width: "20px", height: "20px" }}
+            ></lord-icon>
+            <span>Enquire Now →</span>
+          </div>
+
         </motion.button>
       </div>
     </motion.div>
@@ -504,7 +513,16 @@ function ProgrammeCard({ programme, index, onBook }) {
           className="w-full py-3 rounded-[5px] text-white text-sm font-bold tracking-widest  shadow-lg"
           style={{ backgroundColor: programme.accent }}
         >
-          Enquire Now
+          <div className="flex items-center justify-center gap-2">
+            <lord-icon
+              src="https://cdn.lordicon.com/wtywrnoz.json"
+              trigger="loop"
+              colors="primary:#ffffff"
+              style={{ width: "20px", height: "20px" }}
+            ></lord-icon>
+            <span>Enquire Now</span>
+          </div>
+
         </motion.button>
       </div>
     </motion.div>

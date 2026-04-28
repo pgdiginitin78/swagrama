@@ -365,15 +365,15 @@ const schema = yup.object().shape({
 
         const tempObj = {
           amount: costs.total,
-          appointmentDate:
-            checkIn && !isNaN(new Date(checkIn).getTime())
-              ? format(new Date(checkIn), "yyyy-MM-dd")
-              : "",
-          SloteStartTime: checkInTime,
-          SloteEndTime: checkOutTime,
+          // appointmentDate:
+          //   checkIn && !isNaN(new Date(checkIn).getTime())
+          //     ? format(new Date(checkIn), "yyyy-MM-dd")
+          //     : "",
+          // SloteStartTime: checkInTime,
+          // SloteEndTime: checkOutTime,
           userId: userId,
           paymentFor: "StayBooking",
-          bookingId: bookingId,
+          bookingId: bookingId?.data,
         };
 
         const res = await InitiatePayment(null, userId, tempObj);

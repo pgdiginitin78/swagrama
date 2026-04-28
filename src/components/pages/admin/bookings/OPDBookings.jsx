@@ -1,94 +1,190 @@
-import React from 'react';
-import { Avatar, IconButton } from '@mui/material';
-import { VisibilityOutlined as ViewIcon, EditOutlined as EditIcon, DeleteOutline as DeleteIcon, ChevronLeft, ChevronRight } from '@mui/icons-material';
-import { StatusBadge, OriginBadge } from './BookingComponents';
-import CommonButton from '../../../common/button/CommonButton';
+import React, { useEffect, useState } from "react";
+import { Avatar, IconButton } from "@mui/material";
+import {
+  VisibilityOutlined as ViewIcon,
+  EditOutlined as EditIcon,
+  DeleteOutline as DeleteIcon,
+  ChevronLeft,
+  ChevronRight,
+} from "@mui/icons-material";
+import { StatusBadge, OriginBadge } from "./BookingComponents";
+import CommonButton from "../../../common/button/CommonButton";
+import { GetAllOPDBookingList } from "../../../../services/adminDashboard/AdminDashboardServices";
+import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
+import LoadingSpinner from "../../../common/table/LoadingSpinner";
+import ComputerIcon from "@mui/icons-material/Computer";
+import SmartphoneIcon from "@mui/icons-material/Smartphone";
 
-const OPD_DATA = Array.from({ length: 15 }, (_, i) => ({
-  id: `#OPD-10${i + 1}`,
-  date: 'Oct 24, 2023',
-  time: '10:30 AM',
-  customer: i % 2 === 0 ? 'Rajesh Iyer' : 'Meera Kapoor',
-  origin: i % 2 === 0 ? 'MOBILE' : 'AYURMITRA',
-  service: i % 2 === 0 ? 'Consultation' : 'Follow-up 3M',
-  lastFollowUp: 'Oct 15, 2023',
-  status: i % 2 === 0 ? 'CONFIRMED' : 'PENDING',
-  avatar: i % 2 === 0 ? 'RJ' : 'MK',
-  phone: '+91 98765 43210',
-  img: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?w=200'
-}));
+const OPDBookings = () => {
+  const [opdList, setOpdList] = useState([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
-const OPDBookings = ({ onSelect, selectedId }) => {
+  const populateTable = (forPagination) => {
+    let obj = {
+      page: !forPagination ? 0 : page,
+      pageSize: rowsPerPage,
+      clinicId: 5,
+    };
+    setLoadingSpinner(true);
+    GetAllOPDBookingList(obj)
+      .then((res) => {
+        if (forPagination) {
+          setOpdList((prevData) => [...prevData, ...res.data.data.data]);
+        } else {
+          setOpdList(res.data.data.data);
+        }
+        console.log("1234567890", res.data.data);
+
+        setTotalCount(res.data.data.totalRecords);
+        setLoadingSpinner(false);
+      })
+      .catch((error) => {
+        setLoadingSpinner(false);
+      });
+  };
+
+  const renderInput = (row, index, header) => {
+    if (header === "status") {
+      const statusStyles = {
+        Pending: "text-amber-600 border border-amber-400 bg-amber-100",
+        Confirmed: "text-emerald-700 border border-emerald-500 bg-emerald-100",
+        Canceled: "text-red-700 border border-red-500 bg-red-100",
+        "Check-In": "text-orange-700 border border-orange-400 bg-orange-100",
+        Completed: "text-emerald-800 border border-emerald-600 bg-emerald-100",
+        "Check-Out": "text-teal-700 border border-teal-500 bg-teal-100",
+      };
+
+      const dotStyles = {
+        Pending: "bg-amber-400",
+        Confirmed: "bg-emerald-500",
+        Canceled: "bg-red-500",
+        "Check-In": "bg-orange-400",
+        Completed: "bg-emerald-600",
+        "Check-Out": "bg-teal-500",
+      };
+
+      const status = row["status"]?.trim();
+
+      return (
+        <span
+          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 text-xs font-medium rounded-2xl min-w-[110px] ${
+            statusStyles[status] ||
+            "text-gray-600 border border-gray-300 bg-gray-100"
+          }`}
+        >
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${
+              dotStyles[status] || "bg-gray-400"
+            }`}
+          />
+          {status}
+        </span>
+      );
+    }
+    if (header === "customer") {
+      const initials = row.customer
+        .split(" ")
+        .slice(0, 2)
+        .map((w) => w[0])
+        .join("");
+      return (
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-white  font-medium">
+            {initials}
+          </div>
+          <span className="font-medium">{row.customer}</span>
+        </div>
+      );
+    }
+    if (header === "origin") {
+      return (
+        <div className="flex items-center gap-2.5">
+          <div className=" flex items-center justify-center space-x-2 font-medium">
+            {row.origin === "web" ? (
+              <ComputerIcon
+                style={{ fontSize: "18px" }}
+                className="text-indigo-600"
+              />
+            ) : row.origin === "app" ? (
+              <SmartphoneIcon
+                style={{ fontSize: "18px" }}
+                className="text-emerald-600"
+              />
+            ) : (
+              ""
+            )}{" "}
+            <span className="text-capitalize">{row.origin}</span>
+          </div>
+        </div>
+      );
+    }
+    return row[header];
+  };
+
+
+
+  useEffect(() => {
+    populateTable();
+  }, []);
+
+  console.log("opdList", opdList);
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden bg-[#fbfcfa]">
       <div className="flex justify-between items-center mb-4 px-4 pt-4 shrink-0">
         <div>
-          <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">OPD Bookings</h1>
-          <p className="text-gray-400 text-[10px] font-normal  mt-1">Manage outpatient department consultations.</p>
+          <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">
+            OPD Bookings
+          </h1>
+          <p className="text-gray-400 text-[10px] font-normal  mt-1">
+            Manage outpatient department consultations.
+          </p>
         </div>
-        <CommonButton className="bg-[#003d33] text-white text-[10.5px] shadow-sm transition-all active:scale-95"
-        
-        label="+ New OPD Booking"
+        <CommonButton
+          className="bg-[#003d33] text-white text-[10.5px] shadow-sm transition-all active:scale-95"
+          label="+ New OPD Booking"
         />
-      
       </div>
 
-      <div className="flex-1 overflow-auto bg-white border-y border-gray-100 [&::-webkit-scrollbar]:w-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">
-        <table className="w-full text-left border-collapse min-w-[750px] table-auto">
-          <thead className="sticky top-0 bg-[#fafafa] z-20">
-            <tr>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">BOOKING DETAILS</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">CUSTOMER</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">ORIGIN</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">SERVICE</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap">LAST FOLLOW-UP</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap text-center">STATUS</th>
-              <th className="px-4 py-2 text-[8px] font-bold text-gray-400 uppercase tracking-widest whitespace-nowrap text-center">ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-50">
-            {OPD_DATA.map((booking) => {
-              const isSelected = selectedId === booking.id;
-              return (
-                <tr key={booking.id} onClick={() => onSelect(booking)} className={`group cursor-pointer transition-all ${isSelected ? 'bg-[#f4f7f6]' : 'hover:bg-gray-50/50'}`}>
-                  <td className="px-4 py-2 whitespace-nowrap relative">
-                    {isSelected && <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#003d33]" />}
-                    <div className="flex flex-col">
-                      <span className="text-[10.5px] font-bold text-[#1a2a0f]">{booking.id}</span>
-                      <span className="text-[8.5px] text-gray-400 font-medium tracking-tight whitespace-nowrap">{booking.date} • {booking.time}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <div className="flex items-center gap-2">
-                      <Avatar sx={{ width: 22, height: 22, bgcolor: '#d4edda', color: '#6d9751', fontSize: '10px', fontWeight: 700 }}>{booking.avatar}</Avatar>
-                      <span className="text-[11px] font-bold text-[#1a2a0f]">{booking.customer}</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-2"><OriginBadge origin={booking.origin} /></td>
-                  <td className="px-4 py-2 whitespace-nowrap"><span className="text-[10px] font-bold text-gray-700">{booking.service}</span></td>
-                  <td className="px-4 py-2 whitespace-nowrap italic text-gray-400 font-medium text-[9px]">{booking.lastFollowUp}</td>
-                  <td className="px-4 py-2 text-center"><StatusBadge status={booking.status} /></td>
-                  <td className="px-4 py-2">
-                    <div className="flex items-center justify-center gap-1">
-                      <IconButton size="small" className="!p-1"><ViewIcon className="!text-[16px] text-gray-400" /></IconButton>
-                      <IconButton size="small" className="!p-1"><EditIcon className="!text-[16px] text-gray-400" /></IconButton>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-
-      <footer className="footer-compact px-4 py-2.5 flex items-center justify-between shrink-0 bg-white">
-        <span className="text-[9px] font-bold text-gray-400 uppercase">Showing {OPD_DATA.length} Bookings</span>
-        <div className="flex items-center gap-1.5">
-          <IconButton size="small"><ChevronLeft className="!text-sm" /></IconButton>
-          <button className="w-5 h-5 flex items-center justify-center rounded-lg bg-[#003d33] text-[9.5px] font-bold text-white">1</button>
-          <IconButton size="small"><ChevronRight className="!text-sm" /></IconButton>
+      {loadingSpinner && (
+        <div className="my-40 flex justify-center">
+          <LoadingSpinner />
         </div>
-      </footer>
+      )}
+
+      {opdList?.length > 0 ? (
+        <div className="mb-5">
+          <CommonPaginationTable
+            dataResult={opdList}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            setPage={setPage}
+            count={totalCount}
+            setCount={setTotalCount}
+            setRowsPerPage={setRowsPerPage}
+            tableClass={"h-[370px] border cursor-pointer"}
+            setDataResult={setOpdList}
+            populateTable={populateTable}
+            handleSelectedRow={(row) => setSelectedRow(row)}
+            customRowBgColor={"#cde8b8"}
+            renderInput={renderInput}
+            editableColumns={["status", "customer", "origin"]}
+            removeHeaders={["paymentStatus", "amount"]}
+          />
+        </div>
+      ) : (
+        <>
+          {!loadingSpinner && (
+            <div className="my-40 text-center flex-1 text-sm font-semibold">
+              No Records Found<span className="animate-pulse">...</span>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

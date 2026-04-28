@@ -71,7 +71,7 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
 
   if (type === 'THERAPY') {
     return (
-      <div className="flex flex-col h-full bg-[#f9faf9] overflow-hidden p-3.5 relative">
+      <div className="flex flex-col h-full bg-[#f9faf9]  p-3.5 relative">
         <IconButton size="small" onClick={onClose} className="!absolute !top-3 !right-3 !bg-white shadow-sm !p-1 z-10">
           <CloseIcon className="!text-[14px] text-gray-400" />
         </IconButton>
@@ -145,7 +145,7 @@ export const BookingDetailContent = ({ selectedBooking, onClose, type = 'STAY' }
   }
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden shadow-2xl">
+    <div className="flex flex-col h-full bg-white  shadow-2xl">
       <div className="p-3.5 flex items-center justify-between border-b border-gray-50">
         <h2 className="text-[12px] font-bold text-[#002a24] uppercase tracking-widest leading-none">Stay Summary</h2>
         <IconButton size="small" onClick={onClose} className="!p-1 hover:bg-gray-100">

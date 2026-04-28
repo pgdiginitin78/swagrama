@@ -196,7 +196,9 @@ const validationSchema = yup.object().shape({
 
 const ayurvedaSideContent = [
   {
-    icon: <img src={HolisticHealing} alt="Holistic Healing" className="h-5 w-5" />,
+    icon: (
+      <img src={HolisticHealing} alt="Holistic Healing" className="h-5 w-5" />
+    ),
     gradient: "from-teal-400 to-emerald-500",
     bg: "bg-teal-50",
     border: "border-teal-100",
@@ -431,7 +433,9 @@ function BookingPreviewModal({
             <PreviewRow
               label="Doctor"
               value={
-                selectedDoctorId ? `${selectedDoctorId.firstName} ${selectedDoctorId.lName}` : "—"
+                selectedDoctorId
+                  ? `${selectedDoctorId.firstName} ${selectedDoctorId.lName}`
+                  : "—"
               }
             />
             <PreviewRow
@@ -493,7 +497,6 @@ function AyurvedaForm({
   activeGradient = "from-emerald-600 to-green-500",
   activeDept = "Ayurveda",
 }) {
-
   const isYoga = activeDept?.toLowerCase() === "yoga";
   const isHomeopathy = activeDept?.toLowerCase() === "homeopathy";
 
@@ -562,10 +565,8 @@ function AyurvedaForm({
     mode: "onChange",
   });
 
-  
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
-
 
   const updateVisibleCount = useCallback(() => {
     const w = window.innerWidth;
@@ -774,6 +775,7 @@ function AyurvedaForm({
       taxDeatils: data.taxDetails,
       EncounterStatus: data?.EncounterStatus,
       reason: data.reasonForVisit,
+      bookingSource: "web",
     };
     setFinalObj(saveObj);
     setPreviewData({ ...data, selectedTimeSlot });
@@ -878,7 +880,8 @@ function AyurvedaForm({
         (list) => list.label === patientFid.bloodGroup,
       );
       const filterGender = genderOptions.find(
-        (list) => list.label?.toLowerCase() === patientFid.gender?.toLowerCase(),
+        (list) =>
+          list.label?.toLowerCase() === patientFid.gender?.toLowerCase(),
       );
 
       setValue("bloodGroup", bloodGroupFilter);
@@ -1057,7 +1060,6 @@ function AyurvedaForm({
                       .map((n) => n[0])
                       .join("")
                       .toUpperCase();
-
 
                     return (
                       <motion.div
@@ -1307,7 +1309,11 @@ function AyurvedaForm({
         >
           <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:gap-3">
             <div className="flex items-center gap-2">
-              <img src={bookAppointmentIcon} alt="Book Appointment" className="h-5 w-5" />
+              <img
+                src={bookAppointmentIcon}
+                alt="Book Appointment"
+                className="h-5 w-5"
+              />
               <h2 className="text-xs font-bold text-white uppercase tracking-wider sm:text-sm">
                 Schedule Appointment
               </h2>
@@ -1328,7 +1334,8 @@ function AyurvedaForm({
             <div className="space-y-2">
               <div className="md:flex items-center md:justify-between px-1">
                 <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                  {appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+                  {appointmentDate &&
+                  !isNaN(new Date(appointmentDate).getTime())
                     ? format(new Date(appointmentDate), "MMMM yyyy")
                     : format(new Date(), "MMMM yyyy")}
                 </span>
@@ -1622,7 +1629,7 @@ function AyurvedaForm({
           open={openAddPatientModal}
           handleClose={() => {
             setOpenAddPatientModal(false);
-            handleGetPatientData()
+            handleGetPatientData();
           }}
         />
       )}

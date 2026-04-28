@@ -335,12 +335,12 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
         const tempObj = {
           amount: formData.Amount,
-          appointmentDate: formData.Appointmentdate,
-          SloteStartTime: formData.slotTime,
-          SloteEndTime: formData.slotTime,
+          // appointmentDate: formData.Appointmentdate,
+          // SloteStartTime: formData.slotTime,
+          // SloteEndTime: formData.slotTime,
           userId: user?.userId,
           paymentFor: "NatureTherapy",
-          bookingId: bookingId,
+          bookingId: bookingId?.data,
         };
 
         const res = await InitiatePayment(null, user?.userId, tempObj);

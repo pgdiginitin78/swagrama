@@ -9,7 +9,14 @@ import BookingsDashboard from "./BookingsDashboard";
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
     <div className="w-16 h-16 rounded-2xl bg-[#e8f5e0] flex items-center justify-center mb-4">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3d6b1f" strokeWidth="2">
+      <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#3d6b1f"
+        strokeWidth="2"
+      >
         <rect x="3" y="3" width="18" height="18" rx="2" />
         <line x1="9" y1="9" x2="15" y2="9" />
         <line x1="9" y1="12" x2="15" y2="12" />
@@ -17,7 +24,9 @@ const PlaceholderPage = ({ title }) => (
       </svg>
     </div>
     <h2 className="text-[18px] font-black text-[#1a2a0f] m-0">{title}</h2>
-    <p className="text-[12px] text-[#9aa090] mt-2 font-medium">This section is coming soon.</p>
+    <p className="text-[12px] text-[#9aa090] mt-2 font-medium">
+      This section is coming soon.
+    </p>
   </div>
 );
 
@@ -38,14 +47,16 @@ const AdminLayout = () => {
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
 
   return (
-    <div className="flex overflow-hidden bg-[#f7f9f5] h-[calc(100vh-64px)] md:h-[calc(100vh-80px)]">
+    <div className="flex overflow-hidden ">
+      <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-0px)] z-10">
+        <AdminDrawer
+          activeMenu={activeMenu}
+          onMenuChange={setActiveMenu}
+          mobileOpen={mobileDrawerOpen}
+          onMobileClose={() => setMobileDrawerOpen(false)}
+        />
+      </div>
       {/* Sidebar */}
-      <AdminDrawer
-        activeMenu={activeMenu}
-        onMenuChange={setActiveMenu}
-        mobileOpen={mobileDrawerOpen}
-        onMobileClose={() => setMobileDrawerOpen(false)}
-      />
 
       {/* Main content wrapper */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
@@ -55,7 +66,15 @@ const AdminLayout = () => {
             onClick={() => setMobileDrawerOpen(true)}
             className="w-8 h-8 rounded-lg border border-[#e8ede4] bg-white flex items-center justify-center cursor-pointer hover:bg-[#f5f6f2] transition-colors"
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3a4a30" strokeWidth="2.5" strokeLinecap="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#3a4a30"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
               <line x1="3" y1="6" x2="21" y2="6" />
               <line x1="3" y1="12" x2="21" y2="12" />
               <line x1="3" y1="18" x2="21" y2="18" />
@@ -68,15 +87,16 @@ const AdminLayout = () => {
               </svg>
             </div>
             <span className="text-[13px] font-black text-[#1a2a0f]">
-              Swagrama{" "}
-              <span className="text-[#3d6b1f]">Admin</span>
+              Swagrama <span className="text-[#3d6b1f]">Admin</span>
             </span>
           </div>
         </div>
 
         {/* Page content */}
         <div className="flex-1 overflow-hidden h-full">
-          {CONTENT_MAP[activeMenu] || <PlaceholderPage title="Page Not Found" />}
+          {CONTENT_MAP[activeMenu] || (
+            <PlaceholderPage title="Page Not Found" />
+          )}
         </div>
       </div>
     </div>

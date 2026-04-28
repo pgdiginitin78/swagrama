@@ -1,42 +1,33 @@
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Close as CloseIcon,
+  FilterList as FilterIcon,
+  People as PeopleIcon,
+  Person as PersonIcon,
+  RestartAlt as ResetIcon,
+  TrendingUp as TrendingIcon,
+} from "@mui/icons-material";
 import {
   Avatar,
-  IconButton,
-  Drawer,
-  FormControl,
-  Select,
-  MenuItem,
+  Badge,
   Chip,
   Divider,
-  ToggleButtonGroup,
+  Drawer,
+  FormControl,
+  IconButton,
+  MenuItem,
+  Select,
   ToggleButton,
-  Badge,
+  ToggleButtonGroup,
 } from "@mui/material";
-import {
-  FilterList as FilterIcon,
-  AddCircleOutline as AddCircleIcon,
-  ChevronLeft,
-  ChevronRight,
-  TrendingUp as TrendingIcon,
-  Person as PersonIcon,
-  People as PeopleIcon,
-  VisibilityOutlined as ViewIcon,
-  EditOutlined as EditIcon,
-  ReceiptOutlined as InvoiceIcon,
-  Close as CloseIcon,
-  RestartAlt as ResetIcon,
-  CalendarToday as CalIcon,
-  Hotel as HotelIcon,
-  Payments as PayIcon,
-  Phone as PhoneIcon,
-  Email as EmailIcon,
-  TouchApp as TouchIcon,
-} from "@mui/icons-material";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   GetNext24HoursArrivals,
   GetUpcomingStays,
 } from "../../../../services/adminDashboard/AdminDashboardServices";
+import CommonButton from "../../../common/button/CommonButton";
+import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
+import LoadingSpinner from "../../../common/table/LoadingSpinner";
 
 const STAY_DATA = [
   {
@@ -468,6 +459,11 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [next24HoursArrivals, setNext24HoursArrivals] = useState(null);
   const [upcomingStays, setUpcomingStays] = useState([]);
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [count, setCount] = useState(0);
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const [filters, setFilters] = useState({
     payment: "ALL",
@@ -491,29 +487,33 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
     (v) => v !== "ALL",
   ).length;
 
-  const filtered = STAY_DATA.filter((b) => {
-    if (filters.payment !== "ALL" && b.paymentStatus !== filters.payment)
-      return false;
-    if (filters.booking !== "ALL" && b.bookingStatus !== filters.booking)
-      return false;
-    if (filters.room !== "ALL" && b.roomType !== filters.room) return false;
-    if (filters.occupancy !== "ALL" && b.occupancyIcon !== filters.occupancy)
-      return false;
-    return true;
-  });
-
-
   console.log("next24HoursArrivals", upcomingStays);
- 
-  const populateTable = () => {
-    GetUpcomingStays("All")
-      .then((res) => {
 
-        if (res.data.statusCode === 200) {
-          setUpcomingStays(res.data.data);
+  const populateTable = (forPagination) => {
+    let obj = {
+      page: !forPagination ? 1 : page,
+      pageSize: rowsPerPage,
+      type: "all",
+      // paymentStatus: "",
+      // bookingStatus: "",
+      // roomType: "",
+      // occupancyType: "",
+    };
+    setLoadingSpinner(true);
+    GetUpcomingStays(obj)
+      .then((res) => {
+        if (forPagination) {
+          setUpcomingStays((prevData) => [...prevData, ...res.data.data.data]);
+        } else {
+          setUpcomingStays(res.data.data.data);
         }
+        console.log("res.data.data", res.data.data);
+        setCount(res.data.data.totalRecords);
+        setLoadingSpinner(false);
       })
-      .catch((err) => err);
+      .catch((error) => {
+        setLoadingSpinner(false);
+      });
   };
 
   useEffect(() => {
@@ -522,11 +522,11 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
         setNext24HoursArrivals(res.data.data);
       })
       .catch((err) => err);
-      populateTable()
+    populateTable();
   }, []);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#fbfbf8] p-3 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-[#fbfbf8] h-screen p-3 ">
       <div className="flex flex-col h-full">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -559,21 +559,19 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
                 },
               }}
             >
-              <button
+              <CommonButton
+                type="button"
+                icon={<FilterIcon style={{ fontSize: 11 }} />}
+                label="Filter"
+                className={"bg-[#2e3d28] text-white"}
                 onClick={() => setDrawerOpen(true)}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-white border border-[#c2dbb8] text-[8.5px] font-black text-[#3a5c30] uppercase tracking-wide shadow-sm hover:border-[#4c7c70] transition-colors"
-              >
-                <FilterIcon style={{ fontSize: 11 }} />
-                Filter
-              </button>
+              />
             </Badge>
-            <motion.button
-              whileTap={{ scale: 0.94 }}
-              className="flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#003d33] text-[8.5px] font-black text-white uppercase tracking-wide shadow-md"
-            >
-              <AddCircleIcon style={{ fontSize: 11 }} />
-              New Stay
-            </motion.button>
+            <CommonButton
+              type="button"
+              label="+ New Booking"
+              className={"bg-[#2e3d28] text-white"}
+            />
           </div>
         </motion.div>
 
@@ -634,220 +632,39 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           </motion.div>
         )}
 
-        <div className="flex gap-3 flex-1 min-h-0">
-          <div className="flex-1 min-w-0 flex flex-col min-h-0">
-            <div className="hidden md:flex flex-col flex-1 min-h-0 bg-white rounded-xl border border-[#d4e9ce] shadow-sm overflow-hidden">
-              <div className="flex-1 overflow-auto">
-                <table
-                  className="w-full text-left border-collapse"
-                  style={{ minWidth: 580 }}
-                >
-                  <thead>
-                    <tr className="bg-[#eef7eb] sticky top-0 z-10">
-                      {[
-                        "Booking & Customer",
-                        "Room & Occupancy",
-                        "Stay Details",
-                        "Financials",
-                        "",
-                      ].map((h, i) => (
-                        <th
-                          key={i}
-                          className={`px-2 py-1.5 text-[6.8px] font-black text-[#6a9060] uppercase tracking-[0.15em] border-b border-[#d4e9ce] whitespace-nowrap ${i === 3 ? "text-center" : i === 4 ? "text-right w-[40px]" : ""}`}
-                        >
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <AnimatePresence mode="popLayout">
-                      {filtered.length === 0 ? (
-                        <motion.tr
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                        >
-                          <td
-                            colSpan={5}
-                            className="px-4 py-10 text-center text-[10px] font-bold text-gray-400"
-                          >
-                            No bookings match the selected filters.
-                          </td>
-                        </motion.tr>
-                      ) : (
-                        filtered.map((booking, i) => {
-                          const isSelected = selectedId === booking.id;
-                          return (
-                            <motion.tr
-                              key={booking.id}
-                              custom={i}
-                              variants={rowVariants}
-                              initial="hidden"
-                              animate="show"
-                              exit="exit"
-                              onClick={() =>
-                                onSelect(isSelected ? null : booking)
-                              }
-                              className={`group cursor-pointer border-b border-[#f0f7ee] last:border-b-0 transition-colors ${isSelected ? "bg-[#dff0da]" : "hover:bg-[#f4fbf2]"}`}
-                            >
-                              <td className="px-2 py-1.5 whitespace-nowrap">
-                                <div className="flex items-center gap-1.5">
-                                  <Avatar
-                                    src={booking.avatarImg}
-                                    sx={{
-                                      width: 24,
-                                      height: 24,
-                                      bgcolor: isSelected
-                                        ? "#b2d0ac"
-                                        : "#c8dfc2",
-                                      color: "#2e5c28",
-                                      fontSize: "8px",
-                                      fontWeight: 800,
-                                    }}
-                                  >
-                                    {booking.avatar}
-                                  </Avatar>
-                                  <div>
-                                    <p className="text-[10px] font-bold text-[#002a24] leading-none">
-                                      {booking.customer}
-                                    </p>
-                                    <p className="text-[7.5px] text-gray-400 font-bold mt-0.5 leading-none">
-                                      {booking.id}
-                                    </p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-2 py-1.5 whitespace-nowrap">
-                                <p className="text-[9.5px] font-bold text-[#4c7c70] leading-none">
-                                  {booking.roomType}
-                                </p>
-                                <div className="flex items-center gap-0.5 mt-0.5 leading-none">
-                                  {booking.occupancyIcon === "twin" ? (
-                                    <PeopleIcon
-                                      style={{ fontSize: 8, color: "#9ca3af" }}
-                                    />
-                                  ) : (
-                                    <PersonIcon
-                                      style={{ fontSize: 8, color: "#9ca3af" }}
-                                    />
-                                  )}
-                                  <span className="text-[7px] text-gray-400 font-black uppercase tracking-tight">
-                                    {booking.occupancyType}
-                                  </span>
-                                </div>
-                              </td>
-                              <td className="px-2 py-1.5 whitespace-nowrap">
-                                <p className="text-[9.5px] font-bold text-[#002a24] leading-none">
-                                  {booking.stayDates}
-                                </p>
-                                <p className="text-[7.5px] text-gray-400 font-black uppercase tracking-tight mt-0.5 leading-none">
-                                  {booking.duration}
-                                </p>
-                              </td>
-                              <td className="px-2 py-1.5 whitespace-nowrap">
-                                <div className="flex flex-col items-center gap-0.5">
-                                  <StatusBadge status={booking.paymentStatus} />
-                                  <StatusBadge status={booking.bookingStatus} />
-                                </div>
-                              </td>
-                              <td className="px-2 py-1.5 text-right whitespace-nowrap w-[40px]">
-                                <div className="flex items-center justify-end gap-0.5">
-                                  {[ViewIcon, EditIcon].map((Icon, idx) => (
-                                    <IconButton
-                                      key={idx}
-                                      size="small"
-                                      sx={{ padding: "2px" }}
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      <Icon
-                                        style={{
-                                          fontSize: 11,
-                                          color: "#6a9060",
-                                        }}
-                                      />
-                                    </IconButton>
-                                  ))}
-                                </div>
-                              </td>
-                            </motion.tr>
-                          );
-                        })
-                      )}
-                    </AnimatePresence>
-                  </tbody>
-                </table>
-              </div>
+        <div className="flex gap-3 h-full flex-1 ">
+          {loadingSpinner && (
+            <div className="my-32 flex justify-center items-center flex-1">
+              <LoadingSpinner />
             </div>
-
-            <div className="md:hidden flex-1 overflow-y-auto space-y-2">
-              <AnimatePresence mode="popLayout">
-                {filtered.length === 0 ? (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="bg-white rounded-xl border border-[#d4e9ce] p-6 text-center"
-                  >
-                    <p className="text-[10px] font-bold text-gray-400">
-                      No bookings match the selected filters.
-                    </p>
-                  </motion.div>
-                ) : (
-                  filtered.map((booking, i) => (
-                    <MobileBookingCard
-                      key={booking.id}
-                      booking={booking}
-                      index={i}
-                      onSelect={(b) => onSelect(selectedId === b.id ? null : b)}
-                      isSelected={selectedId === booking.id}
-                    />
-                  ))
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="flex items-center justify-between mt-2.5 px-0.5 shrink-0">
-              <span className="text-[8px] font-black text-[#8ab080] uppercase tracking-[0.2em]">
-                Page 1 of 12
-              </span>
-              <div className="flex items-center gap-1.5">
-                <IconButton
-                  size="small"
-                  sx={{
-                    background: "white",
-                    border: "1px solid #d4e9ce",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  }}
-                >
-                  <ChevronLeft style={{ fontSize: 13, color: "#6a9060" }} />
-                </IconButton>
-                <div className="flex gap-1">
-                  {[1, 2, 3].map((n) => (
-                    <motion.button
-                      key={n}
-                      whileTap={{ scale: 0.9 }}
-                      className={`w-6 h-6 flex items-center justify-center rounded-lg text-[9px] font-black transition-all ${n === 1 ? "bg-[#003d33] text-white" : "text-[#6a9060] hover:text-[#003d33]"}`}
-                    >
-                      {n}
-                    </motion.button>
-                  ))}
+          )}
+          {upcomingStays?.length > 0 ? (
+            <main className="">
+              <CommonPaginationTable
+                dataResult={upcomingStays}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                setPage={setPage}
+                count={count}
+                setCount={setCount}
+                setRowsPerPage={setRowsPerPage}
+                tableClass={"h-[320px] border cursor-pointer"}
+                setDataResult={setUpcomingStays}
+                populateTable={populateTable}
+                handleSelectedRow={(row) => setSelectedRow(row)}
+                customRowBgColor={"#cde8b8"}
+              />
+            </main>
+          ) : (
+            <>
+              {!loadingSpinner && (
+                <div className="my-32 text-center flex-1 text-sm font-semibold">
+                  No Records Found
+                  <span className="animate-pulse">...</span>
                 </div>
-                <IconButton
-                  size="small"
-                  sx={{
-                    background: "white",
-                    border: "1px solid #d4e9ce",
-                    borderRadius: "8px",
-                    padding: "4px",
-                  }}
-                >
-                  <ChevronRight style={{ fontSize: 13, color: "#6a9060" }} />
-                </IconButton>
-              </div>
-            </div>
-          </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 

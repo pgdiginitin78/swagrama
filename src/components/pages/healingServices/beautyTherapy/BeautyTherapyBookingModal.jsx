@@ -319,12 +319,12 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
         const tempObj = {
           amount: formData.amount,
-          appointmentDate: formData.bookingDate,
-          SloteStartTime: formData.slotStartTime,
-          SloteEndTime: formData.slotEndTime,
+          // appointmentDate: formData.bookingDate,
+          // SloteStartTime: formData.slotStartTime,
+          // SloteEndTime: formData.slotEndTime,
           userId: user?.userId,
           paymentFor: "BeautyTherapy",
-          bookingId: bookingId,
+          bookingId: bookingId?.data,
         };
 
         const res = await InitiatePayment(null, user?.userId, tempObj);

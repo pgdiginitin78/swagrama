@@ -43,8 +43,8 @@ const BookingsDashboard = () => {
             <input type="text" placeholder="Quick search..." className="bg-transparent border-none outline-none text-[9.5px] w-full text-gray-700 font-medium" />
             <SearchIcon className="text-gray-400 !text-[13px] ml-2" />
           </div>
-          <IconButton size="small"><NotificationsIcon className="text-gray-600 !text-lg" /></IconButton>
-          <IconButton size="small"><ProfileIcon className="text-gray-600 !text-xl" /></IconButton>
+          {/* <IconButton size="small"><NotificationsIcon className="text-gray-600 !text-lg" /></IconButton>
+          <IconButton size="small"><ProfileIcon className="text-gray-600 !text-xl" /></IconButton> */}
         </div>
       </header>
 

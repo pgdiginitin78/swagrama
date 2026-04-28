@@ -30,63 +30,13 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { GetUpcomingStays } from "../../../services/adminDashboard/AdminDashboardServices";
+import {
+  GetTodayOPDCount,
+  GetUpcomingStays,
+} from "../../../services/adminDashboard/AdminDashboardServices";
 
 const G = "#3d6b1f";
 const G2 = "#5a9e2f";
-
-const KPIData = [
-  {
-    id: "revenue",
-    title: "Total Revenue",
-    value: "₹0.00",
-    trend: "+0%",
-    sub: "incl. Shop & Services",
-    icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
-    bg: "#e8f5e0",
-    fg: "#3d6b1f",
-  },
-  {
-    id: "membership",
-    title: "Memberships",
-    value: "458",
-    trend: "+15",
-    sub: "Gold/Platinum active",
-    icon: <People sx={{ fontSize: 18 }} />,
-    bg: "#e3f2fd",
-    fg: "#1565c0",
-  },
-  {
-    id: "shop",
-    title: "Store Orders",
-    value: "142",
-    trend: "+8.2%",
-    sub: "pending fulfillment",
-    icon: <CalendarMonth sx={{ fontSize: 18 }} />,
-    bg: "#fce4ec",
-    fg: "#c62828",
-  },
-  {
-    id: "stays",
-    title: "Stay Occupancy",
-    value: "82%",
-    trend: "Full",
-    sub: "Hospitals & Detox",
-    icon: <Hotel sx={{ fontSize: 18 }} />,
-    bg: "#ede7f6",
-    fg: "#4527a0",
-  },
-  {
-    id: "consultations",
-    title: "Today's OPD",
-    value: "28",
-    trend: "Live",
-    sub: "consultations in prog",
-    icon: <Timeline sx={{ fontSize: 18 }} />,
-    bg: "#fff3e0",
-    fg: "#e65100",
-  },
-];
 
 const earningsTrend = [
   { name: "Mon", amount: 0 },
@@ -166,42 +116,6 @@ const doctorAssignments = [
   },
 ];
 
-const checkInsData = [
-  {
-    id: 1,
-    patient: "Karan Johar",
-    therapy: "Detox Stay",
-    doctor: "Dr. Rajesh Kumar",
-    clinic: "Detox House",
-    time: "10:00 AM",
-    duration: "3 Days",
-    type: "Stay",
-    room: "204B",
-  },
-  {
-    id: 2,
-    patient: "Ananya Pandey",
-    therapy: "Beauty Therapy",
-    doctor: "Wellness Staff",
-    clinic: "Nature Sanctuary",
-    time: "11:30 AM",
-    duration: "Today",
-    type: "Therapy",
-    room: "Room 12",
-  },
-  {
-    id: 3,
-    patient: "Vicky Kaushal",
-    therapy: "IPD Wellness Stay",
-    doctor: "Dr. Arvind Sharma",
-    clinic: "Hospital Wing",
-    time: "02:00 PM",
-    duration: "7 Days",
-    type: "Stay",
-    room: "101A",
-  },
-];
-
 const statusColor = (s) => {
   if (s === "Available") return { bg: "#e8f5e0", fg: "#3d6b1f" };
   if (s === "Busy") return { bg: "#fff3e0", fg: "#e65100" };
@@ -237,14 +151,60 @@ const SuperAdminDashboard = () => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [upCommingStays, setUpCommingStays] = useState([]);
+  const [todaysOPDCount, setTodaysOPDCount] = useState(0);
 
-  const scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-      setNavOpen(false);
-    }
-  };
+  const KPIData = [
+    {
+      id: "revenue",
+      title: "Total Revenue",
+      value: "₹0.00",
+      trend: "+0%",
+      sub: "incl. Shop & Services",
+      icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
+      bg: "#e8f5e0",
+      fg: "#3d6b1f",
+    },
+    {
+      id: "membership",
+      title: "Memberships",
+      value: "458",
+      trend: "+15",
+      sub: "Gold/Platinum active",
+      icon: <People sx={{ fontSize: 18 }} />,
+      bg: "#e3f2fd",
+      fg: "#1565c0",
+    },
+    {
+      id: "shop",
+      title: "Store Orders",
+      value: "142",
+      trend: "+8.2%",
+      sub: "pending fulfillment",
+      icon: <CalendarMonth sx={{ fontSize: 18 }} />,
+      bg: "#fce4ec",
+      fg: "#c62828",
+    },
+    {
+      id: "stays",
+      title: "Stay Occupancy",
+      value: "82%",
+      trend: "Full",
+      sub: "Hospitals & Detox",
+      icon: <Hotel sx={{ fontSize: 18 }} />,
+      bg: "#ede7f6",
+      fg: "#4527a0",
+    },
+    {
+      id: "consultations",
+      title: "Today's OPD",
+      value: todaysOPDCount,
+      trend: "Live",
+      sub: "consultations in prog",
+      icon: <Timeline sx={{ fontSize: 18 }} />,
+      bg: "#fff3e0",
+      fg: "#e65100",
+    },
+  ];
 
   const filteredDoctors = doctorAssignments.filter(
     (doc) =>
@@ -259,9 +219,18 @@ const SuperAdminDashboard = () => {
   console.log("upCommingStays", upCommingStays);
 
   useEffect(() => {
-    GetUpcomingStays("Confirm")
+    GetUpcomingStays({
+      type: "confirm",
+    })
       .then((res) => {
-        setUpCommingStays(res.data.data);
+        if (res?.data?.data?.data?.length > 0) {
+          setUpCommingStays(res.data.data.data);
+        }
+      })
+      .catch((err) => err);
+    GetTodayOPDCount(5)
+      .then((res) => {
+        setTodaysOPDCount(res?.data?.data?.todayOPDCount);
       })
       .catch((err) => err);
   }, []);
@@ -692,7 +661,8 @@ const SuperAdminDashboard = () => {
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#5a9e2f] inline-block pulse-dot" />
                 <span className="text-[9px] font-extrabold text-[#3d6b1f] uppercase">
-                  3 Arriving
+                  {upCommingStays?.length > 0 ? upCommingStays?.length : 0}
+                  Arriving
                 </span>
               </div>
             </div>
@@ -723,11 +693,23 @@ const SuperAdminDashboard = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start">
-                        <div className="text-[12px] font-extrabold text-[#1a2a0f] truncate max-w-[60%]">
-                          {c.fullName}
+                        <div className="text-[12px] font-extrabold text-[#1a2a0f] truncate max-w-[60%] flex space-x-5">
+                          <span>{c.fullName || c.customer}</span>
                         </div>
-                        <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
-                          {c.roomType}
+                        <span className="flex space-x-4">
+                          <span className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-full">
+                            {c?.roomType || c.room}
+                          </span>
+                          <span
+                            className={`text-[9px] px-2 py-0.5 rounded-full font-semibold
+                              ${c?.bookingStatus === "Confirmed" ? "bg-green-100 text-green-700" : ""}
+                              ${c?.bookingStatus === "Pending" ? "bg-yellow-100 text-yellow-700" : ""}
+                              ${c?.bookingStatus === "Cancelled" ? "bg-red-100 text-red-700" : ""}
+                              ${c?.bookingStatus === "Completed" ? "bg-blue-100 text-blue-700" : ""}
+                            `}
+                          >
+                            {c?.bookingStatus}
+                          </span>
                         </span>
                       </div>
                       <div className="text-[9px] font-bold text-[#9aa090] mt-0.5 uppercase">

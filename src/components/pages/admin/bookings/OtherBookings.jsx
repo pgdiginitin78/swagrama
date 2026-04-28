@@ -32,13 +32,13 @@ const OtherBookings = ({ onSelect, selectedId }) => {
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
-  const [selectedMember, setSelectedMember] = useState();
   const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
 
   const populateTable = (forPagination) => {
     let obj = {
       page: !forPagination ? 0 : page,
-      size: rowsPerPage,
+      pageSize: rowsPerPage,
     };
     setLoadingSpinner(true);
     GetOtherBookingsList(obj)
@@ -51,6 +51,8 @@ const OtherBookings = ({ onSelect, selectedId }) => {
         } else {
           setOtherBookingList(res.data.data.data);
         }
+        console.log("1234567890",res.data.data);
+        
         setTotalCount(res.data.data.totalRecords);
         setLoadingSpinner(false);
       })
@@ -63,8 +65,10 @@ const OtherBookings = ({ onSelect, selectedId }) => {
     populateTable();
   }, []);
 
+  console.log("otherBookingList", otherBookingList);
+
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#fbfcfa]">
+    <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
       <div className="flex justify-between items-center mb-4 px-4 pt-4 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">
@@ -83,13 +87,13 @@ const OtherBookings = ({ onSelect, selectedId }) => {
       </div>
 
       {loadingSpinner && (
-        <div className="my-40 text-center flex-1">
+        <div className="my-40 flex justify-center">
           <LoadingSpinner />
         </div>
       )}
 
       {otherBookingList?.length > 0 ? (
-        <div className="flex-1">
+        <div className="mb-5">
           <CommonPaginationTable
             dataResult={otherBookingList}
             page={page}
@@ -101,36 +105,19 @@ const OtherBookings = ({ onSelect, selectedId }) => {
             tableClass={"h-[370px] border cursor-pointer"}
             setDataResult={setOtherBookingList}
             populateTable={populateTable}
-            handleSelectedRow={(row) => setSelectedMember(row)}
+            handleSelectedRow={(row) => setSelectedRow(row)}
             customRowBgColor={"#cde8b8"}
           />
         </div>
       ) : (
         <>
           {!loadingSpinner && (
-            <div className="my-40 text-center flex-1">
+            <div className="my-40 text-center flex-1 text-sm font-semibold">
               No Records Found<span className="animate-pulse">...</span>
             </div>
           )}
         </>
       )}
-
-      <footer className="footer-compact px-4 py-2.5 flex items-center justify-between shrink-0 bg-white">
-        <span className="text-[9px] font-bold text-gray-400 uppercase">
-          Showing {OTHER_DATA.length} Entries
-        </span>
-        <div className="flex items-center gap-1.5">
-          <IconButton size="small">
-            <ChevronLeft className="!text-sm" />
-          </IconButton>
-          <button className="w-5 h-5 flex items-center justify-center rounded-lg bg-[#003d33] text-[9.5px] font-bold text-white">
-            1
-          </button>
-          <IconButton size="small">
-            <ChevronRight className="!text-sm" />
-          </IconButton>
-        </div>
-      </footer>
     </div>
   );
 };

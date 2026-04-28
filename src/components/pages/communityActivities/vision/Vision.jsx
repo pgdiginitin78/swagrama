@@ -696,7 +696,16 @@ const OurVision = () => {
                             : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
                         }`}
                       >
-                        Enquire Now
+                        <div className="flex items-center justify-center gap-2">
+                          <lord-icon
+                            src="https://cdn.lordicon.com/wtywrnoz.json"
+                            trigger="loop"
+                            colors="primary:#ffffff"
+                            style={{ width: "20px", height: "20px" }}
+                          ></lord-icon>
+                          <span>Enquire Now</span>
+                        </div>
+
                       </button>
                     </div>
                     <div className="h-1 bg-gradient-to-r from-lime-400 via-green-500 to-emerald-500" />

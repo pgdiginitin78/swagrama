@@ -29,64 +29,7 @@ import CommonButton from "../../../common/button/CommonButton";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
 
-const STAY_DATA = [
-  {
-    id: "#SWG-2024-8831",
-    date: "12 Oct, 10:30 AM",
-    customer: "Ananya Mehta",
-    roomType: "Premium Suite",
-    occupancyType: "Twin Sharing",
-    occupancyIcon: "twin",
-    stayDates: "15 Oct - 22 Oct",
-    duration: "7 Nights",
-    paymentStatus: "PAID",
-    bookingStatus: "CONFIRMED",
-    avatar: "AM",
-    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200",
-    phone: "+91 98200 11234",
-    email: "ananya.mehta@gmail.com",
-    amount: "₹42,000",
-    notes: "Early check-in requested. Vegan meal plan.",
-  },
-  {
-    id: "#SWG-2024-8842",
-    date: "12 Oct, 11:15 AM",
-    customer: "Rajiv Malhotra",
-    roomType: "Deluxe Cottage",
-    occupancyType: "Single Occupancy",
-    occupancyIcon: "single",
-    stayDates: "Today - 20 Oct",
-    duration: "Checked-in",
-    paymentStatus: "PARTIALLY PAID",
-    bookingStatus: "CHECKED-IN",
-    avatar: "RM",
-    avatarImg:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100",
-    img: "https://images.unsplash.com/photo-1582719478250-c89cae4df85b?w=200",
-    phone: "+91 97300 55678",
-    email: "rajiv.m@outlook.com",
-    amount: "₹28,500",
-    notes: "Balance ₹9,500 due on checkout.",
-  },
-  {
-    id: "#SWG-2024-8855",
-    date: "12 Oct, 12:45 PM",
-    customer: "Sneha Kapoor",
-    roomType: "Standard Room",
-    occupancyType: "Twin Sharing",
-    occupancyIcon: "twin",
-    stayDates: "22 Oct - 27 Oct",
-    duration: "5 Nights",
-    paymentStatus: "UNPAID",
-    bookingStatus: "PENDING",
-    avatar: "SK",
-    img: "https://images.unsplash.com/photo-1590490360182-c33d57733427?w=200",
-    phone: "+91 99100 87654",
-    email: "sneha.kapoor@yahoo.com",
-    amount: "₹18,750",
-    notes: "Awaiting advance payment confirmation.",
-  },
-];
+
 
 const statusStyles = {
   PAID: "bg-emerald-50 text-emerald-700 border-emerald-200",
@@ -209,72 +152,18 @@ const SummaryCard = ({
   );
 };
 
-const MobileBookingCard = ({ booking, index, onSelect, isSelected }) => (
-  <motion.div
-    custom={index}
-    variants={rowVariants}
-    initial="hidden"
-    animate="show"
-    exit="exit"
-    onClick={() => onSelect(booking)}
-    whileTap={{ scale: 0.99 }}
-    className={`rounded-xl border p-2.5 cursor-pointer transition-colors ${isSelected ? "bg-[#e0f0db] border-[#b2d0ac]" : "bg-[#f0f7ee] border-[#d4e9ce]"}`}
-  >
-    <div className="flex items-start justify-between gap-2 mb-2">
-      <div className="flex items-center gap-2">
-        <Avatar
-          src={booking.avatarImg}
-          sx={{
-            width: 30,
-            height: 30,
-            bgcolor: "#c8dfc2",
-            color: "#2e5c28",
-            fontSize: "10px",
-            fontWeight: 700,
-          }}
-        >
-          {booking.avatar}
-        </Avatar>
-        <div>
-          <p className="text-[11px] font-bold text-[#002a24] leading-tight">
-            {booking.customer}
-          </p>
-          <p className="text-[8px] text-gray-400 font-medium mt-0.5">
-            {booking.id}
-          </p>
-        </div>
-      </div>
-      <div className="flex flex-col items-end gap-1">
-        <StatusBadge status={booking.bookingStatus} />
-        <StatusBadge status={booking.paymentStatus} />
-      </div>
-    </div>
-    <div className="grid grid-cols-2 gap-1.5">
-      <div className="bg-white border border-[#d4e9ce] rounded-lg p-1.5">
-        <p className="text-[7px] font-black uppercase tracking-wide text-[#6a9060] mb-0.5">
-          Room
-        </p>
-        <p className="text-[10px] font-bold text-[#4c7c70] leading-tight">
-          {booking.roomType}
-        </p>
-      </div>
-      <div className="bg-white border border-[#d4e9ce] rounded-lg p-1.5">
-        <p className="text-[7px] font-black uppercase tracking-wide text-[#6a9060] mb-0.5">
-          Stay
-        </p>
-        <p className="text-[10px] font-bold text-[#002a24] leading-tight">
-          {booking.stayDates}
-        </p>
-      </div>
-    </div>
-  </motion.div>
-);
-
-const FilterDrawer = ({ open, onClose, filters, onChange, activeCount }) => {
-  const paymentOptions = ["ALL", "PAID", "PARTIALLY PAID", "UNPAID"];
-  const bookingOptions = ["ALL", "CONFIRMED", "CHECKED-IN", "PENDING"];
+const FilterDrawer = ({
+  open,
+  onClose,
+  filters,
+  onChange,
+  activeCount,
+  populateTable,
+}) => {
+  const paymentOptions = ["all", "paid", "unpaid"];
+  const bookingOptions = ["all", "confirmed", "pending"];
   const roomOptions = [
-    "ALL",
+    "all",
     "Premium Suite",
     "Deluxe Cottage",
     "Standard Room",
@@ -430,13 +319,13 @@ const FilterDrawer = ({ open, onClose, filters, onChange, activeCount }) => {
               }}
             >
               <ToggleButton value="ALL">All</ToggleButton>
-              <ToggleButton value="single">
+              <ToggleButton value="Seperate">
                 <PersonIcon style={{ fontSize: 11, marginRight: 3 }} />
-                Single
+                Seperate
               </ToggleButton>
-              <ToggleButton value="twin">
+              <ToggleButton value="Double">
                 <PeopleIcon style={{ fontSize: 11, marginRight: 3 }} />
-                Twin
+                Double
               </ToggleButton>
             </ToggleButtonGroup>
           </div>
@@ -444,7 +333,10 @@ const FilterDrawer = ({ open, onClose, filters, onChange, activeCount }) => {
         <div className="px-4 py-3 border-t border-[#d4e9ce]">
           <motion.button
             whileTap={{ scale: 0.97 }}
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              populateTable();
+            }}
             className="w-full py-2.5 bg-[#003d33] text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl shadow-sm"
           >
             Apply Filters
@@ -466,19 +358,21 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
   const [selectedRow, setSelectedRow] = useState(null);
 
   const [filters, setFilters] = useState({
-    payment: "ALL",
-    booking: "ALL",
-    room: "ALL",
-    occupancy: "ALL",
+    paymentStatus: "all",
+    bookingStatus: "all",
+    roomType: "all",
+    occupancyType: "all",
   });
+
+  console.log("filters", filters);
 
   const handleFilter = (key, val) => {
     if (key === "reset")
       setFilters({
-        payment: "ALL",
-        booking: "ALL",
-        room: "ALL",
-        occupancy: "ALL",
+        paymentStatus: "all",
+        bookingStatus: "all",
+        roomType: "all",
+        occupancyType: "all",
       });
     else setFilters((p) => ({ ...p, [key]: val }));
   };
@@ -491,13 +385,10 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
 
   const populateTable = (forPagination) => {
     let obj = {
+      ...filters,
       page: !forPagination ? 1 : page,
       pageSize: rowsPerPage,
       type: "all",
-      // paymentStatus: "",
-      // bookingStatus: "",
-      // roomType: "",
-      // occupancyType: "",
     };
     setLoadingSpinner(true);
     GetUpcomingStays(obj)
@@ -674,6 +565,7 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
         filters={filters}
         onChange={handleFilter}
         activeCount={activeFilterCount}
+        populateTable={populateTable}
       />
     </div>
   );

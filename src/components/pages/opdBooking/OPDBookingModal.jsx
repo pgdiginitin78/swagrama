@@ -236,7 +236,11 @@ export default function OPDBookingModal({
         paymentFor: "OPD",
       };
       setIsLoading(true);
-      const res = await InitiatePayment(clinicFidValue?.id, userId, tempObj);
+      const res = await InitiatePayment(
+        clinicFidValue?.id,
+        patientFid !== null ? patientFid?.id : userId,
+        tempObj,
+      );
       const data = res?.data;
 
       if (data?.status === 200) {

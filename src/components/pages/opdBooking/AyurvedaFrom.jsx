@@ -815,7 +815,7 @@ function AyurvedaForm({
           data.clientTxnId,
           async () => {
             const res = await bookAppointment(finalObj,    patientFid !== null ? patientFid?.id : userId);
-            if (res.data.status === 200) {
+            if (res.data.statusCode === 201) {
               successAlert(
                 res.data.message || "Appointment booked successfully!",
               );

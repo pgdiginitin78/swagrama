@@ -18,6 +18,7 @@ import {
   Select,
   ToggleButton,
   ToggleButtonGroup,
+  Box
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -30,15 +31,6 @@ import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
 
 
-
-const statusStyles = {
-  PAID: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  CONFIRMED: "bg-teal-50 text-teal-700 border-teal-200",
-  "PARTIALLY PAID": "bg-amber-50 text-amber-700 border-amber-200",
-  "CHECKED-IN": "bg-lime-50 text-lime-700 border-lime-200",
-  UNPAID: "bg-red-50 text-red-700 border-red-200",
-  PENDING: "bg-gray-100 text-gray-500 border-gray-200",
-};
 
 const cardVariants = {
   hidden: { opacity: 0, scale: 0.96, y: 8 },
@@ -53,38 +45,6 @@ const cardVariants = {
     },
   }),
 };
-
-const rowVariants = {
-  hidden: { opacity: 0, x: -10 },
-  show: (i) => ({
-    opacity: 1,
-    x: 0,
-    transition: {
-      delay: 0.2 + i * 0.07,
-      duration: 0.32,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  }),
-  exit: { opacity: 0, x: 10, transition: { duration: 0.18 } },
-};
-
-const panelVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
-  },
-  exit: { opacity: 0, y: -8, transition: { duration: 0.18 } },
-};
-
-const StatusBadge = ({ status }) => (
-  <span
-    className={`px-2 py-0.5 rounded text-[7px] font-bold tracking-wide uppercase border ${statusStyles[status] || "bg-gray-50 text-gray-600 border-gray-200"} whitespace-nowrap`}
-  >
-    {status}
-  </span>
-);
 
 const SummaryCard = ({
   title,
@@ -104,7 +64,7 @@ const SummaryCard = ({
       initial="hidden"
       animate="show"
       whileHover={{ y: -1, transition: { duration: 0.18 } }}
-      className={`flex-1 min-w-[20px] p-2 rounded-lg flex flex-col justify-between border ${
+      className={`flex-1 min-w-[20px] px-2 py-4 rounded-lg flex flex-col justify-between border ${
         isDark
           ? "bg-[#2e3d28] border-[#3a4a32] text-white"
           : isSilver
@@ -162,12 +122,7 @@ const FilterDrawer = ({
 }) => {
   const paymentOptions = ["all", "paid", "unpaid"];
   const bookingOptions = ["all", "confirmed", "pending"];
-  const roomOptions = [
-    "all",
-    "Premium Suite",
-    "Deluxe Cottage",
-    "Standard Room",
-  ];
+  const roomOptions = ["all"];
   return (
     <Drawer
       anchor="right"
@@ -225,8 +180,8 @@ const FilterDrawer = ({
                 <motion.button
                   key={opt}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onChange("payment", opt)}
-                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.payment === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
+                  onClick={() => onChange("paymentStatus", opt)}
+                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.paymentStatus === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
                 >
                   {opt}
                 </motion.button>
@@ -243,8 +198,8 @@ const FilterDrawer = ({
                 <motion.button
                   key={opt}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onChange("booking", opt)}
-                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.booking === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
+                  onClick={() => onChange("bookingStatus", opt)}
+                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.bookingStatus === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
                 >
                   {opt}
                 </motion.button>
@@ -258,8 +213,8 @@ const FilterDrawer = ({
             </p>
             <FormControl fullWidth size="small">
               <Select
-                value={filters.room}
-                onChange={(e) => onChange("room", e.target.value)}
+                value={filters.roomType}
+                onChange={(e) => onChange("roomType", e.target.value)}
                 displayEmpty
                 sx={{
                   borderRadius: "10px",
@@ -295,9 +250,9 @@ const FilterDrawer = ({
               Occupancy Type
             </p>
             <ToggleButtonGroup
-              value={filters.occupancy}
+              value={filters.occupancyType}
               exclusive
-              onChange={(e, v) => v && onChange("occupancy", v)}
+              onChange={(e, v) => v && onChange("occupancyType", v)}
               fullWidth
               size="small"
               sx={{
@@ -318,7 +273,7 @@ const FilterDrawer = ({
                 },
               }}
             >
-              <ToggleButton value="ALL">All</ToggleButton>
+              <ToggleButton value="all">All</ToggleButton>
               <ToggleButton value="Seperate">
                 <PersonIcon style={{ fontSize: 11, marginRight: 3 }} />
                 Seperate
@@ -364,47 +319,52 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
     occupancyType: "all",
   });
 
-  console.log("filters", filters);
-
-  const handleFilter = (key, val) => {
-    if (key === "reset")
-      setFilters({
-        paymentStatus: "all",
-        bookingStatus: "all",
-        roomType: "all",
-        occupancyType: "all",
-      });
-    else setFilters((p) => ({ ...p, [key]: val }));
-  };
 
   const activeFilterCount = Object.values(filters).filter(
-    (v) => v !== "ALL",
+    (v) => v !== "all",
   ).length;
 
-  console.log("next24HoursArrivals", upcomingStays);
-
-  const populateTable = (forPagination) => {
+  const populateTable = (forPagination, currentFilters) => {
+    const filterData = currentFilters || filters;
     let obj = {
-      ...filters,
-      page: !forPagination ? 1 : page,
+      ...filterData,
+      page: typeof forPagination === "number" ? forPagination + 1 : 1,
       pageSize: rowsPerPage,
       type: "all",
     };
     setLoadingSpinner(true);
     GetUpcomingStays(obj)
       .then((res) => {
-        if (forPagination) {
-          setUpcomingStays((prevData) => [...prevData, ...res.data.data.data]);
-        } else {
-          setUpcomingStays(res.data.data.data);
-        }
-        console.log("res.data.data", res.data.data);
-        setCount(res.data.data.totalRecords);
+        const responseData = res?.data?.data?.data || [];
+        const totalRecords = res?.data?.data?.totalRecords || 0;
+
+        setUpcomingStays(responseData);
+        setCount(totalRecords);
         setLoadingSpinner(false);
       })
       .catch((error) => {
+        console.error("Error fetching upcoming stays:", error);
         setLoadingSpinner(false);
       });
+  };
+
+  const handleFilter = (key, val, shouldRefresh = false) => {
+    if (key === "reset") {
+      const resetFilters = {
+        paymentStatus: "all",
+        bookingStatus: "all",
+        roomType: "all",
+        occupancyType: "all",
+      };
+      setFilters(resetFilters);
+      if (shouldRefresh) populateTable(0, resetFilters);
+    } else {
+      setFilters((p) => {
+        const updated = { ...p, [key]: val };
+        if (shouldRefresh) populateTable(0, updated);
+        return updated;
+      });
+    }
   };
 
   useEffect(() => {
@@ -416,8 +376,11 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
     populateTable();
   }, []);
 
+  console.log("selectedRow",selectedRow);
+  
+
   return (
-    <div className="flex-1 flex flex-col bg-[#fbfbf8] h-screen p-3 ">
+    <div className="flex-1 flex flex-col bg-[#fbfbf8] min-h-screen  ">
       <div className="flex flex-col h-full">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -426,10 +389,10 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 shrink-0"
         >
           <div>
-            <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-[#4d7040] mb-0.5">
+            <p className="text-[7.5px] font-black  tracking-[0.2em] text-[#4d7040] mb-0.5">
               Sanctuary Management
             </p>
-            <h1 className="text-[17px] font-black text-[#002a24] tracking-tight leading-none uppercase">
+            <h1 className="text-[17px] font-black text-[#002a24] tracking-tight leading-none ">
               Wellness Stay
             </h1>
             <p className="text-[8.5px] text-[#5a7a50] font-medium mt-0.5">
@@ -443,10 +406,16 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
               overlap="circular"
               sx={{
                 "& .MuiBadge-badge": {
-                  fontSize: "6.5px",
-                  minWidth: "11px",
-                  height: "11px",
+                  fontSize: "8px",
+                  minWidth: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
                   fontWeight: 900,
+                  zIndex: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "0",
                 },
               }}
             >
@@ -497,11 +466,11 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
             className="flex flex-wrap gap-1.5 mb-2 shrink-0"
           >
             {Object.entries(filters).map(([key, val]) =>
-              val !== "ALL" ? (
+              val !== "all" ? (
                 <Chip
                   key={key}
                   label={`${key}: ${val}`}
-                  onDelete={() => handleFilter(key, "ALL")}
+                  onDelete={() => handleFilter(key, "all", true)}
                   size="small"
                   sx={{
                     fontSize: "8px",
@@ -530,7 +499,7 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
             </div>
           )}
           {upcomingStays?.length > 0 ? (
-            <main className="">
+            <main className="pb-5 flex-1">
               <CommonPaginationTable
                 dataResult={upcomingStays}
                 page={page}
@@ -542,8 +511,9 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
                 tableClass={"h-[320px] border cursor-pointer"}
                 setDataResult={setUpcomingStays}
                 populateTable={populateTable}
-                handleSelectedRow={(row) => setSelectedRow(row)}
+                handleSelectedRow={(row) => { setSelectedRow(row); if (onSelect) onSelect(row); }}
                 customRowBgColor={"#cde8b8"}
+                removeHeaders={["doctor","twinsharing","financials","petFriendly","bookingStatus","daysRemaining"]}
               />
             </main>
           ) : (

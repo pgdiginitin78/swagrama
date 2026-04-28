@@ -5,7 +5,6 @@ import EnquiryDashboard from "./EnquiryDashboard";
 
 import BookingsDashboard from "./BookingsDashboard";
 
-/* Placeholder pages for unimplemented sections */
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
     <div className="w-16 h-16 rounded-2xl bg-[#e8f5e0] flex items-center justify-center mb-4">
@@ -30,25 +29,28 @@ const PlaceholderPage = ({ title }) => (
   </div>
 );
 
-const CONTENT_MAP = {
-  dashboard: <SuperAdminDashboard />,
+const buildContentMap = (setActiveMenu, bookingsInitialTab, setBookingsInitialTab) => ({
+  dashboard: <SuperAdminDashboard onNavigate={(menu, tab) => { if (tab !== undefined) setBookingsInitialTab(tab); setActiveMenu(menu); }} />,
   enquiries: <EnquiryDashboard />,
-  bookings: <BookingsDashboard />,
+  bookings: <BookingsDashboard initialTab={bookingsInitialTab} onTabConsumed={() => setBookingsInitialTab(undefined)} />,
   inventory: <PlaceholderPage title="Inventory" />,
   masters: <PlaceholderPage title="Masters" />,
   "patient-master": <PlaceholderPage title="Patient Master" />,
   "doctor-master": <PlaceholderPage title="Doctor Master" />,
   "service-master": <PlaceholderPage title="Service Master" />,
   settings: <PlaceholderPage title="Settings" />,
-};
+});
 
 const AdminLayout = () => {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
+  const [bookingsInitialTab, setBookingsInitialTab] = useState(undefined);
+
+  const contentMap = buildContentMap(setActiveMenu, bookingsInitialTab, setBookingsInitialTab);
 
   return (
-    <div className="flex overflow-hidden ">
-      <div className="h-[calc(100vh-64px)] md:h-[calc(100vh-0px)] z-10">
+    <div className="flex">
+      <div className=" z-10 flex-shrink-0 h-screen">
         <AdminDrawer
           activeMenu={activeMenu}
           onMenuChange={setActiveMenu}
@@ -56,11 +58,8 @@ const AdminLayout = () => {
           onMobileClose={() => setMobileDrawerOpen(false)}
         />
       </div>
-      {/* Sidebar */}
 
-      {/* Main content wrapper */}
-      <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        {/* Mobile top bar */}
+      <div className="flex flex-col flex-1 min-w-0  h-full">
         <div className="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-[#e8ede4] sticky top-0 z-20">
           <button
             onClick={() => setMobileDrawerOpen(true)}
@@ -92,9 +91,8 @@ const AdminLayout = () => {
           </div>
         </div>
 
-        {/* Page content */}
-        <div className="flex-1 overflow-hidden h-full">
-          {CONTENT_MAP[activeMenu] || (
+        <div className="flex-1  h-full">
+          {contentMap[activeMenu] || (
             <PlaceholderPage title="Page Not Found" />
           )}
         </div>

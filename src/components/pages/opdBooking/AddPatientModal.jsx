@@ -270,7 +270,7 @@ export default function AddPatientModal({
       const apiData = response?.data?.data || response?.data;
 
       if (
-        response?.statusCode === 201 &&
+        response?.data?.statusCode === 201 &&
         (apiData?.userId || apiData?.success)
       ) {
         successAlert(apiData?.message || "Patient registered successfully!");

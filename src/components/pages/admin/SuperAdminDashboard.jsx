@@ -1,8 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import {
   AccountBalanceWallet,
-  ArrowForward,
   Assignment,
   CalendarMonth,
   Close,
@@ -11,10 +8,10 @@ import {
   People,
   Search,
   Timeline,
-  TrendingUp,
-  Visibility,
-  Menu,
+  Visibility
 } from "@mui/icons-material";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -144,10 +141,9 @@ const CustomTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-const SuperAdminDashboard = () => {
+const SuperAdminDashboard = ({ onNavigate }) => {
   const [searchDoc, setSearchDoc] = useState("");
   const [clinicFilter, setClinicFilter] = useState("All");
-  const [navOpen, setNavOpen] = useState(false);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [upCommingStays, setUpCommingStays] = useState([]);
@@ -238,8 +234,7 @@ const SuperAdminDashboard = () => {
   return (
     <div className="h-full overflow-y-auto px-4 no-scrollbar">
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap');
-        *, body { font-family: 'DM Sans', sans-serif; box-sizing: border-box; }
+        *, body {  box-sizing: border-box; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .pulse-dot { animation: pulse-dot 1.5s infinite; }
       `}</style>
@@ -727,8 +722,10 @@ const SuperAdminDashboard = () => {
                   </div>
                 ))}
             </div>
-            <button className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer uppercase tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150">
-              View All Operational Logs →
+            <button
+              onClick={() => onNavigate && onNavigate("bookings", 2)}
+              className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150">
+              View All Stays →
             </button>
           </div>
         </section>

@@ -65,7 +65,7 @@ const OtherBookings = ({ onSelect, selectedId }) => {
     populateTable();
   }, []);
 
-  console.log("otherBookingList", otherBookingList);
+  console.log("selectedRow", selectedRow);
 
   return (
     <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
@@ -105,7 +105,10 @@ const OtherBookings = ({ onSelect, selectedId }) => {
             tableClass={"h-[370px] border cursor-pointer"}
             setDataResult={setOtherBookingList}
             populateTable={populateTable}
-            handleSelectedRow={(row) => setSelectedRow(row)}
+            handleSelectedRow={(row) => {
+              setSelectedRow(row);
+              if (onSelect) onSelect(row);
+            }}
             customRowBgColor={"#cde8b8"}
           />
         </div>

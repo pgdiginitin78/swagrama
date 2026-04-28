@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 
-const drawerWidth = 240;
+const drawerWidth = 220;
 
 const openedMixin = (theme) => ({
   width: drawerWidth,
@@ -148,21 +148,44 @@ const AdminDrawer = ({
           <Tooltip
             title={
               !showContent ? (
-                <Box sx={{ p: 0.5, color: "#fff" }}>
-                  <p
-                    style={{
-                      margin: "0 0 6px 0",
-                      fontSize: "11px",
-                      opacity: 0.9,
-                      fontWeight: 900,
-                      color: "#ffffff",
-                      borderBottom: "1px solid rgba(255,255,255,0.2)",
-                      paddingBottom: "4px",
-                      fontFamily: '"Inter", sans-serif',
-                    }}
-                  >
-                    {item.label}
-                  </p>
+                <Box sx={{ p: 0.5 }}>
+                  {hasChildren ? (
+                    <p
+                      style={{
+                        margin: "0 0 6px 0",
+                        fontSize: "11px",
+                        fontWeight: 900,
+                        color: "#166534",
+                        borderBottom: "1px solid rgba(22,101,52,0.15)",
+                        paddingBottom: "4px",
+                        fontFamily: '"Inter", sans-serif',
+                      }}
+                    >
+                      {item.label}
+                    </p>
+                  ) : (
+                    <Box
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMenuClick(item.key);
+                      }}
+                      sx={{
+                        px: 1,
+                        py: 0.5,
+                        fontSize: "12px",
+                        fontWeight: 800,
+                        color: "#166534",
+                        cursor: "pointer",
+                        borderRadius: "6px",
+                        fontFamily: '"Inter", sans-serif',
+                        "&:hover": {
+                          backgroundColor: "rgba(22,101,52,0.08)",
+                        },
+                      }}
+                    >
+                      {item.label}
+                    </Box>
+                  )}
                   {hasChildren &&
                     item.children.map((child) => (
                       <Box
@@ -177,17 +200,15 @@ const AdminDrawer = ({
                           fontSize: "12px",
                           borderRadius: "6px",
                           backgroundColor: isSelected(child.key)
-                            ? "#fff"
+                            ? "rgba(22,101,52,0.12)"
                             : "transparent",
-                          color: isSelected(child.key) ? "#1e5d66" : "#fff",
+                          color: isSelected(child.key) ? "#166534" : "#4b7a5e",
                           cursor: "pointer",
                           fontWeight: isSelected(child.key) ? 800 : 500,
                           mb: 0.5,
                           transition: "all 0.2s",
                           "&:hover": {
-                            backgroundColor: isSelected(child.key)
-                              ? "#fff"
-                              : "rgba(255,255,255,0.1)",
+                            backgroundColor: "rgba(22,101,52,0.08)",
                           },
                         }}
                       >
@@ -207,18 +228,18 @@ const AdminDrawer = ({
               popper: {
                 sx: {
                   [`& .MuiTooltip-tooltip`]: {
-                    backgroundColor: "#1e5d66",
-                    color: "#ffffff !important",
+                    background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+                    color: "#166534",
                     fontWeight: 700,
                     fontSize: "12px",
                     px: 1.5,
                     py: 1.2,
                     borderRadius: "12px",
-                    boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    boxShadow: "0 8px 24px rgba(34,197,94,0.15)",
+                    border: "1px solid rgba(134,239,172,0.4)",
                   },
                   [`& .MuiTooltip-arrow`]: {
-                    color: "#1e5d66",
+                    color: "#dcfce7",
                   },
                 },
               },
@@ -240,14 +261,16 @@ const AdminDrawer = ({
                 borderRadius: "12px",
                 backgroundColor: active ? "white" : "transparent",
                 boxShadow: active ? "0 4px 12px rgba(0,0,0,0.06)" : "none",
-                color: active ? "#1e5d66" : "#4a5568",
+                color: active ? "#16a34a" : "#4a5568",
                 "& .MuiListItemIcon-root": {
-                  color: active ? "#1e5d66" : "#4a5568",
+                  color: active ? "#16a34a" : "#4a5568",
                 },
                 "&:hover": {
-                  backgroundColor: active ? "white" : "rgba(30, 93, 102, 0.06)",
+                  background: active
+                    ? "white"
+                    : "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
                   "& .MuiListItemIcon-root": {
-                    color: "#1e5d66",
+                    color: "#16a34a",
                   },
                 },
               }}
@@ -300,9 +323,9 @@ const AdminDrawer = ({
                       mb: 0.5,
                       borderRadius: "10px",
                       backgroundColor: childActive
-                        ? "rgba(30, 93, 102, 0.08)"
+                        ? "rgba(22, 163, 74, 0.08)"
                         : "transparent",
-                      color: childActive ? "#1e5d66" : "#718096",
+                      color: childActive ? "#16a34a" : "#718096",
                       "& .MuiTypography-root": {
                         fontSize: "13px",
                         fontWeight: childActive ? 700 : 500,
@@ -310,8 +333,8 @@ const AdminDrawer = ({
                       },
                       "&:hover": {
                         backgroundColor: childActive
-                          ? "rgba(30, 93, 102, 0.12)"
-                          : "rgba(0, 0, 0, 0.03)",
+                          ? "rgba(22, 163, 74, 0.12)"
+                          : "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
                       },
                     }}
                   >
@@ -347,7 +370,7 @@ const AdminDrawer = ({
           height: 38,
           borderRadius: "10px",
           overflow: "hidden",
-          backgroundColor: "#1e5d66",
+          backgroundColor: "#16a34a",
           flexShrink: 0,
           display: "flex",
           alignItems: "center",
@@ -374,7 +397,7 @@ const AdminDrawer = ({
               margin: 0,
               fontSize: "12px",
               fontWeight: 800,
-              color: "#1e5d66",
+              color: "#16a34a",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -417,10 +440,10 @@ const AdminDrawer = ({
         }}
       >
         <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-          <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-[#16a34a] flex items-center justify-center">
             <Database size={18} color="white" />
           </div>
-          <span className="font-bold text-[#1e5d66] text-lg">Swagrama</span>
+          <span className="font-bold text-[#16a34a] text-lg">Swagrama</span>
         </Box>
         <Divider sx={{ mb: 1, opacity: 0.5 }} />
         <List sx={{ px: 1 }}>
@@ -442,11 +465,11 @@ const AdminDrawer = ({
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 1.2, ml: 1 }}
             >
-              <div className="w-8 h-8 rounded-lg bg-[#1e5d66] flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-lg bg-[#16a34a] flex items-center justify-center shadow-sm">
                 <Database size={18} color="white" />
               </div>
               <span
-                style={{ fontWeight: 800, fontSize: "18px", color: "#1e5d66" }}
+                style={{ fontWeight: 800, fontSize: "18px", color: "#16a34a" }}
               >
                 Swagrama
               </span>
@@ -457,7 +480,7 @@ const AdminDrawer = ({
           <IconButton
             onClick={handleDrawerToggle}
             sx={{
-              color: "#1e5d66",
+              color: "#16a34a",
               mr: open ? 0 : "auto",
               ml: open ? 0 : "auto",
             }}

@@ -172,19 +172,17 @@ export default function OPDBookingModal({
   const doctorValue = watch("doctorFid");
   const appointmentDate = watch("appointmentDate");
   const selectedServiceValue = watch("serviceFid");
+  const patientFid = watch("patientFid");
 
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
 
   const handleReset = () => {
-    reset();
+    setValue("doctorFid", null);
+    setValue("appointmentDate", null);
+    setValue("serviceFid", null);
     setSelectedTimeSlot(null);
     setSlotError("");
-    setDoctorSlots([]);
-    setClinicOptions([]);
-    setDoctorOptions([]);
-    setServicesOptions([]);
-    setPatientOptions([]);
   };
 
   const handleBookAppointment = (dataObj) => {
@@ -215,7 +213,7 @@ export default function OPDBookingModal({
       ServiceDetails: dataObj.ServiceDetails,
       taxDeatils: dataObj.taxDetails,
       EncounterStatus: dataObj?.EncounterStatus,
-      bookingSource:"web"
+      bookingSource: "web",
     };
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -234,7 +232,7 @@ export default function OPDBookingModal({
           appointmentDate && !isNaN(new Date(appointmentDate).getTime())
             ? format(new Date(appointmentDate), "yyyy-MM-dd")
             : "",
-        userId: userId,
+        userId: patientFid !== null ? patientFid?.id : userId,
         paymentFor: "OPD",
       };
       setIsLoading(true);
@@ -250,7 +248,10 @@ export default function OPDBookingModal({
           clinicFidValue?.id,
           data.clientTxnId,
           async () => {
-            const res = await bookAppointment(finalSaveObj, userId);
+            const res = await bookAppointment(
+              finalSaveObj,
+              patientFid !== null ? patientFid?.id : userId,
+            );
             if (res.data.statusCode === 201) {
               successAlert(res.data.message);
               setOpenConfirmationModal(false);
@@ -388,10 +389,15 @@ export default function OPDBookingModal({
   }, [clinicFidValue, user, setValue]);
 
   useEffect(() => {
-    if (doctorValue?.id && appointmentDate && clinicFidValue?.id) {
+    if (
+      doctorValue !== null &&
+      appointmentDate !== null &&
+      clinicFidValue !== null
+    ) {
       setSelectedTimeSlot(null);
       setSlotError("");
       setLoading(true);
+      setDoctorSlots([]);
       getDoctorAvailableSlots(
         doctorValue.id,
         appointmentDate && !isNaN(new Date(appointmentDate).getTime())
@@ -413,7 +419,7 @@ export default function OPDBookingModal({
       setDoctorSlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [doctorValue?.id, appointmentDate, clinicFidValue]);
+  }, [doctorValue, appointmentDate, clinicFidValue]);
 
   useEffect(() => {
     if (patientOptions?.length > 0) {
@@ -584,15 +590,15 @@ export default function OPDBookingModal({
                                   weekDays={selectedTherapy?.weekDays}
                                 />
                               </div>
-                              <div>
+                              {/* <div>
                                 <DropdownField
                                   control={control}
                                   name="Status"
                                   placeholder="Select Status"
                                   dataArray={statusData}
                                 />
-                              </div>
-                              <div className="col-span-2">
+                              </div> */}
+                              <div className="">
                                 <DropdownField
                                   control={control}
                                   name="doctorFid"

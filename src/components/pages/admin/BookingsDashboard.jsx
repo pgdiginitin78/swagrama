@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Tabs, Tab, IconButton } from '@mui/material';
 import { Search as SearchIcon, NotificationsNone as NotificationsIcon, AccountCircleOutlined as ProfileIcon } from '@mui/icons-material';
@@ -8,9 +8,17 @@ import WellnessStayBookings from './bookings/WellnessStayBookings';
 import OtherBookings from './bookings/OtherBookings';
 import { BookingDetailContent } from './bookings/BookingComponents';
 
-const BookingsDashboard = () => {
-  const [activeTab, setActiveTab] = useState(0);
+const BookingsDashboard = ({ initialTab, onTabConsumed }) => {
+  const [activeTab, setActiveTab] = useState(initialTab ?? 0);
   const [selectedBooking, setSelectedBooking] = useState(null);
+
+  useEffect(() => {
+    if (initialTab !== undefined) {
+      setActiveTab(initialTab);
+      setSelectedBooking(null);
+      if (onTabConsumed) onTabConsumed();
+    }
+  }, [initialTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -32,7 +40,7 @@ const BookingsDashboard = () => {
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ duration: 0.4 }}
-      className="flex flex-col h-full bg-[#fbfbf8] overflow-hidden font-sans"
+      className="flex flex-col h-full bg-[#fbfbf8] "
     >
       <header className="flex flex-col md:flex-row items-center justify-between px-4 py-1 bg-[#fbfbf8] border-b border-gray-100 gap-2 shrink-0">
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ minHeight: 'auto', '& .MuiTabs-indicator': { backgroundColor: '#4c7c70', height: 2 }, '& .MuiTab-root': { textTransform: 'uppercase', minWidth: 'auto', p: '4px 10px', fontSize: '9px', fontWeight: 800, color: '#999', letterSpacing: '0.1em', '&.Mui-selected': { color: '#003d33' } } }}>
@@ -48,16 +56,16 @@ const BookingsDashboard = () => {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden p-2 gap-2">
-        <main className={`flex-1 flex flex-col overflow-hidden bg-white rounded-xl border border-gray-100 ${selectedBooking ? 'hidden lg:flex' : 'flex'}`}>
+      <div className="flex flex-1 p-2 gap-2">
+        <main className={`flex-1 flex flex-col  bg-white rounded-xl border border-gray-100 ${selectedBooking ? 'hidden lg:flex' : 'flex'}`}>
           {renderActiveTab()}
         </main>
 
-        <aside className={`flex-shrink-0 bg-white border border-gray-100 rounded-xl transition-all duration-300 flex flex-col overflow-hidden ${selectedBooking ? 'fixed inset-0 z-10 lg:relative lg:inset-auto w-full lg:w-[360px] xl:w-[400px]' : 'hidden lg:flex lg:w-[320px] xl:w-[360px] h-full'}`}>
+        <aside className={`flex-shrink-0 bg-white border border-gray-100 rounded-xl transition-all duration-300 flex flex-col  ${selectedBooking ? 'fixed inset-0 z-10 lg:relative lg:inset-auto w-full lg:w-[360px] xl:w-[400px]' : 'hidden lg:flex lg:w-[320px] xl:w-[360px] h-full'}`}>
           <BookingDetailContent 
             selectedBooking={selectedBooking} 
             onClose={() => setSelectedBooking(null)} 
-            type={activeTab === 1 ? 'THERAPY' : 'STAY'} 
+            type={activeTab === 0 ? 'OPD' : activeTab === 1 ? 'THERAPY' : activeTab === 2 ? 'STAY' : 'OTHER'} 
           />
         </aside>
       </div>

@@ -87,7 +87,7 @@ const menuItems = [
     label: "Masters",
     Icon: Database,
     children: [
-      { key: "patient-master", label: "Patient Master" },
+      // { key: "patient-master", label: "Patient Master" },
       { key: "doctor-master", label: "Doctor Master" },
       { key: "service-master", label: "Service Master" },
     ],

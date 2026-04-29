@@ -5,6 +5,7 @@ import EnquiryDashboard from "./EnquiryDashboard";
 
 import BookingsDashboard from "./BookingsDashboard";
 import DoctorMaster from "../masters/doctorMaster/DoctorMaster";
+import TherapyMaster from "../masters/therapyMaster/TherapyMaster";
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
@@ -36,10 +37,10 @@ const buildContentMap = (setActiveMenu, bookingsInitialTab, setBookingsInitialTa
   bookings: <BookingsDashboard initialTab={bookingsInitialTab} onTabConsumed={() => setBookingsInitialTab(undefined)} />,
   inventory: <PlaceholderPage title="Inventory" />,
   masters: <PlaceholderPage title="Masters" />,
-  "patient-master": <PlaceholderPage title="Patient Master" />,
+
   "doctor-master": <DoctorMaster />,
-  "service-master": <PlaceholderPage title="Service Master" />,
-  settings: <PlaceholderPage title="Settings" />,
+  "service-master": <TherapyMaster />,
+  // settings: <PlaceholderPage title="Settings" />,
 });
 
 const AdminLayout = () => {

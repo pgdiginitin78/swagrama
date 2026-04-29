@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { memo } from "react";
+import { useNavigate } from "react-router-dom";
 import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 import landigPageS1 from "../../assets/landing-page/landigPageS1.webm";
 
-const HeroSection = ({ userData, setOpenAppointmentModal }) => {
+const HeroSection = () => {
+  const navigate = useNavigate();
   return (
     <motion.section
       className="relative min-h-screen overflow-hidden"
@@ -69,7 +71,7 @@ const HeroSection = ({ userData, setOpenAppointmentModal }) => {
             whileHover={{ scale: 1.06 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
-              setOpenAppointmentModal(true);
+              navigate("/healing");
             }}
           >
             <img src={BookAppointmentIcon} className="w-4 h-4 sm:w-5 sm:h-5" />

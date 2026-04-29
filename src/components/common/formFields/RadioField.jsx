@@ -10,25 +10,25 @@ import {
 import { Controller } from "react-hook-form";
 // space-x-2
 
-const RadioField = ({ dataArray, name, label, control }) => {
+const RadioField = ({ dataArray, name, label, control, error }) => {
   return (
-    <FormControl className="">
+    <FormControl error={!!error}>
       <div className="flex flex-row lg:flex-row flex-wrap">
         <FormLabel
           sx={{ color: "#000000", fontSize: "10px" }}
-          id="demo-radio-buttons-group-label"
-          // className="mt-2"
+          id={`radio-label-${name}`}
         >
           {label}
         </FormLabel>
         <Controller
+          name={name}
+          control={control}
+          defaultValue=""
           render={({ field }) => (
             <RadioGroup
               row
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue={""}
-              name={name}
               {...field}
+              aria-labelledby={`radio-label-${name}`}
               sx={{
                 marginTop: "-0.3rem",
                 display: "flex",
@@ -38,13 +38,12 @@ const RadioField = ({ dataArray, name, label, control }) => {
             >
               {dataArray.map((p) => (
                 <FormControlLabel
-                  key={name + p.id}
-                  value={p.id}
+                  key={p.id || p.value}
+                  value={p.id || p.value}
                   control={<Radio size="small" />}
                   label={
                     <Typography
-                      variant="body2 "
-                      className="w-full "
+                      variant="body2"
                       sx={{ fontSize: 12 }}
                     >
                       {p.label}
@@ -54,11 +53,13 @@ const RadioField = ({ dataArray, name, label, control }) => {
               ))}
             </RadioGroup>
           )}
-          name={name}
-          control={control}
-          defaultValue={""}
         />
       </div>
+      {error && (
+        <Typography sx={{ color: "#d32f2f", fontSize: "10px", mt: 0.5 }}>
+          {error.message}
+        </Typography>
+      )}
     </FormControl>
   );
 };

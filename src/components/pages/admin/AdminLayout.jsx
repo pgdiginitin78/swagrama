@@ -4,6 +4,7 @@ import SuperAdminDashboard from "./SuperAdminDashboard";
 import EnquiryDashboard from "./EnquiryDashboard";
 
 import BookingsDashboard from "./BookingsDashboard";
+import DoctorMaster from "../masters/doctorMaster/DoctorMaster";
 
 const PlaceholderPage = ({ title }) => (
   <div className="flex flex-col items-center justify-center h-full min-h-[400px] text-center">
@@ -36,7 +37,7 @@ const buildContentMap = (setActiveMenu, bookingsInitialTab, setBookingsInitialTa
   inventory: <PlaceholderPage title="Inventory" />,
   masters: <PlaceholderPage title="Masters" />,
   "patient-master": <PlaceholderPage title="Patient Master" />,
-  "doctor-master": <PlaceholderPage title="Doctor Master" />,
+  "doctor-master": <DoctorMaster />,
   "service-master": <PlaceholderPage title="Service Master" />,
   settings: <PlaceholderPage title="Settings" />,
 });
@@ -45,6 +46,7 @@ const AdminLayout = () => {
   const [activeMenu, setActiveMenu] = useState("dashboard");
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [bookingsInitialTab, setBookingsInitialTab] = useState(undefined);
+  
 
   const contentMap = buildContentMap(setActiveMenu, bookingsInitialTab, setBookingsInitialTab);
 

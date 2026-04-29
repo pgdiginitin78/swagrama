@@ -7,7 +7,7 @@ const Wrapper = styled("div")(({ theme }) => ({
   position: "relative",
   width: "100%",
   backgroundColor: "#fff",
-  borderRadius: 10,
+  borderRadius: 5,
   border: `1px solid ${theme.palette.grey[300]}`,
   padding: "6px 14px",
   transition: "0.2s ease",

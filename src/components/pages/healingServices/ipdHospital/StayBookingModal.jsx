@@ -75,6 +75,7 @@ function StayBookingModal({
   const [checkOutTime, setCheckOutTime] = useState(
     format(new Date(), "HH:mm:ss"),
   );
+  const [selectingFor, setSelectingFor] = useState("checkIn");
 
   const [inTimeAnchorEl, setInTimeAnchorEl] = useState(null);
   const [outTimeAnchorEl, setOutTimeAnchorEl] = useState(null);
@@ -116,23 +117,26 @@ function StayBookingModal({
   const outTimeRef = useRef(null);
   const guestInputRef = useRef(null);
 
-const schema = yup.object().shape({
-  fullName: yup.string().required("Full name is required"),
-  email: yup.string().required("Email is required").email("Invalid email format"),
-  mobile: yup
-    .string()
-    .required("Mobile number is required")
-    .matches(/^[0-9]{10}$/, "Must be 10 digits"),
-  city: yup.string().required("City is required"),
-  patientFid: yup
-    .object()
-    .shape({
-      id: yup.mixed().required(),
-      label: yup.string().required(),
-    })
-    .nullable()
-    .required("Patient selection is required"),
-});
+  const schema = yup.object().shape({
+    fullName: yup.string().required("Full name is required"),
+    email: yup
+      .string()
+      .required("Email is required")
+      .email("Invalid email format"),
+    mobile: yup
+      .string()
+      .required("Mobile number is required")
+      .matches(/^[0-9]{10}$/, "Must be 10 digits"),
+    city: yup.string().required("City is required"),
+    patientFid: yup
+      .object()
+      .shape({
+        id: yup.mixed().required(),
+        label: yup.string().required(),
+      })
+      .nullable()
+      .required("Patient selection is required"),
+  });
 
   const { control, watch, setValue, reset } = useForm({
     defaultValues: {
@@ -142,7 +146,7 @@ const schema = yup.object().shape({
       city: "",
       bringingPet: false,
       patientFid: null,
-      twinSharing: true,
+      twinSharing: false,
       mealPreference: {
         label: "Organic Full Board (Included)",
         value: "Organic Full Board (Included)",
@@ -164,21 +168,27 @@ const schema = yup.object().shape({
   const handleDateClick = (date) => {
     if (isBefore(date, startOfToday())) return;
 
-    if (checkIn && !checkOut) {
-      if (isSameDay(date, checkIn)) {
-        setCheckIn(null);
+    if (selectingFor === "checkIn") {
+      setCheckIn(date);
+      if (checkOut && (isBefore(checkOut, date) || isSameDay(date, checkOut))) {
         setCheckOut(null);
-      } else if (isBefore(date, checkIn)) {
+      }
+      setSelectingFor("checkOut");
+    } else {
+      if (!checkIn || isBefore(date, checkIn)) {
         setCheckIn(date);
         setCheckOut(null);
+        setSelectingFor("checkOut");
+      } else if (isSameDay(date, checkIn)) {
+        setCheckIn(null);
+        setCheckOut(null);
+        setSelectingFor("checkIn");
       } else {
         setCheckOut(date);
         setHoveredDate(null);
         setCalendarAnchorEl(null);
+        setSelectingFor("checkIn");
       }
-    } else {
-      setCheckIn(date);
-      setCheckOut(null);
     }
   };
 
@@ -186,7 +196,7 @@ const schema = yup.object().shape({
     if (!selectedService) return { stay: 0, wellness: 0, taxes: 0, total: 0 };
     const base = selectedService.price;
     const wellness = 0;
-    const taxes = (base + wellness) * 0.18;
+    const taxes = (base + wellness) * 0; // tax is zero for now
     return {
       stay: base,
       wellness: wellness,
@@ -325,7 +335,7 @@ const schema = yup.object().shape({
       return;
     }
     const saveObj = {
-      userId: user?.userId || 1,
+      userId: patientFid !==null && patientFid !== undefined? patientFid?.id : user?.userId,
       resortId: 1,
       roomTypeId: selectedService?.roomTypeId,
       stayType: selectedService?.maxOcc === 1 ? "Seperate" : "Double",
@@ -351,7 +361,7 @@ const schema = yup.object().shape({
   const initiateBookingPayment = async () => {
     if (isPaymentPending) return;
     try {
-      const userId = user?.userId || 1;
+      const userId =patientFid !==null && patientFid !== undefined? patientFid?.id : user?.userId ;
       const clinicId = 5;
 
       setIsLoading(true);
@@ -449,7 +459,7 @@ const schema = yup.object().shape({
   console.log("patientFid", patientFid);
 
   useEffect(() => {
-    if (patientFid !== null) {
+    if (patientFid !== null && patientFid !== undefined) {
       setValue("fullName", patientFid.label);
       setValue("mobileNumber", patientFid.mobileNo);
       setValue("age", patientFid?.age);
@@ -492,13 +502,14 @@ const schema = yup.object().shape({
                   className="bg-white rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.04)] p-2 flex flex-col gap-2 border group-hover/searchbar:shadow-[0_15px_40px_rgba(0,0,0,0.06)] transition-all duration-500"
                 >
                   <div className="flex flex-col md:flex-row items-stretch gap-2">
-                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2  gap-2">
                       {/* Check-in Block */}
-                      <div className="flex items-stretch border border-gray-100 rounded-lg bg-white overflow-hidden hover:border-booking-primary transition-colors">
+                      <div className="flex items-stretch border  rounded-[5px] bg-white  hover:border-booking-primary transition-colors">
                         <div
                           ref={checkInDateRef}
                           onClick={(e) => {
                             setCalendarAnchorEl(e.currentTarget);
+                            setSelectingFor("checkIn");
                             if (checkIn) setCalendarViewDate(checkIn);
                           }}
                           className="flex-1 flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 transition-all border-r border-gray-50"
@@ -539,12 +550,14 @@ const schema = yup.object().shape({
                       </div>
 
                       {/* Check-out Block */}
-                      <div className="flex items-stretch border border-gray-100 rounded-lg bg-white overflow-hidden hover:border-booking-primary transition-colors">
+                      <div className="flex items-stretch border  rounded-[5px] bg-white overflow-hidden hover:border-booking-primary transition-colors">
                         <div
                           ref={checkOutDateRef}
                           onClick={(e) => {
                             setCalendarAnchorEl(e.currentTarget);
-                            if (checkIn) setCalendarViewDate(checkIn);
+                            setSelectingFor("checkOut");
+                            if (checkOut) setCalendarViewDate(checkOut);
+                            else if (checkIn) setCalendarViewDate(checkIn);
                           }}
                           className="flex-1 flex flex-col px-3 py-1.5 cursor-pointer hover:bg-gray-50 transition-all border-r border-gray-50"
                         >
@@ -583,7 +596,7 @@ const schema = yup.object().shape({
                         </div>
                       </div>
 
-                      <div
+                      {/* <div
                         ref={guestInputRef}
                         onClick={(e) => setGuestsAnchorEl(e.currentTarget)}
                         className="px-3 py-1.5 cursor-pointer hover:bg-gray-50 rounded-lg transition-all border border-gray-100 group/item flex flex-col justify-center bg-white"
@@ -615,7 +628,7 @@ const schema = yup.object().shape({
                             className={`text-gray-300 ml-auto transition-transform duration-300 ${guestsAnchorEl ? "rotate-180" : ""}`}
                           />
                         </div>
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="flex flex-col justify-center md:w-36">
@@ -1077,6 +1090,7 @@ const schema = yup.object().shape({
                               else end = addMonths(start, 1);
                               setCheckIn(start);
                               setCheckOut(end);
+                              setSelectingFor("checkIn");
                             }
                             setCalendarAnchorEl(null);
                           }}
@@ -1283,13 +1297,68 @@ const schema = yup.object().shape({
                 </Popover>
               </div>
             </LocalizationProvider>
+            <div className="flex flex-col gap-3 pt-3 border rounded-[9px] p-2 mt-2">
+              <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
+                Preferences
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  {
+                    label: "Bringing a Pet?",
+                    sub: "Pre-approval required",
+                    subColor: "text-booking-primary",
+                    field: "bringingPet",
+                  },
+                  {
+                    label: "Twin Sharing?",
+                    sub: "*Same-gender rules",
+                    subColor: "text-red-500",
+                    field: "twinSharing",
+                  },
+                ].map(({ label, sub, subColor, field }) => (
+                  <div
+                    key={field}
+                    className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border  hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
+                        <PeopleAlt
+                          className="text-booking-primary"
+                          sx={{ fontSize: 16 }}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-800 text-xs sm:text-[13px]">
+                          {label}
+                        </p>
+                        <p className={`text-[10px] font-semibold ${subColor}`}>
+                          {sub}
+                        </p>
+                      </div>
+                    </div>
+                    <Switch
+                      size="small"
+                      checked={formValues[field]}
+                      onChange={(e) => setValue(field, e.target.checked)}
+                      sx={{
+                        "& .MuiSwitch-switchBase.Mui-checked": {
+                          color: "#4B6B53",
+                        },
+                        "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
+                          { backgroundColor: "#4B6B53" },
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
 
             <div className="w-full mt-4">
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex flex-col gap-5"
+                className="bg-white rounded-[9px] p-4 sm:p-5 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex flex-col gap-5"
               >
                 <div className="border-b border-booking-primary/10 pb-2">
                   <h2 className="text-base sm:text-lg font-serif text-ayuBrown font-bold">
@@ -1357,64 +1426,6 @@ const schema = yup.object().shape({
                       label="City"
                       variant="outlined"
                     />
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-3 pt-3 border rounded-xl p-2">
-                  <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
-                    Preferences
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {[
-                      {
-                        label: "Bringing a Pet?",
-                        sub: "Pre-approval required",
-                        subColor: "text-booking-primary",
-                        field: "bringingPet",
-                      },
-                      {
-                        label: "Twin Sharing?",
-                        sub: "*Same-gender rules",
-                        subColor: "text-red-500",
-                        field: "twinSharing",
-                      },
-                    ].map(({ label, sub, subColor, field }) => (
-                      <div
-                        key={field}
-                        className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border  hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
-                            <PeopleAlt
-                              className="text-booking-primary"
-                              sx={{ fontSize: 16 }}
-                            />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-800 text-xs sm:text-[13px]">
-                              {label}
-                            </p>
-                            <p
-                              className={`text-[10px] font-semibold ${subColor}`}
-                            >
-                              {sub}
-                            </p>
-                          </div>
-                        </div>
-                        <Switch
-                          size="small"
-                          checked={formValues[field]}
-                          onChange={(e) => setValue(field, e.target.checked)}
-                          sx={{
-                            "& .MuiSwitch-switchBase.Mui-checked": {
-                              color: "#4B6B53",
-                            },
-                            "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                              { backgroundColor: "#4B6B53" },
-                          }}
-                        />
-                      </div>
-                    ))}
                   </div>
                 </div>
 

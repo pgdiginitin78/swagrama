@@ -13,13 +13,14 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getRoomList } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import StayBookingModal from "./StayBookingModal";
-import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.webp";
+import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.png";
 import InfiniteRoom from "../../../assets/rooms/InfiniteRoom.webp";
-import WellHouse from "../../../assets/rooms/WellHouse.webp";
+import WellHouse from "../../../assets/rooms/WellHouse.png";
 import EternityRoom from "../../../assets/rooms/EternityRoom.webp";
-import EternalRoom from "../../../assets/rooms/EternalRoom.webp";
-import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.webp";
+import EternalRoom from "../../../assets/rooms/EternalRoom.png";
+import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.png";
 import OutdoorLeavingImg from "../../../assets/rooms/OutdoorLeaving.webp";
+import BookAppointmentIcon from "../../../assets/bookAppointment.svg"
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -60,9 +61,11 @@ const IPDWellnessStay = () => {
     if (name.includes("perpetual")) return PerpetualRoom;
     if (name.includes("firmness")) return FirmnessRoom;
     if (name.includes("infinite")) return InfiniteRoom;
-    if (name.includes("well house") || name.includes("wellhouse")) return WellHouse;
-    if (name.includes("outdoor") || name.includes("out door")) return OutdoorLeavingImg;
-    
+    if (name.includes("well house") || name.includes("wellhouse"))
+      return WellHouse;
+    if (name.includes("outdoor") || name.includes("out door"))
+      return OutdoorLeavingImg;
+
     return roomImageMap[room.roomTypeId] || EternityRoom;
   };
 
@@ -301,14 +304,14 @@ const IPDWellnessStay = () => {
                           onClick={() => handleBook(service)}
                           className={`px-4 py-1.5 rounded-[5px] flex items-center justify-center transition-all duration-200 ${
                             service.isActive
-                              ? "bg-ayuMid text-white  hover:scale-105 shadow-sm shadow-ayuDark/20"
+                              ? "bg-ayuMid text-white  hover:scale-105 shadow-sm shadow-ayuDark/20 "
                               : "bg-gray-100 text-gray-400 cursor-not-allowed"
                           }`}
                           title={
                             service.isActive ? "View Details" : "Unavailable"
                           }
                         >
-                          View Details
+                          <span className="flex space-x-2 items-center animate-pulse"><img src={BookAppointmentIcon} className="mr-2 w-4 h-4" alt="" />Book Now</span>
                         </button>
                       </div>
                     </div>

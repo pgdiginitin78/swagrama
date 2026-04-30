@@ -54,7 +54,7 @@ const UpcomingEventsSection = ({
                     exit={{ opacity: 0, y: -20 }}
                     className="flex flex-col flex-1"
                   >
-                    <div className="relative w-full h-[145px] bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 rounded-t-xl border border-lime-200 flex-shrink-0">
+                    <div className="relative w-full h-[200px] md:h-[145px] bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 rounded-t-xl border border-lime-200 flex-shrink-0">
                       <div className="absolute inset-0 flex items-center justify-center">
                         <motion.img
                           src={event.image}

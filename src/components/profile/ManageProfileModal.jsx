@@ -42,7 +42,7 @@ const schema = yup.object().shape({
     .required("Pincode is required")
     .matches(/^[0-9]{6}$/, "Must be 6 digits"),
   address: yup.string().required("Address is required"),
-  locality: yup.string().required("Locality is required"),
+  // locality: yup.string().required("Locality is required"),
   city: yup.string().required("City is required"),
   state: yup.string().required("State is required"),
   country: yup.string().required("Country is required"),
@@ -160,16 +160,15 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       setOpenConfirmationModal(false);
       setIsLoading(true);
       const response = await signupJYA(formData);
-      const apiData = response?.data;
+      const apiData = response?.data;      
       if (response.status === 200 && apiData) {
-        successAlert(apiData);
+        successAlert(apiData?.message);
         onClose();
         reset();
-        setIsLoading(false);
       } else {
         errorAlert("Registration failed");
-        setIsLoading(false);
       }
+      setIsLoading(false);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
       errorAlert(errorMessage);
@@ -518,7 +517,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                         type="button"
                         label="Reset"
                         onClick={reset}
-                        className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all text-sm py-2 px-4 rounded-lg font-bold"
+                        className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all "
                       />
                       <CommonButton
                         onClick={handleSubmit(onSubmit)}
@@ -526,7 +525,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                           !isDirty && authUser?.avatar === avatarPreview
                         }
                         label="Update Profile"
-                        className="flex-[2] sm:flex-initial bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-md hover:shadow-lg active:scale-95 transition-all disabled:grayscale disabled:opacity-50 text-sm py-2 px-5 rounded-lg"
+                        className="flex-[2] sm:flex-initial bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-md hover:shadow-lg active:scale-95 transition-all disabled:grayscale disabled:opacity-50 "
                       />
                     </div>
                   </div>

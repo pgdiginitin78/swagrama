@@ -8,11 +8,11 @@ import {
   Calendar,
   ClipboardList,
   MapPin,
-  User as UserIcon
-} from "lucide-react"; 
+  User as UserIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import * as yup from "yup"; 
+import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
 import {
   getPatientDataByMobileNo,
@@ -179,14 +179,14 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     });
 
     const saveObj = {
-      userId: user?.userId,
+      userId: patientFid !== null ? patientFid.id : user?.userId,
       fullName: data?.fullName,
       mobile: data?.mobileNumber,
       city: data?.city,
       email: data?.email,
       activityName: serviceDetails?.serviceName,
-      checkin: serviceDetails?.checkIn,
-      checkOut: serviceDetails?.checkOut,
+      checkin: origin === "AnnualEvent" ? null : serviceDetails?.checkIn,
+      checkOut: origin === "AnnualEvent" ? null : serviceDetails?.checkOut,
       visitDate: format(data.appointmentDate, "yyyy-MM-dd"),
       no_of_person: data.noOfPerson,
       amount: total,
@@ -209,11 +209,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
         const tempObj = {
           amount: formData.amount,
           appointmentDate: formData.visitDate,
-          SloteStartTime: formData.checkin,
-          SloteEndTime: formData.checkOut,
-          userId: user?.userId,
+          SloteStartTime: origin === "AnnualEvent" ? null : formData.checkin,
+          SloteEndTime: origin === "AnnualEvent" ? null : formData.checkOut,
+          userId:patientFid !== null ? patientFid.id :  user?.userId,
           paymentFor: origin,
-          bookingId: bookingId,
+          bookingId: bookingId.id,
         };
 
         const res = await InitiatePayment(null, user?.userId, tempObj);
@@ -287,7 +287,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-white leading-tight">
-                      Booking Request
+                      Booking Request 
                     </h2>
                     <p className="text-white/80 text-xs font-medium uppercase tracking-widest mt-0.5">
                       Community Services
@@ -468,9 +468,9 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       <div className="space-y-4">
                         <div className="flex justify-between text-xs font-semibold">
                           <span className="text-green-200">
-                            Base Price ({serviceDetails.price})
+                            Base Price 
                           </span>
-                          <span>₹{subtotal.toLocaleString()}</span>
+                          <span>{serviceDetails.price}</span>
                         </div>
                         <div className="flex justify-between text-xs font-semibold">
                           <span className="text-green-200">Persons</span>

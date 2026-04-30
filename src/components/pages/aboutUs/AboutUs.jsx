@@ -728,12 +728,12 @@ const AboutUs = () => {
                       <motion.img
                         src={healer.image}
                         alt={healer.name}
-                        className="w-full h-full object-cover object-top "
+                        className="w-full h-full object-cover object-center "
                         whileHover={{ scale: 1.05 }}
                         transition={{ duration: 0.4 }}
                       />
 
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                      {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" /> */}
                     </div>
 
                     <CardContent className="mt-2 pb-4 px-6 text-center">

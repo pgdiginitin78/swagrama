@@ -130,7 +130,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     reset,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {  
+    defaultValues: {
       fullName: "",
       email: "",
       mobile: "",
@@ -147,7 +147,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   });
 
   const patientFid = watch("patientFid");
-
 
   const bookingDate = watch("bookingDate");
   const selectedServiceValue = watch("serviceFid");
@@ -191,7 +190,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       .then((res) => {
         const data = res?.data?.data || [];
         const filterData = data.find(
-          (item) => String(item.userId) === String(user?.userId)
+          (item) => String(item.userId) === String(user?.userId),
         );
         if (data?.length) {
           setPatientOptions(
@@ -200,12 +199,12 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               id: d.userId,
               value: d.userId,
               label: `${d.firstName || ""} ${d.lastName || ""}`.trim(),
-            }))
+            })),
           );
           if (filterData) {
             setValue(
               "fullName",
-              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim()
+              `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
             );
             setValue("email", filterData.emailId || "");
             setValue("mobile", String(filterData.mobileNo || ""));
@@ -351,7 +350,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               errorAlert(msg);
               setOpenConfirmation(false);
               setIsPaymentPending(false);
-            }
+            },
           );
         } else {
           setIsLoading(false);
@@ -392,7 +391,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                 <div className="sticky top-0 z-20 bg-white border-b border-booking-border px-4 sm:px-6 py-3 shadow-md flex items-center justify-between">
                   <h2 className="text-lg sm:text-xl font-bold text-booking-text flex items-center gap-2">
                     <span className="bg-booking-primary/10 p-1.5 rounded-[9px] flex items-center justify-center">
-                      <Event sx={{ fontSize: 20, color: "var(--booking-primary)" }} className="text-booking-primary" />
+                      <Event
+                        sx={{ fontSize: 20, color: "var(--booking-primary)" }}
+                        className="text-booking-primary"
+                      />
                     </span>
                     Book Beauty Therapy
                   </h2>
@@ -517,7 +519,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                 />
                               </div>
                             </div>
-
                           </div>
                         </div>
 
@@ -637,9 +638,14 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                 </span>
                               </div>
                               <div className="flex justify-between text-[11px] font-medium">
-                                <span className="text-slate-500">GST (18%)</span>
+                                <span className="text-slate-500">
+                                  GST (18%)
+                                </span>
                                 <span className="text-slate-700 font-bold">
-                                  ₹{Math.round((selectedServiceValue?.charges || 0) * 0.18)}
+                                  ₹
+                                  {Math.round(
+                                    (selectedServiceValue?.charges || 0) * 0.18,
+                                  )}
                                 </span>
                               </div>
                               <div className="pt-2 mt-2 border-t border-booking-primary/10 flex justify-between items-end">

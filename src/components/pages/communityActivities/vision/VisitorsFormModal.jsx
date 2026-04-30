@@ -31,6 +31,7 @@ import InputField from "../../../common/formFields/InputField";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+import BillSummaryIcon from "../../../assets/BillSummary.svg";
 
 const schema = yup.object().shape({
   fullName: yup
@@ -185,12 +186,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       city: data?.city,
       email: data?.email,
       activityName: serviceDetails?.serviceName,
-      checkin: origin === "AnnualEvent" ? null : serviceDetails?.checkIn,
-      checkOut: origin === "AnnualEvent" ? null : serviceDetails?.checkOut,
+      checkin: origin === "AnnualEvents" ? null : serviceDetails?.checkIn,
+      checkOut: origin === "AnnualEvents" ? null : serviceDetails?.checkOut,
       visitDate: format(data.appointmentDate, "yyyy-MM-dd"),
       no_of_person: data.noOfPerson,
       amount: total,
-      origin: origin,
     };
     setFormData(saveObj);
     setOpenConfirmation(true);
@@ -209,8 +209,8 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
         const tempObj = {
           amount: formData.amount,
           appointmentDate: formData.visitDate,
-          SloteStartTime: origin === "AnnualEvent" ? null : formData.checkin,
-          SloteEndTime: origin === "AnnualEvent" ? null : formData.checkOut,
+          SloteStartTime: origin === "AnnualEvents" ? null : formData.checkin,
+          SloteEndTime: origin === "AnnualEvents" ? null : formData.checkOut,
           userId:patientFid !== null ? patientFid.id :  user?.userId,
           paymentFor: origin,
           bookingId: bookingId.id,
@@ -304,7 +304,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                   className="grid lg:grid-cols-12 gap-7"
                 >
                   <div className="lg:col-span-7 space-y-6">
-                    <div className="bg-gradient-to-br from-green-50 to-white p-5 rounded-2xl border border-green-100 shadow-sm">
+                    <div className="bg-gradient-to-br from-green-50 to-white p-5 rounded-[9px] border border-green-300 shadow-sm">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-xl font-black text-green-900 leading-tight">
@@ -345,8 +345,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    {/* Schedule Details */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
                       <h4 className="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5" /> Schedule
                         Configuration
@@ -374,8 +373,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    {/* Personal Information */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                           <UserIcon className="w-3.5 h-3.5" /> Visitor
@@ -431,8 +429,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    {/* Request & Consent */}
-                    <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
                       <InputArea
                         control={control}
                         name="specialRequests"
@@ -441,7 +438,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                         error={errors.specialRequests}
                         minRows={2}
                       />
-                      <div className="mt-4 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                      <div className="mt-4 p-3 bg-emerald-50 rounded-[9px] border border-emerald-300">
                         <CheckBoxField
                           control={control}
                           name="termsAccepted"
@@ -452,14 +449,13 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                     </div>
                   </div>
 
-                  {/* Sidebar (Right Column) */}
                   <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-0 h-fit">
                     {/* Bill Summary */}
-                    <div className="bg-green-800 rounded-2xl shadow-xl p-6 text-white relative overflow-hidden">
+                    <div className="bg-green-800 rounded-[9px] shadow-xl p-6 text-white relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
 
                       <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
-                        <PaymentOutlinedIcon className="w-5 h-5 text-green-300" />
+                        <img src={BillSummaryIcon} alt="" className="w-5 h-5" />
                         <h3 className="font-bold text-xs tracking-widest uppercase">
                           Bill Summary
                         </h3>
@@ -504,8 +500,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    {/* Summary Notes */}
-                    <div className="bg-white p-5 rounded-2xl border border-dashed border-slate-200">
+                    <div className="bg-white p-5 rounded-[9px] border border-dashed border-slate-300">
                       <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-3 px-1">
                         Special Benefits
                       </h5>
@@ -519,7 +514,6 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                 </form>
               </div>
 
-              {/* Mobile Actions */}
               <div className="lg:hidden p-4 bg-white border-t border-slate-100 flex gap-3">
                 <button
                   type="button"

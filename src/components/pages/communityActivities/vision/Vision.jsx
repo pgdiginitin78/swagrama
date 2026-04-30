@@ -45,6 +45,8 @@ import img11 from "../../../assets/community-activities/visionImages/IMG_2022071
 import img12 from "../../../assets/community-activities/visionImages/IMG_20220713_105048~2.webp";
 import img13 from "../../../assets/community-activities/visionImages/IMG_20230923_094519.webp";
 import img14 from "../../../assets/community-activities/visionImages/DSC_0310-1.webp";
+import { IoEarthSharp } from "react-icons/io5";
+import { TbUniverse } from "react-icons/tb";
 
 const carouselImages = [
   img1,
@@ -424,29 +426,26 @@ const OurVision = () => {
             viewport={{ once: true }}
             className="text-[#f7f5f0]/95 text-base sm:text-lg md:text-xl font-light leading-relaxed max-w-4xl mx-auto mb-10"
           >
-            This comprehensive vision of
+            This comprehensive vision of&nbsp;
             <strong className="text-[#8bc34a] font-semibold">
-              {" "}
-              स्वग्राम{" "}
-            </strong>{" "}
-            allows visitors to
+              स्वग्राम&nbsp;
+            </strong>
+            allows visitors to&nbsp;
             <strong className="text-[#8bc34a] font-semibold">
-              {" "}
               immerse fully in the philosophy of One Universe, One Earth, One
-              Community
+              Community&nbsp;
             </strong>
             . Each step is a learning and healing experience — teaching
             <strong className="text-[#8bc34a] font-semibold">
-              {" "}
-              responsibility, sustainability, compassion, and mindfulness
+              &nbsp;responsibility, sustainability, compassion, and mindfulness
             </strong>
             .
           </motion.p>
 
           <div className="flex justify-center gap-6 sm:gap-10 md:gap-14 flex-wrap mb-10">
             {[
-              { icon: PublicIcon, text: "One Universe" },
-              { icon: NatureIcon, text: "One Earth" },
+              { icon: TbUniverse, text: "One Universe" },
+              { icon: IoEarthSharp, text: "One Earth" },
               { icon: GroupsIcon, text: "One Community" },
             ].map((item, index) => (
               <motion.div

@@ -707,19 +707,17 @@ export default function AddNewDoctors({ open, handleClose }) {
               title="Doctor Session"
             >
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                <InputField
+                <DropdownField
                   control={control}
                   name="timeSlot"
                   error={errors.timeSlot}
-                  label="Time Slot (min)"
-                  type="number"
+                  placeholder="Time Slot (min)"
                 />
-                <InputField
+                <DropdownField
                   control={control}
                   name="slotCount"
                   error={errors.slotCount}
-                  label="Slot Count"
-                  type="number"
+                  placeholder="Slot Count"
                 />
               </div>
 

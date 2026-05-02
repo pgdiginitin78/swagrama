@@ -42,30 +42,30 @@ const OPDClinic = () => {
   const [selectedDoctorId, setSelectedDoctorId] = useState(null);
 
   const activeDept = departmentList[activeTab] ?? null;
-  const activeGradient = activeDept ? getDeptGradient(activeDept) : "";
+  const activeGradient = activeDept ? getDeptGradient(activeDept?.departmentName) : "";
+
+  console.log("departmentList",departmentList);
+  
 
   useEffect(() => {
     setLoadingDepts(true);
     getDepartmentList(5)
       .then((res) => {
-        const data = res.data.data || res.data || [];
-        const normalized = data.map((item) =>
-          typeof item === "string" ? item : item.item || item.name || ""
-        ).filter(Boolean);
-        setDepartmentList(normalized);
+        const data = res?.data?.data || [];
+        setDepartmentList(data);
       })
       .catch(() => setDepartmentList([]))
       .finally(() => setLoadingDepts(false));
   }, []);
 
   useEffect(() => {
-    if (!activeDept) {
+    if (!activeDept?.departmentName) {
       setDoctorList([]);
       return;
     }
     setLoadingDoctors(true);
     setSelectedDoctorId(null);
-    getDoctorListByLocationDepartment(5, activeDept)
+    getDoctorListByLocationDepartment(5, activeDept.departmentName)
       .then((res) => setDoctorList(res.data.data ?? []))
       .catch(() => setDoctorList([]))
       .finally(() => setLoadingDoctors(false));
@@ -111,19 +111,19 @@ const OPDClinic = () => {
           <div className="flex justify-center mb-4">
             <div className="w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
           </div>
-        ) : departmentList.length === 0 ? (
+        ) : departmentList?.length === 0 ? (
           <p className="text-center text-sm text-gray-400 mb-4">
             No departments available.
           </p>
         ) : (
           <div className="flex justify-center mb-4">
             <div className="inline-flex bg-white/80 backdrop-blur-xl p-1.5 rounded-xl shadow-2xl border border-green-200">
-              {departmentList?.length> 0 && departmentList.map((dept, index) => {
-                const Icon = getDeptIcon(dept);
-                const gradient = getDeptGradient(dept);
+              {departmentList?.map((dept, index) => {
+                const Icon = getDeptIcon(dept?.departmentName);
+                const gradient = getDeptGradient(dept?.departmentName);
                 return (
                   <button
-                    key={dept}
+                    key={dept?.departmentId || index}
                     onClick={() => setActiveTab(index)}
                     className={`relative px-4 py-2 rounded-lg font-bold text-xs transition-all duration-300 ${
                       activeTab === index
@@ -138,14 +138,16 @@ const OPDClinic = () => {
                     )}
                     <span className="relative z-10 flex items-center gap-1.5">
                       <span className="text-base">
-                        {dept === "Ayurveda" ? (
+                        {dept?.departmentName === "Ayurveda" || dept?.departmentName === "Aayurveda" ? (
                           <img src={AyurvedaIcon} alt="Ayurveda" className="h-5 w-5" />
                         ) : (
                           <Icon fontSize="small" />
                         )}
                       </span>
-                      <span className="hidden sm:inline">{dept}</span>
-                      <span className="sm:hidden">{dept.substring(0, 6)}</span>
+                      <span className="hidden sm:inline">{dept?.departmentName}</span>
+                      <span className="sm:hidden">
+                        {dept?.departmentName ? dept.departmentName.substring(0, 6) : ""}
+                      </span>
                     </span>
                   </button>
                 );
@@ -161,7 +163,7 @@ const OPDClinic = () => {
           selectedDoctorId={selectedDoctorId}
           setSelectedDoctorId={setSelectedDoctorId}
           activeGradient={activeGradient}
-          activeDept={activeDept}
+          activeDept={activeDept?.departmentName}
         />
         {/* // )} */}
       </div>

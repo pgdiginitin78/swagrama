@@ -22,18 +22,16 @@ const colorMap = {
 };
 
 const getDeptIcon = (name) => {
-  const key = name?.toLowerCase();
+  const key = typeof name === "string" ? name.toLowerCase() : "";
   return iconMap[key] ?? CompostIcon;
 };
 
 const getDeptGradient = (name) => {
-  const key = name?.toLowerCase();
+  const key = typeof name === "string" ? name.toLowerCase() : "";
   return colorMap[key] ?? "from-green-600 to-emerald-500";
 };
 
 const OPDClinic = () => {
-
-
   const [activeTab, setActiveTab] = useState(0);
   const [departmentList, setDepartmentList] = useState([]);
   const [doctorList, setDoctorList] = useState([]);

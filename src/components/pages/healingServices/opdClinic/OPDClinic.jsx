@@ -118,7 +118,7 @@ const OPDClinic = () => {
         ) : (
           <div className="flex justify-center mb-4">
             <div className="inline-flex bg-white/80 backdrop-blur-xl p-1.5 rounded-xl shadow-2xl border border-green-200">
-              {departmentList.map((dept, index) => {
+              {departmentList?.length> 0 && departmentList.map((dept, index) => {
                 const Icon = getDeptIcon(dept);
                 const gradient = getDeptGradient(dept);
                 return (

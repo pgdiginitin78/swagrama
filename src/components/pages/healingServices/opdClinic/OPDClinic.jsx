@@ -32,6 +32,8 @@ const getDeptGradient = (name) => {
 };
 
 const OPDClinic = () => {
+
+
   const [activeTab, setActiveTab] = useState(0);
   const [departmentList, setDepartmentList] = useState([]);
   const [doctorList, setDoctorList] = useState([]);
@@ -45,7 +47,13 @@ const OPDClinic = () => {
   useEffect(() => {
     setLoadingDepts(true);
     getDepartmentList(5)
-      .then((res) => setDepartmentList(res.data.data ?? []))
+      .then((res) => {
+        const data = res.data.data || res.data || [];
+        const normalized = data.map((item) =>
+          typeof item === "string" ? item : item.item || item.name || ""
+        ).filter(Boolean);
+        setDepartmentList(normalized);
+      })
       .catch(() => setDepartmentList([]))
       .finally(() => setLoadingDepts(false));
   }, []);

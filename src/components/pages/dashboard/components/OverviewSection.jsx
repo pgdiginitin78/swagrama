@@ -18,7 +18,7 @@ const OverviewSection = ({
   setActiveTab,
   setSelectedItem,
 }) => {
-  const activities = [...upcomingActivities, ...upcomingOPD, ...upcomingTherapies];
+  const activities = [...upcomingActivities];
 
   return (
     <motion.div

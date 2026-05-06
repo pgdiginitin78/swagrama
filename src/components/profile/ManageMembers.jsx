@@ -182,7 +182,7 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   const fetchMembers = () => {
     if (user?.mobileNo) {
       setLoading(true);
-      getPatientDataByMobileNo(user?.mobileNo, 5)
+      getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
         .then((res) => {
           if (res?.data?.data) {
             setMemberList(res.data.data);

@@ -149,13 +149,12 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       setIsLoading(true);
       const response = await signupJYA(formData);
       const apiData = response?.data;
+      console.log("apiData",response);      
       if (response.status === 200 && apiData) {
-        successAlert(apiData?.message);
+        successAlert(response?.data);
         onClose();
         reset();
-      } else {
-        errorAlert("Registration failed");
-      }
+      } 
       setIsLoading(false);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;

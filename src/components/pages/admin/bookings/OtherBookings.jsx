@@ -1,17 +1,10 @@
-import React, { useEffect, useState } from "react";
-import { Avatar, IconButton } from "@mui/material";
-import {
-  VisibilityOutlined as ViewIcon,
-  EditOutlined as EditIcon,
-  DeleteOutline as DeleteIcon,
-  ChevronLeft,
-  ChevronRight,
-} from "@mui/icons-material";
-import { StatusBadge, OriginBadge } from "./BookingComponents";
+import { useEffect, useState } from "react";
 import { GetOtherBookingsList } from "../../../../services/adminDashboard/AdminDashboardServices";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
-import CommonButton from "../../../common/button/CommonButton";
+import { EmptyDetailView } from "./BookingComponents";
+import OtherDetailView from "./OtherDetailView";
+
 
 const OTHER_DATA = Array.from({ length: 3 }, (_, i) => ({
   id: `#OTH-20${i + 1}`,
@@ -27,32 +20,25 @@ const OTHER_DATA = Array.from({ length: 3 }, (_, i) => ({
   img: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=200",
 }));
 
-const OtherBookings = ({ onSelect, selectedId }) => {
+const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   const [otherBookingList, setOtherBookingList] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingSpinner, setLoadingSpinner] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
 
-  const populateTable = (forPagination) => {
+  const populateTable = (newPage) => {
+    const currentPage = typeof newPage === "number" ? newPage : page;
     let obj = {
-      page: !forPagination ? 0 : page,
+      page: currentPage + 1,
       pageSize: rowsPerPage,
     };
     setLoadingSpinner(true);
+    setOtherBookingList([])
     GetOtherBookingsList(obj)
       .then((res) => {
-        if (forPagination) {
-          setOtherBookingList((prevData) => [
-            ...prevData,
-            ...res.data.data.data,
-          ]);
-        } else {
-          setOtherBookingList(res.data.data.data);
-        }
-        console.log("1234567890",res.data.data);
-        
+        setOtherBookingList(res.data.data.data);
         setTotalCount(res.data.data.totalRecords);
         setLoadingSpinner(false);
       })
@@ -63,7 +49,7 @@ const OtherBookings = ({ onSelect, selectedId }) => {
 
   useEffect(() => {
     populateTable();
-  }, []);
+  }, [refreshTrigger]);
 
   console.log("selectedRow", selectedRow);
 
@@ -78,49 +64,69 @@ const OtherBookings = ({ onSelect, selectedId }) => {
             Manage miscellaneous gift cards and memberships.
           </p>
         </div>
-        <CommonButton
+        {/* <CommonButton
           type="button"
           className="bg-[#003d33] text-white  transition-all active:scale-95"
           label="+ New Entry"
           onClick={() => {}}
-        />
+        /> */}
       </div>
 
-      {loadingSpinner && (
-        <div className="my-40 flex justify-center">
-          <LoadingSpinner />
-        </div>
-      )}
-
-      {otherBookingList?.length > 0 ? (
-        <div className="mb-5">
-          <CommonPaginationTable
-            dataResult={otherBookingList}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            setPage={setPage}
-            count={totalCount}
-            setCount={setTotalCount}
-            setRowsPerPage={setRowsPerPage}
-            tableClass={"h-[370px] border cursor-pointer"}
-            setDataResult={setOtherBookingList}
-            populateTable={populateTable}
-            handleSelectedRow={(row) => {
-              setSelectedRow(row);
-              if (onSelect) onSelect(row);
-            }}
-            customRowBgColor={"#cde8b8"}
-          />
-        </div>
-      ) : (
-        <>
-          {!loadingSpinner && (
-            <div className="my-40 text-center flex-1 text-sm font-semibold">
-              No Records Found<span className="animate-pulse">...</span>
+      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+        <div className="flex-1 transition-all duration-300">
+          {loadingSpinner && (
+            <div className="my-40 flex justify-center">
+              <LoadingSpinner />
             </div>
           )}
-        </>
-      )}
+
+          {otherBookingList?.length > 0 ? (
+            <div className="px-4 pb-4 h-full">
+              <CommonPaginationTable
+                dataResult={otherBookingList}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                setPage={setPage}
+                count={totalCount}
+                setCount={setTotalCount}
+                setRowsPerPage={setRowsPerPage}
+                tableClass={"h-[420px] border cursor-pointer"}
+                setDataResult={setOtherBookingList}
+                populateTable={populateTable}
+                handleSelectedRow={(row) => {
+                  setSelectedRow(row);
+                  if (onSelect) onSelect(row);
+                }}
+                customRowBgColor={"#cde8b8"}
+              />
+            </div>
+          ) : (
+            <>
+              {!loadingSpinner && (
+                <div className="my-40 text-center flex-1 text-sm font-semibold">
+                  No Records Found<span className="animate-pulse">...</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+          {selectedRow ? (
+            <div className="h-full animate-in fade-in slide-in-from-right duration-300">
+              <OtherDetailView
+                selectedBooking={selectedRow}
+                onClose={() => {
+                  setSelectedRow(null);
+                  if (onSelect) onSelect(null);
+                }}
+              />
+            </div>
+          ) : (
+            <EmptyDetailView />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

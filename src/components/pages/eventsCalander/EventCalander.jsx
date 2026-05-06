@@ -413,7 +413,7 @@ const EventCalendar = () => {
                     exit={{ opacity: 0, y: -20 }}
                     className="space-y-2 mb-2"
                   >
-                    <div className="relative w-full h-24 sm:h-28 md:h-32 lg:h-48 bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 overflow-hidden border border-lime-200">
+                    <div className="relative w-full h-36 md:h-32 lg:h-48 bg-gradient-to-br from-lime-100 via-green-100 to-lime-50 overflow-hidden border border-lime-200">
                       <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
                         {selectedEvents?.[0]?.image ? (
                           <img
@@ -507,7 +507,7 @@ const EventCalendar = () => {
                                   setOpenEventBookModal(true);
                                   setCurrentEvent(event);
                                 }}
-                                className="ml-auto px-2 sm:px-3 py-0.5 sm:py-1 bg-gradient-to-r from-lime-600 to-green-700 text-white font-bold rounded text-[10px] sm:text-xs shadow-sm hover:shadow-md transition-all"
+                                className="ml-auto px-3 py-1 bg-gradient-to-r from-lime-600 to-green-700 text-white font-bold rounded text-xs shadow-sm hover:shadow-md transition-all"
                               >
                                 Book Event
                               </motion.button>
@@ -568,6 +568,7 @@ const EventCalendar = () => {
             setCurrentEvent(null);
           }}
           serviceDetails={currentEvent}
+          origin={"AnnualEvents"}
         />
       )}
     </div>

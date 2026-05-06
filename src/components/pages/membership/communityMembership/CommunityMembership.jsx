@@ -22,7 +22,6 @@ import {
 import { useState } from "react";
 import CommunityMembershipImg from "../../../assets/membership/communityMembership.webp";
 import MembershipRegistrationModal from "./MembershipRegistrationModal";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 
 const benefits = [
   {
@@ -315,9 +314,9 @@ const CommunityMembership = () => {
 
   return (
     <div className="  w-full">
-      <section className="relative w-full h-screen overflow-hidden -mt-20 sm:-mt-24 md:mt-0">
+      <section className="relative w-full lg:h-screen overflow-hidden   md:mt-0">
         <div
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat w-full"
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat w-full hidden lg:block"
           style={{ backgroundImage: `url(${CommunityMembershipImg})` }}
         />
 

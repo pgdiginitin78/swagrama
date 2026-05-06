@@ -20,7 +20,7 @@ import EternityRoom from "../../../assets/rooms/EternityRoom.webp";
 import EternalRoom from "../../../assets/rooms/EternalRoom.png";
 import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.png";
 import OutdoorLeavingImg from "../../../assets/rooms/OutdoorLeaving.webp";
-import BookAppointmentIcon from "../../../assets/bookAppointment.svg"
+import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 
 const staggerContainer = {
   hidden: { opacity: 0 },
@@ -311,7 +311,14 @@ const IPDWellnessStay = () => {
                             service.isActive ? "View Details" : "Unavailable"
                           }
                         >
-                          <span className="flex space-x-2 items-center animate-pulse"><img src={BookAppointmentIcon} className="mr-2 w-4 h-4" alt="" />Book Now</span>
+                          <span className="flex space-x-2 items-center animate-pulse">
+                            <img
+                              src={BookAppointmentIcon}
+                              className="mr-2 w-4 h-4"
+                              alt=""
+                            />
+                            Book Now
+                          </span>
                         </button>
                       </div>
                     </div>
@@ -320,8 +327,8 @@ const IPDWellnessStay = () => {
               );
             })
           ) : (
-            <div className="text-center text-gray-500 text-sm">
-              No rooms available
+            <div className="text-center text-gray-500 text-sm flex justify-center w-full my-32 col-span-3">
+              <p>No Rooms Available...</p>
             </div>
           )}
         </div>

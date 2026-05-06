@@ -156,7 +156,7 @@ export default function OPDBookingModal({
       patientFid: null,
       doctorFid: null,
       serviceFid: null,
-      appointmentDate: null,
+      appointmentDate: new Date(),
       Status: null,
       ServiceDetails: "",
       taxDetails: "",
@@ -179,7 +179,7 @@ export default function OPDBookingModal({
 
   const handleReset = () => {
     setValue("doctorFid", null);
-    setValue("appointmentDate", null);
+    setValue("appointmentDate", new Date());
     setValue("serviceFid", null);
     setSelectedTimeSlot(null);
     setSlotError("");
@@ -262,6 +262,7 @@ export default function OPDBookingModal({
               setIsPaymentPending(false);
               handleClose();
               reset();
+              setValue("appointmentDate", new Date());
             }
           },
           (errorStatus) => {
@@ -380,8 +381,8 @@ export default function OPDBookingModal({
               setPatientOptions(
                 data.map((item) => ({
                   ...item,
-                  id: item.userId,
-                  value: item.userId,
+                  id: item.patientId,
+                  value: item.patientId,
                   label: `${item.firstName} ${item.lastName}`,
                 })),
               );

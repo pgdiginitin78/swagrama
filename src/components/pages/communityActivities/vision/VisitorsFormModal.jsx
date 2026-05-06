@@ -10,7 +10,7 @@ import {
   MapPin,
   User as UserIcon,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
@@ -32,6 +32,7 @@ import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import BillSummaryIcon from "../../../assets/BillSummary.svg";
+import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 
 const schema = yup.object().shape({
   fullName: yup
@@ -82,7 +83,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
-  const { setIsLoading } = useLoader();
+  const { isLoading, setIsLoading } = useLoader();
 
   const {
     control,
@@ -124,7 +125,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
   const total = subtotal + gst;
 
   const handleGetPatientData = () => {
-    getPatientDataByMobileNo(user?.mobileNo, 5)
+    getPatientDataByMobileNo(user?.mobileNo, user.userId, "OPD", 5)
       .then((res) => {
         const data = res?.data?.data || [];
         const filterData = data.find(
@@ -162,6 +163,8 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     }
   }, [patientFid, setValue]);
 
+  console.log("patientFid", patientFid);
+
   useEffect(() => {
     if (!user) return;
     handleGetPatientData();
@@ -180,7 +183,9 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     });
 
     const saveObj = {
-      userId: patientFid !== null ? patientFid.id : user?.userId,
+      userId: patientFid?.userId,
+      createdBy: user?.userId,
+      clinicFid: 5,
       fullName: data?.fullName,
       mobile: data?.mobileNumber,
       city: data?.city,
@@ -191,48 +196,46 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       visitDate: format(data.appointmentDate, "yyyy-MM-dd"),
       no_of_person: data.noOfPerson,
       amount: total,
+      origin: origin,
     };
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
+  const cancelPaymentRef = useRef(null);
 
   const handleConfirmBooking = async () => {
-    if (isPaymentPending || !formData) return;
+    if (isPaymentPending) return;
     try {
       setIsLoading(true);
       const bookingRes = await SaveActivities(formData);
       const bookingData = bookingRes?.data;
 
       if (bookingData?.message) {
-        const bookingId = bookingData?.bookingId || bookingData?.data;
+        const innerData = bookingData?.data?.data || bookingData?.data;
+        const bookingId = innerData?.bookingId;
 
         const tempObj = {
           amount: formData.amount,
-          appointmentDate: formData.visitDate,
-          SloteStartTime: origin === "AnnualEvents" ? null : formData.checkin,
-          SloteEndTime: origin === "AnnualEvents" ? null : formData.checkOut,
-          userId:patientFid !== null ? patientFid.id :  user?.userId,
+          userId: patientFid?.userId,
           paymentFor: origin,
-          bookingId: bookingId.id,
+          bookingId: bookingId,
         };
-
-        const res = await InitiatePayment(null, user?.userId, tempObj);
+        const res = await InitiatePayment(5, null, tempObj);
         const data = res?.data;
-
         if (data?.status === 200) {
           setIsLoading(false);
           setIsPaymentPending(true);
 
-          RedirectToSabPaisa(
+          cancelPaymentRef.current = RedirectToSabPaisa(
             data,
-            null,
+            0,
             data.clientTxnId,
             async () => {
               successAlert(bookingData.message);
               setOpenConfirmation(false);
               setIsPaymentPending(false);
-              reset();
               handleClose();
+              reset();
             },
             (errorStatus) => {
               const msg =
@@ -253,7 +256,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     } catch (error) {
       setIsLoading(false);
       errorAlert("An unexpected error occurred during the booking process.");
-      console.error(error);
+      console.error("Booking error:", error);
     }
   };
 
@@ -263,13 +266,8 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     <>
       <Modal open={open} closeAfterTransition>
         <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            outline: "none",
-          }}
+          sx={ModalStyle}
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-y-auto rounded-xl  p-0 custom-scrollbar-wellness-stay"
         >
           <AnimatePresence>
             <motion.div
@@ -277,19 +275,17 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
               initial="hidden"
               animate="visible"
               exit="hidden"
-              className="w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[900px] max-h-[92vh] flex flex-col overflow-hidden rounded-2xl shadow-2xl bg-[#fdfdfc] border border-green-100"
             >
-              {/* Header */}
-              <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-5 py-4 flex items-center justify-between sticky top-0 z-20 shrink-0">
+              <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 sm:px-5 py-4 flex items-center justify-between sticky top-0 z-20 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
                     <ClipboardList className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white leading-tight">
-                      Booking Request 
+                    <h2 className="text-lg sm:text-xl font-bold text-white leading-tight">
+                      Booking Request
                     </h2>
-                    <p className="text-white/80 text-xs font-medium uppercase tracking-widest mt-0.5">
+                    <p className="text-white/80 text-[10px] font-medium uppercase tracking-widest mt-0.5">
                       Community Services
                     </p>
                   </div>
@@ -297,17 +293,16 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                 <CancelButtonModal onClick={handleClose} />
               </div>
 
-              {/* Scrollable Content */}
-              <div className="overflow-y-auto flex-1 p-5 sm:p-7 custom-scrollbar">
+              <div className="overflow-y-auto flex-1 p-4 sm:p-5 lg:p-7 custom-scrollbar">
                 <form
                   onSubmit={handleSubmit(onSubmit)}
-                  className="grid lg:grid-cols-12 gap-7"
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-7"
                 >
-                  <div className="lg:col-span-7 space-y-6">
-                    <div className="bg-gradient-to-br from-green-50 to-white p-5 rounded-[9px] border border-green-300 shadow-sm">
+                  <div className="lg:col-span-7 space-y-5 sm:space-y-6">
+                    <div className="bg-gradient-to-br from-green-50 to-white p-4 sm:p-5 rounded-[9px] border border-green-300 shadow-sm">
                       <div className="flex justify-between items-start mb-4">
                         <div>
-                          <h3 className="text-xl font-black text-green-900 leading-tight">
+                          <h3 className="text-lg sm:text-xl font-black text-green-900 leading-tight">
                             {serviceDetails.serviceName}
                           </h3>
                           <p className="text-green-600 font-bold text-sm">
@@ -316,13 +311,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-4 border-t border-green-100 pt-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-green-100 pt-4">
                         <div className="flex items-center gap-2">
-                          <AccessTimeIcon
-                            sx={{ fontSize: 18, color: "#166534" }}
-                          />
+                          <AccessTimeIcon className="text-green-800 !text-[18px]" />
                           <div>
-                            <p className="text-[10px] text-slate-400 uppercase font-extrabold group">
+                            <p className="text-[10px] text-slate-400 uppercase font-extrabold">
                               Timings
                             </p>
                             <p className="text-xs font-bold text-slate-700">
@@ -345,12 +338,12 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
+                    <div className="bg-white p-4 sm:p-5 rounded-[9px] shadow-sm border border-slate-300">
                       <h4 className="text-[10px] font-black text-slate-400 mb-4 uppercase tracking-[0.2em] flex items-center gap-2">
                         <Calendar className="w-3.5 h-3.5" /> Schedule
                         Configuration
                       </h4>
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <DatePickerField
                           control={control}
                           name="appointmentDate"
@@ -373,18 +366,20 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
-                      <div className="flex items-center justify-between mb-4">
-                        <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                    <div className="bg-white p-4 sm:p-5 rounded-[9px] shadow-sm border border-slate-300">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2">
+                        <h4 className="text-[10px] w-full font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                           <UserIcon className="w-3.5 h-3.5" /> Visitor
                           Information
                         </h4>
-                        <CommonButton
-                          type="button"
-                          onClick={() => setOpenAddPatient(true)}
-                          label="+ Add Guest"
-                          className="bg-green-700 text-white  hover:bg-green-800 transition-all shadow-sm shrink-0"
-                        />
+                        <div className="flex justify-end  w-full">
+                          <CommonButton
+                            type="button"
+                            onClick={() => setOpenAddPatient(true)}
+                            label="+ Add Guest"
+                            className="bg-green-700 text-white hover:bg-green-800 transition-all shadow-sm shrink-0"
+                          />
+                        </div>
                       </div>
                       <div className="mb-4">
                         <DropdownField
@@ -396,8 +391,8 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                           searchIcon={true}
                         />
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="md:col-span-2">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="col-span-1 sm:col-span-2">
                           <InputField
                             control={control}
                             name="fullName"
@@ -418,7 +413,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                           label="Email Address *"
                           error={errors.email}
                         />
-                        <div className="md:col-span-2">
+                        <div className="col-span-1 sm:col-span-2">
                           <InputField
                             control={control}
                             name="city"
@@ -429,7 +424,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[9px] shadow-sm border border-slate-300">
+                    <div className="bg-white p-4 sm:p-5 rounded-[9px] shadow-sm border border-slate-300">
                       <InputArea
                         control={control}
                         name="specialRequests"
@@ -449,12 +444,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                     </div>
                   </div>
 
-                  <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-0 h-fit">
-                    {/* Bill Summary */}
-                    <div className="bg-green-800 rounded-[9px] shadow-xl p-6 text-white relative overflow-hidden">
+                  <div className="lg:col-span-5 space-y-5 sm:space-y-6 lg:sticky lg:top-0 h-fit">
+                    <div className="bg-green-800 rounded-[9px] shadow-xl p-5 sm:p-6 text-white relative overflow-hidden">
                       <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
 
-                      <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
+                      <div className="flex items-center gap-2 mb-5 sm:mb-6 border-b border-white/10 pb-4">
                         <img src={BillSummaryIcon} alt="" className="w-5 h-5" />
                         <h3 className="font-bold text-xs tracking-widest uppercase">
                           Bill Summary
@@ -463,9 +457,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
 
                       <div className="space-y-4">
                         <div className="flex justify-between text-xs font-semibold">
-                          <span className="text-green-200">
-                            Base Price 
-                          </span>
+                          <span className="text-green-200">Base Price</span>
                           <span>{serviceDetails.price}</span>
                         </div>
                         <div className="flex justify-between text-xs font-semibold">
@@ -482,7 +474,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             <p className="text-[10px] text-green-300 font-bold uppercase tracking-widest mb-0.5">
                               Payable Total
                             </p>
-                            <p className="text-3xl font-black tracking-tighter">
+                            <p className="text-2xl sm:text-3xl font-black tracking-tighter">
                               ₹{total.toLocaleString()}
                             </p>
                           </div>
@@ -490,7 +482,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             type="submit"
                             label="Book Now"
                             disabled={!termsAccepted}
-                            className={`font-black px-8  transition-all shadow-lg active:scale-95 text-sm ${
+                            className={`font-black px-6 sm:px-8 transition-all shadow-lg active:scale-95 text-sm ${
                               termsAccepted
                                 ? "bg-white text-green-800 hover:bg-green-50"
                                 : "bg-white/10 text-white/30 pointer-events-none"
@@ -500,7 +492,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                       </div>
                     </div>
 
-                    <div className="bg-white p-5 rounded-[9px] border border-dashed border-slate-300">
+                    <div className="bg-white p-4 sm:p-5 rounded-[9px] border border-dashed border-slate-300">
                       <h5 className="text-[10px] font-bold text-slate-400 uppercase mb-3 px-1">
                         Special Benefits
                       </h5>
@@ -515,19 +507,18 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
               </div>
 
               <div className="lg:hidden p-4 bg-white border-t border-slate-100 flex gap-3">
-                <button
+                <CommonButton
                   type="button"
-                  onClick={handleClose}
-                  className="flex-1 py-3 px-4 rounded-xl border border-slate-200 text-slate-500 font-bold text-sm"
-                >
-                  Cancel
-                </button>
+                  onClick={reset}
+                  label="Reset"
+                  className="flex-1 bg-red-50 border border-red-600 text-red-600"
+                />
                 <CommonButton
                   type="submit"
                   onClick={handleSubmit(onSubmit)}
                   label="Book Now"
                   disabled={!termsAccepted}
-                  className="flex-[2] bg-green-700 text-white "
+                  className="flex-1 bg-green-700 text-white"
                 />
               </div>
             </motion.div>
@@ -536,15 +527,21 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       </Modal>
       <ConfirmationModal
         confirmationOpen={openConfirmation}
-        confirmationHandleClose={() => {
-          setOpenConfirmation(false);
-          setIsPaymentPending(false);
-        }}
-        disabled={isPaymentPending}
         confirmationSubmitFunc={handleConfirmBooking}
         confirmationLabel="Confirm Activity Booking"
         confirmationMsg="Are you sure you want to book this activity?"
-        confirmationButtonMsg="Confirm Booking"
+        confirmationButtonMsg={
+          isPaymentPending ? "Processing..." : "Confirm & Pay"
+        }
+        confirmationHandleClose={() => {
+          if (cancelPaymentRef.current) {
+            cancelPaymentRef.current();
+            cancelPaymentRef.current = null;
+          }
+          setIsPaymentPending(false);
+          setOpenConfirmation(false);
+        }}
+        disabled={isPaymentPending}
       />
       <AddPatientModal
         open={openAddPatient}

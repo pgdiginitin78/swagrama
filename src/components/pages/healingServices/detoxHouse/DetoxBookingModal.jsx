@@ -134,7 +134,7 @@ const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
       patientFid: null,
       doctorFid: null,
       serviceFid: null,
-      fromDate: null,
+      fromDate: new Date(),
       toDate: null,
       stayType: "",
       termsAccepted: false,
@@ -218,15 +218,15 @@ console.log("selectedServiceValue",selectedServiceValue);
 
   const handleGetPatientData = () => {
     if (user !== null && clinicFidValue?.id > 0) {
-      getPatientDataByMobileNo(user?.mobileNo, clinicFidValue?.id)
+      getPatientDataByMobileNo(user?.mobileNo, user?.userId, "IPD", 5)
         .then((res) => {
           const data = res?.data?.data;
           if (data?.length) {
             setPatientOptions(
               data.map((item) => ({
                 ...item,
-                id: item.userId,
-                value: item.userId,
+                id: item.patientId,
+                value: item.patientId,
                 label: `${item.firstName} ${item.lastName}`,
               }))
             );
@@ -358,6 +358,7 @@ console.log("selectedServiceValue",selectedServiceValue);
     console.log("Detox Booking Confirmed:", formData);
     setOpenConfirmation(false);
     reset();
+    setValue("fromDate", new Date());
     handleClose();
   };
 

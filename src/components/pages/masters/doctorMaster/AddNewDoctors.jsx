@@ -21,37 +21,32 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SchoolIcon from "@mui/icons-material/School";
 import PersonIcon from "@mui/icons-material/Person";
 import EventNoteIcon from "@mui/icons-material/EventNote";
+import { AddDoctorWithSession } from "../../../../services/masters/DoctorMasterServices";
+import { useAuth } from "../../../../context/AuthContext";
+import { successAlert, errorAlert } from "../../../common/toast/CustomToast";
+import { format, isValid } from "date-fns";
+import ConfirmationModal from "../../../common/ConfirmationModal";
+import { useLoader } from "../../../common/commonLoader/LoaderContext";
+import { getDepartmentList } from "../../../../services/healingServices/opdClinic/OPDClinicServices";
 
 const SPECIALIZATION_OPTIONS = [
-  { id: "ayurvedic_physician", label: "Ayurvedic Physician" },
-  { id: "general_physician", label: "General Physician" },
-  { id: "cardiologist", label: "Cardiologist" },
-  { id: "dermatologist", label: "Dermatologist" },
-  { id: "orthopedic", label: "Orthopedic" },
-  { id: "neurologist", label: "Neurologist" },
-  { id: "pediatrician", label: "Pediatrician" },
-  { id: "gynecologist", label: "Gynecologist" },
-  { id: "ent_specialist", label: "ENT Specialist" },
-  { id: "ophthalmologist", label: "Ophthalmologist" },
-  { id: "psychiatrist", label: "Psychiatrist" },
-  { id: "urologist", label: "Urologist" },
+  { value: "allergy_and_immunology", label: "Allergy and Immunology" },
+  { value: "dermatology", label: "Dermatology" },
+  { value: "family_medicine", label: "Family Medicine" },
+  { value: "neurology", label: "Neurology" },
 ];
 
-const DEPARTMENT_OPTIONS = [
-  { id: "ayurveda", label: "Ayurveda" },
-  { id: "general_medicine", label: "General Medicine" },
-  { id: "cardiology", label: "Cardiology" },
-  { id: "dermatology", label: "Dermatology" },
-  { id: "orthopedics", label: "Orthopedics" },
-  { id: "neurology", label: "Neurology" },
-  { id: "pediatrics", label: "Pediatrics" },
-  { id: "gynecology", label: "Gynecology" },
-  { id: "ent", label: "ENT" },
-  { id: "ophthalmology", label: "Ophthalmology" },
-  { id: "psychiatry", label: "Psychiatry" },
-  { id: "urology", label: "Urology" },
-  { id: "emergency", label: "Emergency" },
+const TIME_SLOT_OPTIONS = [
+  { value: 15, label: "15 mins" },
+  { value: 30, label: "30 mins" },
+  { value: 45, label: "45 mins" },
+  { value: 60, label: "60 mins" },
 ];
+
+const SLOT_COUNT_OPTIONS = Array.from({ length: 10 }, (_, i) => ({
+  value: i + 1,
+  label: (i + 1).toString(),
+}));
 
 const WEEK_DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 
@@ -69,7 +64,7 @@ const DAY_LABELS = {
 const dropdownObjectSchema = yup
   .object()
   .shape({
-    id: yup.mixed().required(),
+    value: yup.mixed().required(),
     label: yup.string().required(),
   })
   .nullable()
@@ -114,18 +109,8 @@ const validationSchema = yup.object().shape({
   city: yup.string().nullable(),
   postalCode: yup.string().nullable(),
   qualifications: yup.array().of(qualificationSchema),
-  timeSlot: yup
-    .number()
-    .transform((val, orig) => (orig === "" ? undefined : val))
-    .typeError("Must be a number")
-    .positive("Must be positive")
-    .required("Required"),
-  slotCount: yup
-    .number()
-    .transform((val, orig) => (orig === "" ? undefined : val))
-    .typeError("Must be a number")
-    .positive("Must be positive")
-    .required("Required"),
+  timeSlot: dropdownObjectSchema,
+  slotCount: dropdownObjectSchema,
   morningStartTime: yup.mixed().nullable(),
   morningEndTime: yup.mixed().nullable(),
   eveningStartTime: yup.mixed().nullable(),
@@ -195,9 +180,7 @@ function AvatarUploader({ value, onChange, label }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => onChange(ev.target.result);
-    reader.readAsDataURL(file);
+    onChange(file); // Pass actual file object
     e.target.value = "";
   };
 
@@ -287,9 +270,7 @@ function SignatureUploader({ value, onChange }) {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => onChange(ev.target.result);
-    reader.readAsDataURL(file);
+    onChange(file); // Pass actual file object
     e.target.value = "";
   };
 
@@ -398,10 +379,16 @@ function SectionCard({ icon, title, children, action }) {
   );
 }
 
-export default function AddNewDoctors({ open, handleClose }) {
+export default function AddNewDoctors({ open, handleClose, populateTable }) {
+  const { user } = useAuth();
+  const { setIsLoading } = useLoader();
   const [photoPreview, setPhotoPreview] = useState(null);
   const [signaturePreview, setSignaturePreview] = useState(null);
-
+  const [profileFile, setProfileFile] = useState(null);
+  const [signatureFile, setSignatureFile] = useState(null);
+  const [confirmationOpen, setConfirmationOpen] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [departmentList, setDepartmentList] = useState([]);
   const {
     control,
     handleSubmit,
@@ -468,317 +455,469 @@ export default function AddNewDoctors({ open, handleClose }) {
     reset(DEFAULT_VALUES);
     setPhotoPreview(null);
     setSignaturePreview(null);
+    setProfileFile(null);
+    setSignatureFile(null);
   };
 
   const onSubmit = (data) => {
-    console.log("Form Data:", {
-      ...data,
-      photo: photoPreview,
-      signature: signaturePreview,
-    });
+    setFormData(data);
+    setConfirmationOpen(true);
+  };
+
+  const handleConfirmSave = async () => {
+    if (!formData) {
+      errorAlert("Form data is missing");
+      return;
+    }
+
+    const safeFormat = (date, pattern) => {
+      if (!date) return null;
+      const d = new Date(date);
+      return isValid(d) ? format(d, pattern) : null;
+    };
+
+    const safeTimeFormat = (date, pattern, fallback = "00:00:00") => {
+      const formatted = safeFormat(date, pattern);
+      return formatted || fallback;
+    };
+
+    try {
+      setIsLoading(true);
+      setConfirmationOpen(false);
+      const clinicId = user?.clinicId || 5;
+
+      const postData = new FormData();
+      postData.append("FirstName", formData.firstName);
+      postData.append("LName", formData.lastName);
+      postData.append("EmailId", formData.email);
+      postData.append("MobileNo", formData.contactNumber);
+      postData.append(
+        "Dob",
+        safeFormat(formData.dob, "yyyy-MM-dd'T'HH:mm:ss") || "",
+      );
+      postData.append("Gender", formData.gender || "");
+      postData.append(
+        "SpecializationFid",
+        formData.specialization?.value || "",
+      );
+      postData.append(
+        "ExperienceInYear",
+        formData.experianceInYear?.toString() || "0",
+      );
+      postData.append("DoctorRefrenceNo", formData.doctorRefferanceNo || "");
+      postData.append("DepartmentID", formData.department?.value || 0);
+      postData.append("Address", formData.address || "");
+      postData.append("Country", formData.country || "");
+      postData.append("CityName", formData.city || "");
+      postData.append("Postalcode", formData.postalCode || "");
+
+      postData.append(
+        "Degree",
+        formData.qualifications?.map((q) => q.degree).join(", ") || "",
+      );
+      postData.append(
+        "University",
+        formData.qualifications?.map((q) => q.university).join(", ") || "",
+      );
+      postData.append(
+        "Degree_Year",
+        formData.qualifications?.map((q) => q.year).join(", ") || "",
+      );
+
+      postData.append(
+        "timeSlot",
+        parseInt(formData.timeSlot?.value || formData.timeSlot) || 0,
+      );
+      postData.append(
+        "morningFrom",
+        safeTimeFormat(formData.morningStartTime, "HH:mm:ss"),
+      );
+      postData.append(
+        "morningTo",
+        safeTimeFormat(formData.morningEndTime, "HH:mm:ss"),
+      );
+      postData.append(
+        "eveningFrom",
+        safeTimeFormat(formData.eveningStartTime, "HH:mm:ss"),
+      );
+      postData.append(
+        "eveningTo",
+        safeTimeFormat(formData.eveningEndTime, "HH:mm:ss"),
+      );
+
+      const weekDaysStr = formData.weekDays
+        ? Object.keys(formData.weekDays)
+            .filter((day) => day !== "all" && formData.weekDays[day])
+            .map((day) => day.charAt(0).toUpperCase() + day.slice(1))
+            .join(",")
+        : "";
+      postData.append("weekDays", weekDaysStr);
+
+      if (profileFile) {
+        postData.append("ProfileImage", profileFile);
+      }
+      if (signatureFile) {
+        postData.append("DoctorSignature", signatureFile);
+      }
+
+      const response = await AddDoctorWithSession(postData, clinicId);
+
+      if (response?.data?.statusCode === 200) {
+        console.log("AddDoctorWithSession",response?.data?.message);
+        
+        successAlert(response?.data?.message);
+        handleClose();
+        reset(DEFAULT_VALUES);
+        populateTable();
+      } else {
+        errorAlert(response.data?.message);
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      errorAlert(error?.response?.data?.message );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const weekDaysError = errors?.weekDays?.message;
+  useEffect(() => {
+    getDepartmentList(user?.clinicId || 5)
+      .then((res) => {
+        const data = res.data.data || res.data || [];
+        const modifiedData = data.map((item) => {
+          const label =
+            typeof item === "string"
+              ? item
+              : item.departmentName || item.departmentName || "";
+          const value =
+            typeof item === "string"
+              ? item
+              : item.departmentId || item.departmentId || label || "";
+          return { value, label };
+        });
+        setDepartmentList(modifiedData);
+      })
+      .catch((err) => {
+        setDepartmentList([]);
+      });
+  }, [user?.clinicId]);
 
   console.log("errors", errors);
 
   return (
-    <Modal open={open}>
-      <Box
-        sx={ModalStyle}
-        className="w-[95%] sm:w-[88%] lg:w-[78%] max-w-[900px] max-h-[92vh] rounded-2xl overflow-hidden flex flex-col"
-      >
-        <div className="bg-gradient-to-r from-teal-600 to-green-600 px-5 py-4 flex items-center justify-between flex-shrink-0">
-          <div>
-            <h1 className="text-white font-bold text-[15px] sm:text-xl tracking-tight">
-              Doctor Creation
-            </h1>
-            <p className="text-teal-100 text-[11px] mt-0.5">
-              Fill in the details to register a new doctor
-            </p>
+    <>
+      <Modal open={open}>
+        <Box
+          sx={ModalStyle}
+          className="w-[95%] sm:w-[88%] lg:w-[78%] max-w-[900px] max-h-[92vh] rounded-[9px] overflow-hidden flex flex-col"
+        >
+          <div className="bg-gradient-to-r from-teal-600 to-green-600 px-5 py-4 flex items-center justify-between flex-shrink-0">
+            <div>
+              <h1 className="text-white font-bold text-[15px] sm:text-xl tracking-tight">
+                Doctor Creation
+              </h1>
+              <p className="text-teal-100 text-[11px] mt-0.5">
+                Fill in the details to register a new doctor
+              </p>
+            </div>
+            <CancelButtonModal onClick={handleClose} />
           </div>
-          <CancelButtonModal onClick={handleClose} />
-        </div>
 
-        <div className="overflow-y-auto flex-1 bg-slate-50 p-3 sm:p-5">
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <SectionCard
-              icon={<PersonIcon sx={{ fontSize: 18 }} />}
-              title="Doctor Details"
-            >
-              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-5 pb-5 border-b border-slate-100">
-                <AvatarUploader
-                  value={photoPreview}
-                  onChange={setPhotoPreview}
-                  label="Profile Photo"
-                />
-                <SignatureUploader
-                  value={signaturePreview}
-                  onChange={setSignaturePreview}
-                />
-              </div>
+          <div className="overflow-y-auto flex-1 bg-slate-50 p-3 sm:p-5">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <SectionCard
+                icon={<PersonIcon sx={{ fontSize: 18 }} />}
+                title="Doctor Details"
+              >
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-5 pb-5 border-b border-slate-100">
+                  <AvatarUploader
+                    value={photoPreview}
+                    onChange={(file) => {
+                      setProfileFile(file);
+                      const reader = new FileReader();
+                      reader.onload = (ev) => setPhotoPreview(ev.target.result);
+                      reader.readAsDataURL(file);
+                    }}
+                    label="Profile Photo"
+                  />
+                  <SignatureUploader
+                    value={signaturePreview}
+                    onChange={(file) => {
+                      setSignatureFile(file);
+                      const reader = new FileReader();
+                      reader.onload = (ev) =>
+                        setSignaturePreview(ev.target.result);
+                      reader.readAsDataURL(file);
+                    }}
+                  />
+                </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <InputField
-                  control={control}
-                  name="firstName"
-                  error={errors.firstName}
-                  label="First Name"
-                />
-                <InputField
-                  control={control}
-                  name="lastName"
-                  error={errors.lastName}
-                  label="Last Name"
-                />
-                <InputField
-                  control={control}
-                  name="email"
-                  error={errors.email}
-                  label="Email"
-                  type="email"
-                />
-                <InputField
-                  control={control}
-                  name="contactNumber"
-                  error={errors.contactNumber}
-                  label="Contact Number"
-                />
-                <DatePickerField
-                  control={control}
-                  name="dob"
-                  error={errors.dob}
-                  label="Date of Birth"
-                />
-                <RadioField
-                  control={control}
-                  name="gender"
-                  error={errors.gender}
-                  label="Gender"
-                  dataArray={[
-                    { label: "Male", value: "Male" },
-                    { label: "Female", value: "Female" },
-                    { label: "Other", value: "Other" },
-                  ]}
-                />
-                <DropdownField
-                  control={control}
-                  name="specialization"
-                  error={errors.specialization}
-                  placeholder="Specialization *"
-                  dataArray={SPECIALIZATION_OPTIONS}
-                  isRequired
-                />
-                <InputField
-                  control={control}
-                  name="experianceInYear"
-                  error={errors.experianceInYear}
-                  label="Experience In Year"
-                  type="number"
-                />
-                <InputField
-                  control={control}
-                  name="doctorRefferanceNo"
-                  error={errors.doctorRefferanceNo}
-                  label="Doctor Reference No"
-                />
-                <DropdownField
-                  control={control}
-                  name="department"
-                  error={errors.department}
-                  placeholder="Department *"
-                  dataArray={DEPARTMENT_OPTIONS}
-                  isRequired
-                />
-              </div>
-            </SectionCard>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  <InputField
+                    control={control}
+                    name="firstName"
+                    error={errors.firstName}
+                    label="First Name"
+                  />
+                  <InputField
+                    control={control}
+                    name="lastName"
+                    error={errors.lastName}
+                    label="Last Name"
+                  />
+                  <InputField
+                    control={control}
+                    name="email"
+                    error={errors.email}
+                    label="Email"
+                    type="email"
+                  />
+                  <InputField
+                    control={control}
+                    name="contactNumber"
+                    error={errors.contactNumber}
+                    label="Contact Number"
+                  />
+                  <DatePickerField
+                    control={control}
+                    name="dob"
+                    error={errors.dob}
+                    label="Date of Birth"
+                  />
+                  <RadioField
+                    control={control}
+                    name="gender"
+                    error={errors.gender}
+                    label="Gender"
+                    dataArray={[
+                      { label: "Male", value: "Male" },
+                      { label: "Female", value: "Female" },
+                      { label: "Other", value: "Other" },
+                    ]}
+                  />
+                  <DropdownField
+                    control={control}
+                    name="specialization"
+                    error={errors.specialization}
+                    placeholder="Specialization *"
+                    dataArray={SPECIALIZATION_OPTIONS}
+                    isRequired
+                  />
+                  <InputField
+                    control={control}
+                    name="experianceInYear"
+                    error={errors.experianceInYear}
+                    label="Experience In Year"
+                    type="number"
+                  />
+                  <InputField
+                    control={control}
+                    name="doctorRefferanceNo"
+                    error={errors.doctorRefferanceNo}
+                    label="Doctor Reference No"
+                  />
+                  <DropdownField
+                    control={control}
+                    name="department"
+                    error={errors.department}
+                    placeholder="Department *"
+                    dataArray={departmentList}
+                    isRequired
+                  />
+                </div>
+              </SectionCard>
 
-            <SectionCard
-              icon={<LocationOnIcon sx={{ fontSize: 18 }} />}
-              title="Contact & Address"
-            >
-              <div className="mb-3">
-                <InputArea
-                  control={control}
-                  name="address"
-                  error={errors.address}
-                  label="Address"
-                  rows={2}
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <InputField
-                  control={control}
-                  name="country"
-                  error={errors.country}
-                  label="Country"
-                />
-                <InputField
-                  control={control}
-                  name="city"
-                  error={errors.city}
-                  label="City"
-                />
-                <InputField
-                  control={control}
-                  name="postalCode"
-                  error={errors.postalCode}
-                  label="Postal Code"
-                />
-              </div>
-            </SectionCard>
+              <SectionCard
+                icon={<LocationOnIcon sx={{ fontSize: 18 }} />}
+                title="Contact & Address"
+              >
+                <div className="mb-3">
+                  <InputArea
+                    control={control}
+                    name="address"
+                    error={errors.address}
+                    label="Address"
+                    rows={2}
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <InputField
+                    control={control}
+                    name="country"
+                    error={errors.country}
+                    label="Country"
+                  />
+                  <InputField
+                    control={control}
+                    name="city"
+                    error={errors.city}
+                    label="City"
+                  />
+                  <InputField
+                    control={control}
+                    name="postalCode"
+                    error={errors.postalCode}
+                    label="Postal Code"
+                  />
+                </div>
+              </SectionCard>
 
-            <SectionCard
-              icon={<SchoolIcon sx={{ fontSize: 18 }} />}
-              title="Qualifications"
-              action={
-                <button
-                  type="button"
-                  onClick={handleAddQualification}
-                  className="flex items-center gap-1.5 text-teal-600 border border-dashed border-teal-400
+              <SectionCard
+                icon={<SchoolIcon sx={{ fontSize: 18 }} />}
+                title="Qualifications"
+                action={
+                  <button
+                    type="button"
+                    onClick={handleAddQualification}
+                    className="flex items-center gap-1.5 text-teal-600 border border-dashed border-teal-400
                     rounded-lg px-3 py-1.5 text-[12px] font-semibold hover:bg-teal-50 transition-colors"
-                >
-                  <span className="text-base leading-none">+</span>
-                  Add Qualification
-                </button>
-              }
-            >
-              {fields.length === 0 ? (
-                <p className="text-center text-slate-400 text-[13px] py-6">
-                  No qualifications added yet. Click &ldquo;+ Add
-                  Qualification&rdquo; to begin.
-                </p>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {fields.map((item, index) => (
-                    <div
-                      key={item.id}
-                      className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_120px_36px] gap-2.5 items-start
+                  >
+                    <span className="text-base leading-none">+</span>
+                    Add Qualification
+                  </button>
+                }
+              >
+                {fields.length === 0 ? (
+                  <p className="text-center text-slate-400 text-[13px] py-6">
+                    No qualifications added yet. Click &ldquo;+ Add
+                    Qualification&rdquo; to begin.
+                  </p>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {fields.map((item, index) => (
+                      <div
+                        key={item.id}
+                        className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_120px_36px] gap-2.5 items-start
                         bg-slate-50 p-3 rounded-xl border border-slate-100"
-                    >
-                      <InputField
-                        control={control}
-                        name={`qualifications.${index}.degree`}
-                        error={errors.qualifications?.[index]?.degree}
-                        label="Degree"
-                      />
-                      <InputField
-                        control={control}
-                        name={`qualifications.${index}.university`}
-                        error={errors.qualifications?.[index]?.university}
-                        label="University"
-                      />
-                      <InputField
-                        control={control}
-                        name={`qualifications.${index}.year`}
-                        error={errors.qualifications?.[index]?.year}
-                        label="Year"
-                        type="number"
-                      />
-                      <IconButton
-                        type="button"
-                        onClick={() => remove(index)}
-                        size="small"
-                        sx={{
-                          alignSelf: "flex-end",
-                          mb: "2px",
-                          color: "#f43f5e",
-                          border: "1px solid #fecaca",
-                          borderRadius: "8px",
-                          width: 36,
-                          height: 36,
-                          flexShrink: 0,
-                          "&:hover": {
-                            background: "#fff1f2",
-                            borderColor: "#f43f5e",
-                          },
-                        }}
                       >
-                        <DeleteIcon />
-                      </IconButton>
+                        <InputField
+                          control={control}
+                          name={`qualifications.${index}.degree`}
+                          error={errors.qualifications?.[index]?.degree}
+                          label="Degree"
+                        />
+                        <InputField
+                          control={control}
+                          name={`qualifications.${index}.university`}
+                          error={errors.qualifications?.[index]?.university}
+                          label="University"
+                        />
+                        <InputField
+                          control={control}
+                          name={`qualifications.${index}.year`}
+                          error={errors.qualifications?.[index]?.year}
+                          label="Year"
+                          type="number"
+                        />
+                        <IconButton
+                          type="button"
+                          onClick={() => remove(index)}
+                          size="small"
+                          sx={{
+                            alignSelf: "flex-end",
+                            mb: "2px",
+                            color: "#f43f5e",
+                            border: "1px solid #fecaca",
+                            borderRadius: "8px",
+                            width: 36,
+                            height: 36,
+                            flexShrink: 0,
+                            "&:hover": {
+                              background: "#fff1f2",
+                              borderColor: "#f43f5e",
+                            },
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </SectionCard>
+
+              <SectionCard
+                icon={<EventNoteIcon sx={{ fontSize: 18 }} />}
+                title="Doctor Session"
+              >
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                  <DropdownField
+                    control={control}
+                    name="timeSlot"
+                    error={errors.timeSlot}
+                    placeholder="Time Slot (min) *"
+                    dataArray={TIME_SLOT_OPTIONS}
+                    isRequired
+                  />
+                  <DropdownField
+                    control={control}
+                    name="slotCount"
+                    error={errors.slotCount}
+                    placeholder="Slot Count *"
+                    dataArray={SLOT_COUNT_OPTIONS}
+                    isRequired
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  <div className="p-3 rounded-xl bg-blue-50/40 border border-blue-100">
+                    <p className="text-[11.5px] font-bold text-blue-800 mb-3 flex items-center gap-1.5">
+                      Morning Session
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <TimePickerField
+                        control={control}
+                        name="morningStartTime"
+                        label="Start Time"
+                        error={errors.morningStartTime}
+                      />
+                      <TimePickerField
+                        control={control}
+                        name="morningEndTime"
+                        label="End Time"
+                        error={errors.morningEndTime}
+                      />
                     </div>
-                  ))}
-                </div>
-              )}
-            </SectionCard>
-
-            <SectionCard
-              icon={<EventNoteIcon sx={{ fontSize: 18 }} />}
-              title="Doctor Session"
-            >
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
-                <DropdownField
-                  control={control}
-                  name="timeSlot"
-                  error={errors.timeSlot}
-                  placeholder="Time Slot (min)"
-                />
-                <DropdownField
-                  control={control}
-                  name="slotCount"
-                  error={errors.slotCount}
-                  placeholder="Slot Count"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
-                <div className="p-3 rounded-xl bg-blue-50/40 border border-blue-100">
-                  <p className="text-[11.5px] font-bold text-blue-800 mb-3 flex items-center gap-1.5">
-                    Morning Session
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <TimePickerField
-                      control={control}
-                      name="morningStartTime"
-                      label="Start Time"
-                      error={errors.morningStartTime}
-                    />
-                    <TimePickerField
-                      control={control}
-                      name="morningEndTime"
-                      label="End Time"
-                      error={errors.morningEndTime}
-                    />
+                  </div>
+                  <div className="p-3 rounded-xl bg-orange-50/40 border border-orange-100">
+                    <p className="text-[11.5px] font-bold text-orange-800 mb-3 flex items-center gap-1.5">
+                      Evening Session
+                    </p>
+                    <div className="grid grid-cols-2 gap-3">
+                      <TimePickerField
+                        control={control}
+                        name="eveningStartTime"
+                        label="Start Time"
+                        error={errors.eveningStartTime}
+                      />
+                      <TimePickerField
+                        control={control}
+                        name="eveningEndTime"
+                        label="End Time"
+                        error={errors.eveningEndTime}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="p-3 rounded-xl bg-orange-50/40 border border-orange-100">
-                  <p className="text-[11.5px] font-bold text-orange-800 mb-3 flex items-center gap-1.5">
-                    Evening Session
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <TimePickerField
-                      control={control}
-                      name="eveningStartTime"
-                      label="Start Time"
-                      error={errors.eveningStartTime}
-                    />
-                    <TimePickerField
-                      control={control}
-                      name="eveningEndTime"
-                      label="End Time"
-                      error={errors.eveningEndTime}
-                    />
-                  </div>
-                </div>
-              </div>
 
-              <div>
-                <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2">
-                  Week Days <span className="text-red-500">*</span>
-                </p>
-                <div
-                  className={`flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 border transition-colors ${
-                    weekDaysError
-                      ? "border-red-400 bg-red-50/30"
-                      : "border-slate-200"
-                  }`}
-                >
-                  {["all", ...WEEK_DAYS].map((day) => (
-                    <button
-                      key={day}
-                      type="button"
-                      onClick={() => handleToggleDay(day)}
-                      className={`px-3 py-1.5 rounded-[9px] text-[11.5px] font-semibold border transition-all
+                <div>
+                  <p className="text-[11px] font-semibold text-slate-500 uppercase tracking-wide mb-2">
+                    Week Days <span className="text-red-500">*</span>
+                  </p>
+                  <div
+                    className={`flex flex-wrap gap-2 p-3 rounded-xl bg-slate-50 border transition-colors ${
+                      weekDaysError
+                        ? "border-red-400 bg-red-50/30"
+                        : "border-slate-200"
+                    }`}
+                  >
+                    {["all", ...WEEK_DAYS].map((day) => (
+                      <button
+                        key={day}
+                        type="button"
+                        onClick={() => handleToggleDay(day)}
+                        className={`px-3 py-1.5 rounded-[9px] text-[11.5px] font-semibold border transition-all
                         flex items-center gap-1 select-none ${
                           weekDays?.[day]
                             ? day === "all"
@@ -786,42 +925,52 @@ export default function AddNewDoctors({ open, handleClose }) {
                               : "bg-teal-500 border-teal-500 text-white shadow-sm"
                             : "bg-white border-slate-200 text-slate-500 hover:border-teal-400 hover:text-teal-600"
                         }`}
-                    >
-                      {weekDays?.[day] && (
-                        <span className="text-[9px] font-bold">✓</span>
-                      )}
-                      {DAY_LABELS[day]}
-                    </button>
-                  ))}
+                      >
+                        {weekDays?.[day] && (
+                          <span className="text-[9px] font-bold">✓</span>
+                        )}
+                        {DAY_LABELS[day]}
+                      </button>
+                    ))}
+                  </div>
+                  {weekDaysError && (
+                    <p className="text-red-500 text-[11px] mt-1.5 flex items-center gap-1">
+                      <span>⚠</span> {weekDaysError}
+                    </p>
+                  )}
                 </div>
-                {weekDaysError && (
-                  <p className="text-red-500 text-[11px] mt-1.5 flex items-center gap-1">
-                    <span>⚠</span> {weekDaysError}
-                  </p>
-                )}
-              </div>
-            </SectionCard>
+              </SectionCard>
 
-            <div
-              className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-3 pb-1
+              <div
+                className="flex flex-col-reverse sm:flex-row justify-end gap-2.5 pt-3 pb-1
                 border-t border-slate-200 sticky bottom-0 bg-slate-50 z-10"
-            >
-              <CommonButton
-                label="Reset"
-                onClick={handleReset}
-                type="button"
-                className="border border-red-300 text-red-600 hover:bg-red-50 transition-colors "
-              />
-              <CommonButton
-                label="Save Doctor"
-                type="submit"
-                className="bg-gradient-to-r from-lime-600 to-green-600 text-white shadow-md
+              >
+                <CommonButton
+                  label="Reset"
+                  onClick={handleReset}
+                  type="button"
+                  className="border border-red-300 text-red-600 hover:bg-red-50 transition-colors "
+                />
+                <CommonButton
+                  label="Save Doctor"
+                  type="submit"
+                  className="bg-gradient-to-r from-lime-600 to-green-600 text-white shadow-md
                   hover:from-lime-700 hover:to-green-700 transition-all"
-              />
-            </div>
-          </form>
-        </div>
-      </Box>
-    </Modal>
+                />
+              </div>
+            </form>
+          </div>
+        </Box>
+      </Modal>
+
+      <ConfirmationModal
+        confirmationOpen={confirmationOpen}
+        confirmationHandleClose={() => setConfirmationOpen(false)}
+        confirmationSubmitFunc={handleConfirmSave}
+        confirmationLabel="Save Doctor"
+        confirmationMsg="Are you sure you want to save this doctor details?"
+        confirmationButtonMsg="Confirm Save"
+      />
+    </>
   );
 }

@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Call, Email, WhatsApp } from "@mui/icons-material";
 import CardMembershipIcon from "@mui/icons-material/CardMembership";
-import { Box, Modal, CircularProgress } from "@mui/material";
+import { Box, Modal, CircularProgress, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { User as UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -17,6 +17,7 @@ import InputField from "../../../common/formFields/InputField";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import { SaveEnquiry } from "../../../../services/membershipServices/MembershipServices";
+import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 
 const schema = yup.object().shape({
   fullName: yup
@@ -56,6 +57,12 @@ const itemVariants = {
   visible: { opacity: 1, x: 0 },
 };
 
+const CONTACT_MODES = [
+  { id: "Call", label: "Call", icon: <Call fontSize="small" /> },
+  { id: "WhatsApp", label: "WhatsApp", icon: <WhatsApp fontSize="small" /> },
+  { id: "Email", label: "Email", icon: <Email fontSize="small" /> },
+];
+
 const MembershipRegistrationModal = ({
   open,
   handleClose,
@@ -66,6 +73,7 @@ const MembershipRegistrationModal = ({
   const [loading, setLoading] = useState(false);
   const [confirmationOpen, setConfirmationOpen] = useState(false);
   const [formData, setFormData] = useState(null);
+
   const {
     control,
     handleSubmit,
@@ -89,6 +97,7 @@ const MembershipRegistrationModal = ({
   });
 
   const termsAcceptedValue = watch("termsAccepted");
+  const contactModeValue = watch("contactMode");
 
   useEffect(() => {
     if (open) {
@@ -108,26 +117,25 @@ const MembershipRegistrationModal = ({
               setValue("state", userData.state || "");
             }
           })
-          .catch(() => {
-            errorAlert("Failed to fetch user details.");
-          });
+          .catch(() => errorAlert("Failed to fetch user details."));
       }
     }
   }, [open, user, reset, setValue]);
 
   const onSubmit = (data) => {
-    if (!user || !user?.userId) {
+    if (!user?.userId) {
       errorAlert("Please login first to submit your enquiry.");
       return;
     }
-    const finalSaveObj = {
+    setFormData({
+      userId: user.userId,
+      createdBy: user.userId,
       enquiryName:
         membershipDetails?.serviceName ||
         membershipDetails?.membershipName ||
         "Wedding Ceremony",
       duration:
         membershipDetails?.duration || membershipDetails?.durationRange || "",
-      userId: user?.userId,
       fullName: data.fullName,
       email: data.email,
       contactMode: data.contactMode,
@@ -136,13 +144,12 @@ const MembershipRegistrationModal = ({
       state: data.state,
       message: data.specialRequests,
       EnquiryOrigin: origin,
-    };
-    setFormData(finalSaveObj);
+    });
     setConfirmationOpen(true);
   };
 
   const handleConfirmSubmit = async () => {
-    if (!user || !user?.userId) {
+    if (!user?.userId) {
       errorAlert("Authentication lost. Please login again.");
       setConfirmationOpen(false);
       return;
@@ -150,13 +157,11 @@ const MembershipRegistrationModal = ({
     setLoading(true);
     try {
       const res = await SaveEnquiry(formData);
-      console.log("SaveEnquiry", res);
       successAlert(res?.data?.message || "Enquiry submitted successfully!");
       handleClose();
       reset();
       setConfirmationOpen(false);
     } catch (error) {
-      console.error("Error saving enquiry:", error);
       errorAlert(
         error?.response?.data?.message ||
           "Something went wrong. Please try again.",
@@ -166,240 +171,215 @@ const MembershipRegistrationModal = ({
     }
   };
 
-  console.log("membershipDetails", membershipDetails);
-
   if (!membershipDetails) return null;
+
+  const hindiName =
+    membershipDetails?.membershipNameHi ||
+    membershipDetails?.nameHindi ||
+    membershipDetails?.programmeNameHindi ||
+    membershipDetails?.season;
+
+  const benefitCount =
+    membershipDetails?.benifits?.length || membershipDetails?.info?.length || 0;
+
+  const priceDisplay =
+    membershipDetails?.duration || membershipDetails?.durationRange
+      ? `₹ ${membershipDetails?.price?.toLocaleString("en-IN")}`
+      : membershipDetails?.price?.toLocaleString("en-IN");
+
+  const durationDisplay =
+    membershipDetails?.duration || membershipDetails?.durationRange;
 
   return (
     <>
-      <Modal open={open}>
+      <Modal open={open} aria-labelledby="membership-modal-title">
         <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            outline: "none",
-          }}
+          sx={ModalStyle}
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-y-auto rounded-xl  p-0 custom-scrollbar-wellness-stay"
         >
-          <AnimatePresence>
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              className="w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[850px] max-h-[90vh] flex flex-col overflow-hidden rounded-lg shadow-2xl bg-white "
-            >
-              {/* Header */}
-              <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-10 shrink-0">
-                <div className="flex items-center gap-3">
-                  <div className="bg-white/20 p-2.5 rounded-xl hidden sm:block backdrop-blur-md">
-                    <CardMembershipIcon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-white/80 text-sm sm:text-lg font-semibold">
-                      {membershipDetails?.serviceName}
-                      {membershipDetails?.membershipNameHi ||
-                        membershipDetails?.nameHindi ||
-                        membershipDetails?.programmeNameHindi ||
-                        (membershipDetails?.season && (
-                          <>
-                            (
-                            {membershipDetails?.membershipNameHi ||
-                              membershipDetails?.nameHindi ||
-                              membershipDetails?.programmeNameHindi ||
-                              membershipDetails?.season}
-                            )
-                          </>
-                        ))}
-                    </p>
-
-                    <p className="text-white/80 text-xs sm:text-sm font-medium">
-                      {(membershipDetails?.benifits ||
-                        membershipDetails?.info) !== undefined && (
-                        <span className="border rounded-full py-0.5 border-green-400 bg-green-100 text-green-700 px-3 text-[10px]">
-                          {(membershipDetails?.benifits?.length ||
-                            membershipDetails?.info?.length ||
-                            0) === 1
-                            ? "Individual"
-                            : "Per Person"}
-                        </span>
-                      )}
-                      &nbsp;
-                      <span>
-                        {membershipDetails?.duration ||
-                        membershipDetails?.durationRange
-                          ? "₹ " +
-                            membershipDetails?.price?.toLocaleString("en-IN")
-                          : membershipDetails?.price?.toLocaleString("en-IN")}
-                      </span>{" "}
-                      {(membershipDetails?.duration ||
-                        membershipDetails?.durationRange) !== undefined
-                        ? "/ "
-                        : ""}
-                      {membershipDetails?.duration ||
-                        membershipDetails?.durationRange}
-                    </p>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="flex flex-col h-full overflow-hidden"
+          >
+            <div className="bg-gradient-to-r from-green-700 to-emerald-500 px-4 sm:px-6 py-4 sm:py-5 flex items-center justify-between sticky top-0 z-10 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex bg-white/20 backdrop-blur-sm p-2.5 rounded-xl">
+                  <CardMembershipIcon
+                    className="text-white"
+                    style={{ fontSize: 24 }}
+                  />
+                </div>
+                <div>
+                  <p className="text-white font-semibold text-base sm:text-lg leading-tight">
+                    {membershipDetails?.serviceName ||
+                      membershipDetails?.membershipName}
+                    {hindiName && (
+                      <span className="font-normal"> ({hindiName})</span>
+                    )}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                    {(membershipDetails?.benifits ||
+                      membershipDetails?.info) !== undefined && (
+                      <span className="border border-green-400 rounded-full px-3 py-0.5 bg-green-50 text-green-700 text-[10px] font-semibold">
+                        {benefitCount === 1 ? "Individual" : "Per Person"}
+                      </span>
+                    )}
+                    <span className="text-white/85 text-xs font-medium">
+                      {priceDisplay}
+                      {durationDisplay && ` / ${durationDisplay}`}
+                    </span>
                   </div>
                 </div>
-                <CancelButtonModal onClick={handleClose} />
               </div>
-              <div className="overflow-y-auto flex-1 p-4 sm:p-6 custom-scrollbar bg-slate-50/50">
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                  <motion.section
-                    variants={itemVariants}
-                    className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"
-                  >
-                    <h3 className="text-sm font-bold text-green-800 mb-3 flex items-center gap-2 border-b border-slate-100 pb-2 uppercase tracking-tight">
-                      <UserIcon className="w-4 h-4" /> Personal & Contact Info
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      <div className="col-span-3">
-                        <InputField
-                          control={control}
-                          name="fullName"
-                          label="Full Name *"
-                          error={errors.fullName}
-                        />
-                      </div>
-                      <InputField
-                        control={control}
-                        name="mobileNumber"
-                        label="Mobile Number *"
-                        type="tel"
-                        error={errors.mobileNumber}
-                      />
-                      <div className="col-span-2">
-                        <InputField
-                          control={control}
-                          name="email"
-                          label="Email Address *"
-                          type="email"
-                          error={errors.email}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <InputField
-                          control={control}
-                          name="city"
-                          label="City *"
-                          error={errors.city}
-                        />
-                      </div>
-                      <div className="col-span-2">
-                        <InputField
-                          control={control}
-                          name="state"
-                          label="State *"
-                          error={errors.state}
-                        />
-                      </div>
-                    </div>
-                  </motion.section>
-                  <motion.section
-                    variants={itemVariants}
-                    className="bg-white p-6 rounded-xl shadow-sm border border-slate-200"
-                  >
-                    <h3 className="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">
-                      Preferred Contact Mode
-                    </h3>
-                    <div className="flex flex-wrap gap-4">
-                      {[
-                        {
-                          id: "Call",
-                          label: "Call",
-                          icon: <Call className="w-5 h-5" />,
-                        },
-                        {
-                          id: "WhatsApp",
-                          label: "WhatsApp",
-                          icon: <WhatsApp className="w-5 h-5" />,
-                        },
-                        {
-                          id: "Email",
-                          label: "Email",
-                          icon: <Email className="w-5 h-5" />,
-                        },
-                      ].map((mode) => (
-                        <button
-                          key={mode.id}
-                          type="button"
-                          onClick={() => setValue("contactMode", mode.id)}
-                          className={`flex items-center gap-3 px-8 py-3 rounded-full transition-all duration-200 font-medium ${
-                            watch("contactMode") === mode.id
-                              ? "bg-white border-2 border-green-700 text-green-700 shadow-md"
-                              : "bg-slate-100 border-2 border-transparent text-green-600 hover:bg-slate-200"
-                          }`}
-                        >
-                          <span
-                            className={
-                              watch("contactMode") === mode.id
-                                ? "text-emerald-700"
-                                : "text-green-500"
-                            }
-                          >
-                            {mode.icon}
-                          </span>
-                          <span>{mode.label}</span>
-                        </button>
-                      ))}
-                    </div>
-                    {errors.contactMode && (
-                      <p className="text-xs text-red-500 mt-2">
-                        {errors.contactMode.message}
+              <CancelButtonModal onClick={handleClose} />
+            </div>
+
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 bg-slate-50 scrollbar-thin scrollbar-thumb-slate-300">
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="flex flex-col gap-4 sm:gap-5">
+                  <motion.section variants={itemVariants}>
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+                      <p className="text-green-700 font-bold flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 text-sm uppercase tracking-wide">
+                        <UserIcon size={16} />
+                        Personal &amp; Contact Info
                       </p>
-                    )}
-                  </motion.section>
-                  <motion.section
-                    variants={itemVariants}
-                    className="bg-white p-4 rounded-xl shadow-sm border border-slate-200"
-                  >
-                    <InputArea
-                      control={control}
-                      name="specialRequests"
-                      label="Anything else you'd like us to know?"
-                      error={errors.specialRequests}
-                      minRows={2}
-                    />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4">
+                        <div className="sm:col-span-2 lg:col-span-9">
+                          <InputField
+                            control={control}
+                            name="fullName"
+                            label="Full Name *"
+                            error={errors.fullName}
+                          />
+                        </div>
+                        <div className="lg:col-span-3">
+                          <InputField
+                            control={control}
+                            name="mobileNumber"
+                            label="Mobile Number *"
+                            type="tel"
+                            error={errors.mobileNumber}
+                          />
+                        </div>
+                        <div className="lg:col-span-6">
+                          <InputField
+                            control={control}
+                            name="email"
+                            label="Email Address *"
+                            type="email"
+                            error={errors.email}
+                          />
+                        </div>
+                        <div className="lg:col-span-6">
+                          <InputField
+                            control={control}
+                            name="city"
+                            label="City *"
+                            error={errors.city}
+                          />
+                        </div>
+                        <div className="sm:col-span-2 lg:col-span-12">
+                          <InputField
+                            control={control}
+                            name="state"
+                            label="State *"
+                            error={errors.state}
+                          />
+                        </div>
+                      </div>
+                    </div>
                   </motion.section>
 
-                  <div className="space-y-4">
-                    <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-                      <CheckBoxField
+                  <motion.section variants={itemVariants}>
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+                      <p className="text-slate-500 font-bold uppercase tracking-widest text-xs mb-3">
+                        Preferred Contact Mode
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                        {CONTACT_MODES.map((mode) => {
+                          const isSelected = contactModeValue === mode.id;
+                          return (
+                            <button
+                              key={mode.id}
+                              type="button"
+                              onClick={() => setValue("contactMode", mode.id)}
+                              className={`
+                                flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-full
+                                text-sm font-semibold transition-all duration-200
+                                ${
+                                  isSelected
+                                    ? "bg-white border-2 border-green-700 text-green-700 shadow-md shadow-green-100"
+                                    : "bg-slate-100 border-2 border-transparent text-green-700 hover:bg-slate-200"
+                                }
+                              `}
+                            >
+                              <span className="flex items-center">
+                                {mode.icon}
+                              </span>
+                              {mode.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {errors.contactMode && (
+                        <p className="text-red-500 text-xs mt-2">
+                          {errors.contactMode.message}
+                        </p>
+                      )}
+                    </div>
+                  </motion.section>
+
+                  <motion.section variants={itemVariants}>
+                    <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5">
+                      <InputArea
                         control={control}
-                        name="termsAccepted"
-                        label="I agree  to be contacted by the Swagarama Community team regarding this membership enquiry and wellness updates."
-                        error={errors.termsAccepted}
+                        name="specialRequests"
+                        label="Anything else you'd like us to know?"
+                        error={errors.specialRequests}
+                        minRows={3}
                       />
                     </div>
+                  </motion.section>
+
+                  <div className="bg-green-50 rounded-2xl border border-green-100 p-3 sm:p-4">
+                    <CheckBoxField
+                      control={control}
+                      name="termsAccepted"
+                      label="I agree to be contacted by the Swagarama Community team regarding this membership enquiry and wellness updates."
+                      error={errors.termsAccepted}
+                    />
                   </div>
-                  <div className="flex justify-end gap-3 pt-2">
+
+                  <div className="flex  gap-2 sm:gap-3 justify-end pt-1">
                     <CommonButton
                       type="button"
                       label="Reset"
                       onClick={() => reset()}
-                      className=" border border-red-600 text-red-600 hover:bg-red-50 "
+                      className="border border-red-600 text-red-600 hover:bg-red-50 w-full sm:w-auto"
                     />
                     <CommonButton
                       type="submit"
-                      label={loading ? "Submitting..." : "Enquir Now"}
+                      label={loading ? "Submitting..." : "Enquiry Now"}
                       icon={
                         loading && (
                           <CircularProgress size={16} color="inherit" />
                         )
                       }
                       disabled={!termsAcceptedValue || loading}
-                      className={` text-white transition-all ${
+                      className={`w-full sm:w-auto ${
                         termsAcceptedValue && !loading
-                          ? "bg-gradient-to-r from-green-700 to-green-600  hover:shadow-xl hover:-translate-y-0.5"
+                          ? "bg-gradient-to-r from-green-700 to-green-600 text-white hover:shadow-xl hover:-translate-y-0.5"
                           : "bg-slate-300 pointer-events-none"
                       }`}
                     />
                   </div>
-                </form>
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                </div>
+              </form>
+            </div>
+          </motion.div>
         </Box>
       </Modal>
 

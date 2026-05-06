@@ -106,9 +106,6 @@ function StayBookingModal({
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
 
-  useEffect(() => {
-    setRoomStatus(null);
-  }, [checkIn, checkOut, guests.adults, guests.children, guests.rooms]);
 
   const carouselRef = useRef(null);
   const checkInDateRef = useRef(null);
@@ -136,6 +133,25 @@ function StayBookingModal({
       })
       .nullable()
       .required("Patient selection is required"),
+    noOfAdults: yup
+      .number()
+      .typeError("Must be a number")
+      .min(1, "Minimum 1 adult")
+      .max(3, "Maximum 3 adults allowed")
+      .test("no-children-with-3-adults", "Cannot have children with 3 adults", function(value) {
+        const { noOfChildren } = this.parent;
+        return !(value === 3 && noOfChildren > 0);
+      }),
+
+    noOfChildren: yup
+      .number()
+      .typeError("Must be a number")
+      .min(0, "Minimum 0")
+      .max(2, "Maximum 2 children allowed")
+      .test("max-2-adults-with-children", "Max 2 adults allowed when children are added", function(value) {
+        const { noOfAdults } = this.parent;
+        return !(value > 0 && noOfAdults > 2);
+      }),
   });
 
   const { control, watch, setValue, reset } = useForm({
@@ -147,6 +163,8 @@ function StayBookingModal({
       bringingPet: false,
       patientFid: null,
       twinSharing: false,
+      noOfAdults: 1,
+      noOfChildren: 0,
       mealPreference: {
         label: "Organic Full Board (Included)",
         value: "Organic Full Board (Included)",
@@ -157,6 +175,35 @@ function StayBookingModal({
   });
   const patientFid = watch("patientFid");
   const formValues = watch();
+
+  useEffect(() => {
+    setRoomStatus(null);
+  }, [
+    checkIn,
+    checkOut,
+    formValues.noOfAdults,
+    formValues.noOfChildren,
+    guests.rooms,
+  ]);
+
+  // Handle constraints between Adults and Children
+  useEffect(() => {
+    const adults = Number(formValues.noOfAdults);
+    const children = Number(formValues.noOfChildren);
+
+    if (adults === 3 && children > 0) {
+      setValue("noOfChildren", 0);
+    }
+  }, [formValues.noOfAdults]);
+
+  useEffect(() => {
+    const adults = Number(formValues.noOfAdults);
+    const children = Number(formValues.noOfChildren);
+
+    if (children > 0 && adults > 2) {
+      setValue("noOfAdults", 2);
+    }
+  }, [formValues.noOfChildren]);
 
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
@@ -193,15 +240,38 @@ function StayBookingModal({
   };
 
   const calculateTotal = () => {
-    if (!selectedService) return { stay: 0, wellness: 0, taxes: 0, total: 0 };
+    if (!selectedService)
+      return {
+        stay: 0,
+        wellness: 0,
+        taxes: 0,
+        petSurcharge: 0,
+        adultSurcharge: 0,
+        childrenSurcharge: 0,
+        total: 0,
+      };
     const base = selectedService.price;
     const wellness = 0;
     const taxes = (base + wellness) * 0; // tax is zero for now
+
+    let petSurcharge = 0;
+    if (formValues?.bringingPet) {
+      petSurcharge = (base + wellness + taxes) * 0.25;
+    }
+
+    let adultSurcharge = 0;
+    if (Number(formValues?.noOfAdults) === 3) {
+      adultSurcharge = base * 0.75;
+    }
+
     return {
       stay: base,
       wellness: wellness,
       taxes: taxes,
-      total: base + wellness + taxes,
+      petSurcharge: petSurcharge,
+      adultSurcharge: adultSurcharge,
+      childrenSurcharge: 0,
+      total: base + wellness + taxes + petSurcharge + adultSurcharge,
     };
   };
 
@@ -252,6 +322,12 @@ function StayBookingModal({
             onClick={() =>
               isCurrentMonth && !isPast && handleDateClick(currentDay)
             }
+            onTouchEnd={(e) => {
+              if (isCurrentMonth && !isPast) {
+                e.preventDefault();
+                handleDateClick(currentDay);
+              }
+            }}
             className={`relative flex items-center justify-center h-8 w-8 md:h-10 md:w-10 cursor-pointer text-[13px] font-medium transition-all
                 ${!isCurrentMonth ? "opacity-0 pointer-events-none" : isPast ? "text-gray-300 pointer-events-none" : "text-gray-700"}
                 ${inRange && isCurrentMonth ? "bg-booking-primaryLight/60" : ""}
@@ -335,16 +411,18 @@ function StayBookingModal({
       return;
     }
     const saveObj = {
-      userId: patientFid !==null && patientFid !== undefined? patientFid?.id : user?.userId,
+      userId: patientFid?.userId,
       resortId: 1,
+      clinicFid: 5,
+      createdBy: user?.userId,
       roomTypeId: selectedService?.roomTypeId,
       stayType: selectedService?.maxOcc === 1 ? "Seperate" : "Double",
       checkInDate: checkIn ? format(new Date(checkIn), "yyyy-MM-dd") : "",
       CheckoutDate: checkOut ? format(new Date(checkOut), "yyyy-MM-dd") : "",
       checkInTime: checkInTime,
       checkOutTime: checkOutTime,
-      noOfPersons: guests?.adults || 0,
-      noOfChildren: guests?.children || 0,
+      noOfPersons: Number(formValues?.noOfAdults) || 1,
+      noOfChildren: Number(formValues?.noOfChildren) || 0,
       isPet: formValues?.bringingPet || false,
       twinSharing: formValues?.twinSharing || false,
       totalAmount: costs?.total || 0,
@@ -357,15 +435,12 @@ function StayBookingModal({
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
+  console.log("patientFid", patientFid);
 
   const initiateBookingPayment = async () => {
     if (isPaymentPending) return;
     try {
-      const userId =patientFid !==null && patientFid !== undefined? patientFid?.id : user?.userId ;
-      const clinicId = 5;
-
       setIsLoading(true);
-
       const bookingRes = await wellnessStayBooking(finalSaveObj);
       const bookingData = bookingRes?.data;
       console.log("bookingData", bookingData);
@@ -374,31 +449,31 @@ function StayBookingModal({
         const bookingId = bookingData?.data;
 
         const tempObj = {
-          amount: costs.total,
           // appointmentDate:
           //   checkIn && !isNaN(new Date(checkIn).getTime())
           //     ? format(new Date(checkIn), "yyyy-MM-dd")
           //     : "",
           // SloteStartTime: checkInTime,
           // SloteEndTime: checkOutTime,
-          userId: userId,
+          amount: costs.total,
+          patientId: patientFid?.patientId,
+          userId: patientFid?.userId,
+          bookingId: bookingId?.bookingId,
           paymentFor: "StayBooking",
-          bookingId: bookingId?.data,
         };
 
-        const res = await InitiatePayment(null, userId, tempObj);
+        const res = await InitiatePayment(5, bookingId?.patientUserId, tempObj);
         const data = res?.data;
 
         if (data?.status === 200) {
           setIsLoading(false);
           setIsPaymentPending(true);
-
           cancelPaymentRef.current = RedirectToSabPaisa(
             data,
-            null,
+            5,
             data.clientTxnId,
             async () => {
-              successAlert(bookingData.message || "Booking Successful!");
+              successAlert(bookingData.message);
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
               handleClose();
@@ -414,11 +489,11 @@ function StayBookingModal({
           );
         } else {
           setIsLoading(false);
-          errorAlert(data?.message || "Failed to initiate payment");
+          errorAlert(data?.message);
         }
       } else {
         setIsLoading(false);
-        errorAlert(bookingData?.message || "Booking failed");
+        errorAlert(bookingData?.message);
       }
     } catch (error) {
       setIsLoading(false);
@@ -427,18 +502,18 @@ function StayBookingModal({
   };
 
   const handleGetPatientData = () => {
-    getPatientDataByMobileNo(user?.mobileNo, 5)
+    getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
       .then((res) => {
         const dataArray = res?.data?.data;
         if (Array.isArray(dataArray) && dataArray.length > 0) {
           const filterData = dataArray.find(
-            (item) => item.userId === user?.userId,
+            (item) => item.patientId === user?.userId,
           );
           setPatientOptions(
             dataArray.map((d) => ({
               ...d,
-              id: d.userId,
-              value: d.userId,
+              id: d.patientId,
+              value: d.patientId,
               label: `${d.firstName} ${d.lastName}`,
             })),
           );
@@ -450,6 +525,7 @@ function StayBookingModal({
             setValue("email", filterData.emailId || "");
             setValue("mobile", filterData.mobileNo || "");
             setValue("city", filterData.city || "");
+            setValue("noOfAdults", 1);
           }
         }
       })
@@ -461,10 +537,11 @@ function StayBookingModal({
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
       setValue("fullName", patientFid.label);
-      setValue("mobileNumber", patientFid.mobileNo);
+      setValue("mobile", patientFid.mobileNo);
       setValue("age", patientFid?.age);
       setValue("city", patientFid.city);
-      setValue("emailAddress", patientFid.emailId);
+      setValue("email", patientFid.emailId);
+      setValue("noOfAdults", 1);
     }
   }, [patientFid]);
 
@@ -507,8 +584,14 @@ function StayBookingModal({
                       <div className="flex items-stretch border  rounded-[5px] bg-white  hover:border-booking-primary transition-colors">
                         <div
                           ref={checkInDateRef}
-                          onClick={(e) => {
-                            setCalendarAnchorEl(e.currentTarget);
+                          onClick={() => {
+                            setCalendarAnchorEl(checkInDateRef.current);
+                            setSelectingFor("checkIn");
+                            if (checkIn) setCalendarViewDate(checkIn);
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            setCalendarAnchorEl(checkInDateRef.current);
                             setSelectingFor("checkIn");
                             if (checkIn) setCalendarViewDate(checkIn);
                           }}
@@ -531,7 +614,11 @@ function StayBookingModal({
                         </div>
                         <div
                           ref={inTimeRef}
-                          onClick={(e) => setInTimeAnchorEl(e.currentTarget)}
+                          onClick={() => setInTimeAnchorEl(inTimeRef.current)}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            setInTimeAnchorEl(inTimeRef.current);
+                          }}
                           className="w-24 flex flex-col px-2 py-1.5 cursor-pointer hover:bg-gray-50 transition-all"
                         >
                           <p className="text-[7px] font-bold text-booking-primary uppercase tracking-[0.15em] mb-0.5">
@@ -553,8 +640,15 @@ function StayBookingModal({
                       <div className="flex items-stretch border  rounded-[5px] bg-white overflow-hidden hover:border-booking-primary transition-colors">
                         <div
                           ref={checkOutDateRef}
-                          onClick={(e) => {
-                            setCalendarAnchorEl(e.currentTarget);
+                          onClick={() => {
+                            setCalendarAnchorEl(checkOutDateRef.current);
+                            setSelectingFor("checkOut");
+                            if (checkOut) setCalendarViewDate(checkOut);
+                            else if (checkIn) setCalendarViewDate(checkIn);
+                          }}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            setCalendarAnchorEl(checkOutDateRef.current);
                             setSelectingFor("checkOut");
                             if (checkOut) setCalendarViewDate(checkOut);
                             else if (checkIn) setCalendarViewDate(checkIn);
@@ -578,7 +672,11 @@ function StayBookingModal({
                         </div>
                         <div
                           ref={outTimeRef}
-                          onClick={(e) => setOutTimeAnchorEl(e.currentTarget)}
+                          onClick={() => setOutTimeAnchorEl(outTimeRef.current)}
+                          onTouchEnd={(e) => {
+                            e.preventDefault();
+                            setOutTimeAnchorEl(outTimeRef.current);
+                          }}
                           className="w-24 flex flex-col px-2 py-1.5 cursor-pointer hover:bg-gray-50 transition-all"
                         >
                           <p className="text-[7px] font-bold text-booking-primary uppercase tracking-[0.15em] mb-0.5">
@@ -631,7 +729,7 @@ function StayBookingModal({
                       </div> */}
                     </div>
 
-                    <div className="flex flex-col justify-center md:w-36">
+                    <div className="flex justify-end md:justify-center md:w-36">
                       <CommonButton
                         type="button"
                         searchIcon={true}
@@ -657,7 +755,7 @@ function StayBookingModal({
                     >
                       <div
                         className={`p-3 rounded-xl border flex items-center gap-3 ${
-                          roomStatus?.message === "Room is sold out" ||
+                          roomStatus?.message === "Sold Out" ||
                           roomStatus === "unavailable" ||
                           roomStatus === "error"
                             ? "bg-red-50 border-red-100 text-red-700"
@@ -666,14 +764,14 @@ function StayBookingModal({
                       >
                         <div
                           className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
-                            roomStatus?.message === "Room is sold out" ||
+                            roomStatus?.message === "Sold Out" ||
                             roomStatus === "unavailable" ||
                             roomStatus === "error"
                               ? "bg-white text-red-500"
                               : "bg-white text-booking-primary"
                           }`}
                         >
-                          {roomStatus?.message === "Room is sold out" ||
+                          {roomStatus?.message === "Sold Out" ||
                           roomStatus === "unavailable" ||
                           roomStatus === "error" ? (
                             <svg
@@ -713,7 +811,7 @@ function StayBookingModal({
                                 : "Unavailable")}
                           </p>
                           <p className="text-[10px] opacity-80 font-medium">
-                            {roomStatus?.message === "Room is sold out" ||
+                            {roomStatus?.message === "Sold Out" ||
                             roomStatus === "unavailable"
                               ? "Please try different dates"
                               : roomStatus === "error"
@@ -1426,6 +1524,22 @@ function StayBookingModal({
                       label="City"
                       variant="outlined"
                     />
+                    <InputField
+                      control={control}
+                      name="noOfAdults"
+                      label="Adults (Max 3)"
+                      variant="outlined"
+                      type="number"
+                      inputProps={{ min: 1, max: 3 }}
+                    />
+                    <InputField
+                      control={control}
+                      name="noOfChildren"
+                      label="Children (Max 2, Age 6-12)"
+                      variant="outlined"
+                      type="number"
+                      inputProps={{ min: 0, max: 2 }}
+                    />
                   </div>
                 </div>
 
@@ -1458,15 +1572,31 @@ function StayBookingModal({
                       label: "Taxes & Service",
                       value: Math.round(costs.taxes),
                     },
+                    ...(costs.petSurcharge > 0
+                      ? [
+                          {
+                            label: "Pet Charges (25%)",
+                            value: Math.round(costs.petSurcharge),
+                          },
+                        ]
+                      : []),
+                    ...(costs.adultSurcharge > 0
+                      ? [
+                          {
+                            label: "Extra Adult (75%)",
+                            value: Math.round(costs.adultSurcharge),
+                          },
+                        ]
+                      : []),
                   ].map(({ label, value }) => (
                     <div
                       key={label}
                       className="flex justify-between items-center"
                     >
-                      <span className="text-gray-500 font-bold uppercase text-[10px] tracking-wider">
+                      <span className="text-gray-500 font-semibold  text-[10px] tracking-wider">
                         {label}
                       </span>
-                      <span className="text-booking-primaryDark font-bold text-sm">
+                      <span className="text-booking-primaryDark font-semibold text-sm">
                         ₹{value.toLocaleString()}
                       </span>
                     </div>
@@ -1500,7 +1630,7 @@ function StayBookingModal({
                       !checkIn ||
                       !checkOut ||
                       isSearching ||
-                      roomStatus?.message === "Room is sold out" ||
+                      roomStatus?.message === "Sold Out" ||
                       roomStatus === "unavailable" ||
                       roomStatus === "error" ||
                       roomStatus === null
@@ -1513,7 +1643,7 @@ function StayBookingModal({
                       checkOut &&
                       !isSearching &&
                       roomStatus !== null &&
-                      roomStatus?.message !== "Room is sold out" &&
+                      roomStatus?.message !== "Sold Out" &&
                       roomStatus !== "unavailable" &&
                       roomStatus !== "error"
                         ? "bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white shadow-lg shadow-booking-primary/10"

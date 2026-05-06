@@ -39,6 +39,10 @@ import वदनभ्यङ्गFaceUnguentFemaleImg from "../../../assets/hea
 import वदनवर्ण्यFacePowderFemaleImg from "../../../assets/healingServices/beuty-therapy/वदनवर्ण्यFacePowderFemale.webp";
 import BeutyMassageImg from "../../../assets/membership/healingServices/herbalMassage.webp";
 import BeautyTherapyBookingModal from "./BeautyTherapyBookingModal";
+import {
+  GetDetoxTherapyByServiceCategory,
+  GetTherapyNameByServiceCategory,
+} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 
 const beautyData = [
   // Beautiful Hair
@@ -251,7 +255,7 @@ const beautyData = [
     benefits: "Opens pores, detoxifies, relaxes",
     icon: CloudRain,
     price: 3000,
-    image:BodySkinSteamingFemale,
+    image: BodySkinSteamingFemale,
   },
   {
     category: "gracefulWomen",
@@ -260,7 +264,7 @@ const beautyData = [
     benefits: "Rejuvenates skin, hydrates",
     icon: Gift,
     price: 3000,
-    image:BodySkinPackFemale, 
+    image: BodySkinPackFemale,
   },
   {
     category: "gracefulWomen",
@@ -428,41 +432,25 @@ const beautyData = [
 const BeautyTherapy = () => {
   const [selectedService, setSelectedService] = useState(null);
   const [openModal, setOpenModal] = useState(false);
-  const [displayCount, setDisplayCount] = useState(12);
-  const [selectedCategory, setSelectedCategory] = useState("All");
-
-  const categories = [
-    {
-      key: "beautifulHairFemale",
-      label: "स्त्रीकेशरक्षा Female Hair Care",
-      icon: Feather,
-    },
-    {
-      key: "beautifulHairMale",
-      label: "पुंकेशरक्षा Male Hair Care",
-      icon: Flower2,
-    },
-    { key: "gracefulWomen", label: "स्त्रीरक्षा Women Care", icon: Flower2 },
-    { key: "gracefulMen", label: "पुंस्रक्षा Men Care", icon: User },
-    { key: "All", label: "All Services", icon: Sparkles },
-  ];
-
-  const filteredServices = beautyData.filter((service) => {
-    if (selectedCategory === "All") return true;
-
-    if (
-      (selectedCategory === "beautifulHairFemale" ||
-        selectedCategory === "beautifulHairMale") &&
-      service.category === "beautifulHair"
-    ) {
-      return true;
-    }
-
-    return service.category === selectedCategory;
+  const [serviceCategories, setServiceCategories] = useState([]);
+  const [services, setServices] = useState([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const [selectedCategory, setSelectedCategory] = useState({
+    serviceGroupId: 0,
+    serviceGroupName: "All",
   });
 
-  const displayedServices = filteredServices.slice(0, displayCount);
-  const hasMore = displayCount < filteredServices.length;
+  const hasMore = count > services.length;
+
+  const handleCategoryChange = (cat) => {
+    if (cat.serviceGroupId === selectedCategory.serviceGroupId) return;
+    setSelectedCategory(cat);
+    setPage(1);
+    setServices([]);
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -482,9 +470,58 @@ const BeautyTherapy = () => {
     },
   };
 
+  const handleShowDetoxServices = () => {
+    setIsLoading(true);
+    GetTherapyNameByServiceCategory(
+      5,
+      selectedCategory.serviceGroupId,
+      "Beauty Therapy",
+      page,
+      10,
+    )
+      .then((res) => {
+        const responseData = res?.data?.data;
+        if (responseData) {
+          const newServices = responseData.data || [];
+          if (page === 1) {
+            setServices(newServices);
+          } else {
+            setServices((prev) => [...prev, ...newServices]);
+          }
+          setCount(responseData.totalRecords || 0);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  };
+
   useEffect(() => {
-    setDisplayCount(10);
-  }, [selectedCategory]);
+    GetDetoxTherapyByServiceCategory(5)
+      .then((res) => {
+        const data = res?.data?.data.filter(
+          (item) => item.therapyType === "Beauty Therapy",
+        );
+        if (data?.length) {
+          setServiceCategories([
+            {
+              serviceGroupId: 0,
+              serviceGroupName: "All",
+            },
+            ...data.map((d) => ({
+              serviceGroupId: d?.serviceGroupId,
+              serviceGroupName: d?.serviceGroupName,
+            })),
+          ]);
+        }
+      })
+      .catch((err) => err);
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory !== null && selectedCategory !== undefined) {
+      handleShowDetoxServices();
+    }
+  }, [selectedCategory, page]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-emerald-50 to-green-100">
@@ -535,37 +572,38 @@ const BeautyTherapy = () => {
             </div>
 
             <div className="grid  md:grid-cols-4 xl:flex xl:gap-0 xl space-x-3 gap-2">
-              {categories.map((cat) => {
-                const Icon = cat.icon;
-                const isSelected = selectedCategory === cat.key;
+              {serviceCategories?.length > 0 &&
+                serviceCategories.map((cat) => {
+                  const isSelected =
+                    selectedCategory.serviceGroupId === cat.serviceGroupId;
 
-                return (
-                  <motion.button
-                    key={cat.key}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelectedCategory(cat.key)}
-                    className={`relative overflow-hidden rounded-xl p-3 transition-all ${
-                      isSelected
-                        ? "bg-white text-green-900 shadow-lg border border-white font-semibold"
-                        : "backdrop-blur-sm bg-green-800/60 text-emerald-100 hover:bg-green-700/60 border border-emerald-600/30"
-                    }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Icon size={18} />
-                      <span className="text-sm font-medium">{cat.label}</span>
-                    </div>
-                  </motion.button>
-                );
-              })}
+                  return (
+                    <motion.button
+                      key={cat.serviceGroupId}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => handleCategoryChange(cat)}
+                      className={`relative overflow-hidden rounded-xl p-3 transition-all ${
+                        isSelected
+                          ? "bg-white text-green-900 shadow-lg border border-white font-semibold"
+                          : "backdrop-blur-sm bg-green-800/60 text-emerald-100 hover:bg-green-700/60 border border-emerald-600/30"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {cat.serviceGroupName}
+                        </span>
+                      </div>
+                    </motion.button>
+                  );
+                })}
             </div>
           </div>
         </motion.div>
 
         <div className="mb-4 px-1">
           <p className="text-sm text-emerald-800">
-            Showing {displayedServices.length} of {filteredServices.length}{" "}
-            services
+            Showing {services.length} of {count} services
           </p>
         </div>
 
@@ -576,84 +614,88 @@ const BeautyTherapy = () => {
           className="grid md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3 mb-6"
         >
           <AnimatePresence mode="popLayout">
-            {displayedServices.map((service, index) => {
-              const Icon = service.icon;
-              return (
-                <motion.div
-                  key={`${service.serviceName}-${index}`}
-                  variants={cardVariants}
-                  layout
-                  whileHover={{ y: -4, scale: 1.02 }}
-                  className="group bg-white border border0 rounded-xl overflow-hidden shadow-md hover:shadow-xl  transition-all"
-                >
-                  <div className="relative h-44 md:h-32 xl:h-44 overflow-hidden">
-                    <img
-                      src={service.image}
-                      alt={service.serviceName}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                    />
-
+            {services?.length > 0 &&
+              services.map((service, index) => {
+                // const Icon = service.icon;
+                return (
+                  <motion.div
+                    key={`${service.serviceName}-${index}`}
+                    variants={cardVariants}
+                    layout
+                    whileHover={{ y: -4, scale: 1.02 }}
+                    className="group bg-white border border0 rounded-xl overflow-hidden shadow-md hover:shadow-xl  transition-all"
+                  >
+                    <div className="relative h-44 md:h-32 xl:h-44 overflow-hidden">
+                      <img
+                        src={service.serviceImage}
+                        alt={service.serviceName}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      {/* 
                     <motion.div
                       whileHover={{ rotate: 360, scale: 1.1 }}
                       transition={{ duration: 0.5 }}
                       className="absolute top-2 right-2 w-8 h-8 rounded-lg bg-emerald-600/90 backdrop-blur-sm flex items-center justify-center shadow-lg"
                     >
                       <Icon className="text-white" size={16} />
-                    </motion.div>
-                  </div>
-
-                  <div className="p-3">
-                    <h3 className="text-sm font-semibold 2xl:text-lg text-emerald-800 mb-1 leading-tight line-clamp-2 py-1 ">
-                      {service.serviceName}
-                    </h3>
-
-                    <p className="text-xs 2xl:text-sm  text-emerald-700 mb-1 line-clamp-2">
-                      {service.description}
-                    </p>
-
-                    <div className="backdrop-blur-sm bg-lime-50 border border-emerald-800/50 rounded-lg p-2 mb-2">
-                      <p className="text-xs 2xl:text-sm  text-lime-600 leading-snug line-clamp-2">
-                        {service.benefits}
-                      </p>
+                    </motion.div> */}
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        setSelectedService(service);
-                        setOpenModal(true);
-                      }}
-                      className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white text-xs font-medium py-2 rounded-lg shadow-sm hover:shadow-md hover:from-emerald-500 hover:to-green-500 transition-all"
-                    >
-                      Book Now
-                    </motion.button>
-                  </div>
-                </motion.div>
-              );
-            })}
+
+                    <div className="p-3">
+                      <h3 className="text-sm font-semibold 2xl:text-lg text-emerald-800 mb-1 leading-tight line-clamp-2 py-1 ">
+                        {service.serviceName}
+                      </h3>
+
+                      <p className="text-xs 2xl:text-sm  text-emerald-700 mb-1 line-clamp-2">
+                        {service.description}
+                      </p>
+
+                      <div className="backdrop-blur-sm bg-lime-50 border border-emerald-800/50 rounded-lg p-2 mb-2">
+                        <p className="text-xs 2xl:text-sm  text-lime-600 leading-snug line-clamp-2">
+                          {service.benefits}
+                        </p>
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => {
+                          setSelectedService(service);
+                          setOpenModal(true);
+                        }}
+                        className="w-full bg-gradient-to-r from-emerald-600 to-green-600 text-white text-xs font-medium py-2 rounded-lg shadow-sm hover:shadow-md hover:from-emerald-500 hover:to-green-500 transition-all"
+                      >
+                        Book Now
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                );
+              })}
           </AnimatePresence>
         </motion.div>
 
         {hasMore && (
-          <div className="text-center">
+          <div className="text-center mb-2">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => setDisplayCount((prev) => prev + 12)}
-              className="backdrop-blur-md bg-green-900/60 border border-emerald-700/50 text-emerald-200 px-5 py-2 rounded-xl font-medium text-sm shadow-md hover:shadow-lg hover:bg-green-800/70 transition-all flex items-center gap-2 mx-auto"
+              onClick={() => setPage((prev) => prev + 1)}
+              disabled={isLoading}
+              className="backdrop-blur-md bg-green-900/60 border border-emerald-700/50 text-emerald-200 px-5 py-2 rounded-xl font-medium text-sm shadow-md hover:shadow-lg hover:bg-green-800/70 transition-all flex items-center gap-2 mx-auto disabled:opacity-50"
             >
-              Load More
-              <motion.div
-                animate={{ y: [0, 3, 0] }}
-                transition={{ duration: 1, repeat: Infinity }}
-              >
-                <Sparkles size={16} />
-              </motion.div>
+              {isLoading ? "Loading..." : "Load More"}
+              {!isLoading && (
+                <motion.div
+                  animate={{ y: [0, 3, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                >
+                  <Sparkles size={16} />
+                </motion.div>
+              )}
             </motion.button>
           </div>
         )}
 
-        {filteredServices.length === 0 && (
+        {services.length === 0 && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -6,11 +6,14 @@ import OPDBookings from './bookings/OPDBookings';
 import TherapyBookings from './bookings/TherapyBookings';
 import WellnessStayBookings from './bookings/WellnessStayBookings';
 import OtherBookings from './bookings/OtherBookings';
-import { BookingDetailContent } from './bookings/BookingComponents';
+
 
 const BookingsDashboard = ({ initialTab, onTabConsumed }) => {
   const [activeTab, setActiveTab] = useState(initialTab ?? 0);
   const [selectedBooking, setSelectedBooking] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  const handleRefresh = () => setRefreshTrigger((prev) => prev + 1);
 
   useEffect(() => {
     if (initialTab !== undefined) {
@@ -27,11 +30,11 @@ const BookingsDashboard = ({ initialTab, onTabConsumed }) => {
 
   const renderActiveTab = () => {
     switch (activeTab) {
-      case 0: return <OPDBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} />;
-      case 1: return <TherapyBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} />;
-      case 2: return <WellnessStayBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} />;
-      case 3: return <OtherBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} />;
-      default: return <OPDBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} />;
+      case 0: return <OPDBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} refreshTrigger={refreshTrigger} />;
+      case 1: return <TherapyBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} refreshTrigger={refreshTrigger} />;
+      case 2: return <WellnessStayBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} refreshTrigger={refreshTrigger} />;
+      case 3: return <OtherBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} refreshTrigger={refreshTrigger} />;
+      default: return <OPDBookings onSelect={setSelectedBooking} selectedId={selectedBooking?.id} refreshTrigger={refreshTrigger} />;
     }
   };
 
@@ -56,18 +59,10 @@ const BookingsDashboard = ({ initialTab, onTabConsumed }) => {
         </div>
       </header>
 
-      <div className="flex flex-1 p-2 gap-2">
-        <main className={`flex-1 flex flex-col  bg-white rounded-xl border border-gray-100 ${selectedBooking ? 'hidden lg:flex' : 'flex'}`}>
+      <div className="flex flex-1 p-2 gap-2 overflow-hidden">
+        <main className="flex-1 flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden">
           {renderActiveTab()}
         </main>
-
-        <aside className={`flex-shrink-0 bg-white border border-gray-100 rounded-xl transition-all duration-300 flex flex-col  ${selectedBooking ? 'fixed inset-0 z-10 lg:relative lg:inset-auto w-full lg:w-[360px] xl:w-[400px]' : 'hidden lg:flex lg:w-[320px] xl:w-[360px] h-full'}`}>
-          <BookingDetailContent 
-            selectedBooking={selectedBooking} 
-            onClose={() => setSelectedBooking(null)} 
-            type={activeTab === 0 ? 'OPD' : activeTab === 1 ? 'THERAPY' : activeTab === 2 ? 'STAY' : 'OTHER'} 
-          />
-        </aside>
       </div>
     </motion.div>
   );

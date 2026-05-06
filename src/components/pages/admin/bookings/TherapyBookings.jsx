@@ -1,19 +1,17 @@
 import {
-  ChevronLeft,
-  ChevronRight,
-  EditOutlined as EditIcon,
-  FilterList as FilterIcon,
-  VisibilityOutlined as ViewIcon,
+  FilterList as FilterIcon
 } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { useEffect, useState } from "react";
+import { GetTherapyBookingList } from "../../../../services/adminDashboard/AdminDashboardServices";
 import CommonButton from "../../../common/button/CommonButton";
+import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
+import LoadingSpinner from "../../../common/table/LoadingSpinner";
 import {
-  OriginBadge,
-  PaymentStatusBadge,
-  StatusBadge,
+  EmptyDetailView
 } from "./BookingComponents";
-import { useState } from "react";
 import TherapyAdminBooking from "./TherapyAdminBooking";
+import TherapyDetailView from "./TherapyDetailView";
+
 
 const THERAPY_DATA = [
   {
@@ -90,8 +88,39 @@ const THERAPY_DATA = [
   },
 ];
 
-const TherapyBookings = ({ onSelect, selectedId }) => {
-  const [openTherapyBookingModal,setOpenTherapyBookingModal] = useState(false)
+const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
+  const [openTherapyBookingModal, setOpenTherapyBookingModal] = useState(false);
+  const [therapyList, setTherapyList] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
+  const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
+  //GetTherapyBookingList
+
+  const populateTable = (forPagination) => {
+    setLoadingSpinner(true);
+    GetTherapyBookingList(5, !forPagination ? 1 : page + 1, rowsPerPage)
+      .then((res) => {
+        if (forPagination) {
+          setTherapyList((prevData) => [...prevData, ...res.data.data.data]);
+        } else {
+          setTherapyList(res.data.data.data);
+        }
+        setTotalCount(res.data.data.totalRecords);
+
+        setLoadingSpinner(false);
+      })
+      .catch((error) => {
+        setLoadingSpinner(false);
+      });
+  };
+
+  useEffect(() => {
+    populateTable();
+  }, [refreshTrigger]);
+
   return (
     <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
       <div className="flex justify-between items-center mb-4 px-5 pt-5 shrink-0">
@@ -111,16 +140,16 @@ const TherapyBookings = ({ onSelect, selectedId }) => {
             className="bg-white  text-[#002a24] border border-[#002a24] "
           />
 
-          <CommonButton
+          {/* <CommonButton
             type="button"
             label="+ New Booking"
             className="bg-[#002a24] text-white  transition-all active:scale-95"
             onClick={()=>setOpenTherapyBookingModal(true)}
-          />
+          /> */}
         </div>
       </div>
 
-      <div className="flex-1 overflow-x-auto px-5 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">
+      {/* <div className="flex-1 overflow-x-auto px-5 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">
         <table className="w-full text-left border-separate border-spacing-y-1.5 min-w-[900px]">
           <thead>
             <tr>
@@ -238,9 +267,9 @@ const TherapyBookings = ({ onSelect, selectedId }) => {
             })}
           </tbody>
         </table>
-      </div>
+      </div> */}
 
-      <footer className="px-5 py-4 flex items-center justify-between shrink-0 border-t border-gray-50">
+      {/* <footer className="px-5 py-4 flex items-center justify-between shrink-0 border-t border-gray-50">
         <span className="text-[10px] font-bold text-gray-400 uppercase">
           Showing 4 of 28 Bookings
         </span>
@@ -255,12 +284,83 @@ const TherapyBookings = ({ onSelect, selectedId }) => {
             <ChevronRight className="!text-sm" />
           </button>
         </div>
-      </footer>
+      </footer> */}
+
+      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+        <div className="flex-1 transition-all duration-300">
+          {loadingSpinner && (
+            <div className="my-40 flex justify-center">
+              <LoadingSpinner />
+            </div>
+          )}
+
+          {therapyList?.length > 0 ? (
+            <div className="px-4 pb-4 h-full">
+              <CommonPaginationTable
+                dataResult={therapyList}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                setPage={setPage}
+                count={totalCount}
+                setCount={setTotalCount}
+                setRowsPerPage={setRowsPerPage}
+                tableClass={"h-[460px] border cursor-pointer"}
+                setDataResult={setTherapyList}
+                populateTable={populateTable}
+                handleSelectedRow={(row) => {
+                  setSelectedRow(row);
+                  if (onSelect) onSelect(row);
+                }}
+                customRowBgColor={"#cde8b8"}
+                removeHeaders={[
+                  "bookingId",
+                  "userId",
+                  "serviceGroupName",
+                  "doctorName",
+                  "roomName",
+                  "fromDate",
+                  "toDate",
+                  "duration",
+                  "amount",
+                  "charges",
+                  "totalAmount",
+                  "image",
+                ]}
+              />
+            </div>
+          ) : (
+            <>
+              {!loadingSpinner && (
+                <div className="my-40 text-center flex-1 text-sm font-semibold">
+                  No Records Found
+                  <span className="animate-pulse">...</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+          {selectedRow ? (
+            <div className="h-full animate-in fade-in slide-in-from-right duration-300">
+              <TherapyDetailView
+                selectedBooking={selectedRow}
+                onClose={() => {
+                  setSelectedRow(null);
+                  if (onSelect) onSelect(null);
+                }}
+              />
+            </div>
+          ) : (
+            <EmptyDetailView />
+          )}
+        </div>
+      </div>
 
       {openTherapyBookingModal && (
         <TherapyAdminBooking
           open={openTherapyBookingModal}
-          handleClose={()=>setOpenTherapyBookingModal(false)}
+          handleClose={() => setOpenTherapyBookingModal(false)}
         />
       )}
     </div>

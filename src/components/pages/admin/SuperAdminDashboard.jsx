@@ -8,7 +8,7 @@ import {
   People,
   Search,
   Timeline,
-  Visibility
+  Visibility,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -28,6 +28,11 @@ import {
   YAxis,
 } from "recharts";
 import {
+  GetClinicRevenue,
+  GetDashboardCount,
+  GetDoctorDashboard,
+  GetRevenueTrends,
+  GetTherapySplit,
   GetTodayOPDCount,
   GetUpcomingStays,
 } from "../../../services/adminDashboard/AdminDashboardServices";
@@ -57,61 +62,10 @@ const therapyRevenue = [
   { name: "Ayurveda", value: 0 },
   { name: "Panchakarma", value: 0 },
   { name: "Nature Therapy", value: 0 },
-  { name: "Beauty/Detox", value: 20 },
+  { name: "Beauty/Detox", value: 0 },
 ];
 
 const PIE_COLORS = ["#3d6b1f", "#5a9e2f", "#81c784", "#c8e6c9"];
-
-const doctorAssignments = [
-  {
-    id: 1,
-    name: "Dr. Arvind Sharma",
-    therapies: ["OPD Consultation", "Panchakarma"],
-    clinic: "Wellness Wing",
-    bookings: 12,
-    upcoming: 4,
-    completed: 45,
-    status: "Busy",
-    email: "arvind@swagrama.com",
-    phone: "+91 98XXX XXX01",
-  },
-  {
-    id: 2,
-    name: "Dr. Sunitha Reddy",
-    therapies: ["Yoga", "Meditation"],
-    clinic: "City Center",
-    bookings: 8,
-    upcoming: 2,
-    completed: 32,
-    status: "Available",
-    email: "sunitha@swagrama.com",
-    phone: "+91 98XXX XXX02",
-  },
-  {
-    id: 3,
-    name: "Dr. Rajesh Kumar",
-    therapies: ["Detox Stay", "Healing"],
-    clinic: "North Branch",
-    bookings: 15,
-    upcoming: 6,
-    completed: 58,
-    status: "Active",
-    email: "rajesh@swagrama.com",
-    phone: "+91 98XXX XXX03",
-  },
-  {
-    id: 4,
-    name: "Dr. Meera Iyer",
-    therapies: ["Ayurveda"],
-    clinic: "Wellness Wing",
-    bookings: 5,
-    upcoming: 1,
-    completed: 22,
-    status: "Available",
-    email: "meera@swagrama.com",
-    phone: "+91 98XXX XXX04",
-  },
-];
 
 const statusColor = (s) => {
   if (s === "Available") return { bg: "#e8f5e0", fg: "#3d6b1f" };
@@ -147,13 +101,18 @@ const SuperAdminDashboard = ({ onNavigate }) => {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const [selectedDetail, setSelectedDetail] = useState(null);
   const [upCommingStays, setUpCommingStays] = useState([]);
-  const [todaysOPDCount, setTodaysOPDCount] = useState(0);
+  const [docData, setDocData] = useState([]);
+  const [revenueData, setRevenueData] = useState([]);
+  const [revenueTrends, setRevenueTrends] = useState([]);
+  const [therapySplit, setTherapySplit] = useState([]);
+  const [selectedPeriod, setSelectedPeriod] = useState("weekly");
+  const [dashboardStats, setDashboardStats] = useState(null);
 
   const KPIData = [
     {
       id: "revenue",
       title: "Total Revenue",
-      value: "₹0.00",
+      value: `₹${dashboardStats?.totalRevenue}`,
       trend: "+0%",
       sub: "incl. Shop & Services",
       icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
@@ -163,9 +122,9 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "membership",
       title: "Memberships",
-      value: "458",
-      trend: "+15",
-      sub: "Gold/Platinum active",
+      value: `₹${dashboardStats?.membership}`,
+      trend: "0",
+      sub: "Active members",
       icon: <People sx={{ fontSize: 18 }} />,
       bg: "#e3f2fd",
       fg: "#1565c0",
@@ -173,8 +132,8 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "shop",
       title: "Store Orders",
-      value: "142",
-      trend: "+8.2%",
+      value: `₹${dashboardStats?.storeOrders}`,
+      trend: "0",
       sub: "pending fulfillment",
       icon: <CalendarMonth sx={{ fontSize: 18 }} />,
       bg: "#fce4ec",
@@ -182,9 +141,9 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     },
     {
       id: "stays",
-      title: "Stay Occupancy",
-      value: "82%",
-      trend: "Full",
+      title: "Stay Revenue",
+      value: `₹${dashboardStats?.stayOccupancy}`,
+      trend: "N/A",
       sub: "Hospitals & Detox",
       icon: <Hotel sx={{ fontSize: 18 }} />,
       bg: "#ede7f6",
@@ -192,8 +151,8 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     },
     {
       id: "consultations",
-      title: "Today's OPD",
-      value: todaysOPDCount,
+      title: "OPD Revenue",
+      value: `₹${dashboardStats?.opd}`,
       trend: "Live",
       sub: "consultations in prog",
       icon: <Timeline sx={{ fontSize: 18 }} />,
@@ -202,34 +161,87 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     },
   ];
 
-  const filteredDoctors = doctorAssignments.filter(
+  const filteredDoctors = (docData || []).filter(
     (doc) =>
-      doc.name.toLowerCase().includes(searchDoc.toLowerCase()) &&
-      (clinicFilter === "All" || doc.clinic === clinicFilter),
+      (doc.doctorName || "").toLowerCase().includes(searchDoc.toLowerCase()) &&
+      (clinicFilter === "All" || (doc.clinic || "N/A") === clinicFilter),
   );
 
   const handleDetailClick = (item, type) => {
     setSelectedDetail({ ...item, dataType: type });
     setDrawerOpen(true);
   };
-  console.log("upCommingStays", upCommingStays);
+  console.log("revenueTrends", revenueTrends);
 
   useEffect(() => {
-    GetUpcomingStays({
+    GetUpcomingStays(5, {
       type: "confirm",
     })
       .then((res) => {
+        console.log("res", res);
         if (res?.data?.data?.data?.length > 0) {
-          setUpCommingStays(res.data.data.data);
+          setUpCommingStays(res?.data?.data?.data);
         }
       })
       .catch((err) => err);
-    GetTodayOPDCount(5)
+  }, []);
+
+  useEffect(() => {
+    GetClinicRevenue(5, selectedPeriod)
       .then((res) => {
-        setTodaysOPDCount(res?.data?.data?.todayOPDCount);
+        if (res?.data?.data?.length > 0) {
+          setRevenueData(res.data.data);
+        }
       })
       .catch((err) => err);
-  }, []);
+
+    GetDoctorDashboard(5)
+      .then((res) => {
+        setDocData(res?.data?.data);
+      })
+      .catch((err) => err);
+
+    GetRevenueTrends(5, selectedPeriod)
+      .then((res) => {
+        console.log("res", res);
+        const modifiedData = res.data.data.map((list) => {
+          return {
+            ...list,
+            name: list.label,
+          };
+        });
+        setRevenueTrends(modifiedData);
+      })
+      .catch((err) => err);
+    GetTherapySplit(5, selectedPeriod)
+      .then((res) => {
+        const rawData = res?.data?.data;
+        const dataArray = Array.isArray(rawData)
+          ? rawData
+          : Array.isArray(rawData?.data)
+            ? rawData.data
+            : [];
+
+        const modifiedData = dataArray.map((list) => ({
+          ...list,
+          name: list.therapyName || "Unknown",
+          value: parseFloat(list.percentage) || 0,
+        }));
+
+        setTherapySplit(modifiedData);
+      })
+      .catch((err) => console.error("Error fetching therapy split:", err));
+
+    GetDashboardCount(5, selectedPeriod)
+      .then((res) => {
+        console.log("Dashboard Count Response:", res);
+        setDashboardStats(res?.data?.data);
+      })
+      .catch((err) => console.error("Error fetching dashboard count:", err));
+  }, [selectedPeriod]);
+
+  console.log("docData", docData);
+  console.log("therapySplit", dashboardStats);
 
   return (
     <div className="h-full overflow-y-auto px-4 no-scrollbar">
@@ -255,15 +267,21 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             </p>
           </div>
           <div className="flex items-center gap-2.5">
-            <div className="hidden sm:block text-right">
-              <p className="m-0 text-[10px] font-bold text-[#b0bba5] uppercase tracking-widest">
-                {new Date().toLocaleDateString("en-US", {
-                  weekday: "short",
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
+            <div className="hidden sm:block text-right"></div>
+            <div className="flex bg-[#f5f6f2] border border-[#3d6b1f] rounded-[9px] p-0.5 gap-0.5">
+              {["weekly", "monthly", "yearly"].map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setSelectedPeriod(p)}
+                  className={`px-2.5 py-1 text-[14px] font-semibold rounded-[7px] border-none cursor-pointer transition-all ${
+                    selectedPeriod === p
+                      ? "bg-green-200 text-green-600 shadow-sm"
+                      : "bg-transparent text-gray-600"
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
           </div>
         </header>
@@ -329,26 +347,12 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                   Earnings & Revenue Trends
                 </span>
               </div>
-              <div className="flex bg-[#f5f6f2] rounded-[9px] p-0.5 gap-0.5">
-                {["Weekly", "Monthly"].map((p, i) => (
-                  <button
-                    key={p}
-                    className={`px-2.5 py-1 text-[10px] font-bold rounded-[7px] border-none cursor-pointer transition-all ${
-                      i === 0
-                        ? "bg-white text-[#3d6b1f] shadow-sm"
-                        : "bg-transparent text-[#9aa090]"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 overflow-hidden">
               <div className="h-[200px] md:h-[290px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={earningsTrend}
+                    data={revenueTrends}
                     margin={{ top: 5, right: 8, left: 0, bottom: 0 }}
                   >
                     <defs>
@@ -401,36 +405,50 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                   <p className="m-0 mb-2 text-[10px] font-bold text-[#9aa090] uppercase tracking-[0.5px]">
                     Therapy Split
                   </p>
-                  <div className="h-[250px] md:h-[290px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart
-                        margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-                      >
-                        <Pie
-                          data={therapyRevenue}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius="38%"
-                          outerRadius="60%"
-                          paddingAngle={4}
-                          dataKey="value"
+                  <div className="h-[250px] md:h-[290px] relative flex items-center justify-center">
+                    {therapySplit.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart
+                          key={`pie-${selectedPeriod}-${therapySplit.length}`}
                         >
-                          {therapyRevenue.map((_, i) => (
-                            <Cell
-                              key={i}
-                              fill={PIE_COLORS[i]}
-                              cornerRadius={3}
-                            />
-                          ))}
-                        </Pie>
-                        <RechartsTooltip formatter={(v, n) => [`${v}%`, n]} />
-                        <Legend
-                          iconType="circle"
-                          iconSize={7}
-                          wrapperStyle={{ fontSize: 9, fontWeight: 700 }}
-                        />
-                      </PieChart>
-                    </ResponsiveContainer>
+                          <Pie
+                            data={therapySplit}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={50}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                            nameKey="name"
+                            minAngle={15}
+                            isAnimationActive={true}
+                          >
+                            {therapySplit.map((entry, i) => (
+                              <Cell
+                                key={`cell-${i}`}
+                                fill={PIE_COLORS[i % PIE_COLORS.length]}
+                              />
+                            ))}
+                          </Pie>
+                          <RechartsTooltip />
+                          <Legend
+                            verticalAlign="bottom"
+                            height={36}
+                            iconSize={8}
+                            wrapperStyle={{ fontSize: "10px" }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-[#9aa090]">
+                        <div className="text-[10px] font-bold uppercase tracking-widest opacity-50">
+                          No Data Available
+                        </div>
+                        <div className="text-[8px] mt-1 italic">
+                          Try changing the time period
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex flex-col">
@@ -440,7 +458,14 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                   <div className="h-[200px] md:h-[290px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
-                        data={categoryRevenue}
+                        data={
+                          (revenueData || []).length > 0
+                            ? revenueData.map((r) => ({
+                                name: r.category,
+                                revenue: r.amount,
+                              }))
+                            : categoryRevenue
+                        }
                         margin={{ top: 0, right: 4, left: 0, bottom: 0 }}
                       >
                         <CartesianGrid
@@ -523,7 +548,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
               >
                 <option value="All">All Clinics</option>
                 {Array.from(
-                  new Set(doctorAssignments.map((d) => d.clinic)),
+                  new Set((docData || []).map((d) => d.clinic || "N/A")),
                 ).map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -532,19 +557,16 @@ const SuperAdminDashboard = ({ onNavigate }) => {
               </select>
             </div>
           </div>
-          <div className="overflow-x-auto w-full">
+          <div className="overflow-x-auto w-full max-h-[400px] overflow-y-auto no-scrollbar">
             <table className="w-full border-collapse min-w-[700px]">
               <thead>
                 <tr className="bg-[#fafbf8]">
                   {[
                     "Doctor",
-                    "Therapies",
-                    "Clinic",
                     "Bookings",
                     "Upcoming",
                     "Completed",
                     "Status",
-                    "",
                   ].map((h) => (
                     <th
                       key={h}
@@ -558,82 +580,67 @@ const SuperAdminDashboard = ({ onNavigate }) => {
               <tbody>
                 {filteredDoctors.map((doc) => (
                   <tr
-                    key={doc.id}
+                    key={doc.doctorId}
                     className="border-b border-[#f5f6f2] hover:bg-[#fafbf8] transition-colors duration-150"
                   >
                     <td className="px-3.5 py-[11px]">
                       <div className="flex items-center gap-2.5">
                         <div className="w-[30px] h-[30px] rounded-full bg-[#e8f5e0] text-[#3d6b1f] flex items-center justify-center text-[11px] font-black flex-shrink-0">
-                          {doc.name.charAt(4)}
+                          {(doc.doctorName || "D")
+                            .trim()
+                            .replace(/^Dr\.\s*/i, "")
+                            .charAt(0)}
                         </div>
                         <div>
                           <div className="text-[12px] font-extrabold text-[#1a2a0f] whitespace-nowrap">
-                            {doc.name}
+                            {doc.doctorName}
                           </div>
                           <div className="text-[9px] text-[#9aa090] font-medium">
-                            {doc.email}
+                            {doc.email || "N/A"}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-3.5 py-[11px]">
-                      <div className="flex flex-wrap gap-1">
-                        {doc.therapies.map((t) => (
-                          <span
-                            key={t}
-                            className="text-[9px] font-bold bg-[#e8f5e0] text-[#3d6b1f] px-1.5 py-0.5 rounded-[5px]"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="px-3.5 py-[11px] text-[11px] font-bold text-[#3a4a30] whitespace-nowrap">
-                      {doc.clinic}
-                    </td>
+
                     <td className="px-3.5 py-[11px]">
                       <div className="flex items-center gap-1.5">
                         <div className="w-[50px] h-[5px] bg-[#eef0ea] rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#3d6b1f] rounded-full"
-                            style={{ width: `${(doc.bookings / 20) * 100}%` }}
+                            style={{
+                              width: `${((doc.bookedCount || 0) / 20) * 100}%`,
+                            }}
                           />
                         </div>
                         <span className="text-[11px] font-extrabold text-[#3d6b1f]">
-                          {doc.bookings}/20
+                          {doc.bookedCount || 0}/20
                         </span>
                       </div>
                     </td>
                     <td className="px-3.5 py-[11px]">
                       <span
                         className={`text-[12px] font-extrabold ${
-                          doc.upcoming > 3 ? "text-[#e65100]" : "text-[#3d6b1f]"
+                          (doc.upcomingCount || 0) > 3
+                            ? "text-[#e65100]"
+                            : "text-[#3d6b1f]"
                         }`}
                       >
-                        {doc.upcoming}
+                        {doc.upcomingCount || 0}
                       </span>
                     </td>
                     <td className="px-3.5 py-[11px] text-[11px] font-bold text-[#9aa090]">
-                      {doc.completed}
+                      {doc.completedCount || 0}
                     </td>
                     <td className="px-3.5 py-[11px]">
                       <span
                         className="text-[9px] font-extrabold px-2 py-0.5 rounded-full uppercase"
                         style={{
-                          background: statusColor(doc.status).bg,
-                          color: statusColor(doc.status).fg,
+                          background: statusColor(doc.availability).bg,
+                          color: statusColor(doc.availability).fg,
                         }}
                       >
-                        {doc.status}
+                        {doc.availability}
                       </span>
-                    </td>
-                    <td className="px-3.5 py-[11px]">
-                      <button
-                        onClick={() => handleDetailClick(doc, "doctor")}
-                        className="w-7 h-7 border border-[#e8ede4] rounded-lg bg-white cursor-pointer flex items-center justify-center text-[#3d6b1f] hover:bg-[#f7faf4] transition-colors"
-                      >
-                        <Visibility sx={{ fontSize: 14 }} />
-                      </button>
                     </td>
                   </tr>
                 ))}
@@ -724,7 +731,8 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             </div>
             <button
               onClick={() => onNavigate && onNavigate("bookings", 2)}
-              className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150">
+              className="mt-3.5 w-full py-2.5 border-2 border-dashed border-[#e8ede4] rounded-[13px] bg-transparent text-[10px] font-bold text-[#9aa090] cursor-pointer tracking-[0.5px] hover:border-[#3d6b1f] hover:text-[#3d6b1f] hover:bg-[#f7faf4] transition-all duration-150"
+            >
               View All Stays →
             </button>
           </div>

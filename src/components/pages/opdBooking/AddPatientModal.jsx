@@ -196,6 +196,7 @@ function SectionHeader({ icon: Icon, label, children }) {
 export default function AddPatientModal({
   open,
   handleClose,
+  type,
   title = "Patient Registration",
 }) {
   const { user } = useAuth();
@@ -266,7 +267,11 @@ export default function AddPatientModal({
     try {
       setOpenConfirmationModal(false);
       setIsLoading(true);
-      const response = await AddPatient(finalSaveObj);
+      const response = await AddPatient(
+        type === "OPD" ? "OPD" : "IPD",
+        5,
+        finalSaveObj,
+      );
       const apiData = response?.data?.data || response?.data;
 
       if (
@@ -292,6 +297,8 @@ export default function AddPatientModal({
     reset();
     handleClose();
   };
+
+  console.log("user", user);
 
   const handleAgeInput = (e) => {
     const raw = e.target.value.replace(/[^0-9]/g, "");
@@ -321,7 +328,6 @@ export default function AddPatientModal({
     if (dob && !isNaN(new Date(dob))) {
       const calculatedAge = calculateAgeFromDOB(dob);
       const currentAge = getValues("age");
-      // Only update age if it's different from the current age value
       if (calculatedAge !== "" && calculatedAge !== currentAge) {
         setValue("age", calculatedAge, { shouldValidate: true });
       }
@@ -330,7 +336,7 @@ export default function AddPatientModal({
 
   useEffect(() => {
     const age = watchedAge;
-    
+
     if (age === "" || age === null || age === undefined) {
       if (getValues("dob") !== null) {
         setValue("dob", null, { shouldValidate: true });
@@ -345,7 +351,6 @@ export default function AddPatientModal({
       ageNum >= 0 &&
       ageNum <= 120
     ) {
-      // ONLY update DOB if the current DOB doesn't already correspond to this age.
       const currentDob = getValues("dob");
       const currentAgeFromDOB = calculateAgeFromDOB(currentDob);
       if (currentAgeFromDOB !== age) {
@@ -511,7 +516,7 @@ export default function AddPatientModal({
                   control={control}
                   label="Registerd Mobile No."
                   error={errors.mobileNO}
-                  disabled={true}
+                  disabled={user?.role === "Admin" ? false : true}
                 />
                 <DatePickerField
                   name="dob"

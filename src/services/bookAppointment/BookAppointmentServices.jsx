@@ -12,9 +12,16 @@ export const getDoctorsByClinicId = (clinicId) => {
   return AxiosInstance.get(`Doctors?ClinicFid=${clinicId}`);
 };
 
-export const getPatientDataByMobileNo = (contactNumber, ClinicId) => {
+//https://ayurmitra.in/WellnessAPILive/Patients?contactNumber=7385395192&userId=124&Type=IPD&ClinicId=5
+
+export const getPatientDataByMobileNo = (
+  contactNumber,
+  userId,
+  type,
+  ClinicId,
+) => {
   return AxiosInstance.get(
-    `Patients?contactNumber=${contactNumber}&ClinicId=${ClinicId}`,
+    `Patients?contactNumber=${contactNumber}&userId=${userId}&Type=${type}&ClinicId=${ClinicId}`,
   );
 };
 
@@ -45,14 +52,20 @@ export const getDoctorsProfile = (DoctorFid) => {
   return AxiosInstance.get(`DoctorsProfile?DoctorFid=${DoctorFid}`);
 };
 
-export const AddPatient = (saveObj) => {
-  return AxiosInstance.post(`AddPatient`, saveObj);
+//https://ayurmitra.in/WellnessAPILive/AddPatient?type=therapy&ClinicFid=11
+export const AddPatient = (type, clinicId, saveObj) => {
+  return AxiosInstance.post(
+    `AddPatient?type=${type}&ClinicFid=${clinicId}`,
+    saveObj,
+  );
 };
 
 export const InitiatePayment = (ClinicId, userId, postObj) => {
   const params = new URLSearchParams();
 
-  params.append("userId", userId);
+  if (userId !== null && userId !== undefined) {
+    params.append("userId", userId);
+  }
 
   if (ClinicId !== null && ClinicId !== undefined) {
     params.append("ClinicId", ClinicId);

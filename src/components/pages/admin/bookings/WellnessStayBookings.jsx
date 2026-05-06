@@ -7,7 +7,6 @@ import {
   TrendingUp as TrendingIcon,
 } from "@mui/icons-material";
 import {
-  Avatar,
   Badge,
   Chip,
   Divider,
@@ -17,18 +16,19 @@ import {
   MenuItem,
   Select,
   ToggleButton,
-  ToggleButtonGroup,
-  Box
+  ToggleButtonGroup
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
   GetNext24HoursArrivals,
-  GetUpcomingStays,
+  GetUpcomingStays
 } from "../../../../services/adminDashboard/AdminDashboardServices";
 import CommonButton from "../../../common/button/CommonButton";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
+import { EmptyDetailView } from "./BookingComponents";
+import StayDetailView from "./StayDetailView";
 
 
 
@@ -302,11 +302,15 @@ const FilterDrawer = ({
   );
 };
 
-export default function WellnessStayBookings({ onSelect, selectedId }) {
+export default function WellnessStayBookings({
+  onSelect,
+  selectedId,
+  refreshTrigger,
+}) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [next24HoursArrivals, setNext24HoursArrivals] = useState(null);
   const [upcomingStays, setUpcomingStays] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [count, setCount] = useState(0);
   const [loadingSpinner, setLoadingSpinner] = useState(false);
@@ -319,31 +323,31 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
     occupancyType: "all",
   });
 
-
   const activeFilterCount = Object.values(filters).filter(
     (v) => v !== "all",
   ).length;
 
-  const populateTable = (forPagination, currentFilters) => {
-    const filterData = currentFilters || filters;
-    let obj = {
+  const populateTable = (forPagination) => {
+    const filterData = filters;
+    const obj = {
       ...filterData,
-      page: typeof forPagination === "number" ? forPagination + 1 : 1,
+      page: !forPagination ? 1 : page + 1,
       pageSize: rowsPerPage,
+      clinicId: 5,
       type: "all",
     };
     setLoadingSpinner(true);
-    GetUpcomingStays(obj)
+    GetUpcomingStays(5, obj)
       .then((res) => {
-        const responseData = res?.data?.data?.data || [];
-        const totalRecords = res?.data?.data?.totalRecords || 0;
-
-        setUpcomingStays(responseData);
-        setCount(totalRecords);
+        if (forPagination) {
+          setUpcomingStays((prevData) => [...prevData, ...res.data.data.data]);
+        } else {
+          setUpcomingStays(res.data.data.data);
+        }
+        setCount(res.data.data.totalRecords);
         setLoadingSpinner(false);
       })
       .catch((error) => {
-        console.error("Error fetching upcoming stays:", error);
         setLoadingSpinner(false);
       });
   };
@@ -367,6 +371,8 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
     }
   };
 
+
+
   useEffect(() => {
     GetNext24HoursArrivals()
       .then((res) => {
@@ -374,10 +380,9 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
       })
       .catch((err) => err);
     populateTable();
-  }, []);
+  }, [refreshTrigger]);
 
-  console.log("selectedRow",selectedRow);
-  
+  console.log("selectedRow", selectedRow);
 
   return (
     <div className="flex-1 flex flex-col bg-[#fbfbf8] min-h-screen  ">
@@ -427,11 +432,11 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
                 onClick={() => setDrawerOpen(true)}
               />
             </Badge>
-            <CommonButton
+            {/* <CommonButton
               type="button"
               label="+ New Booking"
               className={"bg-[#2e3d28] text-white"}
-            />
+            /> */}
           </div>
         </motion.div>
 
@@ -492,40 +497,72 @@ export default function WellnessStayBookings({ onSelect, selectedId }) {
           </motion.div>
         )}
 
-        <div className="flex gap-3 h-full flex-1 ">
-          {loadingSpinner && (
-            <div className="my-32 flex justify-center items-center flex-1">
-              <LoadingSpinner />
-            </div>
-          )}
-          {upcomingStays?.length > 0 ? (
-            <main className="pb-5 flex-1">
-              <CommonPaginationTable
-                dataResult={upcomingStays}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                setPage={setPage}
-                count={count}
-                setCount={setCount}
-                setRowsPerPage={setRowsPerPage}
-                tableClass={"h-[320px] border cursor-pointer"}
-                setDataResult={setUpcomingStays}
-                populateTable={populateTable}
-                handleSelectedRow={(row) => { setSelectedRow(row); if (onSelect) onSelect(row); }}
-                customRowBgColor={"#cde8b8"}
-                removeHeaders={["doctor","twinsharing","financials","petFriendly","bookingStatus","daysRemaining"]}
-              />
-            </main>
-          ) : (
-            <>
-              {!loadingSpinner && (
-                <div className="my-32 text-center flex-1 text-sm font-semibold">
-                  No Records Found
-                  <span className="animate-pulse">...</span>
-                </div>
-              )}
-            </>
-          )}
+        <div className="flex gap-4 h-full flex-1 overflow-hidden">
+          <div className="flex-1 transition-all duration-300">
+            {loadingSpinner && (
+              <div className="my-32 flex justify-center items-center flex-1">
+                <LoadingSpinner />
+              </div>
+            )}
+            {upcomingStays?.length > 0 ? (
+              <main className=" flex-1 h-full">
+                <CommonPaginationTable
+                  dataResult={upcomingStays}
+                  page={page}
+                  rowsPerPage={rowsPerPage}
+                  setPage={setPage}
+                  count={count}
+                  setCount={setCount}
+                  setRowsPerPage={setRowsPerPage}
+                  tableClass={"h-[460px] border cursor-pointer"}
+                  setDataResult={setUpcomingStays}
+                  populateTable={populateTable}
+                  handleSelectedRow={(row) => {
+                    setSelectedRow(row);
+                    if (onSelect) onSelect(row);
+                  }}
+                  customRowBgColor={"#cde8b8"}
+                  removeHeaders={[
+                    "bookingId",
+                    "patientId",
+                    "doctor",
+                    "twinsharing",
+                    "financials",
+                    "petFriendly",
+                    "bookingStatus",
+                    "daysRemaining",
+                    "images"
+                  ]}
+                />
+              </main>
+            ) : (
+              <>
+                {!loadingSpinner && (
+                  <div className="my-32 text-center flex-1 text-sm font-semibold">
+                    No Records Found
+                    <span className="animate-pulse">...</span>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+            {selectedRow ? (
+              <div className="h-full animate-in fade-in slide-in-from-right duration-300">
+                <StayDetailView
+                  selectedBooking={selectedRow}
+                  onClose={() => {
+                    setSelectedRow(null);
+                    if (onSelect) onSelect(null);
+                  }}
+                  onSuccess={populateTable}
+                />
+              </div>
+            ) : (
+              <EmptyDetailView />
+            )}
+          </div>
         </div>
       </div>
 

@@ -1,8 +1,9 @@
 import AxiosInstance from "../../AxiosInstance";
 
-export const GetUpcomingStays = (data) => {
-  return AxiosInstance.post(`GetUpcomingStays`, data);
+export const GetUpcomingStays = (clinicId, data) => {
+  return AxiosInstance.post(`GetUpcomingStays?ClinicFid=${5}`, data);
 };
+
 
 export const GetEnquiryByTypeDropdown = () => {
   return AxiosInstance.get(`GetEnquiryByTypeDropdown`);
@@ -34,4 +35,44 @@ export const GetTodayOPDCount = (clinicId) => {
 
 export const GetAllOPDBookingList = (data) => {
   return AxiosInstance.post(`GetOPDBooking`, data);
+};
+
+export const GetDoctorDashboard = (clinicId) => {
+  return AxiosInstance.get(`GetDoctorDashboard?ClinicId=${clinicId}`);
+};
+
+export const GetClinicRevenue = (clinicId, filter) => {
+  return AxiosInstance.get(
+    `GetClinicRevenue?clinicId=${clinicId}&filter=${filter}`,
+  );
+};
+
+export const GetRevenueTrends = (clinicId, filter) => {
+  return AxiosInstance.get(
+    `GetRevenueTrends?clinicId=${clinicId}&filter=${filter}`,
+  );
+};
+
+export const GetTherapySplit = (clinicId, filter) => {
+  return AxiosInstance.get(
+    `GetTherapySplit?clinicId=${clinicId}&Filter=${filter}`,
+  );
+};
+
+export const GetDashboardCount = (clinicId, filter) => {
+  return AxiosInstance.get(
+    `GetDashboardCount?clinicId=${clinicId}&filter=${filter}`,
+  );
+};
+
+export const GetTherapyBookingList = (clinicId, page, size) => {
+  return AxiosInstance.get(
+    `GetTherapyBookingList?clinicId=${clinicId}&page=${page}&size=${size}`,
+  );
+};
+
+export const UpdateStayCheckInOut = (bookingId, ClinicId) => {
+  return AxiosInstance.post(
+    `UpdateStayCheckInOut?bookingId=${bookingId}&ClinicFid=${ClinicId}`,
+  );
 };

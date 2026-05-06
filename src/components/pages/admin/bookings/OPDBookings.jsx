@@ -5,6 +5,10 @@ import { GetAllOPDBookingList } from "../../../../services/adminDashboard/AdminD
 import CommonButton from "../../../common/button/CommonButton";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
+import OPDDetailView from "./OPDDetailView";
+
+
+import { StatusBadge, OriginBadge, EmptyDetailView } from "./BookingComponents";
 
 // ── Status style maps ─────────────────────────────────────────────────────────
 const STATUS_PILL = {
@@ -24,16 +28,18 @@ const STATUS_DOT = {
   "Check-Out": "bg-teal-500",
 };
 
-const OPDBookings = ({ onSelect, selectedId }) => {
+const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   const [opdList, setOpdList] = useState([]);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalCount, setTotalCount] = useState(0);
   const [loadingSpinner, setLoadingSpinner] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+
 
   const populateTable = (forPagination) => {
     const obj = {
-      page: !forPagination ? 0 : page,
+      page: !forPagination ? 1 : page + 1,
       pageSize: rowsPerPage,
       clinicId: 5,
     };
@@ -41,14 +47,17 @@ const OPDBookings = ({ onSelect, selectedId }) => {
     GetAllOPDBookingList(obj)
       .then((res) => {
         if (forPagination) {
-          setOpdList((prev) => [...prev, ...res.data.data.data]);
+          setOpdList((prevData) => [...prevData, ...res.data.data.data]);
         } else {
           setOpdList(res.data.data.data);
         }
         setTotalCount(res.data.data.totalRecords);
+
         setLoadingSpinner(false);
       })
-      .catch(() => setLoadingSpinner(false));
+      .catch((error) => {
+        setLoadingSpinner(false);
+      });
   };
 
   const renderInput = (row, _index, header) => {
@@ -110,7 +119,7 @@ const OPDBookings = ({ onSelect, selectedId }) => {
 
   useEffect(() => {
     populateTable();
-  }, []);
+  }, [refreshTrigger]);
 
   console.log("selectedRow", onSelect);
   return (
@@ -130,48 +139,71 @@ const OPDBookings = ({ onSelect, selectedId }) => {
             Manage outpatient department consultations.
           </p>
         </div>
-        <CommonButton
+        {/* <CommonButton
           className="bg-[#003d33] text-white text-[10.5px] shadow-sm transition-all active:scale-95"
           label="+ New OPD Booking"
-        />
+        /> */}
       </div>
 
-      {loadingSpinner && (
-        <div className="my-40 flex justify-center">
-          <LoadingSpinner />
-        </div>
-      )}
-
-      {opdList?.length > 0 ? (
-        <div className="px-4 pb-4">
-          <CommonPaginationTable
-            dataResult={opdList}
-            page={page}
-            rowsPerPage={rowsPerPage}
-            setPage={setPage}
-            count={totalCount}
-            setCount={setTotalCount}
-            setRowsPerPage={setRowsPerPage}
-            tableClass={"h-[370px] border cursor-pointer"}
-            setDataResult={setOpdList}
-            populateTable={populateTable}
-            handleSelectedRow={(row) => onSelect && onSelect(row)}
-            customRowBgColor={"#cde8b8"}
-            renderInput={renderInput}
-            editableColumns={["status", "customer", "origin"]}
-            removeHeaders={["paymentStatus", "amount"]}
-          />
-        </div>
-      ) : (
-        <>
-          {!loadingSpinner && (
-            <div className="my-40 text-center flex-1 text-sm font-semibold">
-              No Records Found
-              <span className="animate-pulse">...</span>
+      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+        <div className="flex-1 transition-all duration-300">
+          {loadingSpinner && (
+            <div className="my-40 flex justify-center">
+              <LoadingSpinner />
             </div>
           )}
-        </>
-      )}
+
+          {opdList?.length > 0 ? (
+            <div className="px-4 pb-4 h-full">
+              <CommonPaginationTable
+                dataResult={opdList}
+                page={page}
+                rowsPerPage={rowsPerPage}
+                setPage={setPage}
+                count={totalCount}
+                setCount={setTotalCount}
+                setRowsPerPage={setRowsPerPage}
+                tableClass={"h-[460px] border cursor-pointer"}
+                setDataResult={setOpdList}
+                populateTable={populateTable}
+                handleSelectedRow={(row) => {
+                  setSelectedRow(row);
+                  if (onSelect) onSelect(row);
+                }}
+                customRowBgColor={"#cde8b8"}
+                renderInput={renderInput}
+                editableColumns={["status", "customer", "origin"]}
+                removeHeaders={["paymentStatus", "amount"]}
+              />
+            </div>
+          ) : (
+            <>
+              {!loadingSpinner && (
+                <div className="my-40 text-center flex-1 text-sm font-semibold">
+                  No Records Found
+                  <span className="animate-pulse">...</span>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+          {selectedRow ? (
+            <div className="h-full animate-in fade-in slide-in-from-right duration-300">
+              <OPDDetailView
+                selectedBooking={selectedRow}
+                onClose={() => {
+                  setSelectedRow(null);
+                  if (onSelect) onSelect(null);
+                }}
+              />
+            </div>
+          ) : (
+            <EmptyDetailView />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

@@ -12,7 +12,7 @@ import Opacity from "@mui/icons-material/Opacity";
 import Spa from "@mui/icons-material/Spa";
 import { motion } from "framer-motion";
 import { Filter, Leaf } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdEco } from "react-icons/md";
 import BathingSweaterTherapyImg from "../../../assets/healingServices/detoxTherapy/BathingSweaterTherapyImg.webp";
 import BodyAnointingImg from "../../../assets/healingServices/detoxTherapy/BodyAnointing.webp";
@@ -113,6 +113,10 @@ import FemaleGenitalEnemaDetoxImg from "../../../assets/healingServices/detoxThe
 import स्नैहिकधूमपानUnctuousSmokeInhalation from "../../../assets/healingServices/detoxTherapy/स्नैहिकधूमपान Unctuous Smoke Inhalation.webp";
 import AutoTypingText from "../../../common/hooks/AutoTypeHook";
 import BookTherapySession from "./BookTherapySession";
+import {
+  GetDetoxTherapyByServiceCategory,
+  GetTherapyNameByServiceCategory,
+} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 
 const FILTER = {
   ALL: "All Services",
@@ -1071,8 +1075,6 @@ const categories = [
   },
 ];
 
-
-
 function ServiceCard({ item }) {
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -1082,10 +1084,10 @@ function ServiceCard({ item }) {
         <div className="group relative h-full bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 border border-green-100 flex flex-col">
           <div className="absolute inset-0 bg-gradient-to-br from-green-50/50 via-transparent to-lime-50/50 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none rounded-2xl" />
 
-          {item.image ? (
+          {item?.serviceImage ? (
             <div className="w-full h-72 md:h-56 2xl:h-56 overflow-hidden relative rounded-t-2xl flex-shrink-0">
               <img
-                src={item.image}
+                src={item.serviceImage}
                 alt={item.serviceName}
                 loading="lazy"
                 decoding="async"
@@ -1094,7 +1096,7 @@ function ServiceCard({ item }) {
               <div className="absolute inset-0 bg-gradient-to-t from-white/30 via-transparent to-transparent pointer-events-none" />
             </div>
           ) : (
-            <div className="w-full h-40 sm:h-44 flex items-center justify-center bg-gradient-to-br from-[#2a5f46] via-[#4f8f73] relative rounded-t-2xl flex-shrink-0">
+            <div className="w-full h-72 md:h-56 2xl:h-56 flex items-center justify-center bg-gradient-to-br from-[#2a5f46] via-[#4f8f73] relative rounded-t-2xl flex-shrink-0">
               <Leaf className="text-white drop-shadow-lg w-12 h-12" />
               <div className="absolute inset-0 bg-gradient-to-t from-green-600/20 via-transparent to-transparent pointer-events-none" />
             </div>
@@ -1138,33 +1140,85 @@ function ServiceCard({ item }) {
 }
 
 export default function DetoxHouse() {
-  const [selectedCategory, setSelectedCategory] = useState(categories[11]);
-  const [visibleCount, setVisibleCount] = useState(12);
+  const [selectedCategory, setSelectedCategory] = useState({
+    serviceGroupId: 0,
+    serviceGroupName: "All",
+  });
   const [isLoading, setIsLoading] = useState(false);
+  const [serviceCategories, setServiceCategories] = useState([]);
+  const [services, setServices] = useState([]);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
 
-  const filteredServices =
-    selectedCategory.filterName === FILTER.ALL
-      ? detoxServicesData
-      : detoxServicesData.filter(
-          (s) => s.filterName === selectedCategory.filterName,
-        );
-
-  const visibleServices = filteredServices.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredServices.length;
+  const hasMore = count > services?.length;
 
   const handleCategoryChange = (cat) => {
-    if (cat.id === selectedCategory.id) return;
+    if (cat.serviceGroupId === selectedCategory.serviceGroupId) return;
     setSelectedCategory(cat);
-    setVisibleCount(12);
+    setPage(1);
+    setServices([]);
   };
 
   const loadMore = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setVisibleCount((prev) => Math.min(prev + 12, filteredServices.length));
-      setIsLoading(false);
-    }, 500);
+    setPage((prev) => prev + 1);
   };
+
+  const handleShowDetoxServices = () => {
+    setIsLoading(true);
+    GetTherapyNameByServiceCategory(
+      5,
+      selectedCategory.serviceGroupId,
+      "Detox Therapy",
+      page,
+      10,
+    )
+      .then((res) => {
+        const responseData = res?.data?.data;
+        if (responseData) {
+          const newServices = responseData.data || [];
+          if (page === 1) {
+            setServices(newServices);
+          } else {
+            setServices((prev) => [...prev, ...newServices]);
+          }
+          setCount(responseData.totalRecords || 0);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    GetDetoxTherapyByServiceCategory(5)
+      .then((res) => {
+        const data = res?.data?.data.filter(
+          (item) => item.therapyType === "Detox Therapy ",
+        );
+        setIsLoading(false);
+        if (data?.length) {
+          setServiceCategories([
+            {
+              serviceGroupId: 0,
+              serviceGroupName: "All",
+            },
+            ...data.map((d) => ({
+              serviceGroupId: d?.serviceGroupId,
+              serviceGroupName: d?.serviceGroupName,
+            })),
+          ]);
+        }
+      })
+      .catch((err) => err);
+  }, []);
+
+  useEffect(() => {
+    if (selectedCategory !== null && selectedCategory !== undefined) {
+      handleShowDetoxServices();
+    }
+  }, [selectedCategory, page]);
+
+  console.log(services, "services");
 
   return (
     <div className="min-h-screen pb-5 relative">
@@ -1184,12 +1238,12 @@ export default function DetoxHouse() {
         <div className="relative max-w-5xl mx-auto px-4 text-center">
           <div
             className="mx-auto max-w-3xl
-      backdrop-blur-xl
-      bg-white/10
-      border border-white/20
-      shadow-2xl
-      rounded-2xl
-      px-5 sm:px-8 py-6 sm:py-8"
+                    backdrop-blur-xl
+                    bg-white/10
+                    border border-white/20
+                    shadow-2xl
+                    rounded-2xl
+                    px-5 sm:px-8 py-6 sm:py-8"
           >
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -1243,45 +1297,50 @@ export default function DetoxHouse() {
               Filter by Category
             </span>
             <span className="ml-auto text-xs text-green-700 font-medium bg-green-100 px-2 py-0.5 rounded-full">
-              {filteredServices.length} service
-              {filteredServices.length !== 1 ? "s" : ""}
+              {serviceCategories?.length} service
+              {serviceCategories?.length !== 1 ? "s" : ""}
             </span>
           </div>
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {categories.map((cat) => {
-              const Icon = cat.icon;
-              const isActive = selectedCategory.id === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 active:scale-95 ${
-                    isActive
-                      ? "bg-gradient-to-r from-[#1f4f3a] to-[#4b8b6a] text-white shadow-md scale-[1.02]"
-                      : "bg-[#e8f4f0] text-[#1f4f3a] hover:bg-[#d4ebe3] border border-[#1f4f3a]/30"
-                  }`}
-                >
-                  <Icon
+            {serviceCategories?.length > 0 &&
+              serviceCategories?.map((cat) => {
+                // const Icon = cat.icon;
+                const isActive =
+                  selectedCategory.serviceGroupId === cat.serviceGroupId;
+                return (
+                  <button
+                    key={cat.serviceGroupId}
+                    onClick={() => handleCategoryChange(cat)}
+                    className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl font-medium text-xs sm:text-sm transition-all duration-200 active:scale-95 ${
+                      isActive
+                        ? "bg-gradient-to-r from-[#1f4f3a] to-[#4b8b6a] text-white shadow-md scale-[1.02]"
+                        : "bg-[#e8f4f0] text-[#1f4f3a] hover:bg-[#d4ebe3] border border-[#1f4f3a]/30"
+                    }`}
+                  >
+                    {/* <Icon
                     className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 ${isActive ? "text-[#e5c76a]" : "text-[#1f4f3a]"}`}
-                  />
-                  <span className="whitespace-nowrap">{cat.name}</span>
-                </button>
-              );
-            })}
+                  /> */}
+                    <span className="whitespace-nowrap">
+                      {cat.serviceGroupName}
+                    </span>
+                  </button>
+                );
+              })}
           </div>
         </div>
       </div>
 
       <div className="relative z-10 px-3 sm:px-5 lg:px-6 mt-4 sm:mt-5">
-        {filteredServices.length === 0 ? (
+        {services.length === 0 ? (
           <div className="text-center py-20 text-green-800 text-base font-medium">
             No services found for this category.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5 mb-8">
-            {visibleServices.map((item, i) => (
-              <ServiceCard key={`${selectedCategory.id}-${i}`} item={item} />
-            ))}
+            {services?.length > 0 &&
+              services?.map((item, i) => (
+                <ServiceCard key={item.serviceId || i} item={item} />
+              ))}
           </div>
         )}
 
@@ -1301,7 +1360,7 @@ export default function DetoxHouse() {
               ) : (
                 <>
                   <span className="relative">
-                    Load More ({filteredServices.length - visibleCount}{" "}
+                    Load More ({count - services?.length}
                     remaining)
                   </span>
                   <ExpandMoreIcon

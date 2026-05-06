@@ -82,16 +82,16 @@ const menuItems = [
   { key: "dashboard", label: "Dashboard", Icon: LayoutDashboard },
   { key: "enquiries", label: "Enquiries", Icon: MessageSquare },
   { key: "bookings", label: "Bookings", Icon: CalendarCheck },
-  {
-    key: "masters",
-    label: "Masters",
-    Icon: Database,
-    children: [
-      // { key: "patient-master", label: "Patient Master" },
-      { key: "doctor-master", label: "Doctor Master" },
-      { key: "service-master", label: "Service Master" },
-    ],
-  },
+  // {
+  //   key: "masters",
+  //   label: "Masters",
+  //   Icon: Database,
+  //   children: [
+  //     { key: "patient-master", label: "Patient Master" },
+  //     { key: "doctor-master", label: "Doctor Master" },
+  //     { key: "service-master", label: "Service Master" },
+  //   ],
+  // },
 ];
 
 const bottomMenuItems = [

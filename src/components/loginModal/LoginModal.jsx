@@ -113,15 +113,15 @@ export default function LoginModal({ open, handleClose }) {
       setOpenConfirmationModal(false);
 
       const response = await userLogin(formData);
-      console.log(response?.data.data);
-      if (response.status === 200 ) {
+      if (response?.data.statusCode === 200 ) {
+        console.log("LOGIN API RESPONSE: ",response.data.data);
         localStorage.setItem("accessToken", response.data?.data?.accessToken);
         localStorage.setItem("refreshToken", response.data?.data?.refreshToken);
         localStorage.setItem("user", JSON.stringify(response.data?.data?.user));
         localStorage.setItem("expiresIn", response.data?.data?.expiresIn);
         localStorage.setItem("tokenSetTime", Date.now());
         login(response.data?.data?.user);
-        successAlert(response.data.message || "Login successful");
+        successAlert(response.data.message);
         handleClose();
         reset();
         setIsLoading(false);

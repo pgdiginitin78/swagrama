@@ -40,7 +40,7 @@ import { InitiatePayment } from "../../../../services/bookAppointment/BookAppoin
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
-import SummaryIcon from "../../../../assets/SummaryIcon.svg"
+import SummaryIcon from "../../../../assets/SummaryIcon.svg";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
@@ -56,6 +56,29 @@ const formatTime = (timeStr) => {
   }
 };
 
+const staticTimeSlots = [
+  { slotStartTime: "09:00:00", slotEndTime: "09:30:00", isAvailable: true },
+  { slotStartTime: "09:30:00", slotEndTime: "10:00:00", isAvailable: true },
+  { slotStartTime: "10:00:00", slotEndTime: "10:30:00", isAvailable: true },
+  { slotStartTime: "10:30:00", slotEndTime: "11:00:00", isAvailable: true },
+  { slotStartTime: "11:00:00", slotEndTime: "11:30:00", isAvailable: true },
+  { slotStartTime: "11:30:00", slotEndTime: "12:00:00", isAvailable: true },
+  { slotStartTime: "12:00:00", slotEndTime: "12:30:00", isAvailable: true },
+  { slotStartTime: "12:30:00", slotEndTime: "13:00:00", isAvailable: true },
+  { slotStartTime: "13:00:00", slotEndTime: "13:30:00", isAvailable: true },
+  { slotStartTime: "13:30:00", slotEndTime: "14:00:00", isAvailable: true },
+  { slotStartTime: "14:00:00", slotEndTime: "14:30:00", isAvailable: true },
+  { slotStartTime: "14:30:00", slotEndTime: "15:00:00", isAvailable: true },
+  { slotStartTime: "15:00:00", slotEndTime: "15:30:00", isAvailable: true },
+  { slotStartTime: "15:30:00", slotEndTime: "16:00:00", isAvailable: true },
+  { slotStartTime: "16:00:00", slotEndTime: "16:30:00", isAvailable: true },
+  { slotStartTime: "16:30:00", slotEndTime: "17:00:00", isAvailable: true },
+  { slotStartTime: "17:00:00", slotEndTime: "17:30:00", isAvailable: true },
+  { slotStartTime: "17:30:00", slotEndTime: "18:00:00", isAvailable: true },
+  { slotStartTime: "18:00:00", slotEndTime: "18:30:00", isAvailable: true },
+  { slotStartTime: "18:30:00", slotEndTime: "19:00:00", isAvailable: true },
+];
+
 export default function BookTherapySession({ open, onClose, item }) {
   const backdropRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -69,7 +92,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
-  const [therapySlots, setTherapySlots] = useState([]);
+  const [therapySlots, setTherapySlots] = useState(staticTimeSlots);
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
@@ -94,8 +117,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const {
     control,
     watch,
-    handleSubmit,
-    formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(schema),
     defaultValues: { selectGuest: null },
@@ -130,53 +152,56 @@ export default function BookTherapySession({ open, onClose, item }) {
   }, [sessionsCount]);
 
   const handleGetPatientData = () => {
-    getPatientDataByMobileNo(user?.mobileNo, 5)
-      .then((res) => {
-        const data = res?.data?.data;
-        if (data?.length) {
-          setPatientOptions(
-            data.map((d) => ({
-              ...d,
-              id: d.userId,
-              value: d.userId,
-              label: `${d.firstName} ${d.lastName}`,
-            })),
-          );
-        }
-      })
-      .catch((err) => err);
+    if (user !== null) {
+      getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
+        .then((res) => {
+          const data = res?.data?.data;
+          if (data?.length) {
+            setPatientOptions(
+              data.map((d) => ({
+                ...d,
+                id: d.patientId,
+                value: d.patientId,
+                label: `${d.firstName} ${d.lastName}`,
+              })),
+            );
+          }
+        })
+        .catch((err) => err);
+    }
   };
 
   useEffect(() => {
-    if (!user) return;
     handleGetPatientData();
   }, [user]);
 
   useEffect(() => {
     if (activePickerIndex === null || !user?.userId) {
-      setTherapySlots([]);
+      setTherapySlots(staticTimeSlots);
       return;
     }
 
     const activeSession = schedules[activePickerIndex];
-    if (activeSession?.date) {
+    if (activeSession?.date && user !== null) {
       const formattedDate = format(activeSession.date, "yyyy-MM-dd");
       setIsSlotsLoading(true);
       GetDetoxTherapySlotsByUser(user.userId, formattedDate)
         .then((res) => {
           const data = res?.data;
-          console.log("GetDetoxTherapySlotsByUser", data);
-
-          setTherapySlots(Array.isArray(data?.data) ? data?.data : []);
+          if (Array.isArray(data?.data) && data.data.length > 0) {
+            setTherapySlots(data.data);
+          } else {
+            setTherapySlots(staticTimeSlots);
+          }
         })
         .catch(() => {
-          setTherapySlots([]);
+          setTherapySlots(staticTimeSlots);
         })
         .finally(() => {
           setIsSlotsLoading(false);
         });
     } else {
-      setTherapySlots([]);
+      setTherapySlots(staticTimeSlots);
     }
   }, [activePickerIndex, schedules[activePickerIndex]?.date, user?.userId]);
 
@@ -198,7 +223,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   if (!open || !item) return null;
 
   const priceParsed =
-    parseInt(String(item?.price || "0").replace(/[^0-9]/g, "")) || 0;
+    parseInt(String(item?.charges || "0").replace(/[^0-9]/g, "")) || 0;
   const subTotal = priceParsed * sessionsCount;
   const taxes = Math.round(subTotal * 0);
   const total = subTotal + taxes;
@@ -254,6 +279,8 @@ export default function BookTherapySession({ open, onClose, item }) {
     schedules.every((s) => s.date && s.time) &&
     selectedGuest;
 
+  console.log("selectedGuest", item);
+
   const handleConfirmBooking = () => {
     if (!user) {
       errorAlert("login first");
@@ -261,39 +288,63 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
     if (isPaymentPending) return;
     const saveObj = {
+      role: selectedGuest?.userId === user?.userId ? "self" : "other",
+      userId: selectedGuest?.userId,
+      createdBy: user?.userId,
+      clinicFid: 5,
+      serviceGroupID: item?.serviceGroupId,
+      serviceFid: item?.serviceId,
+      doctorFid: item?.doctorId,
+      fromDate: schedules[0]?.date
+        ? format(schedules[0].date, "yyyy-MM-dd")
+        : "",
+      toDate: schedules[schedules.length - 1]?.date
+        ? format(schedules[schedules.length - 1].date, "yyyy-MM-dd")
+        : "",
+      totalAmount: total,
+      no_Of_Person: 1,
+      duration: item.duration,
       TherapyName: item?.serviceName || "",
-      SlotTime: "45min",
       FirstTimeTaking: isFirstTime,
       No_Of_Sessions: sessionsCount,
       Preferred_therapist: genderPreference,
       Amount: total,
-      UserId: user?.userId,
-      GuestUserId: selectedGuest?.value || selectedGuest?.id,
-      sessions: schedules.map((s) => {
+      // UserId:
+      //   selectedGuest?.value === user?.userId
+      //     ? selectedGuest?.value
+      //     : user?.userId,
+      // GuestUserId: selectedGuest?.value || selectedGuest?.id,
+      slots: schedules.map((s) => {
         let displayTime = "N/A";
-        try {
-          if (s.time) {
+        if (s.time) {
+          try {
+            let finalDate;
             if (s.time.includes("AM") || s.time.includes("PM")) {
-              displayTime = s.time;
+              finalDate = parse(s.time, "hh:mm a", new Date());
             } else {
               const parsedDate = parse(s.time, "HH:mm:ss", new Date());
-              const finalDate = isNaN(parsedDate.getTime())
+              finalDate = isNaN(parsedDate.getTime())
                 ? parse(s.time, "HH:mm", new Date())
                 : parsedDate;
-              displayTime = format(finalDate, "hh:mm a");
             }
+            if (!isNaN(finalDate.getTime())) {
+              displayTime = format(finalDate, "HH:mm:ss");
+            } else {
+              displayTime = s.time;
+            }
+          } catch (e) {
+            displayTime = s.time || "N/A";
           }
-        } catch (e) {
-          displayTime = s.time || "N/A";
         }
 
         return {
-          sessionDate: s.date ? format(s.date, "yyyy-MM-dd") : "N/A",
-          sessionTime: displayTime,
+          SlotDate: s.date ? format(s.date, "yyyy-MM-dd") : "N/A",
+          slotStart: displayTime,
+          slotEnd: displayTime,
         };
       }),
     };
-
+    console.log("saveObj", saveObj);
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
@@ -313,11 +364,12 @@ export default function BookTherapySession({ open, onClose, item }) {
         const tempObj = {
           amount: total,
           userId: user?.userId,
+          patientId: selectedGuest?.userId,
           paymentFor: "TherapyBooking",
-          bookingId: bookingId?.bookingId,
+          bookingId: bookingId?.therapyBookingId || bookingId,
         };
 
-        const res = await InitiatePayment(null, user?.userId, tempObj);
+        const res = await InitiatePayment(5, bookingId?.patientUserId, tempObj);
         const data = res?.data;
 
         if (data?.status === 200) {
@@ -326,12 +378,15 @@ export default function BookTherapySession({ open, onClose, item }) {
 
           cancelPaymentRef.current = RedirectToSabPaisa(
             data,
-            null,
+            5,
             data.clientTxnId,
             async () => {
               successAlert(bookingData.message);
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
+              setSchedules([{ date: startOfToday(), time: null }]);
+              setSessionsCount(1);
+              reset();
               onClose();
             },
             (errorStatus) => {
@@ -351,10 +406,12 @@ export default function BookTherapySession({ open, onClose, item }) {
         errorAlert(bookingData?.message || "Booking failed");
       }
     } catch (error) {
-      console.log("bookingDataError",error);
-      
+      console.log("bookingDataError", error);
       setIsLoading(false);
-      errorAlert("This Slot is already booked. Please select another slot.");
+      errorAlert(
+        error?.response?.data?.message ||
+          "An unexpected error occurred during the booking process.",
+      );
     }
   };
 
@@ -382,7 +439,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                 className="flex items-start bg-[#eef6e8] rounded-[9px] p-3 gap-3 border border-[#d4e8c2] shadow-sm"
               >
                 <img
-                  src={item?.image}
+                  src={item?.serviceImage}
                   alt={item?.serviceName}
                   className="w-14 h-14 sm:w-16 sm:h-16 object-cover rounded-xl shadow-sm flex-shrink-0 mt-0.5"
                 />
@@ -404,10 +461,10 @@ export default function BookTherapySession({ open, onClose, item }) {
                         style={{ fontSize: 12 }}
                         className="text-ayuMid"
                       />
-                      45 Min
+                      {item?.duration} Min
                     </span>
                     <span className="font-bold text-ayuTulsi text-sm">
-                      ₹{priceParsed.toLocaleString()}
+                      ₹{item.charges}
                     </span>
                   </div>
                 </div>
@@ -582,7 +639,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     </div>
                                   ) : therapySlots.length > 0 ? (
                                     therapySlots.map((slot, i) => {
-                                      const t = slot.sessionTime;
+                                      const t = slot.slotStartTime;
                                       const isAvailable =
                                         slot.isAvailable ||
                                         !slot?.isBookedByUser;
@@ -601,25 +658,49 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           );
                                         },
                                       );
+                                      const isSelectedDateToday =
+                                        schedule.date &&
+                                        isSameDay(schedule.date, startOfToday());
+                                      const isPastSlot = isSelectedDateToday
+                                        ? (() => {
+                                            try {
+                                              const [h, m, s] = t
+                                                .split(":")
+                                                .map(Number);
+                                              const slotDate = new Date();
+                                              slotDate.setHours(
+                                                h,
+                                                m,
+                                                s || 0,
+                                                0,
+                                              );
+                                              return slotDate <= new Date();
+                                            } catch {
+                                              return false;
+                                            }
+                                          })()
+                                        : false;
+                                      const isDisabledSlot =
+                                        !isAvailable || isTaken || isPastSlot;
                                       return (
                                         <button
                                           key={i}
                                           type="button"
-                                          disabled={!isAvailable || isTaken}
+                                          disabled={isDisabledSlot}
                                           onClick={() => {
-                                            if (isAvailable && !isTaken)
+                                            if (!isDisabledSlot)
                                               handleTimeSelect(t, idx);
                                           }}
                                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border active:scale-95
                                         ${
                                           schedule.time === t
                                             ? "bg-ayuMid text-white border-ayuMid"
-                                            : !isAvailable || isTaken
+                                            : isDisabledSlot
                                               ? "bg-gray-100/50 text-gray-300 border-gray-100 cursor-not-allowed"
                                               : "bg-white text-gray-500 border-[#e4ebdd] hover:border-ayuMid"
                                         }`}
                                         >
-                                          {formatTime(t)}
+                                          {formatTime(slot.slotStartTime)}{slot.slotEndTime ? ` - ${formatTime(slot.slotEndTime)}` : ""}
                                         </button>
                                       );
                                     })
@@ -767,7 +848,11 @@ export default function BookTherapySession({ open, onClose, item }) {
                   <h3 className="font-serif text-ayuBrown text-sm font-bold">
                     Summary
                   </h3>
-                  <img src={SummaryIcon} alt="Summary" className="text-ayuBrown h-7 w-10" />
+                  <img
+                    src={SummaryIcon}
+                    alt="Summary"
+                    className="text-ayuBrown h-7 w-10"
+                  />
                 </div>
                 <div className="flex flex-col gap-2 text-xs font-bold text-gray-500 border-b border-ayuMid/10 pb-3 mb-3">
                   <div className="flex justify-between items-start">
@@ -835,9 +920,9 @@ export default function BookTherapySession({ open, onClose, item }) {
               <div className="flex justify-end space-x-3">
                 <CommonButton
                   type="button"
-                  label="Cancel"
+                  label="Reset"
                   className={"border border-red-600 text-red-600 bg-red-100"}
-                  onClick={onClose}
+                  onClick={reset}
                 />
                 <CommonButton
                   type="button"
@@ -864,7 +949,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationLabel="Confirm Therapy Booking"
-        confirmationMsg={`Are you sure you want to book ${sessionsCount} session(s) of ${item?.serviceName}? Total Amount: ₹${total.toLocaleString()}`}
+        confirmationMsg={`Are you sure you want to book ${sessionsCount} session of ${item?.serviceName}? Total Amount: ₹${total.toLocaleString()}`}
         confirmationSubmitFunc={initiateBookingPayment}
         confirmationHandleClose={() => {
           if (cancelPaymentRef.current) {

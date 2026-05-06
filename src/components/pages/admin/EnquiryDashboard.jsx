@@ -264,9 +264,10 @@ const EnquiryDashboard = () => {
   const date = watch("date");
   const status = watch("status");
 
-  const populateTable = (forPagination) => {
+  const populateTable = (newPage) => {
+    const currentPage = typeof newPage === "number" ? newPage : page;
     let obj = {
-      page: !forPagination ? 0 : page,
+      page: currentPage + 1,
       size: rowsPerPage,
       EnquiryName: searchEnquiry !== null ? searchEnquiry?.label : null,
       EnquiryByType: enquiryType !== null ? enquiryType?.label : null,
@@ -275,13 +276,10 @@ const EnquiryDashboard = () => {
       EnquiryStatus: status !== null ? status?.value : null,
     };
     setLoadingSpinner(true);
+    setEnquiryList([])
     GetEnquiryList(obj)
       .then((res) => {
-        if (forPagination) {
-          setEnquiryList((prevData) => [...prevData, ...res.data.data.data]);
-        } else {
-          setEnquiryList(res.data.data.data);
-        }
+        setEnquiryList(res.data.data.data);
         setCount(res.data.data.totalRecords);
         setLoadingSpinner(false);
       })
@@ -377,11 +375,11 @@ const EnquiryDashboard = () => {
               label="Export"
               className="border border-[#1E5151] text-[#1E5151]"
             />
-            <CommonButton
+            {/* <CommonButton
               type="button"
               label="+ Add Enquiry"
               className="bg-[#1E5151] text-white"
-            />
+            /> */}
           </div>
         </div>
 
@@ -440,12 +438,12 @@ const EnquiryDashboard = () => {
         </div>
       </header>
 
-      {loadingSpinner && (
-        <div className="my-40 text-center flex-1">
-          <LoadingSpinner />
-        </div>
-      )}
       <main className="flex-1 overflow-y-auto flex flex-col lg:flex-row p-2 md:p-3 gap-3 no-scrollbar">
+        {loadingSpinner && (
+          <div className="my-40 flex justify-center text-center flex-1">
+            <LoadingSpinner />
+          </div>
+        )}
         {enquiryList?.length > 0 ? (
           <div className="flex-1">
             <CommonPaginationTable

@@ -82,6 +82,7 @@ export default function AyurvedaLanding({ userData }) {
             setSelectedEvents(null);
           }}
           serviceDetails={selectedEvents}
+          origin={"AnnualEvents"}
         />
       )}
 

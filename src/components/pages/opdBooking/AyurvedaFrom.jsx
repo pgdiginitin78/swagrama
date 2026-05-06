@@ -102,34 +102,50 @@ const homeopathyCarouselImages = [
 ];
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
-  const isMorning =
-    slot.slotStartTime.includes("AM") ||
-    parseInt(slot.slotStartTime.split(":")[0]) < 12;
-
   return (
     <motion.button
       whileHover={{ y: -1 }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.97 }}
       type="button"
       onClick={onSelect}
-      disabled={!slot.slotStartTime}
+      disabled={!slot.slotStartTime || slot?.count === 0}
       className={`
-        relative px-2 py-2 rounded-[5px] font-bold text-[11px] transition-all duration-200 
-        flex flex-col items-center justify-center border
-        ${
-          isSelected
-            ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200/50"
-            : "bg-emerald-50/50 border-emerald-100 text-slate-700 hover:border-emerald-300 hover:bg-white hover:shadow-sm"
-        }
-        disabled:opacity-40 disabled:cursor-not-allowed
-      `}
+    relative w-full px-2 py-1.5 rounded-lg text-[10px] font-medium
+    flex items-center justify-between gap-2 border
+    transition-all duration-150
+    ${
+      isSelected
+        ? "bg-emerald-500 border-emerald-500 text-white"
+        : slot?.count === 0
+          ? "bg-slate-100 border-slate-200 text-slate-400"
+          : slot?.count <= 3
+            ? "bg-amber-100 border-amber-300 text-amber-900"
+            : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
+    }
+    disabled:opacity-60 disabled:cursor-not-allowed
+  `}
     >
-      <span
-        className={`text-[8px] uppercase tracking-tighter font-black ${isSelected ? "text-emerald-100" : "text-emerald-600/60"}`}
-      >
-        {isMorning ? "Morning" : "Afternoon"}
+      <span className="whitespace-normal leading-tight text-left">
+        {slot?.slotStartTime} - {slot?.slotEndTime}
       </span>
-      <span>{slot.slotStartTime}</span>
+
+      <span
+        className={`
+      flex-shrink-0 flex items-center justify-center min-w-[20px] h-5 px-1.5
+      rounded-md text-[9px] font-bold
+      ${
+        isSelected
+          ? "bg-white/20 text-white"
+          : slot?.count === 0
+            ? "bg-red-100 text-red-600"
+            : slot?.count <= 3
+              ? "bg-amber-200 text-amber-900"
+              : "bg-emerald-100 text-emerald-700"
+      }
+    `}
+      >
+        {slot?.count}
+      </span>
     </motion.button>
   );
 }
@@ -441,7 +457,10 @@ function BookingPreviewModal({
             <PreviewRow
               label="Date & Time"
               value={
-                format(new Date(data.appointmentDate), "dd MMM yyyy") +
+                (data.appointmentDate &&
+                !isNaN(new Date(data.appointmentDate).getTime())
+                  ? format(new Date(data.appointmentDate), "dd MMM yyyy")
+                  : format(new Date(), "dd MMM yyyy")) +
                 " " +
                 data?.selectedTimeSlot?.slotStartTime +
                 " - " +
@@ -493,12 +512,13 @@ function AyurvedaForm({
   doctorList = [],
   loadingDoctors = false,
   selectedDoctorId = null,
-  setSelectedDoctorId = () => {},
+  setSelectedDoctorId,
   activeGradient = "from-emerald-600 to-green-500",
   activeDept = "Ayurveda",
 }) {
-  const isYoga = activeDept?.toLowerCase() === "yoga";
-  const isHomeopathy = activeDept?.toLowerCase() === "homeopathy";
+  const activeDeptStr = typeof activeDept === "string" ? activeDept : "";
+  const isYoga = activeDeptStr.toLowerCase() === "yoga";
+  const isHomeopathy = activeDeptStr.toLowerCase() === "homeopathy";
 
   const currentCarouselImages = isYoga
     ? yogaCarouselImages
@@ -564,6 +584,8 @@ function AyurvedaForm({
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
+
+
 
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
@@ -655,7 +677,7 @@ function AyurvedaForm({
   };
 
   const handleGetPatientData = () => {
-    getPatientDataByMobileNo(user?.mobileNo, 5)
+    getPatientDataByMobileNo(user?.mobileNo, user.userId, "OPD", 5)
       .then((res) => {
         const data = res?.data?.data;
         if (data?.length) {
@@ -694,28 +716,23 @@ function AyurvedaForm({
     }
   }, [user]);
 
-  const docId = selectedDoctorId?.userId;
-  const memoDate = useMemo(() => {
-    if (!appointmentDate) return "";
-    try {
-      return format(new Date(appointmentDate), "yyyy-MM-dd");
-    } catch (e) {
-      return "";
-    }
-  }, [appointmentDate]);
 
   useEffect(() => {
-    let isMounted = true;
-
-    if (docId && memoDate) {
+    if (selectedDoctorId!==null) {
       setSelectedTimeSlot(null);
       setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
 
-      getDoctorAvailableSlots(docId, memoDate, 5)
+      getDoctorAvailableSlots(
+        selectedDoctorId?.userId,
+        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+          ? format(new Date(appointmentDate), "yyyy-MM-dd")
+          : "",
+        5,
+      )
         .then((res) => {
-          if (!isMounted) return;
           const data = res?.data;
-          if (data?.statusCode == 200) {
+
+          if (data?.status == 200) {
             const fetchedSlots = data?.data || [];
             setSlotData({
               slots: fetchedSlots,
@@ -731,7 +748,6 @@ function AyurvedaForm({
           }
         })
         .catch((err) => {
-          if (!isMounted) return;
           console.error("Error fetching slots:", err);
           setSlotData({
             slots: [],
@@ -740,47 +756,51 @@ function AyurvedaForm({
           });
         });
     }
+  }, [selectedDoctorId, appointmentDate]);
 
-    return () => {
-      isMounted = false;
-    };
-  }, [docId, memoDate]);
+  const handleConfirmBooking = handleSubmit(
+    (data) => {
+      if (user === null) {
+        errorAlert("login first");
+      } else if (selectedTimeSlot === null) {
+        setSlotData((prev) => ({
+          ...prev,
+          error: "Please select a time slot to continue.",
+        }));
+        return;
+      }
 
-  const handleConfirmBooking = handleSubmit((data) => {
-    if (user === null) {
-      errorAlert("login first");
-    } else if (selectedTimeSlot === null) {
-      setSlotData((prev) => ({
-        ...prev,
-        error: "Please select a time slot to continue.",
-      }));
-      return;
-    }
-
-    const saveObj = {
-      macId: "",
-      macIp: ipAddress || "",
-      clinicFid: selectedDoctorId?.clinicId,
-      patientFid: data.patientFid?.id,
-      doctorFid: selectedDoctorId?.userId,
-      serviceFid: data.serviceFid?.id ? String(data.serviceFid.id) : "",
-      appoinmentDate:
-        data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
-          ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
-          : "",
-      Status: data.Status?.label || "",
-      SloteEndTime: selectedTimeSlot?.slotEndTime,
-      SloteStartTime: selectedTimeSlot?.slotStartTime,
-      ServiceDetails: data.ServiceDetails,
-      taxDeatils: data.taxDetails,
-      EncounterStatus: data?.EncounterStatus,
-      reason: data.reasonForVisit,
-      bookingSource: "web",
-    };
-    setFinalObj(saveObj);
-    setPreviewData({ ...data, selectedTimeSlot });
-    setPreviewOpen(true);
-  });
+      const saveObj = {
+        macId: "",
+        macIp: ipAddress || "",
+        clinicFid: selectedDoctorId?.clinicId,
+        patientFid: data.patientFid?.id,
+        doctorFid: selectedDoctorId?.userId,
+        serviceFid: data.serviceFid?.id ? String(data.serviceFid.id) : "",
+        appoinmentDate:
+          data.appointmentDate &&
+          !isNaN(new Date(data.appointmentDate).getTime())
+            ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
+            : "",
+        Status: data.Status?.label || "",
+        SloteEndTime: selectedTimeSlot?.slotEndTime,
+        SloteStartTime: selectedTimeSlot?.slotStartTime,
+        ServiceDetails: data.ServiceDetails,
+        taxDeatils: data.taxDetails,
+        EncounterStatus: data?.EncounterStatus,
+        reason: data.reasonForVisit,
+        bookingSource: "web",
+      };
+      setFinalObj(saveObj);
+      setPreviewData({ ...data, selectedTimeSlot });
+      setPreviewOpen(true);
+    },
+    (errors) => {
+      if (errors.serviceFid) {
+        errorAlert("Please select a service");
+      }
+    },
+  );
 
   const initiatePayment = async () => {
     if (isPaymentPending) return;
@@ -795,15 +815,11 @@ function AyurvedaForm({
           !isNaN(new Date(previewData.appointmentDate).getTime())
             ? format(new Date(previewData.appointmentDate), "yyyy-MM-dd")
             : "",
-        userId:    patientFid !== null ? patientFid?.id : userId,
+        userId: patientFid !== null ? patientFid?.id : userId,
         paymentFor: "OPD",
       };
 
-      const res = await InitiatePayment(
-        selectedDoctorId?.clinicId,
-          patientFid !== null ? patientFid?.id : userId,
-        tempObj,
-      );
+      const res = await InitiatePayment(5, patientFid?.userId, tempObj);
       const data = res?.data;
 
       if (data?.status === 200) {
@@ -814,36 +830,29 @@ function AyurvedaForm({
           selectedDoctorId?.clinicId,
           data.clientTxnId,
           async () => {
-            const res = await bookAppointment(finalObj,    patientFid !== null ? patientFid?.id : userId);
-            if (res.data.statusCode === 201) {
+            const res = await bookAppointment(
+              finalObj,
+              patientFid !== null ? patientFid?.id : userId,
+            );
+            console.log(res, "resssssssssssssssssss");
+
+            if (res.data.status === 200) {
               successAlert(
                 res.data.message || "Appointment booked successfully!",
               );
               setIsPaymentPending(false);
-              reset({
-                clinicFid: null,
-                patientFid: null,
-                doctorFid: null,
-                serviceFid: null,
-                appointmentDate: null,
-                Status: null,
-                ServiceDetails: "",
-                taxDetails: "",
-                EncounterStatus: "",
-                location: null,
-                fullName: "",
-                mobileNumber: "",
-                age: "",
-                gender: null,
-                emailAddress: "",
-                city: "",
-                reasonForVisit: "",
-                bloodGroup: null,
-              });
+              reset();
+              setValue("appointmentDate", new Date());
               setSelectedTimeSlot(null);
               setSelectedDoctorId(null);
               setFinalObj(null);
+              setPreviewOpen(false);
               setPreviewData(null);
+              setSlotData({
+                slots: [],
+                loading: false,
+                error: "",
+              });
             } else {
               errorAlert(res.data.message || "Booking failed after payment.");
               setIsPaymentPending(false);
@@ -898,6 +907,8 @@ function AyurvedaForm({
       .catch((error) => console.error("Error:", error));
   }, []);
 
+  console.log(slotData, "slotData");
+
   return (
     <>
       <style>{`
@@ -908,7 +919,7 @@ function AyurvedaForm({
         .ayur-scroll { scrollbar-width: thin; scrollbar-color: #059669 #d1fae5; }
       `}</style>
 
-      <div className="px-3 py-4 space-y-5 sm:px-4 sm:py-5 md:px-5">
+      <div className="px-2 py-4 space-y-5 sm:py-5 md:px-5">
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4">
           <div className="flex flex-col gap-4 lg:col-span-3">
             <div className="flex flex-col gap-3">
@@ -1357,9 +1368,11 @@ function AyurvedaForm({
               >
                 {(() => {
                   const today = startOfDay(new Date());
-                  const baseDate = appointmentDate
-                    ? new Date(appointmentDate)
-                    : new Date();
+                  const baseDate =
+                    appointmentDate &&
+                    !isNaN(new Date(appointmentDate).getTime())
+                      ? new Date(appointmentDate)
+                      : new Date();
                   const monthDays = eachDayOfInterval({
                     start: startOfMonth(baseDate),
                     end: endOfMonth(baseDate),
@@ -1401,14 +1414,14 @@ function AyurvedaForm({
                       Select a Consultant
                     </p>
                   </div>
-                ) : slotData.loading ? (
+                ) : slotData?.loading ? (
                   <div className="flex flex-col items-center justify-center py-5 sm:py-6">
                     <div className="w-7 h-7 border-2 border-emerald-100 border-t-emerald-500 rounded-full animate-spin sm:w-8 sm:h-8" />
                     <p className="text-slate-400 text-[10px] font-bold mt-2">
                       Checking slots...
                     </p>
                   </div>
-                ) : slotData.slots.length === 0 ? (
+                ) : slotData?.slots?.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
                     <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
                     <p className="text-slate-400 font-bold text-[11px]">
@@ -1631,6 +1644,7 @@ function AyurvedaForm({
             setOpenAddPatientModal(false);
             handleGetPatientData();
           }}
+          type={"OPD"}
         />
       )}
 

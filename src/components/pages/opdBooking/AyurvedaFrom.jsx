@@ -1046,7 +1046,7 @@ function AyurvedaForm({
                     Finding expert Vaidyas…
                   </p>
                 </div>
-              ) : doctorList.length === 0 ? (
+              ) : doctorList?.length === 0 ? (
                 <div className="flex flex-col items-center py-8 text-center rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 gap-2 sm:py-10">
                   <AccountCircleIcon sx={{ fontSize: 40, color: "#6ee7b7" }} />
                   <p className="text-sm font-semibold text-gray-400">

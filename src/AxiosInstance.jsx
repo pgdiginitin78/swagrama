@@ -45,15 +45,16 @@ AxiosInstance.interceptors.request.use(
 AxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    const status = error.response?.status || error.response?.statusCode;
     const originalRequest = error.config;
 
     if (originalRequest?.url?.includes("refresh-token")) {
       processQueue(error, null);
-      sessionExpiredLogout();
+      if (status === 400) {
+        sessionExpiredLogout();
+      }
       return Promise.reject(error);
     }
-
-    const status = error.response?.status || error.response?.statusCode;
 
     if (status === 401 && !originalRequest._retry) {
 
@@ -113,17 +114,15 @@ AxiosInstance.interceptors.response.use(
         return AxiosInstance(originalRequest);
       } catch (err) {
         processQueue(err, null);
-        sessionExpiredLogout();
+        if (err.response?.status === 400) {
+          sessionExpiredLogout();
+        }
         return Promise.reject(err);
       } finally {
         setIsRefreshing(false);
       }
     }
 
-    if (status === 400) {
-      sessionExpiredLogout();
-      return Promise.reject(error);
-    }
 
     if (status >= 500) {
       toast.error("A server error occurred. Please try again later.");

@@ -197,7 +197,7 @@ const DetailPanel = ({ enquiry, onClose }) => {
           </div>
         </section>
       </div>
-      <div className="flex-shrink-0 p-3 border-t border-[#eef0ea] flex flex-col gap-1.5 bg-[#fcfdfa]">
+      {/* <div className="flex-shrink-0 p-3 border-t border-[#eef0ea] flex flex-col gap-1.5 bg-[#fcfdfa]">
         <button className="w-full h-8 flex items-center justify-center gap-2 rounded-lg font-bold text-[10px] bg-[#d4edc9] text-[#1e5c0a] hover:bg-[#bfe0b4] transition-colors">
           <svg
             width="10"
@@ -231,7 +231,7 @@ const DetailPanel = ({ enquiry, onClose }) => {
             Convert
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
@@ -254,6 +254,7 @@ const EnquiryDashboard = () => {
       serviceType: null,
       date: null,
       status: null,
+      enquiryDate:new Date(),     
     },
     mode: "onChange",
   });

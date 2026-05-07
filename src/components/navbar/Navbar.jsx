@@ -134,7 +134,6 @@ const Navbar = () => {
   const handleLogout = () => {
     setShowDropdown(false);
     logout();
-    successAlert("User logged out successfully");
   };
 
   const handleManageProfile = () => {

@@ -40,15 +40,6 @@ import {
 const G = "#3d6b1f";
 const G2 = "#5a9e2f";
 
-const earningsTrend = [
-  { name: "Mon", amount: 0 },
-  { name: "Tue", amount: 0 },
-  { name: "Wed", amount: 0 },
-  { name: "Thu", amount: 0 },
-  { name: "Fri", amount: 0 },
-  { name: "Sat", amount: 0 },
-  { name: "Sun", amount: 0 },
-];
 
 const categoryRevenue = [
   { name: "OPD/Clinic", revenue: 0 },
@@ -58,12 +49,6 @@ const categoryRevenue = [
   { name: "Nature/Beauty", revenue: 0 },
 ];
 
-const therapyRevenue = [
-  { name: "Ayurveda", value: 0 },
-  { name: "Panchakarma", value: 0 },
-  { name: "Nature Therapy", value: 0 },
-  { name: "Beauty/Detox", value: 0 },
-];
 
 const PIE_COLORS = ["#3d6b1f", "#5a9e2f", "#81c784", "#c8e6c9"];
 
@@ -112,7 +97,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "revenue",
       title: "Total Revenue",
-      value: `₹${dashboardStats?.totalRevenue}`,
+      value: `₹${dashboardStats?.totalRevenue ?? 0}`,
       trend: "+0%",
       sub: "incl. Shop & Services",
       icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
@@ -122,7 +107,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "membership",
       title: "Memberships",
-      value: `₹${dashboardStats?.membership}`,
+      value: `₹${dashboardStats?.membership ?? 0}`,
       trend: "0",
       sub: "Active members",
       icon: <People sx={{ fontSize: 18 }} />,
@@ -132,7 +117,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "shop",
       title: "Store Orders",
-      value: `₹${dashboardStats?.storeOrders}`,
+      value: `₹${dashboardStats?.storeOrders ?? 0}`,
       trend: "0",
       sub: "pending fulfillment",
       icon: <CalendarMonth sx={{ fontSize: 18 }} />,
@@ -142,7 +127,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "stays",
       title: "Stay Revenue",
-      value: `₹${dashboardStats?.stayOccupancy}`,
+      value: `₹${dashboardStats?.stayOccupancy ?? 0}`,
       trend: "N/A",
       sub: "Hospitals & Detox",
       icon: <Hotel sx={{ fontSize: 18 }} />,
@@ -152,7 +137,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
     {
       id: "consultations",
       title: "OPD Revenue",
-      value: `₹${dashboardStats?.opd}`,
+      value: `₹${dashboardStats?.opd ?? 0}`,
       trend: "Live",
       sub: "consultations in prog",
       icon: <Timeline sx={{ fontSize: 18 }} />,

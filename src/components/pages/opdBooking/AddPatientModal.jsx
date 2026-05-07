@@ -27,6 +27,7 @@ import DropdownField from "../../common/formFields/DropdownField";
 import InputArea from "../../common/formFields/InputArea";
 import InputField from "../../common/formFields/InputField";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
+import RadioField from "../../common/formFields/RadioField";
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -232,6 +233,7 @@ export default function AddPatientModal({
       address: "",
       pinCode: "",
       city: "",
+      gender: "Male",
     },
     mode: "onChange",
   });
@@ -254,6 +256,7 @@ export default function AddPatientModal({
       relation: data.relation ?? "",
       address: data.address,
       pinCode: data.pinCode,
+      Gender: data.gender?.label ?? "",
       macIp: ipAddress ?? "",
       macId: "",
       bloodGroup: data.bloodGroup?.value ?? "",
@@ -273,16 +276,17 @@ export default function AddPatientModal({
         finalSaveObj,
       );
       const apiData = response?.data?.data || response?.data;
+      console.log("apiData", response);
 
       if (
         response?.data?.statusCode === 201 &&
         (apiData?.userId || apiData?.success)
       ) {
-        successAlert(apiData?.message || "Patient registered successfully!");
+        successAlert(response?.data.message);
         handleClose();
         reset();
       } else {
-        errorAlert(apiData?.message || "Registration failed!");
+        errorAlert(apiData?.message);
       }
     } catch (error) {
       const errorMessage =
@@ -539,6 +543,20 @@ export default function AddPatientModal({
                   label="Email *"
                   error={errors.emailId}
                 />
+                <div>
+                  <RadioField
+                    control={control}
+                    name="gender"
+                    label="Gender *"
+                    error={errors.gender}
+                    dataArray={[
+                      { id: "Male", value: "Male", label: "Male" },
+                      { id: "Female", value: "Female", label: "Female" },
+                      { id: "Other", value: "Other", label: "Other" },
+                    ]}
+                  />
+                </div>
+
                 <div>
                   <DropdownField
                     control={control}

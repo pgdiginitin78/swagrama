@@ -7,6 +7,7 @@ import {
 } from "react";
 
 import { useNavigate } from "react-router-dom";
+import { successAlert } from "../components/common/toast/CustomToast";
 
 export const AuthContext = createContext(null);
 
@@ -36,6 +37,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.clear();
     setUser(null);
     navigate("/");
+    successAlert("User logged out successfully");
   }, [navigate]);
 
   const updateUser = useCallback((updatedUser) => {

@@ -1,4 +1,3 @@
-import BookOnline from "@mui/icons-material/BookOnline";
 import FilterList from "@mui/icons-material/FilterList";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
@@ -6,101 +5,7 @@ import {
   GetDetoxTherapyByServiceCategory,
   GetTherapyNameByServiceCategory,
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
-import FertileSoilTherapyImg from "../../../assets/healingServices/natureTherapy/स्वउर्वराचिकित्सा Fertile Soil Therapy.webp";
-import SwimmingTherapyImg from "../../../assets/healingServices/natureTherapy/स्वजलतरणचिकित्सा Swimming Therapy.webp";
-import MaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वपुंस्मृत्तिकास्नान Male MudBath.webp";
-import AthleticTherapyImg from "../../../assets/healingServices/natureTherapy/स्वमल्लचिकित्सा Athletic Therapy.webp";
-import WindSunRejuvenationImg from "../../../assets/healingServices/natureTherapy/स्ववातातपिकरसायन Wind Sun Rejuvenation.webp";
-import FeMaleMudBathImg from "../../../assets/healingServices/natureTherapy/स्वस्त्रीमृत्तिकास्नान Female Mud Bath.webp";
 import NatureTherapyBookingModal from "./NatureTherapyBookingModal";
-
-const therapiesData = [
-  {
-    id: 1,
-    category: "MudTherapy",
-    icon: "Spa",
-    nameEnglish: "स्वपुंस्मृत्तिकास्नान Male MudBath",
-    room: "पुंस्मृत्तिकास्नानकक्ष Male Mud BathRoom",
-    description: "Therapeutic male mud bath using mineral-rich soil.",
-    benefits:
-      "Detoxifies body, improves circulation, nourishes skin, relieves muscle tension.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: MaleMudBathImg,
-  },
-  {
-    id: 2,
-    category: "MudTherapy",
-    icon: "Spa",
-    nameEnglish: "स्वस्त्रीमृत्तिकास्नान Female Mud Bath",
-    room: "स्त्रीमृत्तिकास्नानकक्ष Female Mud BathRoom",
-    description: "Therapeutic female mud bath with rejuvenating soil therapy.",
-    benefits:
-      "Rejuvenates skin and body, relieves fatigue, detoxifies, improves vitality.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: FeMaleMudBathImg,
-  },
-  {
-    id: 3,
-    category: "WaterTherapy",
-    icon: "Pool",
-    nameEnglish: "स्वजलतरणचिकित्सा Swimming Therapy",
-    room: "जलतरणचिकित्साकूप Swimming Therapy Well",
-    description: "Guided swimming sessions in clean water.",
-    benefits:
-      "Enhances flexibility, strengthens muscles, improves cardiovascular health, reduces stress.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: SwimmingTherapyImg,
-  },
-  {
-    id: 4,
-    category: "AirTherapy",
-    icon: "Air",
-    nameEnglish: "स्ववातातपिकरसायन Wind Sun Rejuvenation",
-    room: "वातातपिकरसायनभूमि Wind Sun Rejuvenation Land",
-    description:
-      "व्यायाम, श्रम, कोष्णनिवास, उबदार पांघरून, उपवास, उष्ण सेवन, भय, क्रोध, लेपन, क्रिडा, आतप. Exposure to controlled wind and sun, combined with gentle exercise, labour, warm covering, fasting, warm intake, and physical therapy.",
-    benefits:
-      "Improves immunity, enhances energy, detoxifies body, strengthens metabolism.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: WindSunRejuvenationImg,
-  },
-  {
-    id: 5,
-    category: "PhysicalTherapy",
-    icon: "FitnessCenter",
-    nameEnglish: "स्वमल्लचिकित्सा Athletic Therapy",
-    room: "मल्लचिकित्साभूमि Athletic Therapy Land",
-    description: "Personalized athletic exercises and therapy.",
-    benefits:
-      "Builds strength, improves endurance, supports recovery, promotes overall fitness.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: AthleticTherapyImg,
-  },
-  {
-    id: 6,
-    category: "SoilTherapy",
-    icon: "Grass",
-    nameEnglish: "स्वउर्वराचिकित्सा Fertile Soil Therapy",
-    room: "उर्वराचिकित्साभूमि Fertile Soil Therapy Land",
-    description: "Walking or lying in fertile soil for therapeutic effects.",
-    benefits:
-      "Grounds body, improves circulation, detoxifies, enhances vitality and mental balance.",
-    price: "1000/1",
-    priceRange: "750/2-5",
-    bulkPrice: "500/5 or More",
-    image: FertileSoilTherapyImg,
-  },
-];
 
 export default function NatureTherapy() {
   const [selectedCategory, setSelectedCategory] = useState({
@@ -341,7 +246,7 @@ export default function NatureTherapy() {
                       className="w-full h-full object-cover"
                     />
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                    {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" /> */}
 
                     <div
                       className="
@@ -416,7 +321,7 @@ export default function NatureTherapy() {
                       onClick={() => handleBooking(therapy)}
                       className="w-full bg-gradient-to-r from-green-600 to-lime-600 text-white font-semibold text-sm py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 group-hover:from-green-700 group-hover:to-lime-700"
                     >
-                      <BookOnline className="text-lg" />
+                  
                       Book Now
                     </motion.button>
                   </div>

@@ -1,11 +1,12 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Calendar, Heart, IndianRupee, Leaf } from "lucide-react";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowRight, Calendar, Heart, IndianRupee, Leaf } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import VisitorsFormModal from "../vision/VisitorsFormModal";
-import { eventsData2026 } from "../../eventsCalander/EventCalander";
+import { MdOutlineEventNote } from "react-icons/md";
 import bannerImage from "../../../../assets/annual_events_perfect_banner.webp";
+import { eventsData2026 } from "../../eventsCalander/EventCalander";
+import VisitorsFormModal from "../vision/VisitorsFormModal";
 
 const months = [
   "January",
@@ -169,7 +170,7 @@ const EventCard = ({
               }}
             >
               <span>{past ? "Ended" : "Book Event"}</span>
-              {!past && <ArrowRight className="w-4 h-4" />}
+              {!past && <MdOutlineEventNote className="w-4 h-4" />}
             </button>
           </div>
         </div>
@@ -308,7 +309,6 @@ const CommunityCeremony = () => {
       ref={containerRef}
     >
       <header className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-forest">
-        {/* Modern Background with Parallax */}
         <motion.div 
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -320,7 +320,6 @@ const CommunityCeremony = () => {
             alt="Annual Events Banner" 
             className="w-full h-full object-cover"
           />
-          {/* Subtle Dark Overlay (No white fade) */}
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
 
@@ -331,9 +330,8 @@ const CommunityCeremony = () => {
             transition={{ delay: 0.3, duration: 1 }}
             className="max-w-4xl mx-auto"
           >
-            {/* Glassmorphism Panel */}
             <div className="relative group overflow-hidden rounded-[32px] p-8 md:p-12 border border-white/20 bg-white/10 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-center">
-              {/* Animated Accent Light */}
+      
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-lime/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
               <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-forest/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
 

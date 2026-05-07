@@ -629,7 +629,7 @@ const CommunityActivities = () => {
                   className="ca-slot-card bg-white rounded-[9px] overflow-hidden border border-[#e2efd6] flex flex-col shadow-sm"
                   {...hoverLift}
                 >
-                  <div className="relative h-44 sm:h-52 overflow-hidden">
+                  <div className="relative h-44 md:h-60 overflow-hidden">
                     <motion.img
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.7 }}

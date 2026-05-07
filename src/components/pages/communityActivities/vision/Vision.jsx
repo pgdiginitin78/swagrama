@@ -523,7 +523,7 @@ const OurVision = () => {
                         alt={service.serviceName}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                      {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" /> */}
                       <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-green-700 shadow-sm">
                         {service.price}
                       </div>
@@ -595,7 +595,7 @@ const OurVision = () => {
                         }}
                         className="w-full bg-gradient-to-r from-lime-500 to-green-600 text-white font-semibold py-2.5 rounded-xl hover:from-lime-600 hover:to-green-700 transition-all text-sm shadow-sm"
                       >
-                        Book Now
+                        Book Now 
                       </button>
                     </div>
                   </div>
@@ -639,8 +639,9 @@ const OurVision = () => {
                     <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold text-green-700 shadow-sm">
                       {service.price}
                     </div>
-                    <div className="relative h-36 overflow-hidden">
-                      <div className="absolute inset-0 bg-gradient-to-t from-green-900/60 to-transparent z-10" />
+                    
+                    <div className="relative h-48">
+                      {/* <div className="absolute inset-0 bg-gradient-to-t from-green-900/60 to-transparent z-10" /> */}
                       <img
                         src={service.image}
                         alt={service.serviceName}

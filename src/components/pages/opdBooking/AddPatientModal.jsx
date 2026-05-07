@@ -479,12 +479,11 @@ export default function AddPatientModal({
               bgcolor: "#f0fdf4",
               overflowY: "auto",
               flexGrow: 1,
-              "&::-webkit-scrollbar": { width: 6 },
-              "&::-webkit-scrollbar-track": { bgcolor: "#dcfce7" },
-              "&::-webkit-scrollbar-thumb": {
-                background: "linear-gradient(#16a34a, #22c55e)",
-                borderRadius: 10,
+              "&::-webkit-scrollbar": {
+                display: "none",
               },
+              msOverflowStyle: "none",
+              scrollbarWidth: "none",
             }}
           >
             <Box sx={{ my: 2 }}>

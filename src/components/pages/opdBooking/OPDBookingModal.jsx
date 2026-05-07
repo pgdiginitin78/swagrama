@@ -499,7 +499,7 @@ export default function OPDBookingModal({
                   </div>
                 </div>
 
-                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar">
+                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 no-scrollbar">
                   <form
                     onSubmit={handleSubmit(handleBookAppointment)}
                     className="space-y-5"
@@ -696,7 +696,7 @@ export default function OPDBookingModal({
                                   initial={{ opacity: 0 }}
                                   animate={{ opacity: 1 }}
                                   exit={{ opacity: 0 }}
-                                  className="space-y-4 max-h-[450px] overflow-y-auto overflow-x-hidden pr-1 custom-scrollbar"
+                                  className="space-y-4 max-h-[450px] overflow-y-auto overflow-x-hidden pr-1 no-scrollbar"
                                 >
                                   <div>
                                     <div className="grid grid-cols-2 gap-2">

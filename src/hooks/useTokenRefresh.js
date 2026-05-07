@@ -34,14 +34,19 @@ export function useTokenRefresh() {
     const tokenSetTime = Number(tokenSetTimeRaw);
     const expiresInMs = expiresInRaw * 1000;
 
-    const refreshBeforeExpiry = 5 * 60 * 1000;
+    // ✅ Dynamic buffer: 20% of token life, max 5 minutes
+    const refreshBeforeExpiry = Math.min(5 * 60 * 1000, expiresInMs * 0.2);
 
     const expiryTime = tokenSetTime + expiresInMs;
     const refreshAt = expiryTime - refreshBeforeExpiry;
-
-    const delay = Math.max(refreshAt - Date.now(), 60_000);
+    const delay = refreshAt - Date.now();
 
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+
+    if (delay <= 0) {
+      doRefresh(refreshToken);
+      return;
+    }
 
     timeoutRef.current = setTimeout(() => {
       doRefresh(refreshToken);
@@ -64,7 +69,6 @@ export function useTokenRefresh() {
       } = res.data?.data ?? res.data ?? {};
 
       if (!accessToken) {
-        _isRefreshing = false;
         return;
       }
 
@@ -74,15 +78,12 @@ export function useTokenRefresh() {
         localStorage.setItem("refreshToken", newRefreshToken);
       }
 
-      if (expiresIn) {
-        localStorage.setItem("expiresIn", String(expiresIn));
-      }
-
+      localStorage.setItem("expiresIn", expiresIn);
       localStorage.setItem("tokenSetTime", String(Date.now()));
 
       scheduleRefresh();
     } catch (err) {
-      _isRefreshing = false;
+      console.error("Token refresh failed:", err);
     } finally {
       _isRefreshing = false;
     }

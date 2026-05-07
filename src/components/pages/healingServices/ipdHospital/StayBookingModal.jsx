@@ -186,12 +186,14 @@ function StayBookingModal({
     guests.rooms,
   ]);
 
-  // Handle constraints between Adults and Children
+
   useEffect(() => {
     const adults = Number(formValues.noOfAdults);
     const children = Number(formValues.noOfChildren);
 
-    if (adults === 3 && children > 0) {
+    if (adults > 3) {
+      setValue("noOfAdults", 3);
+    } else if (adults === 3 && children > 0) {
       setValue("noOfChildren", 0);
     }
   }, [formValues.noOfAdults]);
@@ -200,7 +202,9 @@ function StayBookingModal({
     const adults = Number(formValues.noOfAdults);
     const children = Number(formValues.noOfChildren);
 
-    if (children > 0 && adults > 2) {
+    if (children > 2) {
+      setValue("noOfChildren", 2);
+    } else if (children > 0 && adults > 2) {
       setValue("noOfAdults", 2);
     }
   }, [formValues.noOfChildren]);
@@ -252,7 +256,7 @@ function StayBookingModal({
       };
     const base = selectedService.price;
     const wellness = 0;
-    const taxes = (base + wellness) * 0; // tax is zero for now
+    const taxes = (base + wellness) * 0;
 
     let petSurcharge = 0;
     if (formValues?.bringingPet) {
@@ -403,7 +407,6 @@ function StayBookingModal({
         setIsSearching(false);
       });
   };
-  console.log("selectedService", selectedService);
 
   const handleConfirmBooking = () => {
     if (!user) {
@@ -435,7 +438,6 @@ function StayBookingModal({
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
-  console.log("patientFid", patientFid);
 
   const initiateBookingPayment = async () => {
     if (isPaymentPending) return;
@@ -532,7 +534,6 @@ function StayBookingModal({
       .catch((err) => console.error("Error fetching patient data:", err));
   };
 
-  console.log("patientFid", patientFid);
 
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
@@ -550,7 +551,6 @@ function StayBookingModal({
     handleGetPatientData();
   }, [user]);
 
-  console.log("roomStatus", roomStatus);
 
   return (
     <>
@@ -1291,7 +1291,14 @@ function StayBookingModal({
                           </span>
                           <button
                             type="button"
-                            disabled={label === "Room"}
+                            disabled={
+                              label === "Room" ||
+                              (key === "adults" &&
+                                (guests.adults >= 3 ||
+                                  (guests.children > 0 && guests.adults >= 2))) ||
+                              (key === "children" &&
+                                (guests.children >= 2 || guests.adults >= 3))
+                            }
                             onClick={() => {
                               if (key === "children") {
                                 setGuests((g) => ({

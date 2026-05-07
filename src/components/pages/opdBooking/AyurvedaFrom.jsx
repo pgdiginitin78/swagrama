@@ -13,7 +13,14 @@ import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import YardIcon from "@mui/icons-material/Yard";
-import { Dialog, DialogContent, Divider, Fade } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  Divider,
+  Fade,
+  Modal,
+} from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -75,6 +82,8 @@ import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
 import bookAppointmentIcon from "../../../assets/bookAppointment.svg";
 import HolisticHealing from "../../../assets/HolisticHealing.svg";
+import { ModalStyle } from "../../common/modalStyle/ModalStyle";
+import CommonButton from "../../common/button/CommonButton";
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -403,108 +412,96 @@ function BookingPreviewModal({
   selectedDoctorId,
 }) {
   return (
-    <Dialog
-      open={open}
-      maxWidth="sm"
-      fullWidth
-      TransitionComponent={Fade}
-      transitionDuration={300}
-      PaperProps={{
-        sx: {
-          borderRadius: "20px",
-          overflow: "hidden",
-          boxShadow: "0 25px 60px rgba(5,150,105,0.18)",
-        },
-      }}
-    >
-      <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-green-800 px-5 pt-5 pb-6 relative">
-        <div className="absolute top-3 right-3">
-          <CancelButtonModal onClick={onClose} />
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
-            <EventAvailableIcon sx={{ color: "#fff", fontSize: 24 }} />
+    <Modal open={open}>
+      <Box sx={ModalStyle} className="w-[60%] h-[70%] rounded-xl">
+        <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-green-800 px-5 pt-5 pb-6 relative rounded-t-xl">
+          <div className="absolute top-3 right-3">
+            <CancelButtonModal onClick={onClose} />
           </div>
-          <div>
-            <h2 className="text-white font-black text-lg leading-tight">
-              Booking Preview
-            </h2>
-            <p className="text-white/70 text-xs mt-0.5">
-              Review your details before confirming
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <DialogContent sx={{ p: 0 }}>
-        <div className="px-5 pt-4 pb-2">
-          <p className="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1">
-            Patient Details
-          </p>
-          <div className="bg-emerald-50/60 rounded-lg px-4 py-1 border border-emerald-100">
-            <PreviewRow
-              label="Consultation"
-              value={activeDept + "  " + "OPD Consultation"}
-            />
-            <PreviewRow
-              label="Doctor"
-              value={
-                selectedDoctorId
-                  ? `${selectedDoctorId.firstName} ${selectedDoctorId.lName}`
-                  : "—"
-              }
-            />
-            <PreviewRow
-              label="Date & Time"
-              value={
-                (data.appointmentDate &&
-                !isNaN(new Date(data.appointmentDate).getTime())
-                  ? format(new Date(data.appointmentDate), "dd MMM yyyy")
-                  : format(new Date(), "dd MMM yyyy")) +
-                " " +
-                data?.selectedTimeSlot?.slotStartTime +
-                " - " +
-                data?.selectedTimeSlot?.slotEndTime
-              }
-            />
-            <PreviewRow label="Visit Type" value={data.serviceFid.label} />
-            <PreviewRow label="Patient" value={data?.fullName} />
-            <PreviewRow label="Total Fee" value={data?.serviceFid?.charges} />
-          </div>
-        </div>
-
-        {data?.reasonForVisit && (
-          <div className="px-5 pt-3 pb-2">
-            <p className="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1">
-              Reason for Visit
-            </p>
-            <div className="bg-amber-50/60 border border-amber-100 rounded-lg px-4 py-3">
-              <p className="text-sm text-gray-700 leading-relaxed">
-                {data.reasonForVisit}
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center shrink-0">
+              <EventAvailableIcon sx={{ color: "#fff", fontSize: 24 }} />
+            </div>
+            <div>
+              <h2 className="text-white font-black text-lg leading-tight">
+                Booking Preview
+              </h2>
+              <p className="text-white/70 text-xs mt-0.5">
+                Review your details before confirming
               </p>
             </div>
           </div>
-        )}
-
-        <Divider sx={{ mx: 2.5, my: 2, borderColor: "#d1fae5" }} />
-
-        <div className="px-5 pb-5 flex flex-col sm:flex-row gap-3 justify-end">
-          <button
-            onClick={onClose}
-            className="w-full sm:w-auto h-10 px-6 rounded-lg border-2 border-gray-200 text-gray-600 text-sm font-semibold hover:border-red-300 hover:text-red-600 hover:bg-red-50 transition-all duration-200"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onProceed}
-            className="w-full sm:w-auto h-10 px-6 rounded-lg bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/30 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 transition-all duration-200 flex items-center justify-center gap-2"
-          >
-            <CheckCircleIcon sx={{ fontSize: 17 }} />
-            Proceed to Book
-          </button>
         </div>
-      </DialogContent>
-    </Dialog>
+
+        <Box sx={{ p: 0 }}>
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1">
+              Patient Details
+            </p>
+            <div className="bg-emerald-50/60 rounded-lg px-4 py-1 border border-emerald-100">
+              <PreviewRow
+                label="Consultation"
+                value={activeDept + "  " + "OPD Consultation"}
+              />
+              <PreviewRow
+                label="Doctor"
+                value={
+                  selectedDoctorId
+                    ? `${selectedDoctorId.firstName} ${selectedDoctorId.lName}`
+                    : "—"
+                }
+              />
+              <PreviewRow
+                label="Date & Time"
+                value={
+                  (data.appointmentDate &&
+                  !isNaN(new Date(data.appointmentDate).getTime())
+                    ? format(new Date(data.appointmentDate), "dd MMM yyyy")
+                    : format(new Date(), "dd MMM yyyy")) +
+                  " " +
+                  data?.selectedTimeSlot?.slotStartTime +
+                  " - " +
+                  data?.selectedTimeSlot?.slotEndTime
+                }
+              />
+              <PreviewRow label="Visit Type" value={data.serviceFid.label} />
+              <PreviewRow label="Patient" value={data?.fullName} />
+              <PreviewRow label="Total Fee" value={data?.serviceFid?.charges} />
+            </div>
+          </div>
+
+          {data?.reasonForVisit && (
+            <div className="px-5 pt-3 pb-2">
+              <p className="text-[10px] uppercase tracking-widest text-emerald-600 font-bold mb-1">
+                Reason for Visit
+              </p>
+              <div className="bg-amber-50/60 border border-amber-100 rounded-lg px-4 py-3">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {data.reasonForVisit}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <Divider sx={{ mx: 2.5, my: 2, borderColor: "#d1fae5" }} />
+
+          <div className="px-5 pb-5 flex flex-col sm:flex-row gap-3 justify-end">
+            <CommonButton
+              type="button"
+              label="Cancel"
+              onClick={onClose}
+              className="bg-red-50 border border-red-600 text-red-600"
+            />
+            <CommonButton
+              type="button"
+              label="Proceed to Book"
+              onClick={onProceed}
+              className=" bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/30 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 transition-all duration-200"
+            />
+          </div>
+        </Box>
+      </Box>
+    </Modal>
   );
 }
 
@@ -584,8 +581,6 @@ function AyurvedaForm({
     resolver: yupResolver(validationSchema),
     mode: "onChange",
   });
-
-
 
   const appointmentDate = watch("appointmentDate");
   const patientFid = watch("patientFid");
@@ -716,9 +711,8 @@ function AyurvedaForm({
     }
   }, [user]);
 
-
   useEffect(() => {
-    if (selectedDoctorId!==null) {
+    if (selectedDoctorId !== null) {
       setSelectedTimeSlot(null);
       setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
 
@@ -762,11 +756,15 @@ function AyurvedaForm({
     (data) => {
       if (user === null) {
         errorAlert("login first");
+      } else if (selectedDoctorId === null) {
+        errorAlert("Please select a doctor to continue");
+        return;
       } else if (selectedTimeSlot === null) {
         setSlotData((prev) => ({
           ...prev,
           error: "Please select a time slot to continue.",
         }));
+        errorAlert("Please select a time slot to continue.");
         return;
       }
 
@@ -798,6 +796,10 @@ function AyurvedaForm({
     (errors) => {
       if (errors.serviceFid) {
         errorAlert("Please select a service");
+      } else if (errors.patientFid) {
+        errorAlert("Please select a patient");
+      } else if (errors.appointmentDate) {
+        errorAlert("Please select an appointment date");
       }
     },
   );
@@ -1058,7 +1060,7 @@ function AyurvedaForm({
                 </div>
               ) : (
                 <div
-                  className="ayur-scroll overflow-y-auto space-y-2 pr-1 py-1.5 sm:space-y-2.5 sm:py-2"
+                  className="ayur-scroll overflow-y-auto no-scrollbar space-y-2 pr-1 py-1.5 sm:space-y-2.5 sm:py-2"
                   style={{ maxHeight: "360px" }}
                 >
                   {doctorList.map((doctor, idx) => {
@@ -1282,7 +1284,7 @@ function AyurvedaForm({
             </div>
 
             <div
-              className="ayur-scroll overflow-y-auto grid grid-cols-1 gap-2 pr-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-1"
+              className="ayur-scroll overflow-y-auto no-scrollbar grid grid-cols-1 gap-2 pr-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-1"
               style={{ maxHeight: "620px" }}
             >
               {currentSideContent.map((item, idx) => (

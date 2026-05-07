@@ -32,6 +32,7 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     localStorage.clear();
     setUser(null);
+    window.location.href = "/";
   }, []);
 
   const updateUser = useCallback((updatedUser) => {

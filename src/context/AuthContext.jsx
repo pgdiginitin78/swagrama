@@ -6,6 +6,8 @@ import {
   useEffect,
 } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 export const AuthContext = createContext(null);
 
 let _logoutFn = null;
@@ -17,6 +19,7 @@ export const callAuthLogout = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
   const [user, setUser] = useState(() => {
     try {
       return JSON.parse(localStorage.getItem("user")) || null;
@@ -32,8 +35,8 @@ export const AuthProvider = ({ children }) => {
   const logout = useCallback(() => {
     localStorage.clear();
     setUser(null);
-    window.location.href = "/";
-  }, []);
+    navigate("/");
+  }, [navigate]);
 
   const updateUser = useCallback((updatedUser) => {
     localStorage.setItem("user", JSON.stringify(updatedUser));

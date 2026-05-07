@@ -780,7 +780,7 @@ function AyurvedaForm({
           !isNaN(new Date(data.appointmentDate).getTime())
             ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
             : "",
-        Status: data.Status?.label || "",
+        Status: "Booked",
         SloteEndTime: selectedTimeSlot?.slotEndTime,
         SloteStartTime: selectedTimeSlot?.slotStartTime,
         ServiceDetails: data.ServiceDetails,

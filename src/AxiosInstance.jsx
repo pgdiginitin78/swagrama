@@ -6,12 +6,10 @@ import { getIsRefreshing, setIsRefreshing } from "./hooks/useTokenRefresh";
 
 
 const sessionExpiredLogout = () => {
-  localStorage.clear();
   callAuthLogout();
   toast.error("Session expired. Please login again.", {
     toastId: "session-expired", 
   });
-  window.location.href = "/";
 };
 
 const AxiosInstance = axios.create({

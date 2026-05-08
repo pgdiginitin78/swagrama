@@ -189,7 +189,7 @@ function DateCard({ date, isSelected, onClick, disabled }) {
       >
         {dayName}
       </span>
-      <span className="text-base font-black leading-none my-0.5">{dayNum}</span>
+      <span className="text-sm md:text-base font-black leading-none my-0.5">{dayNum}</span>
     </motion.button>
   );
 }
@@ -413,7 +413,7 @@ function BookingPreviewModal({
 }) {
   return (
     <Modal open={open}>
-      <Box sx={ModalStyle} className="w-[60%] h-[70%] rounded-xl">
+      <Box sx={ModalStyle} className="w-[95%] h-[95%] lg:w-[60%] lg:h-[70%] rounded-xl">
         <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-green-800 px-5 pt-5 pb-6 relative rounded-t-xl">
           <div className="absolute top-3 right-3">
             <CancelButtonModal onClick={onClose} />
@@ -485,7 +485,7 @@ function BookingPreviewModal({
 
           <Divider sx={{ mx: 2.5, my: 2, borderColor: "#d1fae5" }} />
 
-          <div className="px-5 pb-5 flex flex-col sm:flex-row gap-3 justify-end">
+          <div className="px-5 pb-5 flex flex-row gap-3 justify-end">
             <CommonButton
               type="button"
               label="Cancel"
@@ -921,7 +921,7 @@ function AyurvedaForm({
         .ayur-scroll { scrollbar-width: thin; scrollbar-color: #059669 #d1fae5; }
       `}</style>
 
-      <div className="px-2 py-4 space-y-5 sm:py-5 md:px-5">
+      <div className="px-1 py-4 space-y-5 sm:py-5 md:px-5">
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4">
           <div className="flex flex-col gap-4 lg:col-span-3">
             <div className="flex flex-col gap-3">
@@ -1320,7 +1320,7 @@ function AyurvedaForm({
           animate="visible"
           className="rounded-xl border border-emerald-100 shadow-xl overflow-hidden bg-white"
         >
-          <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:gap-3">
+          <div className="bg-emerald-900 px-3 py-2.5 flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-between md:px-4 sm:gap-3">
             <div className="flex items-center gap-2">
               <img
                 src={bookAppointmentIcon}
@@ -1431,7 +1431,7 @@ function AyurvedaForm({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-3 gap-1.5 xs:grid-cols-4 sm:grid-cols-5 sm:gap-2 md:grid-cols-6 lg:grid-cols-8">
+                  <div className="grid grid-cols-2 gap-1.5  sm:gap-2 md:grid-cols-6 lg:grid-cols-8">
                     {slotData.slots.map((slot, index) => (
                       <TimeSlotChip
                         key={index}

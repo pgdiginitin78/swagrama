@@ -125,7 +125,7 @@ export default function CommonPaginationTable(props) {
   return (
     <div className="w-auto grid">
       <Box sx={{ width: "100%", overflow: "hidden" }}>
-        <Paper sx={{ width: "100%", my: 2, border: "1px solid lightgray" }}>
+        <Paper sx={{ width: "100%",  border: "1px solid lightgray" }}>
           {/* pagination */}
           <div className="flex justify-between items-center">
             <div className="font-semibold text-sm pl-2">

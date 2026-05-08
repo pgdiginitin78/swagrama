@@ -54,15 +54,13 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   console.log("selectedRow", selectedRow);
 
   return (
-    <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
+    <div className="flex-1 flex flex-col">
       <div className="flex justify-between items-center mb-4 px-4 pt-4 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">
             Other Bookings
           </h1>
-          <p className="text-gray-400 text-[10px] font-normal uppercase mt-1">
-            Manage miscellaneous gift cards and memberships.
-          </p>
+ 
         </div>
         {/* <CommonButton
           type="button"
@@ -72,7 +70,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         /> */}
       </div>
 
-      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+      <div className="flex flex-1 gap-2 overflow-hidden h-full">
         <div className="flex-1 transition-all duration-300">
           {loadingSpinner && (
             <div className="my-40 flex justify-center">
@@ -81,7 +79,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
           )}
 
           {otherBookingList?.length > 0 ? (
-            <div className="px-4 pb-4 h-full">
+            <div className="">
               <CommonPaginationTable
                 dataResult={otherBookingList}
                 page={page}
@@ -111,7 +109,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
           )}
         </div>
 
-        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+        <div className="w-[350px] xl:w-[350px] h-full hidden lg:block shrink-0">
           {selectedRow ? (
             <div className="h-full animate-in fade-in slide-in-from-right duration-300">
               <OtherDetailView

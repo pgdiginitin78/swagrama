@@ -123,21 +123,19 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
 
   console.log("selectedRow", onSelect);
   return (
-    <div className="h-full overflow-y-auto px-4 no-scrollbar">
+    <div className="h-full overflow-y-auto px-2 no-scrollbar">
       <style>{`
         *, body {  box-sizing: border-box; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .pulse-dot { animation: pulse-dot 1.5s infinite; }
       `}</style>
       {/* Header */}
-      <div className="flex justify-between items-center mb-4 px-4 pt-4 shrink-0">
+      <div className="flex justify-between items-center mb-4 px-2 pt-4 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter leading-none">
             OPD Bookings
           </h1>
-          <p className="text-gray-400 text-[10px] font-normal mt-1">
-            Manage outpatient department consultations.
-          </p>
+   
         </div>
         {/* <CommonButton
           className="bg-[#003d33] text-white text-[10.5px] shadow-sm transition-all active:scale-95"
@@ -145,7 +143,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         /> */}
       </div>
 
-      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+      <div className="flex flex-1 gap-2 overflow-hidden h-full">
         <div className="flex-1 transition-all duration-300">
           {loadingSpinner && (
             <div className="my-40 flex justify-center">
@@ -154,7 +152,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
           )}
 
           {opdList?.length > 0 ? (
-            <div className="px-4 pb-4 h-full">
+            <div className="">
               <CommonPaginationTable
                 dataResult={opdList}
                 page={page}
@@ -188,7 +186,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
           )}
         </div>
 
-        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+        <div className="w-[350px] xl:w-[350px] h-full hidden lg:block shrink-0">
           {selectedRow ? (
             <div className="h-full animate-in fade-in slide-in-from-right duration-300">
               <OPDDetailView

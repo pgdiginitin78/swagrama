@@ -41,6 +41,7 @@ const schema = yup.object().shape({
     .number()
     .typeError("Must be a number")
     .min(1, "At least 1 person is required")
+    .max(20, "Maximum 20 persons allowed")
     .required("Required"),
   termsAccepted: yup
     .boolean()
@@ -192,6 +193,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   const cancelPaymentRef = useRef(null);
   const fromDate = watch("fromDate");
   const noOfPerson = watch("noOfPerson");
+  const termsAccepted = watch("termsAccepted");
 
   useEffect(() => {
     const totalPeople = parseInt(noOfPerson) || 1;
@@ -574,7 +576,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                                 label="Number of Persons *"
                                 type="number"
                                 error={errors.noOfPerson}
-                                InputProps={{ inputProps: { min: 1 } }}
+                                InputProps={{ inputProps: { min: 1, max: 20 } }}
                               />
                             </div>
                           </div>
@@ -728,7 +730,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                               <CommonButton
                                 type="submit"
                                 label="Book Now"
-                                className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs px-5 py-2 rounded-lg transition-all shadow-md shrink-0"
+                                className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white  transition-all"
+                                disabled={!termsAccepted}
                               />
                             </div>
                           </div>

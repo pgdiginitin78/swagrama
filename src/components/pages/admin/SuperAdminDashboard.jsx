@@ -7,8 +7,7 @@ import {
   MedicalServices,
   People,
   Search,
-  Timeline,
-  Visibility,
+  Timeline
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
@@ -33,8 +32,7 @@ import {
   GetDoctorDashboard,
   GetRevenueTrends,
   GetTherapySplit,
-  GetTodayOPDCount,
-  GetUpcomingStays,
+  GetUpcomingStays
 } from "../../../services/adminDashboard/AdminDashboardServices";
 
 const G = "#3d6b1f";
@@ -247,9 +245,9 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             <h1 className="m-0 text-[clamp(20px,3vw,28px)] font-black text-[#1a2a0f] tracking-tight">
               <span className="text-[#3d6b1f]">Dashboard</span>
             </h1>
-            <p className="mt-0.5 mb-0 text-xs text-[#8a9580] font-medium">
+            {/* <p className="mt-0.5 mb-0 text-xs text-[#8a9580] font-medium">
               Global ecosystem monitoring & financial analytics
-            </p>
+            </p> */}
           </div>
           <div className="flex items-center gap-2.5">
             <div className="hidden sm:block text-right"></div>

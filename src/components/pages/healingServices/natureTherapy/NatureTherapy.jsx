@@ -283,7 +283,7 @@ export default function NatureTherapy() {
                       <p className="text-xs text-green-900 line-clamp-2">
                         <span className="font-bold">Benefits :</span>
                         <span className="text-green-700 ml-1">
-                          {therapy.benefits}
+                          {therapy.uses}
                         </span>
                       </p>
                     </div>

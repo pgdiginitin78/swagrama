@@ -122,23 +122,21 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   }, [refreshTrigger]);
 
   return (
-    <div className="flex-1 flex flex-col  bg-[#fbfcfa]">
+    <div className="flex-1 flex flex-col  ">
       <div className="flex justify-between items-center mb-4 px-5 pt-5 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#002a24] leading-tight tracking-tight ">
             Therapy Bookings
           </h1>
-          <p className="text-gray-400 text-[10px] font-normal  mt-0.5">
-            Manage schedules and patient arrivals for today.
-          </p>
+
         </div>
         <div className="flex items-center gap-2">
-          <CommonButton
+          {/* <CommonButton
             type="button"
             icon={<FilterIcon className="!text-[14px]" />}
             label="Filters"
             className="bg-white  text-[#002a24] border border-[#002a24] "
-          />
+          /> */}
 
           {/* <CommonButton
             type="button"
@@ -286,7 +284,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         </div>
       </footer> */}
 
-      <div className="flex flex-1 gap-4 overflow-hidden h-full">
+      <div className="flex flex-1 gap-2 overflow-hidden h-full">
         <div className="flex-1 transition-all duration-300">
           {loadingSpinner && (
             <div className="my-40 flex justify-center">
@@ -340,7 +338,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
           )}
         </div>
 
-        <div className="w-[350px] xl:w-[400px] h-full hidden lg:block shrink-0">
+        <div className="w-[350px]  h-full hidden lg:block shrink-0">
           {selectedRow ? (
             <div className="h-full animate-in fade-in slide-in-from-right duration-300">
               <TherapyDetailView

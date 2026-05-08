@@ -16,21 +16,19 @@ import {
   MenuItem,
   Select,
   ToggleButton,
-  ToggleButtonGroup
+  ToggleButtonGroup,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import {
   GetNext24HoursArrivals,
-  GetUpcomingStays
+  GetUpcomingStays,
 } from "../../../../services/adminDashboard/AdminDashboardServices";
 import CommonButton from "../../../common/button/CommonButton";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
 import { EmptyDetailView } from "./BookingComponents";
 import StayDetailView from "./StayDetailView";
-
-
 
 const cardVariants = {
   hidden: { opacity: 0, scale: 0.96, y: 8 },
@@ -371,8 +369,6 @@ export default function WellnessStayBookings({
     }
   };
 
-
-
   useEffect(() => {
     GetNext24HoursArrivals()
       .then((res) => {
@@ -385,7 +381,7 @@ export default function WellnessStayBookings({
   console.log("selectedRow", selectedRow);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#fbfbf8] min-h-screen  ">
+    <div className="flex-1 flex flex-col px-2 min-h-screen  ">
       <div className="flex flex-col h-full">
         <motion.div
           initial={{ opacity: 0, y: -8 }}
@@ -394,15 +390,9 @@ export default function WellnessStayBookings({
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 shrink-0"
         >
           <div>
-            <p className="text-[7.5px] font-black  tracking-[0.2em] text-[#4d7040] mb-0.5">
-              Sanctuary Management
-            </p>
             <h1 className="text-[17px] font-black text-[#002a24] tracking-tight leading-none ">
               Wellness Stay
             </h1>
-            <p className="text-[8.5px] text-[#5a7a50] font-medium mt-0.5">
-              124 active and upcoming sanctuary stays
-            </p>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
             <Badge
@@ -497,7 +487,7 @@ export default function WellnessStayBookings({
           </motion.div>
         )}
 
-        <div className="flex gap-4 h-full flex-1 overflow-hidden">
+        <div className="flex gap-2 h-full flex-1 overflow-hidden">
           <div className="flex-1 transition-all duration-300">
             {loadingSpinner && (
               <div className="my-32 flex justify-center items-center flex-1">
@@ -531,7 +521,7 @@ export default function WellnessStayBookings({
                     "petFriendly",
                     "bookingStatus",
                     "daysRemaining",
-                    "images"
+                    "images",
                   ]}
                 />
               </main>

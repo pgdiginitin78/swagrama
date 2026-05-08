@@ -45,22 +45,22 @@ const BookingsDashboard = ({ initialTab, onTabConsumed }) => {
       transition={{ duration: 0.4 }}
       className="flex flex-col h-full bg-[#fbfbf8] "
     >
-      <header className="flex flex-col md:flex-row items-center justify-between px-4 py-1 bg-[#fbfbf8] border-b border-gray-100 gap-2 shrink-0">
+      <header className="flex flex-col md:flex-row items-center justify-between px-4 py-1  border-b border-gray-100 gap-2 shrink-0">
         <Tabs value={activeTab} onChange={handleTabChange} sx={{ minHeight: 'auto', '& .MuiTabs-indicator': { backgroundColor: '#4c7c70', height: 2 }, '& .MuiTab-root': { textTransform: 'uppercase', minWidth: 'auto', p: '4px 10px', fontSize: '9px', fontWeight: 800, color: '#999', letterSpacing: '0.1em', '&.Mui-selected': { color: '#003d33' } } }}>
           <Tab label="OPD" /><Tab label="Therapy" /><Tab label="Wellness Stay" /><Tab label="Other" />
         </Tabs>
         <div className="flex items-center gap-2">
-          <div className="relative flex items-center bg-[#ecedeb] rounded-md px-2.5 py-1 w-48">
+          {/* <div className="relative flex items-center bg-[#ecedeb] rounded-md px-2.5 py-1 w-48">
             <input type="text" placeholder="Quick search..." className="bg-transparent border-none outline-none text-[9.5px] w-full text-gray-700 font-medium" />
             <SearchIcon className="text-gray-400 !text-[13px] ml-2" />
-          </div>
+          </div> */}
           {/* <IconButton size="small"><NotificationsIcon className="text-gray-600 !text-lg" /></IconButton>
           <IconButton size="small"><ProfileIcon className="text-gray-600 !text-xl" /></IconButton> */}
         </div>
       </header>
 
       <div className="flex flex-1 p-2 gap-2 overflow-hidden">
-        <main className="flex-1 flex flex-col bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <main className="flex-1 flex flex-col rounded-xl border border-gray-100 overflow-hidden">
           {renderActiveTab()}
         </main>
       </div>

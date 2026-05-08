@@ -236,7 +236,7 @@ const BeautyTherapy = () => {
 
                       <div className="backdrop-blur-sm bg-lime-50 border border-emerald-800/50 rounded-lg p-2 mb-2">
                         <p className="text-xs 2xl:text-sm  text-lime-600 leading-snug line-clamp-2">
-                          {service.benefits}
+                          {service.uses}
                         </p>
                       </div>
                       <motion.button

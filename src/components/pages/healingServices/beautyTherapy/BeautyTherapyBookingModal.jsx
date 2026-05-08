@@ -175,6 +175,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
   const bookingDate = watch("bookingDate");
   const selectedServiceValue = watch("serviceFid");
+  const termsAccepted = watch("termsAccepted");
 
   console.log("selectedServiceValue", selectedServiceValue);
 
@@ -726,7 +727,8 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         type="submit"
                         label="Book Now"
                         onClick={handleSubmit(onSubmit)}
-                        className="bg-booking-primary hover:bg-booking-primaryDark text-white font-semibold px-8 transition-transform w-full sm:w-auto"
+                        className="bg-booking-primary hover:bg-booking-primaryDark text-white  transition-transform w-full sm:w-auto"
+                        disabled={!termsAccepted}
                       />
                     </div>
                   </form>

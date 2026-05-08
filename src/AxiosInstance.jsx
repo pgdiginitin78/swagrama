@@ -1,25 +1,25 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { errorAlert } from "./components/common/toast/CustomToast";
 import { API_BASE_URL } from "./http-common";
-import { callAuthLogout } from "./context/AuthContext";
-import { getIsRefreshing, setIsRefreshing } from "./hooks/useTokenRefresh";
+import { refreshTokenOnce } from "./hooks/useTokenRefresh";
+import { loaderRef } from "./components/common/commonLoader/LoaderContext";
 
-
-const sessionExpiredLogout = () => {
-  callAuthLogout();
-  toast.error("Session expired. Please login again.", {
-    toastId: "session-expired", 
-  });
+// Helper: stop the global loader on API error responses
+const stopLoaderOnError = (status) => {
+  const STOP_ON = [400, 401, 409, 500, 502, 503, 504];
+  if (status && (STOP_ON.includes(status) || status >= 500)) {
+    loaderRef.current?.setIsLoading(false);
+  }
 };
 
 const AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  // withCredentials: true,
 });
 
+let isRefreshing = false;
 let failedQueue = [];
 
-const processQueue = (error, token = null) => {
+function processQueue(error, token = null) {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error);
@@ -28,110 +28,94 @@ const processQueue = (error, token = null) => {
     }
   });
   failedQueue = [];
-};
+}
 
 AxiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
     if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers = {
+        ...(config.headers || {}),
+        Authorization: `Bearer ${token}`,
+      };
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 AxiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const status = error.response?.status || error.response?.statusCode;
+    const status = error.response?.status ?? error.response?.statusCode;
     const originalRequest = error.config;
+
+    if (!originalRequest) return Promise.reject(error);
 
     if (originalRequest?.url?.includes("refresh-token")) {
       processQueue(error, null);
-      if (status === 400) {
-        sessionExpiredLogout();
-      }
       return Promise.reject(error);
     }
 
     if (status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
 
-      if (getIsRefreshing()) {
+      if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers = originalRequest.headers || {};
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return AxiosInstance(originalRequest);
+            if (!token) return Promise.reject(new Error("NO_ACCESS_TOKEN"));
+            return AxiosInstance({
+              ...originalRequest,
+              headers: {
+                ...(originalRequest.headers || {}),
+                Authorization: `Bearer ${token}`,
+              },
+            });
           })
           .catch((err) => Promise.reject(err));
       }
 
-      originalRequest._retry = true;
-      setIsRefreshing(true);
+      isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
-
-        const res = await axios.post(`${API_BASE_URL}refresh-token`, {
-          refreshToken,
-        });
-        const payload = res.data?.data ?? res.data ?? {};
-        const {
-          accessToken,
-          refreshToken: newRefreshToken,
-          expiresIn,
-        } = payload;
+        const accessToken = await refreshTokenOnce();
 
         if (!accessToken) {
-          throw new Error("Refresh response missing accessToken");
+          throw new Error("NO_ACCESS_TOKEN");
         }
 
-        localStorage.setItem("accessToken", accessToken);
-
-
-        if (newRefreshToken) {
-          localStorage.setItem("refreshToken", newRefreshToken);
-        }
-
-        if (expiresIn) {
-          localStorage.setItem("expiresIn", String(expiresIn));
-        }
-
-        localStorage.setItem("tokenSetTime", String(Date.now()));
-
-        AxiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`;
         processQueue(null, accessToken);
 
-        originalRequest.headers = originalRequest.headers || {};
-        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        return AxiosInstance(originalRequest);
+        return AxiosInstance({
+          ...originalRequest,
+          headers: {
+            ...(originalRequest.headers || {}),
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
       } catch (err) {
         processQueue(err, null);
-        if (err.response?.status === 400) {
-          sessionExpiredLogout();
-        }
         return Promise.reject(err);
       } finally {
-        setIsRefreshing(false);
+        isRefreshing = false;
       }
     }
 
+    // Stop the global loader for error status codes
+    stopLoaderOnError(status);
 
     if (status >= 500) {
-      toast.error("A server error occurred. Please try again later.");
+      errorAlert("A server error occurred. Please try again later.");
+    } else if (status === 409) {
+      errorAlert(error.response?.data?.message || "Conflict error. Please try again.");
     } else if (error.message === "Network Error") {
-      toast.error("Network error. Please check your internet connection.");
+      errorAlert("Network error. Please check your internet connection.");
     }
 
     return Promise.reject(error);
-  },
+  }
 );
 
 export default AxiosInstance;

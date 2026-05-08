@@ -1,6 +1,9 @@
 import {
-  FilterList as FilterIcon
+  FilterList as FilterIcon,
+  RestartAlt as ResetIcon,
 } from "@mui/icons-material";
+import { Chip } from "@mui/material";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { GetTherapyBookingList } from "../../../../services/adminDashboard/AdminDashboardServices";
 import CommonButton from "../../../common/button/CommonButton";
@@ -99,9 +102,23 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
 
   //GetTherapyBookingList
 
+  const [filters, setFilters] = useState({
+    paymentStatus: "all",
+    bookingStatus: "all",
+  });
+
+  const activeFilterCount = Object.values(filters).filter(
+    (v) => v !== "all",
+  ).length;
+
   const populateTable = (forPagination) => {
     setLoadingSpinner(true);
-    GetTherapyBookingList(5, !forPagination ? 1 : page + 1, rowsPerPage)
+    GetTherapyBookingList(
+      5,
+      !forPagination ? 1 : page + 1,
+      rowsPerPage,
+      filters,
+    )
       .then((res) => {
         if (forPagination) {
           setTherapyList((prevData) => [...prevData, ...res.data.data.data]);
@@ -117,35 +134,144 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
       });
   };
 
+  const handleFilter = (key, val, shouldRefresh = false) => {
+    if (key === "reset") {
+      const resetFilters = {
+        paymentStatus: "all",
+        bookingStatus: "all",
+      };
+      setFilters(resetFilters);
+      if (shouldRefresh) populateTable(0, resetFilters);
+    } else {
+      setFilters((p) => {
+        const updated = { ...p, [key]: val };
+        if (shouldRefresh) populateTable(0, updated);
+        return updated;
+      });
+    }
+  };
+
   useEffect(() => {
     populateTable();
   }, [refreshTrigger]);
 
   return (
     <div className="flex-1 flex flex-col  ">
-      <div className="flex justify-between items-center mb-4 px-5 pt-5 shrink-0">
+      <div className="flex justify-between items-center mb-2 px-5 pt-5 shrink-0">
         <div>
           <h1 className="text-[20px] font-bold text-[#002a24] leading-tight tracking-tight ">
             Therapy Bookings
           </h1>
-
         </div>
-        <div className="flex items-center gap-2">
-          {/* <CommonButton
-            type="button"
-            icon={<FilterIcon className="!text-[14px]" />}
-            label="Filters"
-            className="bg-white  text-[#002a24] border border-[#002a24] "
-          /> */}
-
-          {/* <CommonButton
-            type="button"
-            label="+ New Booking"
-            className="bg-[#002a24] text-white  transition-all active:scale-95"
-            onClick={()=>setOpenTherapyBookingModal(true)}
-          /> */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {activeFilterCount > 0 && (
+            <button
+              onClick={() => handleFilter("reset", null, true)}
+              className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wide text-[#4c7c70] bg-[#d4e9ce] px-2 py-1 rounded-lg hover:bg-[#c4dfbd] transition-colors"
+            >
+              <ResetIcon style={{ fontSize: 10 }} />
+              Reset Filters
+            </button>
+          )}
         </div>
       </div>
+
+      {/* Ultra-Compact Modern Filter Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 5 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 m-4  flex items-center justify-start gap-4 shadow-sm"
+      >
+        <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
+          {/* Payment Status */}
+          <div className="flex flex-col gap-1 pr-1">
+            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+              Payment
+            </span>
+            <div className="flex gap-1">
+              {["all", "paid", "unpaid"].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => handleFilter("paymentStatus", opt)}
+                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                    filters.paymentStatus === opt
+                      ? "bg-[#003d33] text-white shadow-sm"
+                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Booking Status */}
+          <div className="flex flex-col gap-1 pl-6 pr-1">
+            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+              Booking
+            </span>
+            <div className="flex gap-1">
+              {["all", "pending", "confirmed", "canceled"].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => handleFilter("bookingStatus", opt)}
+                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                    filters.bookingStatus === opt
+                      ? "bg-[#003d33] text-white shadow-sm"
+                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                  }`}
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="pl-4">
+          <CommonButton
+            type="button"
+            searchIcon={true}
+            onClick={() => populateTable()}
+            className="bg-[#003d33] text-white hover:bg-[#002a24] transition-all "
+            style={{ height: "32px" }}
+          />
+        </div>
+      </motion.div>
+
+      {activeFilterCount > 0 && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="flex flex-wrap gap-1.5 mb-2 shrink-0 px-5"
+        >
+          {Object.entries(filters).map(([key, val]) =>
+            val !== "all" ? (
+              <Chip
+                key={key}
+                label={`${key}: ${val}`}
+                onDelete={() => handleFilter(key, "all", true)}
+                size="small"
+                sx={{
+                  fontSize: "8px",
+                  fontWeight: 800,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  background: "#c8dfc2",
+                  color: "#002a24",
+                  "& .MuiChip-deleteIcon": {
+                    color: "#4c7c70",
+                    fontSize: "12px",
+                  },
+                  borderRadius: "7px",
+                  height: "22px",
+                }}
+              />
+            ) : null,
+          )}
+        </motion.div>
+      )}
 
       {/* <div className="flex-1 overflow-x-auto px-5 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">
         <table className="w-full text-left border-separate border-spacing-y-1.5 min-w-[900px]">

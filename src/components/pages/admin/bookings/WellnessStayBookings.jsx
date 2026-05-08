@@ -7,12 +7,7 @@ import {
   TrendingUp as TrendingIcon,
 } from "@mui/icons-material";
 import {
-  Badge,
   Chip,
-  Divider,
-  Drawer,
-  FormControl,
-  IconButton,
   MenuItem,
   Select,
   ToggleButton,
@@ -110,202 +105,13 @@ const SummaryCard = ({
   );
 };
 
-const FilterDrawer = ({
-  open,
-  onClose,
-  filters,
-  onChange,
-  activeCount,
-  populateTable,
-}) => {
-  const paymentOptions = ["all", "paid", "unpaid"];
-  const bookingOptions = ["all", "confirmed", "pending"];
-  const roomOptions = ["all"];
-  return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: { xs: "85vw", sm: 340 },
-          borderRadius: "10px 0 0 10px",
-          p: 0,
-          background: "#f0f7ee",
-        },
-      }}
-    >
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#d4e9ce]">
-          <div>
-            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-[#6a9060]">
-              Refine
-            </p>
-            <h3 className="text-[15px] font-black text-[#002a24] tracking-tight leading-tight">
-              Filters
-            </h3>
-          </div>
-          <div className="flex items-center gap-2">
-            {activeCount > 0 && (
-              <button
-                onClick={() => onChange("reset")}
-                className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wide text-[#4c7c70] bg-[#d4e9ce] px-2 py-1 rounded-lg"
-              >
-                <ResetIcon style={{ fontSize: 10 }} />
-                Reset
-              </button>
-            )}
-            <IconButton
-              size="small"
-              onClick={onClose}
-              sx={{
-                background: "#daefd4",
-                borderRadius: "10px",
-                padding: "4px",
-              }}
-            >
-              <CloseIcon style={{ fontSize: 14, color: "#2e5c28" }} />
-            </IconButton>
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
-          <div>
-            <p className="text-[8px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-2">
-              Payment Status
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {paymentOptions.map((opt) => (
-                <motion.button
-                  key={opt}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => onChange("paymentStatus", opt)}
-                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.paymentStatus === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
-                >
-                  {opt}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-          <Divider sx={{ borderColor: "#d4e9ce" }} />
-          <div>
-            <p className="text-[8px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-2">
-              Booking Status
-            </p>
-            <div className="flex flex-wrap gap-1.5">
-              {bookingOptions.map((opt) => (
-                <motion.button
-                  key={opt}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => onChange("bookingStatus", opt)}
-                  className={`px-2.5 py-1 rounded-lg text-[8.5px] font-bold uppercase tracking-wide border transition-all ${filters.bookingStatus === opt ? "bg-[#003d33] text-white border-[#003d33]" : "bg-white text-gray-500 border-[#d4e9ce] hover:border-[#003d33] hover:text-[#003d33]"}`}
-                >
-                  {opt}
-                </motion.button>
-              ))}
-            </div>
-          </div>
-          <Divider sx={{ borderColor: "#d4e9ce" }} />
-          <div>
-            <p className="text-[8px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-2">
-              Room Type
-            </p>
-            <FormControl fullWidth size="small">
-              <Select
-                value={filters.roomType}
-                onChange={(e) => onChange("roomType", e.target.value)}
-                displayEmpty
-                sx={{
-                  borderRadius: "10px",
-                  fontSize: "10px",
-                  fontWeight: 700,
-                  background: "white",
-                  "& .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#d4e9ce",
-                  },
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#4c7c70",
-                  },
-                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "#003d33",
-                  },
-                }}
-              >
-                {roomOptions.map((opt) => (
-                  <MenuItem
-                    key={opt}
-                    value={opt}
-                    sx={{ fontSize: "10px", fontWeight: 600 }}
-                  >
-                    {opt}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
-          <Divider sx={{ borderColor: "#d4e9ce" }} />
-          <div>
-            <p className="text-[8px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-2">
-              Occupancy Type
-            </p>
-            <ToggleButtonGroup
-              value={filters.occupancyType}
-              exclusive
-              onChange={(e, v) => v && onChange("occupancyType", v)}
-              fullWidth
-              size="small"
-              sx={{
-                "& .MuiToggleButton-root": {
-                  borderRadius: "10px !important",
-                  fontSize: "8px",
-                  fontWeight: 800,
-                  letterSpacing: "0.1em",
-                  textTransform: "uppercase",
-                  border: "1px solid #d4e9ce !important",
-                  color: "#6b7280",
-                  mx: 0.3,
-                  "&.Mui-selected": {
-                    background: "#003d33",
-                    color: "white",
-                    borderColor: "#003d33 !important",
-                  },
-                },
-              }}
-            >
-              <ToggleButton value="all">All</ToggleButton>
-              <ToggleButton value="Seperate">
-                <PersonIcon style={{ fontSize: 11, marginRight: 3 }} />
-                Seperate
-              </ToggleButton>
-              <ToggleButton value="Double">
-                <PeopleIcon style={{ fontSize: 11, marginRight: 3 }} />
-                Double
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </div>
-        </div>
-        <div className="px-4 py-3 border-t border-[#d4e9ce]">
-          <motion.button
-            whileTap={{ scale: 0.97 }}
-            onClick={() => {
-              onClose();
-              populateTable();
-            }}
-            className="w-full py-2.5 bg-[#003d33] text-white text-[10px] font-black uppercase tracking-[0.15em] rounded-xl shadow-sm"
-          >
-            Apply Filters
-          </motion.button>
-        </div>
-      </div>
-    </Drawer>
-  );
-};
+
 
 export default function WellnessStayBookings({
   onSelect,
   selectedId,
   refreshTrigger,
 }) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
   const [next24HoursArrivals, setNext24HoursArrivals] = useState(null);
   const [upcomingStays, setUpcomingStays] = useState([]);
   const [page, setPage] = useState(0);
@@ -333,8 +139,8 @@ export default function WellnessStayBookings({
       pageSize: rowsPerPage,
       clinicId: 5,
       type: "all",
-    };
-    setLoadingSpinner(true);
+    }; 
+    setSelectedRow(null)
     GetUpcomingStays(5, obj)
       .then((res) => {
         if (forPagination) {
@@ -395,38 +201,15 @@ export default function WellnessStayBookings({
             </h1>
           </div>
           <div className="flex items-center gap-1.5 shrink-0">
-            <Badge
-              badgeContent={activeFilterCount}
-              color="error"
-              overlap="circular"
-              sx={{
-                "& .MuiBadge-badge": {
-                  fontSize: "8px",
-                  minWidth: "16px",
-                  height: "16px",
-                  borderRadius: "50%",
-                  fontWeight: 900,
-                  zIndex: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "0",
-                },
-              }}
-            >
-              <CommonButton
-                type="button"
-                icon={<FilterIcon style={{ fontSize: 11 }} />}
-                label="Filter"
-                className={"bg-[#2e3d28] text-white"}
-                onClick={() => setDrawerOpen(true)}
-              />
-            </Badge>
-            {/* <CommonButton
-              type="button"
-              label="+ New Booking"
-              className={"bg-[#2e3d28] text-white"}
-            /> */}
+            {activeFilterCount > 0 && (
+              <button
+                onClick={() => handleFilter("reset", null, true)}
+                className="flex items-center gap-1 text-[8px] font-black uppercase tracking-wide text-[#4c7c70] bg-[#d4e9ce] px-2 py-1 rounded-lg hover:bg-[#c4dfbd] transition-colors"
+              >
+                <ResetIcon style={{ fontSize: 10 }} />
+                Reset Filters
+              </button>
+            )}
           </div>
         </motion.div>
 
@@ -452,6 +235,132 @@ export default function WellnessStayBookings({
             type="silver"
           />
         </div>
+
+        {/* Ultra-Compact Modern Filter Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 mb-4 flex items-center justify-start gap-4 shadow-sm"
+        >
+          <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
+            {/* Payment Status */}
+            <div className="flex flex-col gap-1 pr-1">
+              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Payment</span>
+              <div className="flex gap-1">
+                {["all", "paid", "unpaid"].map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleFilter("paymentStatus", opt)}
+                    className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                      filters.paymentStatus === opt
+                        ? "bg-[#003d33] text-white shadow-sm"
+                        : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Booking Status */}
+            <div className="flex flex-col gap-1 pl-6 pr-1">
+              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Booking</span>
+              <div className="flex gap-1">
+                {["all", "confirmed", "pending"].map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => handleFilter("bookingStatus", opt)}
+                    className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                      filters.bookingStatus === opt
+                        ? "bg-[#003d33] text-white shadow-sm"
+                        : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                    }`}
+                  >
+                    {opt}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Room Type */}
+            <div className="flex flex-col gap-1 pl-6 pr-1">
+              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Room Type</span>
+              <Select
+                value={filters.roomType}
+                onChange={(e) => handleFilter("roomType", e.target.value)}
+                displayEmpty
+                variant="standard"
+                disableUnderline
+                sx={{
+                  fontSize: "9px",
+                  fontWeight: 800,
+                  color: "#003d33",
+                  minWidth: 80,
+                  "& .MuiSelect-select": { py: 0 },
+                }}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      "& .MuiMenuItem-root": {
+                        fontSize: "10px",
+                        fontWeight: 700,
+                        color: "#003d33",
+                        "&::before": { display: "none !important" },
+                      },
+                    },
+                  },
+                }}
+              >
+                {["all"].map((opt) => (
+                  <MenuItem key={opt} value={opt} sx={{ fontSize: "10px", fontWeight: 700 }}>
+                    {opt.toUpperCase()}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+
+            {/* Occupancy */}
+            <div className="flex flex-col gap-1 pl-6">
+              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Occupancy</span>
+              <ToggleButtonGroup
+                value={filters.occupancyType}
+                exclusive
+                onChange={(e, v) => v && handleFilter("occupancyType", v)}
+                size="small"
+                sx={{
+                  height: "24px",
+                  "& .MuiToggleButton-root": {
+                    border: "none !important",
+                    borderRadius: "6px !important",
+                    fontSize: "8px",
+                    fontWeight: 800,
+                    px: 1.5,
+                    color: "#6a9060",
+                    "&.Mui-selected": {
+                      background: "#003d33 !important",
+                      color: "white",
+                    },
+                  },
+                }}
+              >
+                <ToggleButton value="all">All</ToggleButton>
+                <ToggleButton value="Seperate"><PersonIcon style={{ fontSize: 11, marginRight: 2 }} />One</ToggleButton>
+                <ToggleButton value="Double"><PeopleIcon style={{ fontSize: 11, marginRight: 2 }} />Two</ToggleButton>
+              </ToggleButtonGroup>
+            </div>
+          </div>
+
+          <div className="pl-4">
+            <CommonButton
+              type="button"
+              searchIcon={true}
+              onClick={() => populateTable()}
+              className="bg-[#003d33] text-white hover:bg-[#002a24] transition-all "
+              style={{ height: "32px" }}
+            />
+          </div>
+        </motion.div>
 
         {activeFilterCount > 0 && (
           <motion.div
@@ -556,14 +465,7 @@ export default function WellnessStayBookings({
         </div>
       </div>
 
-      <FilterDrawer
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        filters={filters}
-        onChange={handleFilter}
-        activeCount={activeFilterCount}
-        populateTable={populateTable}
-      />
+
     </div>
   );
 }

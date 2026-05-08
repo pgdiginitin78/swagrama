@@ -218,7 +218,7 @@ export function useTokenRefresh() {
     clearScheduledRefresh();
 
     if (delay <= 0) {
-      refreshTokenOnce(initiateRefresh);
+      refreshTokenOnce(initiateRefresh).catch(() => {});
       return;
     }
 
@@ -227,7 +227,7 @@ export function useTokenRefresh() {
     const id = setTimeout(() => {
       _activeTimeoutId = null;
       myTimeoutRef.current = null;
-      refreshTokenOnce(initiateRefresh);
+      refreshTokenOnce(initiateRefresh).catch(() => {});
     }, safeDelay);
 
     _activeTimeoutId = id;

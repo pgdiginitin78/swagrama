@@ -55,7 +55,7 @@ export const OriginBadge = ({ origin }) => {
   );
 };
 export const EmptyDetailView = () => (
-  <div className="flex flex-col items-center justify-center w-full h-full p-4 sm:p-6 text-center bg-[#fcfcf9] border rounded-lg">
+  <div className="flex flex-col items-center justify-center w-full h-[500px] p-4 sm:p-6 text-center bg-[#fcfcf9] border rounded-lg">
     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-white flex items-center justify-center mb-3 sm:mb-4 shadow-sm border border-gray-100">
       <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-dashed border-gray-100" />
     </div>

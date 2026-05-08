@@ -20,6 +20,7 @@ import {
 import {
   addDays,
   addMonths,
+  differenceInCalendarDays,
   endOfMonth,
   endOfWeek,
   format,
@@ -253,29 +254,38 @@ function StayBookingModal({
         adultSurcharge: 0,
         childrenSurcharge: 0,
         total: 0,
+        days: 0,
       };
-    const base = selectedService.price;
+
+    const dailyBase = Number(selectedService.price) || 0;
+    const days = (checkIn && checkOut) ? differenceInCalendarDays(checkOut, checkIn) : 1;
+    const effectiveDays = days > 0 ? days : 1;
+
+    const stayTotal = dailyBase * effectiveDays;
     const wellness = 0;
-    const taxes = (base + wellness) * 0;
+    const taxes = (stayTotal + wellness) * 0;
 
     let petSurcharge = 0;
     if (formValues?.bringingPet) {
-      petSurcharge = (base + wellness + taxes) * 0.25;
+      // Pet charges are a separate one-time charge (25% of one day's base)
+      petSurcharge = dailyBase * 0.25;
     }
 
     let adultSurcharge = 0;
     if (Number(formValues?.noOfAdults) === 3) {
-      adultSurcharge = base * 0.75;
+      // Extra adult charge is per day
+      adultSurcharge = (dailyBase * 0.75) * effectiveDays;
     }
 
     return {
-      stay: base,
+      stay: stayTotal,
       wellness: wellness,
       taxes: taxes,
       petSurcharge: petSurcharge,
       adultSurcharge: adultSurcharge,
       childrenSurcharge: 0,
-      total: base + wellness + taxes + petSurcharge + adultSurcharge,
+      total: stayTotal + wellness + taxes + petSurcharge + adultSurcharge,
+      days: effectiveDays,
     };
   };
 
@@ -729,7 +739,7 @@ function StayBookingModal({
                       </div> */}
                     </div>
 
-                    <div className="flex justify-end md:justify-center md:w-36">
+                    <div className="flex justify-end md:justify-start md:w-36">
                       <CommonButton
                         type="button"
                         searchIcon={true}
@@ -1573,7 +1583,10 @@ function StayBookingModal({
 
                 <div className="pt-3 border-t border-booking-primary/5 flex flex-col gap-2">
                   {[
-                    { label: "Stay", value: costs.stay },
+                    {
+                      label: `Stay (${costs.days} Day${costs.days > 1 ? "s" : ""})`,
+                      value: costs.stay,
+                    },
                     { label: "Wellness Access", value: costs.wellness },
                     {
                       label: "Taxes & Service",

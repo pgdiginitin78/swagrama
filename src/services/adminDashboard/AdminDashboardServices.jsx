@@ -65,10 +65,15 @@ export const GetDashboardCount = (clinicId, filter) => {
   );
 };
 
-export const GetTherapyBookingList = (clinicId, page, size) => {
-  return AxiosInstance.get(
-    `GetTherapyBookingList?clinicId=${clinicId}&page=${page}&size=${size}`,
-  );
+export const GetTherapyBookingList = (clinicId, page, size, filters = {}) => {
+  let url = `GetTherapyBookingList?clinicId=${clinicId}&page=${page}&size=${size}`;
+  if (filters.paymentStatus && filters.paymentStatus !== "all") {
+    url += `&paymentStatus=${filters.paymentStatus}`;
+  }
+  if (filters.bookingStatus && filters.bookingStatus !== "all") {
+    url += `&bookingStatus=${filters.bookingStatus}`;
+  }
+  return AxiosInstance.get(url);
 };
 
 export const UpdateStayCheckInOut = (bookingId, ClinicId) => {

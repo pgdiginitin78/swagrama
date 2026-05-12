@@ -14,7 +14,10 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
-import { BookDetoxTherapy } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
+import {
+  BookDetoxTherapy,
+  GetTherapySlots,
+} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import { GetNatureTherapySlotsByUser } from "../../../../services/healingServices/natureTherapyServices/NatureTherapyServices";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
@@ -94,28 +97,16 @@ const formatTime = (timeStr) => {
 };
 
 const staticTimeSlots = [
-  { sessionTime: "09:00:00", isAvailable: true },
-  { sessionTime: "10:00:00", isAvailable: true },
-  { sessionTime: "11:00:00", isAvailable: true },
-  { sessionTime: "12:00:00", isAvailable: true },
-  { sessionTime: "13:00:00", isAvailable: true },
-  { sessionTime: "14:00:00", isAvailable: true },
-  { sessionTime: "15:00:00", isAvailable: true },
-  { sessionTime: "16:00:00", isAvailable: true },
-  { sessionTime: "17:00:00", isAvailable: true },
-].map((slot) => {
-  const startTime = slot.sessionTime;
-  const [h, m, s] = startTime.split(":").map(Number);
-  const date = new Date();
-  date.setHours(h, m, s, 0);
-  date.setMinutes(date.getMinutes() + 60);
-  const endTime = format(date, "HH:mm:ss");
-  return {
-    ...slot,
-    slotStartTime: startTime,
-    slotEndTime: endTime,
-  };
-});
+  { slotStartTime: "09:00:00", slotEndTime: "10:00:00", isAvailable: true },
+  { slotStartTime: "10:00:00", slotEndTime: "11:00:00", isAvailable: true },
+  { slotStartTime: "11:00:00", slotEndTime: "12:00:00", isAvailable: true },
+  { slotStartTime: "12:00:00", slotEndTime: "13:00:00", isAvailable: true },
+  { slotStartTime: "13:00:00", slotEndTime: "14:00:00", isAvailable: true },
+  { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
+  { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
+  { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
+
+];
 
 function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
   const isDisabled = !slot.isAvailable || slot.isBookedByUser || isPast;
@@ -131,8 +122,8 @@ function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
           isSelected
             ? "bg-booking-primary text-white shadow-md"
             : isPast
-            ? "bg-slate-100 text-slate-400 border border-slate-200 line-through"
-            : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
+              ? "bg-slate-100 text-slate-400 border border-slate-200 line-through"
+              : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
         }
         disabled:opacity-40 disabled:cursor-not-allowed
       `}
@@ -159,6 +150,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState([]);
   const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
@@ -306,6 +298,18 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
   }, [servicesOptions, therapy, setValue]);
 
   useEffect(() => {
+    if (therapy?.serviceId && fromDate) {
+      const formattedDate = format(new Date(fromDate), "yyyy-MM-dd");
+      GetTherapySlots(formattedDate, therapy?.serviceId, formattedDate, 5)
+        .then((res) => {
+          console.log("slotsData", res?.data.data);
+          setBookedSlots(res.data.data);
+        })
+        .catch((err) => setBookedSlots([]));
+    }
+  }, [therapy, fromDate]);
+
+  useEffect(() => {
     if (user?.userId && fromDate) {
       setSelectedTimeSlot(null);
       setSlotError("");
@@ -335,7 +339,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     }
   }, [user?.userId, fromDate]);
 
-  console.log("selectedTimeSlot", patientFid, user);
+  console.log("selectedTimeSlot", therapy);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -355,8 +359,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       clinicFid: 5,
       no_Of_Person: data.noOfPerson,
       No_Of_Sessions: 1,
-      TherapyName: therapy?.nameEnglish,
+      TherapyName: therapy?.serviceName,
       doctorFid: null,
+      fromDate: format(new Date(data.fromDate), "yyyy-MM-dd"),
+      toDate: format(new Date(data.fromDate), "yyyy-MM-dd"),
       SpecificRequest: data.specialRequest,
       Amount: watch("totalAmount"),
       totalAmount: watch("totalAmount"),
@@ -374,6 +380,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       ],
       FirstTimeTaking: null,
     };
+
+    console.log("naturTherapySaveObj", saveObj);
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
@@ -443,7 +451,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
       <Modal open={open}>
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[75%] 2xl:w-[65%] max-h-[90dvh] overflow-y-auto rounded-xl  p-0 custom-scrollbar-wellness-stay"
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[75%] 2xl:w-[65%] max-h-[90dvh] overflow-hidden rounded-xl  p-0 no-scrollbar"
         >
           <AnimatePresence>
             <motion.div
@@ -462,13 +470,13 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                         sx={{ fontSize: 20, color: "var(--booking-primary)" }}
                       />
                     </span>
-                    Book Nature Therapy
+                    Book Nature Therapy1
                   </h2>
                   <CancelButtonModal onClick={handleClose} />
                 </div>
 
                 {/* ── Scrollable Body ── */}
-                <div className="max-h-[calc(90vh-64px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar">
+                <div className="max-h-[calc(90vh-64px)] overflow-y-auto px-4 sm:px-6 py-6 no-scrollbar">
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     {/* ── Main Grid: left 8 cols | right 4 cols ── */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
@@ -638,17 +646,32 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                                     slotDateTime.setHours(h, m, s, 0);
                                     isPast = slotDateTime < new Date();
                                   }
+
+                                  const matchedBookedSlot = (
+                                    bookedSlots || []
+                                  ).find(
+                                    (bs) =>
+                                      bs.slotStartTime === slot.slotStartTime &&
+                                      bs.slotEndTime === slot.slotEndTime,
+                                  );
+                                  const isAvailable =
+                                    (matchedBookedSlot
+                                      ? matchedBookedSlot.isAvailable
+                                      : slot.isAvailable) &&
+                                    !slot?.isBookedByUser;
+
+                                  const isDisabled = isPast || !isAvailable;
                                   return (
                                     <TimeSlotChip
                                       key={index}
-                                      slot={slot}
-                                      isPast={isPast}
+                                      slot={{ ...slot, isAvailable }}
+                                      isPast={isDisabled}
                                       isSelected={
                                         selectedTimeSlot?.slotStartTime ===
                                         slot.slotStartTime
                                       }
                                       onSelect={() => {
-                                        if (!isPast) {
+                                        if (!isDisabled) {
                                           setSelectedTimeSlot(slot);
                                           setSlotError("");
                                         }

@@ -176,14 +176,14 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         </div>
       </div>
 
-      {/* Ultra-Compact Modern Filter Bar */}
+ 
       <motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 m-4  flex items-center justify-start gap-4 shadow-sm"
       >
         <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
-          {/* Payment Status */}
+
           <div className="flex flex-col gap-1 pr-1">
             <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
               Payment

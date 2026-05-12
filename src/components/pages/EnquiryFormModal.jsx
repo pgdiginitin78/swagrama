@@ -84,7 +84,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
     if (open) {
       reset();
       if (user?.userId) {
-        getUserDetails(user.userId)
+        getUserDetails(user.userId,null,0)
           .then((res) => {
             const userData = res?.data?.data;
             if (userData) {
@@ -150,7 +150,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
               </div>
               <CancelButtonModal onClick={handleClose} />
             </div>
-            <div className="overflow-y-auto flex-1 p-4 sm:p-6 custom-scrollbar bg-slate-50/50">
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 no-scrollbar bg-slate-50/50">
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <motion.section
                   variants={itemVariants}

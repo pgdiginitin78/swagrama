@@ -13,8 +13,11 @@ export const DeleteLoggedAccount = (password) => {
   return AxiosInstance.post(`/DeleteAccount?password=${password}`);
 };
 
-export const getUserDetails = (userId) => {
-  return AxiosInstance.get(`/UserDetails?userId=${userId}`);
+
+export const getUserDetails = (userId, role, clinicId) => {
+  return AxiosInstance.get(
+    `/UserDetails?userId=${userId}&role=${role}&clinicId=${clinicId}`,
+  );
 };
 
 export const refreshToken = (postObj) => {

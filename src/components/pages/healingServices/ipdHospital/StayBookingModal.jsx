@@ -1,14 +1,16 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
+  AccessTime,
   Add,
   ArrowBackIos,
   ArrowForwardIos,
+  Bed as BedIcon,
   CalendarMonth,
   KeyboardArrowDown,
   PeopleAlt,
   Remove,
-  AccessTime,
-  SearchRounded,
 } from "@mui/icons-material";
+import PetsIcon from "@mui/icons-material/Pets";
 import {
   Box,
   FormControl,
@@ -16,7 +18,10 @@ import {
   Modal,
   Popover,
   Select,
+  Switch,
 } from "@mui/material";
+import { LocalizationProvider, TimeClock } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import {
   addDays,
   addMonths,
@@ -28,39 +33,36 @@ import {
   isSameDay,
   isSameMonth,
   isWithinInterval,
+  parse,
   startOfMonth,
+  startOfToday,
   startOfWeek,
   subMonths,
-  startOfToday,
-  parse,
 } from "date-fns";
-import { LocalizationProvider, TimeClock } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import CommonButton from "../../../common/button/CommonButton";
-import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { Bed as BedIcon } from "@mui/icons-material";
-import { Switch } from "@mui/material";
-import DropdownField from "../../../common/formFields/DropdownField";
-import InputField from "../../../common/formFields/InputField";
-import { checkRoomAvailability } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
-import PetsIcon from "@mui/icons-material/Pets";
 import { useAuth } from "../../../../context/AuthContext";
-import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import {
+  getAgeDetails,
   getPatientDataByMobileNo,
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
-import { wellnessStayBooking } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
-import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
-import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
+import {
+  checkRoomAvailability,
+  wellnessStayBooking,
+} from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
+import CommonButton from "../../../common/button/CommonButton";
+import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../../common/ConfirmationModal";
+import DropdownField from "../../../common/formFields/DropdownField";
+import InputField from "../../../common/formFields/InputField";
+import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
+import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
+import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
 function StayBookingModal({
   open,
@@ -88,7 +90,6 @@ function StayBookingModal({
     childrenAges: [],
   });
 
-  const [guestsConfirmed, setGuestsConfirmed] = useState(true);
   const [activeTab, setActiveTab] = useState("calendar");
   const [flexibleDuration, setFlexibleDuration] = useState("1 week");
   const [selectedFlexibleMonth, setSelectedFlexibleMonth] = useState(null);
@@ -103,10 +104,10 @@ function StayBookingModal({
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
+  const [ageDetailsConfig, setAgeDetailsConfig] = useState([]);
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
-
 
   const carouselRef = useRef(null);
   const checkInDateRef = useRef(null);
@@ -139,20 +140,17 @@ function StayBookingModal({
       .typeError("Must be a number")
       .min(1, "Minimum 1 adult")
       .max(3, "Maximum 3 adults allowed")
-      .test("no-children-with-3-adults", "Cannot have children with 3 adults", function(value) {
-        const { noOfChildren } = this.parent;
-        return !(value === 3 && noOfChildren > 0);
-      }),
+      .test(
+        "no-children-with-3-adults",
+        "Cannot have children with 3 adults",
+        function (value) {
+          const { noOfChildren } = this.parent;
+          return !(value === 3 && noOfChildren > 0);
+        },
+      ),
 
-    noOfChildren: yup
-      .number()
-      .typeError("Must be a number")
-      .min(0, "Minimum 0")
-      .max(2, "Maximum 2 children allowed")
-      .test("max-2-adults-with-children", "Max 2 adults allowed when children are added", function(value) {
-        const { noOfAdults } = this.parent;
-        return !(value > 0 && noOfAdults > 2);
-      }),
+    noOfChildren0to5: yup.number().min(0).max(2).default(0),
+    noOfChildren6to12: yup.number().min(0).max(2).default(0),
   });
 
   const { control, watch, setValue, reset } = useForm({
@@ -165,7 +163,8 @@ function StayBookingModal({
       patientFid: null,
       twinSharing: false,
       noOfAdults: 1,
-      noOfChildren: 0,
+      noOfChildren0to5: 0,
+      noOfChildren6to12: 0,
       mealPreference: {
         label: "Organic Full Board (Included)",
         value: "Organic Full Board (Included)",
@@ -183,32 +182,38 @@ function StayBookingModal({
     checkIn,
     checkOut,
     formValues.noOfAdults,
-    formValues.noOfChildren,
+    formValues.noOfChildren0to5,
+    formValues.noOfChildren6to12,
     guests.rooms,
   ]);
 
-
   useEffect(() => {
-    const adults = Number(formValues.noOfAdults);
-    const children = Number(formValues.noOfChildren);
+    const adults = Number(formValues?.noOfAdults) || 0;
+    const children0to5 = Number(formValues?.noOfChildren0to5) || 0;
+    const children6to12 = Number(formValues?.noOfChildren6to12) || 0;
+    const totalChildren = children0to5 + children6to12;
 
     if (adults > 3) {
       setValue("noOfAdults", 3);
-    } else if (adults === 3 && children > 0) {
-      setValue("noOfChildren", 0);
+    } else if (adults === 3 && totalChildren > 0) {
+      setValue("noOfChildren0to5", 0);
+      setValue("noOfChildren6to12", 0);
     }
-  }, [formValues.noOfAdults]);
+  }, [formValues?.noOfAdults]);
 
   useEffect(() => {
-    const adults = Number(formValues.noOfAdults);
-    const children = Number(formValues.noOfChildren);
+    const adults = Number(formValues?.noOfAdults) || 0;
+    const children0to5 = Number(formValues?.noOfChildren0to5) || 0;
+    const children6to12 = Number(formValues?.noOfChildren6to12) || 0;
+    const totalChildren = children0to5 + children6to12;
 
-    if (children > 2) {
-      setValue("noOfChildren", 2);
-    } else if (children > 0 && adults > 2) {
+    if (totalChildren > 2) {
+      if (children0to5 > 2) setValue("noOfChildren0to5", 2);
+      if (children6to12 > 2) setValue("noOfChildren6to12", 2);
+    } else if (totalChildren > 0 && adults > 2) {
       setValue("noOfAdults", 2);
     }
-  }, [formValues.noOfChildren]);
+  }, [formValues?.noOfChildren0to5, formValues?.noOfChildren6to12]);
 
   const scrollCarousel = (direction) => {
     if (carouselRef.current) {
@@ -258,24 +263,45 @@ function StayBookingModal({
       };
 
     const dailyBase = Number(selectedService.price) || 0;
-    const days = (checkIn && checkOut) ? differenceInCalendarDays(checkOut, checkIn) : 1;
+    const days =
+      checkIn && checkOut ? differenceInCalendarDays(checkOut, checkIn) : 1;
     const effectiveDays = days > 0 ? days : 1;
 
     const stayTotal = dailyBase * effectiveDays;
     const wellness = 0;
     const taxes = (stayTotal + wellness) * 0;
 
+    const petConfig = (ageDetailsConfig || []).find(
+      (d) => d.criterialType === "Pet",
+    );
+    const kid0to5Config = (ageDetailsConfig || []).find(
+      (d) => d.ageGroup === "0-5",
+    );
+    const kid6to12Config = (ageDetailsConfig || []).find(
+      (d) => d.ageGroup === "6-12",
+    );
+
+    const petPct = Number(petConfig?.percentage) || 0;
+    const kid0to5Pct = Number(kid0to5Config?.percentage) || 0;
+    const kid6to12Pct = Number(kid6to12Config?.percentage) || 0;
+
     let petSurcharge = 0;
     if (formValues?.bringingPet) {
-      // Pet charges are a separate one-time charge (25% of one day's base)
-      petSurcharge = dailyBase * 0.25;
+      petSurcharge = dailyBase * (petPct / 100);
     }
 
     let adultSurcharge = 0;
     if (Number(formValues?.noOfAdults) === 3) {
-      // Extra adult charge is per day
-      adultSurcharge = (dailyBase * 0.75) * effectiveDays;
+      adultSurcharge = dailyBase * 0.75 * effectiveDays;
     }
+
+    const children0to5Count = Number(formValues?.noOfChildren0to5) || 0;
+    const children6to12Count = Number(formValues?.noOfChildren6to12) || 0;
+
+    const childrenSurcharge =
+      (children0to5Count * dailyBase * (kid0to5Pct / 100) +
+        children6to12Count * dailyBase * (kid6to12Pct / 100)) *
+      effectiveDays;
 
     return {
       stay: stayTotal,
@@ -283,9 +309,18 @@ function StayBookingModal({
       taxes: taxes,
       petSurcharge: petSurcharge,
       adultSurcharge: adultSurcharge,
-      childrenSurcharge: 0,
-      total: stayTotal + wellness + taxes + petSurcharge + adultSurcharge,
+      childrenSurcharge: childrenSurcharge,
+      total:
+        stayTotal +
+        wellness +
+        taxes +
+        petSurcharge +
+        adultSurcharge +
+        childrenSurcharge,
       days: effectiveDays,
+      petPct,
+      kid0to5Pct,
+      kid6to12Pct,
     };
   };
 
@@ -435,7 +470,9 @@ function StayBookingModal({
       checkInTime: checkInTime,
       checkOutTime: checkOutTime,
       noOfPersons: Number(formValues?.noOfAdults) || 1,
-      noOfChildren: Number(formValues?.noOfChildren) || 0,
+      noOfChildren:
+        (Number(formValues?.noOfChildren0to5) || 0) +
+        (Number(formValues?.noOfChildren6to12) || 0),
       isPet: formValues?.bringingPet || false,
       twinSharing: formValues?.twinSharing || false,
       totalAmount: costs?.total || 0,
@@ -544,7 +581,6 @@ function StayBookingModal({
       .catch((err) => console.error("Error fetching patient data:", err));
   };
 
-
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
       setValue("fullName", patientFid.label);
@@ -554,13 +590,19 @@ function StayBookingModal({
       setValue("email", patientFid.emailId);
       setValue("noOfAdults", 1);
     }
+
+    getAgeDetails()
+      .then((res) => {
+        console.log("res age details", res.data.data);
+        setAgeDetailsConfig(res.data.data);
+      })
+      .catch((err) => setAgeDetailsConfig([]));
   }, [patientFid]);
 
   useEffect(() => {
     if (!user) return;
     handleGetPatientData();
   }, [user]);
-
 
   return (
     <>
@@ -571,7 +613,7 @@ function StayBookingModal({
       >
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[95dvh] overflow-y-auto rounded-xl bg-booking-bg p-0 custom-scrollbar-wellness-stay"
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[95dvh] overflow-hidden rounded-xl bg-booking-bg p-0 flex flex-col no-scrollbar"
         >
           <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-4 py-3 border-b border-booking-border shadow-sm">
             <h1 className="text-booking-primaryDark  text-lg md:text-2xl font-bold leading-tight">
@@ -580,7 +622,7 @@ function StayBookingModal({
             <CancelButtonModal onClick={handleClose} />
           </div>
 
-          <div className="p-3 sm:p-4">
+          <div className="p-3 sm:p-4 flex-1 overflow-y-auto no-scrollbar">
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <div className="relative group/searchbar">
                 <motion.div
@@ -1305,7 +1347,8 @@ function StayBookingModal({
                               label === "Room" ||
                               (key === "adults" &&
                                 (guests.adults >= 3 ||
-                                  (guests.children > 0 && guests.adults >= 2))) ||
+                                  (guests.children > 0 &&
+                                    guests.adults >= 2))) ||
                               (key === "children" &&
                                 (guests.children >= 2 || guests.adults >= 3))
                             }
@@ -1401,7 +1444,7 @@ function StayBookingModal({
                       <CommonButton
                         type="button"
                         onClick={() => {
-                          setGuestsConfirmed(true);
+                 
                           setGuestsAnchorEl(null);
                         }}
                         className="bg-booking-primary text-white"
@@ -1517,12 +1560,14 @@ function StayBookingModal({
                     />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <InputField
-                      control={control}
-                      name="fullName"
-                      label="Full Name"
-                      variant="outlined"
-                    />
+                    <div className="col-span-1 md:col-span-2">
+                      <InputField
+                        control={control}
+                        name="fullName"
+                        label="Full Name"
+                        variant="outlined"
+                      />
+                    </div>
                     <InputField
                       control={control}
                       name="email"
@@ -1549,14 +1594,110 @@ function StayBookingModal({
                       type="number"
                       inputProps={{ min: 1, max: 3 }}
                     />
-                    <InputField
-                      control={control}
-                      name="noOfChildren"
-                      label="Children (Max 2, Age 6-12)"
-                      variant="outlined"
-                      type="number"
-                      inputProps={{ min: 0, max: 2 }}
-                    />
+                    {/* 0-5 Years Child Field */}
+                    <div className="flex items-center justify-between p-3 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
+                      <div className="flex flex-col">
+                        <p className="text-[11px] font-bold text-booking-primary uppercase tracking-wider">
+                          Children (0-5 Years)
+                        </p>
+                        <p className="text-[9px] text-gray-500 font-medium">
+                          Max 2 total children
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          disabled={
+                            (Number(formValues?.noOfChildren0to5) || 0) <= 0
+                          }
+                          onClick={() =>
+                            setValue(
+                              "noOfChildren0to5",
+                              Math.max(
+                                0,
+                                (Number(formValues?.noOfChildren0to5) || 0) - 1,
+                              ),
+                            )
+                          }
+                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all text-ayuBrown disabled:opacity-30"
+                        >
+                          <Remove sx={{ fontSize: 12 }} />
+                        </button>
+                        <span className="w-4 text-center font-bold text-xs text-gray-800">
+                          {Number(formValues?.noOfChildren0to5) || 0}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={
+                            (Number(formValues?.noOfChildren0to5) || 0) +
+                              (Number(formValues?.noOfChildren6to12) || 0) >=
+                              2 || (Number(formValues?.noOfAdults) || 0) >= 3
+                          }
+                          onClick={() =>
+                            setValue(
+                              "noOfChildren0to5",
+                              (Number(formValues?.noOfChildren0to5) || 0) + 1,
+                            )
+                          }
+                          className="w-7 h-7 rounded-full border border-booking-primary text-booking-primary flex items-center justify-center hover:bg-booking-primaryLight active:scale-90 transition-all disabled:opacity-30"
+                        >
+                          <Add sx={{ fontSize: 12 }} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 6-12 Years Child Field */}
+                    <div className="flex items-center justify-between p-3 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
+                      <div className="flex flex-col">
+                        <p className="text-[11px] font-bold text-booking-primary uppercase tracking-wider">
+                          Children (6-12 Years)
+                        </p>
+                        <p className="text-[9px] text-gray-500 font-medium">
+                          Max 2 total children
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          disabled={
+                            (Number(formValues?.noOfChildren6to12) || 0) <= 0
+                          }
+                          onClick={() =>
+                            setValue(
+                              "noOfChildren6to12",
+                              Math.max(
+                                0,
+                                (Number(formValues?.noOfChildren6to12) || 0) -
+                                  1,
+                              ),
+                            )
+                          }
+                          className="w-7 h-7 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-50 active:scale-90 transition-all text-ayuBrown disabled:opacity-30"
+                        >
+                          <Remove sx={{ fontSize: 12 }} />
+                        </button>
+                        <span className="w-4 text-center font-bold text-xs text-gray-800">
+                          {Number(formValues?.noOfChildren6to12) || 0}
+                        </span>
+                        <button
+                          type="button"
+                          disabled={
+                            (Number(formValues?.noOfChildren0to5) || 0) +
+                              (Number(formValues?.noOfChildren6to12) || 0) >=
+                              2 || (Number(formValues?.noOfAdults) || 0) >= 3
+                          }
+                          onClick={() =>
+                            setValue(
+                              "noOfChildren6to12",
+                              (Number(formValues?.noOfChildren6to12) || 0) + 1,
+                            )
+                          }
+                          className="w-7 h-7 rounded-full border border-booking-primary text-booking-primary flex items-center justify-center hover:bg-booking-primaryLight active:scale-90 transition-all disabled:opacity-30"
+                        >
+                          <Add sx={{ fontSize: 12 }} />
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -1595,8 +1736,16 @@ function StayBookingModal({
                     ...(costs.petSurcharge > 0
                       ? [
                           {
-                            label: "Pet Charges (25%)",
+                            label: `Pet Charges (${costs.petPct}%)`,
                             value: Math.round(costs.petSurcharge),
+                          },
+                        ]
+                      : []),
+                    ...(costs.childrenSurcharge > 0
+                      ? [
+                          {
+                            label: `Children Surcharge`,
+                            value: Math.round(costs.childrenSurcharge),
                           },
                         ]
                       : []),

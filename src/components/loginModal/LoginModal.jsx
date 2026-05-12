@@ -219,7 +219,7 @@ export default function LoginModal({ open, handleClose }) {
                 <div className="bg-white rounded-xl shadow-2xl relative w-full flex flex-col max-h-full overflow-hidden">
                   <CancelButtonModal onClick={handleClose} />
 
-                  <div className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 custom-green-scrollbar">
+                  <div className="p-6 sm:p-8 pt-4 sm:pt-6 overflow-y-auto flex-1 no-scrollbar">
                     <style>{`
                       .custom-green-scrollbar {
                         scrollbar-width: thin;

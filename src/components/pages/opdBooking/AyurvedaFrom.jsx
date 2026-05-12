@@ -189,7 +189,9 @@ function DateCard({ date, isSelected, onClick, disabled }) {
       >
         {dayName}
       </span>
-      <span className="text-sm md:text-base font-black leading-none my-0.5">{dayNum}</span>
+      <span className="text-sm md:text-base font-black leading-none my-0.5">
+        {dayNum}
+      </span>
     </motion.button>
   );
 }
@@ -413,7 +415,10 @@ function BookingPreviewModal({
 }) {
   return (
     <Modal open={open}>
-      <Box sx={ModalStyle} className="w-[95%] h-[95%] lg:w-[60%] lg:h-[70%] rounded-xl">
+      <Box
+        sx={ModalStyle}
+        className="w-[95%] h-[95%] lg:w-[60%] lg:h-[70%] rounded-xl"
+      >
         <div className="bg-gradient-to-br from-emerald-700 via-teal-700 to-green-800 px-5 pt-5 pb-6 relative rounded-t-xl">
           <div className="absolute top-3 right-3">
             <CancelButtonModal onClick={onClose} />
@@ -690,26 +695,26 @@ function AyurvedaForm({
   };
 
   useEffect(() => {
-    getServicesByClinicId(5)
-      .then((res) => {
-        const data = res?.data?.data;
-        if (data?.length) {
-          setServicesOptions(
-            data.map((item) => ({
-              ...item,
-              id: item.serviceFid,
-              value: item.serviceFid,
-              label: `${item.serviceName}`,
-            })),
-          );
-        }
-      })
-      .catch((error) => error);
-
-    if (user !== null) {
-      handleGetPatientData();
+    if (patientFid !== null) {
+      getServicesByClinicId(5, patientFid?.userId)
+        .then((res) => {
+          const data = res?.data?.data;
+          if (data?.length) {
+            setServicesOptions(
+              data.map((item) => ({
+                ...item,
+                id: item.serviceFid,
+                value: item.serviceFid,
+                label: `${item.serviceName}`,
+              })),
+            );
+          }else{
+            setServicesOptions([])
+          }
+        })
+        .catch((error) => setServicesOptions([]));
     }
-  }, [user]);
+  }, [patientFid]);
 
   useEffect(() => {
     if (selectedDoctorId !== null) {
@@ -907,7 +912,10 @@ function AyurvedaForm({
       .then((res) => res.json())
       .then((data) => setIpAddress(data.ip))
       .catch((error) => console.error("Error:", error));
-  }, []);
+    if (user !== null) {
+      handleGetPatientData();
+    }
+  }, [user]);
 
   console.log(slotData, "slotData");
 
@@ -1331,16 +1339,6 @@ function AyurvedaForm({
                 Schedule Appointment
               </h2>
             </div>
-            <div className="w-full sm:max-w-[260px] md:max-w-[280px]">
-              <DropdownField
-                control={control}
-                name="serviceFid"
-                placeholder="Service *"
-                dataArray={servicesOptions}
-                error={errors.serviceFid}
-                className="scale-90"
-              />
-            </div>
           </div>
 
           <div className="p-3 space-y-4 sm:p-4 sm:space-y-5">
@@ -1483,16 +1481,27 @@ function AyurvedaForm({
           </div>
 
           <div className="p-3 sm:p-4 md:p-5">
-            <div className="mb-4 sm:mb-5 max-w-full sm:max-w-xs">
-              <DropdownField
-                control={control}
-                name="patientFid"
-                placeholder="Select Patient *"
-                dataArray={patientOptions}
-                error={errors.patientFid}
-              />
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3 mb-4">
+              <div className="">
+                <DropdownField
+                  control={control}
+                  name="patientFid"
+                  placeholder="Select Patient *"
+                  dataArray={patientOptions}
+                  error={errors.patientFid}
+                />
+              </div>
+              <div className="w-full ">
+                <DropdownField
+                  control={control}
+                  name="serviceFid"
+                  placeholder="Service *"
+                  dataArray={servicesOptions}
+                  error={errors.serviceFid}
+                  className="scale-90"
+                />
+              </div>
             </div>
-
             <div className="grid grid-cols-1 gap-3 xs:grid-cols-2 sm:gap-4 lg:grid-cols-4">
               <div className="col-span-1 xs:col-span-2">
                 <InputField

@@ -103,7 +103,7 @@ const MembershipRegistrationModal = ({
     if (open) {
       reset();
       if (user?.userId) {
-        getUserDetails(user.userId)
+        getUserDetails(user.userId,null,0)
           .then((res) => {
             const userData = res?.data?.data;
             if (userData) {
@@ -195,7 +195,7 @@ const MembershipRegistrationModal = ({
       <Modal open={open} aria-labelledby="membership-modal-title">
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-y-auto rounded-xl  p-0 custom-scrollbar-wellness-stay"
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-hidden rounded-xl  p-0 no-scrollbar"
         >
           <motion.div
             variants={containerVariants}
@@ -237,7 +237,7 @@ const MembershipRegistrationModal = ({
               <CancelButtonModal onClick={handleClose} />
             </div>
 
-            <div className="overflow-y-auto flex-1 p-4 sm:p-6 bg-slate-50 scrollbar-thin scrollbar-thumb-slate-300">
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 bg-slate-50 no-scrollbar">
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="flex flex-col gap-4 sm:gap-5">
                   <motion.section variants={itemVariants}>

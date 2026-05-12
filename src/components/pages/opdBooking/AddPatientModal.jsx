@@ -378,7 +378,7 @@ export default function AddPatientModal({
 
   useEffect(() => {
     if (user) {
-      getUserDetails(user?.userId)
+      getUserDetails(user?.userId,null,0)
         .then((res) => {
           const data = res?.data?.data;
           const address = data?.address ?? "";

@@ -33,6 +33,7 @@ import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import {
   GetDetoxTherapySlotsByUser,
   BookDetoxTherapy,
+  GetTherapySlots,
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
@@ -98,8 +99,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openAddPatient, setOpenAddPatient] = useState(false);
-  const cancelPaymentRef = useRef(null);
+  const [bookedSlots, setBookedSlots] = useState([]);
 
+  const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
 
@@ -114,15 +116,12 @@ export default function BookTherapySession({ open, onClose, item }) {
       .required("Please select a guest"),
   });
 
-  const {
-    control,
-    watch,
-    reset,
-  } = useForm({
+  const { control, watch, reset } = useForm({
     resolver: yupResolver(schema),
     defaultValues: { selectGuest: null },
     mode: "onChange",
   });
+
   const selectedGuest = watch("selectGuest");
 
   useEffect(() => {
@@ -219,6 +218,21 @@ export default function BookTherapySession({ open, onClose, item }) {
       return () => clearTimeout(timer);
     }
   }, [activePickerIndex, calendarBaseDate]);
+
+  useEffect(() => {
+    if (item !== null && activePickerIndex !== null) {
+      const activeSession = schedules[activePickerIndex];
+      if (activeSession?.date) {
+        const formattedDate = format(activeSession.date, "yyyy-MM-dd");
+        GetTherapySlots(formattedDate, item?.serviceId, formattedDate, 5)
+          .then((res) => {
+            console.log("slotsData", res?.data.data);
+            setBookedSlots(res.data.data);
+          })
+          .catch((err) => setBookedSlots([]));
+      }
+    }
+  }, [item, activePickerIndex, schedules]);
 
   if (!open || !item) return null;
 
@@ -430,7 +444,7 @@ export default function BookTherapySession({ open, onClose, item }) {
             <CancelButtonModal onClick={onClose} />
           </div>
 
-          <div className="overflow-y-auto flex-1 custom-scrollbar-wellness-stay">
+          <div className="overflow-y-auto flex-1 no-scrollbar">
             <div className="p-2 md:p-4 space-y-5">
               <motion.div
                 initial={{ opacity: 0, y: 6 }}
@@ -574,7 +588,7 @@ export default function BookTherapySession({ open, onClose, item }) {
 
                                 <div
                                   ref={scrollContainerRef}
-                                  className="flex gap-2 overflow-x-auto pb-3 mb-3 custom-scrollbar-wellness-stay scroll-smooth"
+                                  className="flex gap-2 overflow-x-auto pb-3 mb-3 no-scrollbar scroll-smooth"
                                 >
                                   {visibleDates.map((date, i) => {
                                     const isToday = isSameDay(
@@ -640,8 +654,17 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   ) : therapySlots.length > 0 ? (
                                     therapySlots.map((slot, i) => {
                                       const t = slot.slotStartTime;
+                                      const matchedBookedSlot = (
+                                        bookedSlots || []
+                                      ).find(
+                                        (bs) =>
+                                          bs.slotStartTime === slot.slotStartTime &&
+                                          bs.slotEndTime === slot.slotEndTime,
+                                      );
                                       const isAvailable =
-                                        slot.isAvailable ||
+                                        (matchedBookedSlot
+                                          ? matchedBookedSlot.isAvailable
+                                          : slot.isAvailable) &&
                                         !slot?.isBookedByUser;
                                       const isTaken = schedules.some(
                                         (s, sIdx) => {
@@ -660,7 +683,10 @@ export default function BookTherapySession({ open, onClose, item }) {
                                       );
                                       const isSelectedDateToday =
                                         schedule.date &&
-                                        isSameDay(schedule.date, startOfToday());
+                                        isSameDay(
+                                          schedule.date,
+                                          startOfToday(),
+                                        );
                                       const isPastSlot = isSelectedDateToday
                                         ? (() => {
                                             try {
@@ -700,7 +726,10 @@ export default function BookTherapySession({ open, onClose, item }) {
                                               : "bg-white text-gray-500 border-[#e4ebdd] hover:border-ayuMid"
                                         }`}
                                         >
-                                          {formatTime(slot.slotStartTime)}{slot.slotEndTime ? ` - ${formatTime(slot.slotEndTime)}` : ""}
+                                          {formatTime(slot.slotStartTime)}
+                                          {slot.slotEndTime
+                                            ? ` - ${formatTime(slot.slotEndTime)}`
+                                            : ""}
                                         </button>
                                       );
                                     })

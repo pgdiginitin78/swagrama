@@ -149,12 +149,12 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       setIsLoading(true);
       const response = await signupJYA(formData);
       const apiData = response?.data;
-      console.log("apiData",response);      
+      console.log("apiData", response);
       if (response.status === 200 && apiData) {
         successAlert(response?.data);
         onClose();
         reset();
-      } 
+      }
       setIsLoading(false);
     } catch (error) {
       const errorMessage = error?.response?.data?.message || error?.message;
@@ -166,15 +166,19 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
 
   useEffect(() => {
     if (open && user?.userId) {
-      getUserDetails(user.userId)
+      getUserDetails(
+        user.userId,
+        user?.role === "Admin" ? "other" : null,
+        user?.role === "Admin" ? 5 : null,
+      )
         .then((res) => {
           const userData = res?.data?.data;
           if (userData) {
             setValue("FirstName", userData.firstName || "");
-            setValue("lastName", userData.lastName || "");
-            setValue("mobileNo", userData.whatsappNo || "");
+            setValue("lastName", userData.lastName || userData?.lName ||"");
+            setValue("mobileNo", userData.whatsappNo || userData?.contactNumber || "");
             setValue("whatsappNo", userData.whatsappNo || "");
-            setValue("emailId", userData.emailId || "");
+            setValue("emailId", userData.emailId || userData?.email||"");
             if (userData.dob) setValue("dob", new Date(userData.dob));
             const filterGender = genderOptions.find(
               (item) =>
@@ -253,7 +257,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
             overflow: "hidden",
             p: 0,
             border: "none",
-            borderRadius: "16px",
+            borderRadius: "8px",
           }}
           className="w-[95%] md:w-[75%] lg:w-[40%] max-h-[90vh] h-full"
         >
@@ -265,255 +269,252 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
               exit="hidden"
               className="flex flex-col h-full bg-white"
             >
-                <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-4 py-3 shrink-0">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-lg border border-white/30">
-                        <UserIcon className="w-4 h-4 text-white" />
+              <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 px-4 py-3 shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="bg-white/20 backdrop-blur-md p-1.5 rounded-lg border border-white/30">
+                      <UserIcon className="w-4 h-4 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-black text-white leading-tight">
+                        Manage Profile
+                      </h2>
+                      <p className="text-white/70 text-[10px] font-medium">
+                        Update your personal information
+                      </p>
+                    </div>
+                  </div>
+                  <CancelButtonModal onClick={onClose} />
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto overscroll-contain bg-slate-50/40 no-scrollbar">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="p-3 space-y-4"
+                >
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="relative group cursor-pointer shrink-0"
+                        onClick={() => fileRef.current?.click()}
+                      >
+                        <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-emerald-100 bg-emerald-50 flex items-center justify-center">
+                          {avatarPreview ? (
+                            <img
+                              src={avatarPreview}
+                              alt="Avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <UserIcon className="w-7 h-7 text-emerald-200" />
+                          )}
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 group-active:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
+                            <Camera className="w-4 h-4 text-white" />
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-md shadow border-2 border-white hover:bg-emerald-600 active:scale-95 transition-all"
+                        >
+                          <Camera size={10} />
+                        </button>
+                        <input
+                          ref={fileRef}
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          onChange={handleAvatarChange}
+                        />
                       </div>
-                      <div>
-                        <h2 className="text-base font-black text-white leading-tight">
-                          Manage Profile
-                        </h2>
-                        <p className="text-white/70 text-[10px] font-medium">
-                          Update your personal information
+
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                          Profile Photo
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Tap to upload a new photo
                         </p>
                       </div>
                     </div>
-                    <CancelButtonModal onClick={onClose} />
                   </div>
-                </div>
 
-                <div className="flex-1 overflow-y-auto overscroll-contain bg-slate-50/40">
-                  <form
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="p-3 space-y-4"
-                  >
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="relative group cursor-pointer shrink-0"
-                          onClick={() => fileRef.current?.click()}
-                        >
-                          <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-emerald-100 bg-emerald-50 flex items-center justify-center">
-                            {avatarPreview ? (
-                              <img
-                                src={avatarPreview}
-                                alt="Avatar"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <UserIcon className="w-7 h-7 text-emerald-200" />
-                            )}
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 group-active:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
-                              <Camera className="w-4 h-4 text-white" />
-                            </div>
-                          </div>
-                          <button
-                            type="button"
-                            className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-md shadow border-2 border-white hover:bg-emerald-600 active:scale-95 transition-all"
-                          >
-                            <Camera size={10} />
-                          </button>
-                          <input
-                            ref={fileRef}
-                            type="file"
-                            accept="image/*"
-                            hidden
-                            onChange={handleAvatarChange}
-                          />
-                        </div>
-
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                            Profile Photo
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Tap to upload a new photo
-                          </p>
-                        </div>
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                    <SectionLabel
+                      icon={<UserIcon size={14} />}
+                      iconBg="bg-purple-100"
+                      iconColor="text-purple-600"
+                      title="Basic Info"
+                    />
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <InputField
+                        control={control}
+                        name="FirstName"
+                        label="First Name *"
+                        error={errors.FirstName}
+                      />
+                      <InputField
+                        control={control}
+                        name="lastName"
+                        label="Last Name *"
+                        error={errors.lastName}
+                      />
+                      <div className="col-span-2">
+                        <InputField
+                          control={control}
+                          name="userName"
+                          label="Username *"
+                          error={errors.userName}
+                        />
                       </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                      <SectionLabel
-                        icon={<UserIcon size={14} />}
-                        iconBg="bg-purple-100"
-                        iconColor="text-purple-600"
-                        title="Basic Info"
-                      />
-                      <div className="grid grid-cols-2 gap-2.5">
+                      <div className="col-span-2">
                         <InputField
                           control={control}
-                          name="FirstName"
-                          label="First Name *"
-                          error={errors.FirstName}
+                          name="occupation"
+                          label="Occupation"
                         />
-                        <InputField
-                          control={control}
-                          name="lastName"
-                          label="Last Name *"
-                          error={errors.lastName}
-                        />
-                        <div className="col-span-2">
-                          <InputField
-                            control={control}
-                            name="userName"
-                            label="Username *"
-                            error={errors.userName}
-                          />
-                        </div>
-                        <div className="col-span-2">
-                          <InputField
-                            control={control}
-                            name="occupation"
-                            label="Occupation"
-                          />
-                        </div>
                       </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                      <SectionLabel
-                        icon={<Calendar size={14} />}
-                        iconBg="bg-amber-100"
-                        iconColor="text-amber-600"
-                        title="Personal Information"
-                      />
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <DatePickerField
-                          control={control}
-                          name="dob"
-                          label="Date of Birth *"
-                          disableFuture
-                          error={errors.dob}
-                        />
-                        <InputField
-                          control={control}
-                          name="age"
-                          label="Age"
-                          error={errors.age}
-                          disabled
-                        />
-                        <div className="col-span-2">
-                          <RadioField
-                            control={control}
-                            name="gender"
-                            label="Gender *"
-                            dataArray={genderOptions}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                      <SectionLabel
-                        icon={<Phone size={14} />}
-                        iconBg="bg-blue-100"
-                        iconColor="text-blue-600"
-                        title="Contact Information"
-                      />
-                      <div className="grid md:grid-cols-2 gap-3">
-                        <InputField
-                          control={control}
-                          name="mobileNo"
-                          label="Mobile Number *"
-                          error={errors.mobileNo}
-                        />
-                        <InputField
-                          control={control}
-                          name="whatsappNo"
-                          label="WhatsApp Number"
-                        />
-                        <div className="col-span-2">
-                          <InputField
-                            control={control}
-                            name="emailId"
-                            label="Email Address *"
-                            error={errors.emailId}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
-                      <SectionLabel
-                        icon={<MapPin size={14} />}
-                        iconBg="bg-emerald-100"
-                        iconColor="text-emerald-600"
-                        title="Address Information"
-                      />
-                      <div className="grid grid-cols-2 gap-2.5">
-                        <InputField
-                          control={control}
-                          name="pinCode"
-                          label="Pincode *"
-                          error={errors.pinCode}
-                        />
-                        <InputField
-                          control={control}
-                          name="locality"
-                          label="Locality"
-                          error={errors.locality}
-                        />
-                        <InputField
-                          control={control}
-                          name="city"
-                          label="City *"
-                          error={errors.city}
-                        />
-                        <InputField
-                          control={control}
-                          name="state"
-                          label="State *"
-                          error={errors.state}
-                        />
-                        <InputField
-                          control={control}
-                          name="country"
-                          label="Country *"
-                          error={errors.country}
-                        />
-                        <div className="col-span-2">
-                          <InputArea
-                            control={control}
-                            name="address"
-                            label="Address *"
-                            error={errors.address}
-                            minRows={2}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </div>
-
-                <div className="shrink-0 px-3 py-3 border-t border-slate-100 bg-white">
-                  <div className="flex items-center gap-2">
-                    <div className="hidden sm:flex items-center gap-1 text-slate-400 text-[10px] font-medium shrink-0">
-                      <CheckCircle size={11} />
-                      <span>SSL encrypted</span>
-                    </div>
-                    <div className="flex items-center gap-2 w-full sm:ml-auto sm:w-auto">
-                      <CommonButton
-                        type="button"
-                        label="Reset"
-                        onClick={reset}
-                        className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all text-sm"
-                      />
-                      <CommonButton
-                        onClick={handleSubmit(onSubmit)}
-                        disabled={
-                          !isDirty && authUser?.avatar === avatarPreview
-                        }
-                        label="Update Profile"
-                        className="flex-[2] sm:flex-initial bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-md hover:shadow-lg active:scale-95 transition-all disabled:grayscale disabled:opacity-50 text-sm"
-                      />
                     </div>
                   </div>
+
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                    <SectionLabel
+                      icon={<Calendar size={14} />}
+                      iconBg="bg-amber-100"
+                      iconColor="text-amber-600"
+                      title="Personal Information"
+                    />
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <DatePickerField
+                        control={control}
+                        name="dob"
+                        label="Date of Birth *"
+                        disableFuture
+                        error={errors.dob}
+                      />
+                      <InputField
+                        control={control}
+                        name="age"
+                        label="Age"
+                        error={errors.age}
+                        disabled
+                      />
+                      <div className="col-span-2">
+                        <RadioField
+                          control={control}
+                          name="gender"
+                          label="Gender *"
+                          dataArray={genderOptions}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                    <SectionLabel
+                      icon={<Phone size={14} />}
+                      iconBg="bg-blue-100"
+                      iconColor="text-blue-600"
+                      title="Contact Information"
+                    />
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <InputField
+                        control={control}
+                        name="mobileNo"
+                        label="Mobile Number *"
+                        error={errors.mobileNo}
+                      />
+                      <InputField
+                        control={control}
+                        name="whatsappNo"
+                        label="WhatsApp Number"
+                      />
+                      <div className="col-span-2">
+                        <InputField
+                          control={control}
+                          name="emailId"
+                          label="Email Address *"
+                          error={errors.emailId}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                    <SectionLabel
+                      icon={<MapPin size={14} />}
+                      iconBg="bg-emerald-100"
+                      iconColor="text-emerald-600"
+                      title="Address Information"
+                    />
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <InputField
+                        control={control}
+                        name="pinCode"
+                        label="Pincode *"
+                        error={errors.pinCode}
+                      />
+                      <InputField
+                        control={control}
+                        name="locality"
+                        label="Locality"
+                        error={errors.locality}
+                      />
+                      <InputField
+                        control={control}
+                        name="city"
+                        label="City *"
+                        error={errors.city}
+                      />
+                      <InputField
+                        control={control}
+                        name="state"
+                        label="State *"
+                        error={errors.state}
+                      />
+                      <InputField
+                        control={control}
+                        name="country"
+                        label="Country *"
+                        error={errors.country}
+                      />
+                      <div className="col-span-2">
+                        <InputArea
+                          control={control}
+                          name="address"
+                          label="Address *"
+                          error={errors.address}
+                          minRows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              <div className="shrink-0 px-3 py-3 border-t border-slate-100 bg-white">
+                <div className="flex items-center gap-2">
+                  <div className="hidden sm:flex items-center gap-1 text-slate-400 text-[10px] font-medium shrink-0">
+                    <CheckCircle size={11} />
+                    <span>SSL encrypted</span>
+                  </div>
+                  <div className="flex items-center gap-2 w-full sm:ml-auto sm:w-auto">
+                    <CommonButton
+                      type="button"
+                      label="Reset"
+                      onClick={reset}
+                      className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all text-sm"
+                    />
+                    <CommonButton
+                      onClick={handleSubmit(onSubmit)}
+                      disabled={!isDirty && authUser?.avatar === avatarPreview}
+                      label="Update Profile"
+                      className="flex-[2] sm:flex-initial bg-gradient-to-r from-emerald-600 to-green-600 text-white font-black shadow-md hover:shadow-lg active:scale-95 transition-all disabled:grayscale disabled:opacity-50 text-sm"
+                    />
+                  </div>
                 </div>
-              </motion.div>
-      
+              </div>
+            </motion.div>
           </AnimatePresence>
         </Box>
       </Modal>

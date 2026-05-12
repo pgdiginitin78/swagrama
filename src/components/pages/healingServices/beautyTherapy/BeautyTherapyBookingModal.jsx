@@ -14,23 +14,37 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
+import {
+  GetBeautyTherapySlots
+} from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
+import { BookDetoxTherapy, GetTherapySlots } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
+
+import CommonButton from "../../../common/button/CommonButton";
 import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../../common/ConfirmationModal";
-import CancelButtonModal from "../../../common/button/CancelButtonModal";
-import CommonButton from "../../../common/button/CommonButton";
 import CheckBoxField from "../../../common/formFields/CheckBoxField";
 import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
-import {
-  BookBeautyTherapy,
-  GetBeautyTherapySlots,
-} from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
-import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
-import { BookDetoxTherapy } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
+import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+
+const formatTime = (timeStr) => {
+  if (!timeStr || typeof timeStr !== "string") return timeStr;
+  if (!timeStr.includes(":")) return timeStr;
+  try {
+    const [h, m] = timeStr.split(":");
+    let hours = parseInt(h);
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    return `${hours}:${m} ${ampm}`;
+  } catch (e) {
+    return timeStr;
+  }
+};
 
 const dropdownObjectSchema = yup
   .object()
@@ -81,28 +95,15 @@ const sectionVariants = {
 };
 
 const staticTimeSlots = [
-  { sessionTime: "09:00:00", isAvailable: true },
-  { sessionTime: "10:00:00", isAvailable: true },
-  { sessionTime: "11:00:00", isAvailable: true },
-  { sessionTime: "12:00:00", isAvailable: true },
-  { sessionTime: "13:00:00", isAvailable: true },
-  { sessionTime: "14:00:00", isAvailable: true },
-  { sessionTime: "15:00:00", isAvailable: true },
-  { sessionTime: "16:00:00", isAvailable: true },
-  { sessionTime: "17:00:00", isAvailable: true },
-].map((slot) => {
-  const startTime = slot.sessionTime;
-  const [h, m, s] = startTime.split(":").map(Number);
-  const date = new Date();
-  date.setHours(h, m, s, 0);
-  date.setMinutes(date.getMinutes() + 60);
-  const endTime = format(date, "HH:mm:ss");
-  return {
-    ...slot,
-    slotStartTime: startTime,
-    slotEndTime: endTime,
-  };
-});
+  { slotStartTime: "09:00:00", slotEndTime: "10:00:00", isAvailable: true },
+  { slotStartTime: "10:00:00", slotEndTime: "11:00:00", isAvailable: true },
+  { slotStartTime: "11:00:00", slotEndTime: "12:00:00", isAvailable: true },
+  { slotStartTime: "12:00:00", slotEndTime: "13:00:00", isAvailable: true },
+  { slotStartTime: "13:00:00", slotEndTime: "14:00:00", isAvailable: true },
+  { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
+  { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
+  { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
+]
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
   return (
@@ -121,9 +122,9 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
       `}
     >
       <span className="flex items-center space-x-1 whitespace-nowrap">
-        <span className="font-bold">{slot.slotStartTime}</span>
+        <span className="font-bold">{formatTime(slot.slotStartTime)}</span>
         <NavigateNextIcon sx={{ fontSize: 14 }} />
-        <span className="font-normal opacity-90">{slot.slotEndTime}</span>
+        <span className="font-normal opacity-90">{formatTime(slot.slotEndTime)}</span>
       </span>
     </button>
   );
@@ -142,6 +143,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
+
+
   const { setIsLoading } = useLoader();
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
@@ -205,6 +209,18 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       })
       .catch((error) => console.error(error));
   }, [setValue]);
+
+    useEffect(() => {
+      if (eventDetails?.serviceId && bookingDate) {
+        const formattedDate = format(new Date(bookingDate), "yyyy-MM-dd");
+        GetTherapySlots(formattedDate, eventDetails?.serviceId, formattedDate, 5)
+          .then((res) => {
+            console.log("slotsData", res?.data.data);
+            setBookedSlots(res.data.data);
+          })
+          .catch((err) => setBookedSlots([]));
+      }
+    }, [eventDetails, bookingDate]);
 
   const handleGetPatientData = () => {
     getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
@@ -281,31 +297,15 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
           ? format(new Date(bookingDate), "yyyy-MM-dd")
           : "";
 
-      const processSlots = (slots) => {
-        const today = format(new Date(), "yyyy-MM-dd");
-        const currentTime = format(new Date(), "HH:mm:ss");
-
-        return slots.map((slot) => {
-          let isAvailable = slot.isAvailable;
-          if (bookingDateStr === today) {
-            // Disable slots that have already started or passed
-            if (slot.slotStartTime < currentTime) {
-              isAvailable = false;
-            }
-          }
-          return { ...slot, isAvailable };
-        });
-      };
-
       GetBeautyTherapySlots(user.userId, bookingDateStr)
         .then((res) => {
           const data = res?.data?.data || [];
           const slots = data?.length > 0 ? data : staticTimeSlots;
-          setDoctorSlots(processSlots(slots));
+          setDoctorSlots(slots);
           setLoading(false);
         })
         .catch(() => {
-          setDoctorSlots(processSlots(staticTimeSlots));
+          setDoctorSlots(staticTimeSlots);
           setLoading(false);
         });
     } else {
@@ -334,6 +334,8 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       no_Of_Person: 1,
       No_Of_Sessions: 1,
       Amount: watch("totalAmount"),
+      fromDate: format(new Date(data.bookingDate), "yyyy-MM-dd"),
+      toDate: format(new Date(data.bookingDate), "yyyy-MM-dd"),
       totalAmount: watch("totalAmount"),
       doctorFid: null,
       serviceGroupID: eventDetails?.serviceGroupId,
@@ -452,7 +454,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                   <CancelButtonModal onClick={handleClose} />
                 </div>
 
-                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar bg-[#f8fafc]">
+                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 no-scrollbar bg-[#f8fafc]">
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div className="grid lg:grid-cols-3 gap-5">
                       <motion.div
@@ -617,26 +619,52 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   Loading slots...
                                 </p>
                               </div>
-                            ) : doctorSlots?.length > 0 ? (
+                            ) : doctorSlots?.length > 0 ?(
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 className="grid grid-cols-2 gap-2 content-start h-full"
                               >
-                                {doctorSlots.map((slot, index) => (
-                                  <TimeSlotChip
-                                    key={index}
-                                    slot={slot}
-                                    isSelected={
-                                      selectedTimeSlot?.slotStartTime ===
-                                      slot.slotStartTime
+                                {doctorSlots.map((slot, index) => {
+                                  const matchingBookedSlot = (bookedSlots || []).find(
+                                    (bs) =>
+                                      bs.slotStartTime === slot.slotStartTime &&
+                                      bs.slotEndTime === slot.slotEndTime
+                                  );
+
+                                  let isAvailable = matchingBookedSlot
+                                    ? matchingBookedSlot.isAvailable
+                                    : slot.isAvailable;
+
+                                  // Disable past slots if booking for today
+                                  const bookingDateStr =
+                                    bookingDate && !isNaN(new Date(bookingDate).getTime())
+                                      ? format(new Date(bookingDate), "yyyy-MM-dd")
+                                      : "";
+                                  const today = format(new Date(), "yyyy-MM-dd");
+                                  const currentTime = format(new Date(), "HH:mm:ss");
+
+                                  if (bookingDateStr === today) {
+                                    if (slot.slotStartTime < currentTime) {
+                                      isAvailable = false;
                                     }
-                                    onSelect={() => {
-                                      setSelectedTimeSlot(slot);
-                                      setSlotError("");
-                                    }}
-                                  />
-                                ))}
+                                  }
+
+                                  return (
+                                    <TimeSlotChip
+                                      key={index}
+                                      slot={{ ...slot, isAvailable }}
+                                      isSelected={
+                                        selectedTimeSlot?.slotStartTime ===
+                                        slot.slotStartTime
+                                      }
+                                      onSelect={() => {
+                                        setSelectedTimeSlot({ ...slot, isAvailable });
+                                        setSlotError("");
+                                      }}
+                                    />
+                                  );
+                                })}
                               </motion.div>
                             ) : (
                               <motion.div

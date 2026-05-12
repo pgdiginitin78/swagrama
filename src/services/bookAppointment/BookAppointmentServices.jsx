@@ -25,8 +25,8 @@ export const getPatientDataByMobileNo = (
   );
 };
 
-export const getServicesByClinicId = (clinicId) => {
-  return AxiosInstance.get(`Services?ClinicFid=${clinicId}`);
+export const getServicesByClinicId = (clinicId, userId) => {
+  return AxiosInstance.get(`Services?ClinicFid=${clinicId}&userId=${userId}`);
 };
 
 export const bookAppointment = (saveObj, userId) => {
@@ -86,4 +86,10 @@ export const CheckPaymentStatus = (clinicId, clientTxnId) => {
   }
 
   return AxiosInstance.get(`CheckPaymentStatus?${params.toString()}`);
+};
+
+//https://ayurmitra.in/WellnessAPILive/AgeDetails
+
+export const getAgeDetails = () => {
+  return AxiosInstance.get(`AgeDetails`);
 };

@@ -267,7 +267,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       <Modal open={open} closeAfterTransition>
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-y-auto rounded-xl  p-0 custom-scrollbar-wellness-stay"
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-hidden rounded-xl p-0 flex flex-col"
         >
           <AnimatePresence>
             <motion.div
@@ -275,8 +275,9 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
               initial="hidden"
               animate="visible"
               exit="hidden"
+              className="flex flex-col flex-1 min-h-0"
             >
-              <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 sm:px-5 py-4 flex items-center justify-between sticky top-0 z-20 shrink-0">
+              <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 sm:px-5 py-4 flex items-center justify-between shrink-0 z-20">
                 <div className="flex items-center gap-3">
                   <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
                     <ClipboardList className="w-5 h-5 text-white" />
@@ -293,7 +294,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                 <CancelButtonModal onClick={handleClose} />
               </div>
 
-              <div className="overflow-y-auto flex-1 p-4 sm:p-5 lg:p-7 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto p-4 sm:p-5 lg:p-7 no-scrollbar">
                 <form
                   onSubmit={handleSubmit(onSubmit)}
                   className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-7"
@@ -506,7 +507,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                 </form>
               </div>
 
-              <div className="lg:hidden p-4 bg-white border-t border-slate-100 flex gap-3">
+              <div className="lg:hidden p-4 bg-white border-t border-slate-100 flex gap-3 shrink-0">
                 <CommonButton
                   type="button"
                   onClick={reset}
@@ -543,13 +544,15 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
         }}
         disabled={isPaymentPending}
       />
-      <AddPatientModal
-        open={openAddPatient}
-        handleClose={() => {
-          setOpenAddPatient(false);
-          handleGetPatientData();
-        }}
-      />
+      {openAddPatient && (
+        <AddPatientModal
+          open={openAddPatient}
+          handleClose={() => {
+            setOpenAddPatient(false);
+            handleGetPatientData();
+          }}
+        />
+      )}
     </>
   );
 };

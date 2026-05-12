@@ -771,7 +771,7 @@ export default function SignUpModal({ open, handleClose }) {
                           <h4 className="text-base sm:text-lg font-bold text-[#2f3e2e] mb-3">
                             Terms and Conditions
                           </h4>
-                          <div className="max-h-48 overflow-y-auto p-3 sm:p-4 bg-[#f8fbf6] rounded-xl border border-[#e6efe3] text-xs sm:text-sm text-[#4b5563] leading-relaxed custom-scrollbar">
+                          <div className="max-h-48 overflow-y-auto p-3 sm:p-4 bg-[#f8fbf6] rounded-xl border border-[#e6efe3] text-xs sm:text-sm text-[#4b5563] leading-relaxed no-scrollbar">
                             <p className="mb-3">
                               <strong>1. Acceptance of Terms</strong>
                             </p>

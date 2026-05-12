@@ -399,7 +399,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                   </button>
                 </div>
 
-                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar bg-[#f8fafc]">
+                <div className="max-h-[calc(90vh-88px)] overflow-y-auto px-4 sm:px-6 py-6 no-scrollbar bg-[#f8fafc]">
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                     <div className="grid lg:grid-cols-3 gap-5">
                       <motion.div

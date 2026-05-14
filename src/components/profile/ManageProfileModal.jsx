@@ -169,7 +169,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       getUserDetails(
         user.userId,
         user?.role === "Admin" ? "other" : null,
-        user?.role === "Admin" ? 5 : null,
+        user?.role === "Admin" ? 5 : 0,
       )
         .then((res) => {
           const userData = res?.data?.data;

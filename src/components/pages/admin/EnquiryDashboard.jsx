@@ -476,12 +476,12 @@ const EnquiryDashboard = () => {
               className="border border-red-500 text-red-500 bg-red-50"
               onClick={reset}
             />
-            <CommonButton
+            {/* <CommonButton
               type="button"
               icon={<FileDownloadIcon />}
               label="Export"
               className="border border-[#1E5151] text-[#1E5151] whitespace-nowrap"
-            />
+            /> */}
           </div>
         </div>
 

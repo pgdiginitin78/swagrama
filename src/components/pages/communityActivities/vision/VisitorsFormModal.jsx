@@ -198,6 +198,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       amount: total,
       origin: origin,
     };
+    console.log("saveObj",saveObj)
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
@@ -209,6 +210,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       setIsLoading(true);
       const bookingRes = await SaveActivities(formData);
       const bookingData = bookingRes?.data;
+      console.log("bookingData",bookingData)
 
       if (bookingData?.message) {
         const innerData = bookingData?.data?.data || bookingData?.data;
@@ -216,7 +218,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
 
         const tempObj = {
           amount: formData.amount,
-          userId: patientFid?.userId,
+          userId: innerData?.patientUserId,
           paymentFor: origin,
           bookingId: bookingId,
         };
@@ -267,7 +269,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       <Modal open={open} closeAfterTransition>
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[90dvh] overflow-hidden rounded-xl p-0 flex flex-col"
+          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] 2xl:w-[55%] max-h-[90dvh] overflow-hidden rounded-xl p-0 flex flex-col"
         >
           <AnimatePresence>
             <motion.div

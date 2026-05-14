@@ -179,6 +179,7 @@ const getIcon = (specialty) => {
 };
 
 const AboutUs = () => {
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   const containerRef = useRef(null);
   const heroRef = useRef(null);
   const missionRef = useRef(null);
@@ -588,16 +589,14 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section
-        ref={healersRef}
-        className="pb-5 px-4 md:px-12 xl:px-20 bg-white"
-      >
+      <section ref={healersRef} className="py-14 px-4 md:px-12  bg-[#fdfbf7]">
         <div className="w-full mx-auto">
           <motion.div
             variants={staggerContainer}
             initial="hidden"
-            animate={isHealersInView ? "visible" : "hidden"}
-            className="text-center mb-5 pt-5"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-10"
           >
             <motion.span
               variants={fadeInUp}
@@ -608,7 +607,7 @@ const AboutUs = () => {
 
             <motion.h2
               variants={fadeInUp}
-              className="font-serif text-3xl md:text-4xl text-[#111827] mt-4 mb-6"
+              className="font-serif text-4xl text-gray-900 mt-4 mb-6 tracking-tight"
             >
               Pillars of SwaGrama
             </motion.h2>
@@ -618,49 +617,84 @@ const AboutUs = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mx-auto px-3 md:px-5"
           >
             {partnersData.map((healer, index) => (
               <motion.div
                 key={index}
                 variants={cardVariants}
-                whileHover={{ y: -10 }}
-                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100 backdrop-blur-xl rounded-[2rem] p-6 shadow-soft hover:shadow-elevated transition-all duration-500 border border-white/50 group"
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                whileHover="hover"
+                className="relative h-[450px] 2xl:h-[600px] rounded-[1rem] overflow-hidden shadow-2xl group cursor-pointer transition-all duration-700"
               >
-                <div className="flex flex-col items-center text-center">
-                  <div className="relative mb-6">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-green-200 to-lime-200 rounded-2xl blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500" />
-                    <img
-                      src={healer.image}
-                      alt={healer.name}
-                      className="relative w-32 h-32 rounded-2xl object-cover object-top shadow-md"
-                    />
+                {/* Background Image with Zoom Effect */}
+                <img
+                  src={healer.image}
+                  alt={healer.name}
+                  className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
+                />
+
+                {/* Multi-layered Gradient Overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
+
+                {/* Content Container */}
+                <div className="absolute inset-0 p-5 2xl:p-10 flex flex-col justify-end">
+                  {/* Roles List - Full Width and Clean on Hover */}
+                  <div className="absolute inset-0 px-4 flex items-center justify-center pointer-events-none z-20">
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{
+                        opacity: hoveredIndex === index ? 1 : 0,
+                        y: hoveredIndex === index ? 0 : 20,
+                      }}
+                      transition={{
+                        duration: 0.4,
+                        ease: "easeOut",
+                      }}
+                      className="space-y-2 w-full px-3"
+                    >
+                      {healer.roles.map((role, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, scale: 0.95 }}
+                          animate={{
+                            opacity: hoveredIndex === index ? 1 : 0,
+                            scale: hoveredIndex === index ? 1 : 0.95,
+                          }}
+                          transition={{
+                            duration: 0.3,
+                            delay: hoveredIndex === index ? idx * 0.05 : 0,
+                          }}
+                          className="text-white text-[11px] md:text-sm font-medium text-center w-full"
+                        >
+                          <div className="block w-full py-2 px-2 rounded-lg bg-black/40 backdrop-blur-md border border-white/10 shadow-xl">
+                            {role}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
                   </div>
 
-                  <h3 className="font-serif text-xl text-[#111827] mb-1 group-hover:text-green-700 transition-colors">
-                    {healer.name}
-                  </h3>
-                  <p className="text-sm font-medium text-green-600 mb-4 tracking-wide">
-                    {healer.title}
-                  </p>
+                  {/* Aesthetic Divider Line */}
+                  <div className="h-[1px] w-full bg-gradient-to-r from-white/40 via-white/10 to-transparent mb-3" />
 
-                  <div className="space-y-2.5 w-full">
-                    {healer.roles.map((role, roleIndex) => (
-                      <motion.div
-                        key={roleIndex}
-                        initial={{ x: -10, opacity: 0 }}
-                        animate={{
-                          x: 0,
-                          opacity: 1,
-                        }}
-                        transition={{ delay: roleIndex * 0.1 }}
-                        className="flex items-start text-left  gap-2 text-xs text-gray-600 bg-green-50 p-2 rounded-lg"
-                      >
-                        <div className="w-1.5 h-1.5 rounded-full bg-[#1E8E7A] mt-1.5 flex-shrink-0" />
-                        <span className="leading-relaxed">{role}</span>
-                      </motion.div>
-                    ))}
-                  </div>
+                  {/* Name and Professional Title */}
+                  <motion.div
+                    animate={{
+                      y: hoveredIndex === index ? -5 : 0,
+                      opacity: hoveredIndex === index ? 0.8 : 1,
+                    }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <h3 className="font-serif text-2xl 2xl:text-3xl text-white mb-2 tracking-tight group-hover:text-orange-50 transition-colors">
+                      {healer.name}
+                    </h3>
+                    <p className="text-xs md:text-sm font-bold text-orange-400 tracking-[0.25em] uppercase">
+                      {healer.title}
+                    </p>
+                  </motion.div>
                 </div>
               </motion.div>
             ))}
@@ -668,28 +702,30 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8">
-        <Container maxWidth="lg">
+      <div className="py-14 px-4 sm:px-6 lg:px-8 bg-white">
+        <Container maxWidth="xl">
           <motion.div
             initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            className="text-center mb-6 pt-2"
           >
             <motion.div
               initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+              whileInView={{ scale: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
               className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full mb-4"
             >
               <MedicalServices className="text-white" sx={{ fontSize: 32 }} />
             </motion.div>
 
-            <h1 className="font-bold text-gray-800 text-3xl">
+            <h1 className="font-bold text-gray-900 text-4xl  tracking-tight mb-4">
               Our Community Healers
             </h1>
 
-            <p className="text-[#6B7280] mt-2 max-w-2xl mx-auto text-base text-center">
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
               Dedicated practitioners bringing together Ayurveda, Yoga,
               Homoeopathy & Modern Medicine
             </p>
@@ -698,71 +734,77 @@ const AboutUs = () => {
           <motion.div
             variants={containerVariants}
             initial="hidden"
-            animate="visible"
+            whileInView="visible"
+            viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
             {healers.map((healer) => (
               <motion.div
                 key={healer.id}
                 variants={cardVariants}
-                whileHover={{ y: -8, transition: { duration: 0.3 } }}
-                onHoverStart={() => setHoveredId(healer.id)}
+                whileHover={{ y: -12 }}
+                onHoverStart={() => setHoveredId(`healer-${healer.id}`)}
                 onHoverEnd={() => setHoveredId(null)}
-                className="bg-gradient-to-tr from-green-100 via-lime-100 to-emerald-100"
+                className="relative"
               >
                 <Card
-                  className="h-full overflow-hidden border "
+                  className="relative h-[350px] 2xl:h-[450px] overflow-hidden group cursor-pointer"
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: "24px",
+                    border: "none",
                     boxShadow:
-                      hoveredId === healer.id
-                        ? "0 20px 40px rgba(0,0,0,0.15)"
-                        : "0 4px 12px rgba(0,0,0,0.08)",
-                    transition: "box-shadow 0.3s ease",
-
-                    border: "1px solid brown",
+                      hoveredId === `healer-${healer.id}`
+                        ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+                        : "0 10px 20px rgba(0, 0, 0, 0.1)",
+                    transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}
                 >
-                  <div className="relative">
-                    <div className="relative h-56 ">
-                      <motion.img
-                        src={healer.image}
-                        alt={healer.name}
-                        className="w-full h-full object-cover object-center "
-                        whileHover={{ scale: 1.05 }}
-                        transition={{ duration: 0.4 }}
-                      />
+                  <motion.img
+                    src={healer.image}
+                    alt={healer.name}
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                    animate={{
+                      scale: hoveredId === `healer-${healer.id}` ? 1.1 : 1,
+                      filter:
+                        hoveredId === `healer-${healer.id}`
+                          ? "brightness(0.9)"
+                          : "brightness(1)",
+                    }}
+                    transition={{ duration: 0.6 }}
+                  />
 
-                      {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" /> */}
-                    </div>
+                  {/* <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" /> */}
 
-                    <CardContent className="mt-2 pb-4 px-6 text-center">
-                      <Typography
-                        variant="h6"
-                        component="h3"
-                        className="font-bold text-gray-800 mb-2"
-                        sx={{ fontSize: "1rem", fontWeight: 700 }}
-                      >
-                        {healer.name}
-                      </Typography>
+                  <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center">
+                    <motion.h3
+                      className="text-white text-xl font-bold mb-1 tracking-tight leading-tight"
+                      animate={{
+                        y: hoveredId === `healer-${healer.id}` ? -4 : 0,
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      {healer.name}
+                    </motion.h3>
 
-                      <Typography
-                        variant="body2"
-                        className="text-gray-600 font-medium"
-                        sx={{ fontSize: "0.9rem" }}
-                      >
-                        {healer.specialty}
-                      </Typography>
-                      <motion.div
-                        initial={{ width: 0 }}
-                        animate={{
-                          width: hoveredId === healer.id ? "60px" : "40px",
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className="mx-auto mt-4 h-1 rounded-full"
-                        style={{ backgroundColor: healer.color }}
-                      />
-                    </CardContent>
+                    <motion.p
+                      className="text-gray-300 text-sm font-medium tracking-wide uppercase"
+                      animate={{
+                        y: hoveredId === `healer-${healer.id}` ? -4 : 0,
+                      }}
+                      transition={{ duration: 0.3, delay: 0.05 }}
+                    >
+                      {healer.specialty}
+                    </motion.p>
+
+                    <motion.div
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{
+                        width:
+                          hoveredId === `healer-${healer.id}` ? "50px" : "0px",
+                        opacity: hoveredId === `healer-${healer.id}` ? 1 : 0,
+                      }}
+                      className="h-1 bg-emerald-500 rounded-full mt-2"
+                    />
                   </div>
                 </Card>
               </motion.div>

@@ -11,12 +11,12 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../../context/AuthContext";
 import {
-    getClinicList,
-    getDoctorAvailableSlots,
-    getDoctorsByClinicId,
-    getLocationList,
-    getPatientDataByMobileNo,
-    getServicesByClinicId,
+  getClinicList,
+  getDoctorAvailableSlots,
+  getDoctorsByClinicId,
+  getLocationList,
+  getPatientDataByMobileNo,
+  getServicesByClinicId,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -106,7 +106,7 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
 const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
-   const [locationListOptions, setLocationListOptions] = useState([]);
+  const [locationListOptions, setLocationListOptions] = useState([]);
   const [clinicsOptions, setClinicOptions] = useState([]);
   const [patientOptions, setPatientOptions] = useState([]);
   const [doctorOptions, setDoctorOptions] = useState([]);
@@ -151,7 +151,7 @@ const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
   const fromDate = watch("fromDate");
   const toDate = watch("toDate");
   const selectedServiceValue = watch("serviceFid");
-console.log("selectedServiceValue",selectedServiceValue);
+  console.log("selectedServiceValue", selectedServiceValue);
 
   useEffect(() => {
     let days = 0;
@@ -228,7 +228,7 @@ console.log("selectedServiceValue",selectedServiceValue);
                 id: item.patientId,
                 value: item.patientId,
                 label: `${item.firstName} ${item.lastName}`,
-              }))
+              })),
             );
           }
         })
@@ -406,7 +406,6 @@ console.log("selectedServiceValue",selectedServiceValue);
                         variants={sectionVariants}
                         className="lg:col-span-2 space-y-5"
                       >
-                        {/* Patient & Therapy Info */}
                         <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden">
                           <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-white/20 rounded-lg">
@@ -458,8 +457,6 @@ console.log("selectedServiceValue",selectedServiceValue);
                             </div>
                           </div>
                         </div>
-
-                        {/* Schedule Info */}
                         <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden">
                           <div className="bg-booking-primaryLight px-4 py-2 flex items-center gap-2">
                             <div className="p-1.5 bg-white/20 rounded-lg">
@@ -498,7 +495,6 @@ console.log("selectedServiceValue",selectedServiceValue);
                               />
                             </div>
 
-                            {/* Calculated Price Section */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-5 bg-booking-primaryLight p-4 rounded-xl border border-booking-primary/10">
                               <div className="flex flex-col">
                                 <span className="text-booking-label text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
@@ -528,7 +524,6 @@ console.log("selectedServiceValue",selectedServiceValue);
                           </div>
                         </div>
 
-                        {/* Additional Info */}
                         <div className="bg-booking-surface rounded-xl shadow-sm border border-booking-border overflow-hidden p-4 sm:p-5">
                           <InputArea
                             name="specialRequest"
@@ -548,7 +543,6 @@ console.log("selectedServiceValue",selectedServiceValue);
                         </div>
                       </motion.div>
 
-                      {/* Right Panel: Time Slots */}
                       <motion.div
                         variants={sectionVariants}
                         className="lg:col-span-1"

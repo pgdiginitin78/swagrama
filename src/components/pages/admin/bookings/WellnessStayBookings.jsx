@@ -141,6 +141,7 @@ export default function WellnessStayBookings({
       type: "all",
     }; 
     setSelectedRow(null)
+    setLoadingSpinner(true)
     GetUpcomingStays(5, obj)
       .then((res) => {
         if (forPagination) {
@@ -175,6 +176,51 @@ export default function WellnessStayBookings({
     }
   };
 
+  const renderInput = (row, _index, header) => {
+    if (header === "bookingStatus") {
+      const status = row["bookingStatus"]?.trim() || "Pending";
+      
+      const statusConfig = {
+        Confirmed: {
+          pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
+          dot: "bg-emerald-500"
+        },
+        Pending: {
+          pill: "text-amber-600 border-amber-400 bg-amber-100",
+          dot: "bg-amber-400"
+        },
+        Canceled: {
+          pill: "text-red-700 border-red-500 bg-red-100",
+          dot: "bg-red-500"
+        },
+        "Check-In": {
+          pill: "text-[#e7f5ed] border-[#3b4b3e] bg-[#3b4b3e]",
+          dot: "bg-emerald-400"
+        },
+        "Check-Out": {
+          pill: "text-teal-700 border-teal-500 bg-teal-100",
+          dot: "bg-teal-500"
+        },
+        Default: {
+          pill: "text-gray-600 border-gray-300 bg-gray-100",
+          dot: "bg-gray-400"
+        }
+      };
+
+      const config = statusConfig[status] || statusConfig.Default;
+
+      return (
+        <span
+          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 uppercase text-[10px] font-bold rounded-2xl min-w-[100px] border ${config.pill}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+          {status}
+        </span>
+      );
+    }
+    return row[header];
+  };
+
   useEffect(() => {
     GetNext24HoursArrivals()
       .then((res) => {
@@ -196,7 +242,7 @@ export default function WellnessStayBookings({
           className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2 shrink-0"
         >
           <div>
-            <h1 className="text-[17px] font-black text-[#002a24] tracking-tight leading-none ">
+            <h1 className="text-[24px] font-black text-[#002a24] tracking-tight leading-none mb-2 ">
               Wellness Stay
             </h1>
           </div>
@@ -236,25 +282,23 @@ export default function WellnessStayBookings({
           />
         </div>
 
-        {/* Ultra-Compact Modern Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 mb-4 flex items-center justify-start gap-4 shadow-sm"
         >
           <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
-            {/* Payment Status */}
             <div className="flex flex-col gap-1 pr-1">
-              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Payment</span>
+              <span className="text-[14px] font-semibold capitalize text-[#6a9060]">Payment</span>
               <div className="flex gap-1">
                 {["all", "paid", "unpaid"].map((opt) => (
                   <button
                     key={opt}
                     onClick={() => handleFilter("paymentStatus", opt)}
-                    className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                    className={`px-5 py-1 rounded text-[12px] font-semibold capitalize transition-all ${
                       filters.paymentStatus === opt
                         ? "bg-[#003d33] text-white shadow-sm"
-                        : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                        : "text-[#4c7c70] bg-[#d4e9ce]/20"
                     }`}
                   >
                     {opt}
@@ -263,18 +307,17 @@ export default function WellnessStayBookings({
               </div>
             </div>
 
-            {/* Booking Status */}
             <div className="flex flex-col gap-1 pl-6 pr-1">
-              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Booking</span>
+              <span className="text-[14px] font-semibold capitalize  text-[#6a9060]">Booking</span>
               <div className="flex gap-1">
                 {["all", "confirmed", "pending"].map((opt) => (
                   <button
                     key={opt}
                     onClick={() => handleFilter("bookingStatus", opt)}
-                    className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                    className={`px-5 py-1 rounded text-[12px] font-semibold capitalize transition-all ${
                       filters.bookingStatus === opt
                         ? "bg-[#003d33] text-white shadow-sm"
-                        : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                        : "text-[#4c7c70] bg-[#d4e9ce]/20"
                     }`}
                   >
                     {opt}
@@ -283,9 +326,8 @@ export default function WellnessStayBookings({
               </div>
             </div>
 
-            {/* Room Type */}
             <div className="flex flex-col gap-1 pl-6 pr-1">
-              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Room Type</span>
+              <span className="text-[14px] font-semibold capitalize  text-[#6a9060]">Room Type</span>
               <Select
                 value={filters.roomType}
                 onChange={(e) => handleFilter("roomType", e.target.value)}
@@ -313,16 +355,15 @@ export default function WellnessStayBookings({
                 }}
               >
                 {["all"].map((opt) => (
-                  <MenuItem key={opt} value={opt} sx={{ fontSize: "10px", fontWeight: 700 }}>
+                  <MenuItem key={opt} value={opt} sx={{ fontSize: "12px", fontWeight: 600 }}>
                     {opt.toUpperCase()}
                   </MenuItem>
                 ))}
               </Select>
             </div>
 
-            {/* Occupancy */}
             <div className="flex flex-col gap-1 pl-6">
-              <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">Occupancy</span>
+              <span className="text-[14px] font-semibold capitalize text-[#6a9060]">Occupancy</span>
               <ToggleButtonGroup
                 value={filters.occupancyType}
                 exclusive
@@ -332,9 +373,9 @@ export default function WellnessStayBookings({
                   height: "24px",
                   "& .MuiToggleButton-root": {
                     border: "none !important",
-                    borderRadius: "6px !important",
-                    fontSize: "8px",
-                    fontWeight: 800,
+                    borderRadius: "5px !important",
+                    fontSize: "12px",
+                    fontWeight: 600,
                     px: 1.5,
                     color: "#6a9060",
                     "&.Mui-selected": {
@@ -416,6 +457,8 @@ export default function WellnessStayBookings({
                   tableClass={"h-[460px] border cursor-pointer"}
                   setDataResult={setUpcomingStays}
                   populateTable={populateTable}
+                  renderInput={renderInput}
+                  editableColumns={["bookingStatus"]}
                   handleSelectedRow={(row) => {
                     setSelectedRow(row);
                     if (onSelect) onSelect(row);
@@ -428,9 +471,9 @@ export default function WellnessStayBookings({
                     "twinsharing",
                     "financials",
                     "petFriendly",
-                    "bookingStatus",
                     "daysRemaining",
                     "images",
+                    "amount"
                   ]}
                 />
               </main>

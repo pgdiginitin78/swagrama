@@ -259,7 +259,10 @@ const Footer = () => {
             </div>
           </div>
           <div className="text-center pt-4 border-t border-white/20 text-white/80 text-xs">
-            <p>&copy; 2026 Swagrama Community. All rights reserved.</p>
+            <p>
+              &copy; 2026 Swagrama Community. All rights reserved. <br />
+              Created by Probus Studio.
+            </p>
           </div>
         </div>
       </footer>

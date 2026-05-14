@@ -124,7 +124,7 @@ const EventCard = ({
           <p className="text-xs text-muted-foreground line-clamp-2 flex-grow">
             {event.description}
           </p>
-
+      
           <div className="flex items-start gap-2 my-1 p-2 bg-lime/10 rounded-xl border border-lime-200">
             <Heart className="w-4 h-4 text-earth mt-1 flex-shrink-0" />
             <div>
@@ -136,7 +136,6 @@ const EventCard = ({
               </p>
             </div>
           </div>
-
           <div className="flex items-center justify-between gap-3 mt-auto">
             {event.price ? (
               <div className="flex items-center gap-1">
@@ -148,9 +147,7 @@ const EventCard = ({
                 </span>
               </div>
             ) : (
-              <div>
-         
-              </div>
+              <div></div>
             )}
 
             <button
@@ -256,8 +253,7 @@ const CommunityCeremony = () => {
     return acc;
   }, {});
 
-  const todayEvents = eventsData2026.filter(event => isEventToday(event));
-
+  const todayEvents = eventsData2026.filter((event) => isEventToday(event));
 
   useEffect(() => {
     setActiveMonth(currentMonthName);
@@ -265,8 +261,8 @@ const CommunityCeremony = () => {
 
   const scrollMonths = (direction) => {
     if (scrollRef.current) {
-      const scrollAmount = direction === 'left' ? -300 : 300;
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+      const scrollAmount = direction === "left" ? -300 : 300;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
     }
   };
 
@@ -277,26 +273,26 @@ const CommunityCeremony = () => {
 
   const handleMouseDown = (e) => {
     isDown.current = true;
-    scrollRef.current.classList.add('active');
+    scrollRef.current.classList.add("active");
     startX.current = e.pageX - scrollRef.current.offsetLeft;
     scrollLeft.current = scrollRef.current.scrollLeft;
   };
 
   const handleMouseLeave = () => {
     isDown.current = false;
-    scrollRef.current.classList.remove('active');
+    scrollRef.current.classList.remove("active");
   };
 
   const handleMouseUp = () => {
     isDown.current = false;
-    scrollRef.current.classList.remove('active');
+    scrollRef.current.classList.remove("active");
   };
 
   const handleMouseMove = (e) => {
     if (!isDown.current) return;
     e.preventDefault();
     const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX.current) * 2; 
+    const walk = (x - startX.current) * 2;
     scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
 
@@ -309,33 +305,32 @@ const CommunityCeremony = () => {
       ref={containerRef}
     >
       <header className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-forest">
-        <motion.div 
+        <motion.div
           initial={{ scale: 1.1, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
           className="absolute inset-0 z-0"
         >
-          <img 
-            src={bannerImage} 
-            alt="Annual Events Banner" 
+          <img
+            src={bannerImage}
+            alt="Annual Events Banner"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/40" />
         </motion.div>
 
         <div className="container relative z-10 mx-auto px-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 1 }}
             className="max-w-4xl mx-auto"
           >
             <div className="relative group overflow-hidden rounded-[32px] p-8 md:p-12 border border-white/20 bg-white/10 backdrop-blur-2xl shadow-[0_8px_32px_0_rgba(0,0,0,0.37)] text-center">
-      
               <div className="absolute -top-24 -left-24 w-48 h-48 bg-lime/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
               <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-forest/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000" />
 
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.6 }}
@@ -343,11 +338,11 @@ const CommunityCeremony = () => {
               >
                 <Leaf className="w-5 h-5 text-lime" />
                 <span className="font-semibold text-lime uppercase tracking-wider text-sm">
-                   स्वग्राम कार्यक्रम 2026
+                  स्वग्राम कार्यक्रम 2026
                 </span>
               </motion.div>
 
-              <motion.h1 
+              <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
@@ -357,7 +352,7 @@ const CommunityCeremony = () => {
                 <span className="text-lime">Calendar 2026</span>
               </motion.h1>
 
-              <motion.p 
+              <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
@@ -366,7 +361,7 @@ const CommunityCeremony = () => {
                 Discover our curated collection of cultural festivals, wellness
                 communes, and spiritual ceremonies throughout the year.
               </motion.p>
-              
+
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-lime/20 border border-lime/40 rounded-full text-lime text-sm font-semibold">
                 <span className="inline-block w-2 h-2 rounded-full bg-lime animate-pulse" />
                 Viewing {currentMonthName} 2026 ·{" "}
@@ -383,7 +378,7 @@ const CommunityCeremony = () => {
 
       <main className="w-full mx-auto px-4 py-3">
         {todayEvents.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="mb-12"
@@ -392,14 +387,16 @@ const CommunityCeremony = () => {
               <div className="absolute top-0 right-0 p-4">
                 <div className="flex items-center gap-1.5 px-3 py-1 bg-lime/20 backdrop-blur-md rounded-full border border-lime/30">
                   <span className="w-1.5 h-1.5 rounded-full bg-lime animate-ping" />
-                  <span className="text-[10px] font-bold text-lime uppercase tracking-wider">Today's Event</span>
+                  <span className="text-[10px] font-bold text-lime uppercase tracking-wider">
+                    Today's Event
+                  </span>
                 </div>
               </div>
-              
+
               <div className="flex flex-col md:flex-row">
                 <div className="md:w-1/3 h-48 md:h-auto overflow-hidden">
-                  <img 
-                    src={todayEvents[0].image} 
+                  <img
+                    src={todayEvents[0].image}
                     alt={todayEvents[0].serviceName}
                     className="w-full h-full object-cover"
                   />
@@ -415,7 +412,9 @@ const CommunityCeremony = () => {
                     <div className="flex items-start gap-2 pt-2 border-t border-white/10">
                       <Heart className="w-4 h-4 text-lime flex-shrink-0 mt-0.5" />
                       <p className="text-cream/80 text-xs font-medium">
-                        <span className="text-lime uppercase tracking-wider font-bold mr-2">Benefits:</span>
+                        <span className="text-lime uppercase tracking-wider font-bold mr-2">
+                          Benefits:
+                        </span>
                         {todayEvents[0].benefits}
                       </p>
                     </div>
@@ -424,10 +423,12 @@ const CommunityCeremony = () => {
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-lime" />
-                        <span className="text-sm font-semibold text-cream">{todayEvents[0].date}</span>
+                        <span className="text-sm font-semibold text-cream">
+                          {todayEvents[0].date}
+                        </span>
                       </div>
                     </div>
-                    <button 
+                    <button
                       onClick={() => {
                         setOpenEventBookModal(true);
                         setSelectedEvent(todayEvents[0]);
@@ -440,7 +441,7 @@ const CommunityCeremony = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Decorative elements */}
               <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-lime/10 rounded-full blur-3xl" />
             </div>
@@ -452,7 +453,7 @@ const CommunityCeremony = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-bold text-foreground">Select Month</h2>
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => setActiveMonth(currentMonthName)}
                 className="text-xs font-bold text-forest hover:text-earth transition-colors flex items-center gap-1 mr-2"
               >
@@ -460,15 +461,15 @@ const CommunityCeremony = () => {
                 Today
               </button>
               <div className="flex items-center gap-1 border-l border-lime/20 pl-3">
-                <button 
-                  onClick={() => scrollMonths('left')}
+                <button
+                  onClick={() => scrollMonths("left")}
                   className="w-8 h-8 rounded-full bg-white border border-lime/20 flex items-center justify-center text-forest hover:bg-lime/10 transition-colors shadow-sm"
                   title="Previous"
                 >
                   <ChevronLeftIcon fontSize="small" />
                 </button>
-                <button 
-                  onClick={() => scrollMonths('right')}
+                <button
+                  onClick={() => scrollMonths("right")}
                   className="w-8 h-8 rounded-full bg-white border border-lime/20 flex items-center justify-center text-forest hover:bg-lime/10 transition-colors shadow-sm"
                   title="Next"
                 >
@@ -477,9 +478,9 @@ const CommunityCeremony = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="relative group/carousel">
-            <div 
+            <div
               ref={scrollRef}
               onMouseDown={handleMouseDown}
               onMouseLeave={handleMouseLeave}
@@ -487,8 +488,8 @@ const CommunityCeremony = () => {
               onMouseMove={handleMouseMove}
               className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar -mx-2 px-2 scroll-smooth cursor-grab active:cursor-grabbing select-none"
               style={{
-                msOverflowStyle: 'none',
-                scrollbarWidth: 'none',
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
               }}
             >
               <style>{`
@@ -500,15 +501,17 @@ const CommunityCeremony = () => {
                 const isActive = activeMonth === month;
                 const hasEvents = (eventsByMonth[month]?.length || 0) > 0;
                 const isCurrentMonth = month === currentMonthName;
-                
+
                 return (
                   <button
                     key={month}
                     onClick={() => setActiveMonth(month)}
                     className={`flex-shrink-0 relative px-6 py-3 rounded-[9px] font-semibold text-sm transition-all duration-300 pointer-events-auto
-                      ${isActive 
-                        ? "bg-forest text-cream shadow-nature" 
-                        : "bg-white border border-lime/30 text-muted-foreground hover:border-lime hover:bg-lime/5"}
+                      ${
+                        isActive
+                          ? "bg-forest text-cream shadow-nature"
+                          : "bg-white border border-lime/30 text-muted-foreground hover:border-lime hover:bg-lime/5"
+                      }
                       ${!hasEvents && "opacity-50 grayscale"}
                     `}
                   >
@@ -518,7 +521,11 @@ const CommunityCeremony = () => {
                       <motion.div
                         layoutId="activeMonth"
                         className="absolute inset-0 bg-forest rounded-[9px]"
-                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        transition={{
+                          type: "spring",
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
                       />
                     )}
                   </button>
@@ -537,7 +544,8 @@ const CommunityCeremony = () => {
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.4 }}
           >
-            {eventsByMonth[activeMonth] && eventsByMonth[activeMonth].length > 0 ? (
+            {eventsByMonth[activeMonth] &&
+            eventsByMonth[activeMonth].length > 0 ? (
               <MonthSection
                 month={activeMonth}
                 events={eventsByMonth[activeMonth]}
@@ -548,8 +556,12 @@ const CommunityCeremony = () => {
             ) : (
               <div className="py-20 text-center bg-white/50 rounded-2xl border border-dashed border-lime/40">
                 <Calendar className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-foreground/40">No Events Scheduled</h3>
-                <p className="text-muted-foreground/60 text-sm">There are no annual events for {activeMonth} 2026 yet.</p>
+                <h3 className="text-xl font-bold text-foreground/40">
+                  No Events Scheduled
+                </h3>
+                <p className="text-muted-foreground/60 text-sm">
+                  There are no annual events for {activeMonth} 2026 yet.
+                </p>
               </div>
             )}
           </motion.div>

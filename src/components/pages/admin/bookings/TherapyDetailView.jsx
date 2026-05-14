@@ -10,7 +10,7 @@ import { IconButton } from "@mui/material";
 
 const DetailRow = ({ icon, label, value }) => (
   <div className="flex items-center gap-2 px-2.5 py-2 rounded-lg border bg-gray-50 border-gray-100">
-    <span className="text-gray-400 text-[14px] flex-shrink-0">{icon}</span>
+    <span className="text-[#7ccb5e] text-[14px] flex-shrink-0">{icon}</span>
     <div className="min-w-0">
       <p className="text-[8px] font-bold text-gray-500 uppercase tracking-wider">{label}</p>
       <p className="text-[10px] text-[#002a24] font-semibold truncate">{value || "—"}</p>

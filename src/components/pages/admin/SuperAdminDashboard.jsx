@@ -34,6 +34,13 @@ import {
   GetTherapySplit,
   GetUpcomingStays
 } from "../../../services/adminDashboard/AdminDashboardServices";
+import EarningIcon from "../../assets/dashboard/EarningIcon.svg"
+import TotalMoney from "../../assets/dashboard/TotalMoney.svg"
+import ShopOrderIcon from "../../assets/dashboard/ShopOrderIcon.svg"
+import DoctorsIcon from "../../assets/dashboard/DoctorsIcon.svg"
+
+
+
 
 const G = "#3d6b1f";
 const G2 = "#5a9e2f";
@@ -98,7 +105,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
       value: `₹${dashboardStats?.totalRevenue ?? 0}`,
       trend: "+0%",
       sub: "incl. Shop & Services",
-      icon: <AccountBalanceWallet sx={{ fontSize: 18 }} />,
+      icon: <img src={TotalMoney} alt="Total Money" style={{height:"24px",width:"24px"}} />,
       bg: "#e8f5e0",
       fg: "#3d6b1f",
     },
@@ -118,7 +125,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
       value: `₹${dashboardStats?.storeOrders ?? 0}`,
       trend: "0",
       sub: "pending fulfillment",
-      icon: <CalendarMonth sx={{ fontSize: 18 }} />,
+      icon: <img src={ShopOrderIcon} alt="Shop Order" style={{height:"20px",width:"20px"}} />,
       bg: "#fce4ec",
       fg: "#c62828",
     },
@@ -320,11 +327,11 @@ const SuperAdminDashboard = ({ onNavigate }) => {
         </section>
 
         <section className="mb-5">
-          <div className="bg-white rounded-[18px] border border-[#eef0ea] p-[18px]">
+          <div className="bg-white rounded border border-[#eef0ea] p-[18px]">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#e8f5e0] text-[#3d6b1f] flex items-center justify-center">
-                  <AccountBalanceWallet sx={{ fontSize: 15 }} />
+                <div className=" flex items-center justify-center">
+                  <img src={EarningIcon} alt="Earnings Icon" style={{ width: '24px', height: '24px' }} />
                 </div>
                 <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                   Earnings & Revenue Trends
@@ -507,8 +514,14 @@ const SuperAdminDashboard = ({ onNavigate }) => {
         >
           <div className="px-5 py-4 border-b border-[#f5f6f2] flex items-center justify-between flex-wrap gap-2.5">
             <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-[#ede7f6] text-[#4527a0] flex items-center justify-center">
-                <Assignment sx={{ fontSize: 15 }} />
+              <div className="flex items-center justify-center">
+                <img
+                  src={DoctorsIcon}
+                  alt="Doctors"
+                  width={24}
+                  height={24}
+                  style={{ fontSize: 15 }}
+                />
               </div>
               <span className="text-[13px] font-extrabold text-[#1a2a0f]">
                 Doctor Assignments & Capacity

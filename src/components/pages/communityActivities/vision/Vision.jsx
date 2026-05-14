@@ -482,10 +482,8 @@ const OurVision = () => {
         </div>
       </div>
 
-      {/* 5. VISITOR AND WALK-IN SERVICES */}
       <div className="py-8 sm:py-12 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9]">
         <div className="max-w-screen-2xl mx-auto px-4">
-          {/* VISITOR SERVICES */}
           <div className="mb-14 sm:mb-20">
             <motion.div
               initial={{ opacity: 0, y: -20 }}

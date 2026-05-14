@@ -12,14 +12,14 @@ export const StatusBadge = ({ status }) => {
   const isActive = status === "Upcoming" || status === "In Transit";
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold whitespace-nowrap ${
+      className={`inline-flex items-center gap-1 px-4 py-1 rounded text-[14px] font-bold whitespace-nowrap ${
         isActive
-          ? "bg-emerald-50 text-emerald-600"
-          : "bg-gray-100 text-gray-400"
+          ? "bg-emerald-50 text-emerald-600 border border-emerald-600"
+          : "bg-gray-100 text-gray-400 border"
       }`}
     >
       {isActive && (
-        <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+        <span className="w-1 h-1 rounded-full bg-emerald-500  animate-pulse shrink-0" />
       )}
       {status}
     </span>
@@ -82,7 +82,7 @@ const ActivityCard = ({ data, onClick }) => {
               : displayData.type === "order"
                 ? "bg-amber-50 text-amber-600"
                 : displayData.type === "stay"
-                  ? "bg-purple-50 text-purple-600"
+                  ? "bg-purple-50 text-green-600"
                   : "bg-blue-50 text-blue-600"
           }`}
         >

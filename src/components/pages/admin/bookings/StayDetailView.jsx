@@ -75,8 +75,8 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
                 style={{ fontSize: 38, color: "rgba(255,255,255,0.18)" }}
               />
             )}
-            <span className="absolute top-2 right-2 bg-white/20 backdrop-blur-sm text-white text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border border-white/30">
-              {selectedBooking.serviceName || "—"}
+            <span className="absolute top-2 right-2 bg-white/20 backdrop-blur-sm text-white text-[7px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-white/30">
+              {selectedBooking.room || "—"}
             </span>
           </div>
 
@@ -85,12 +85,12 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <p className="text-[13px] font-black text-[#002a24] truncate leading-tight">
                 {selectedBooking.customer || "—"}
               </p>
-              <p className="text-[9px] text-gray-400 font-medium mt-0.5">
+              <p className="text-[12px] text-gray-400 font-medium mt-0.5">
                 Check-in: {checkInFormatted}
               </p>
             </div>
             <span
-              className={`shrink-0 px-2 py-0.5 rounded-full text-[8px] font-bold ${statusStyles[bookingStatus] || "bg-gray-100 text-gray-600"}`}
+              className={`shrink-0 px-2 py-0.5 rounded text-[8px] font-bold ${statusStyles[bookingStatus] || "bg-gray-100 text-gray-600"}`}
             >
               {bookingStatus.toUpperCase()}
             </span>
@@ -99,17 +99,17 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
 
         {selectedBooking.stayDetails && (
           <div className="mx-3 mt-2 px-3 py-2 rounded-lg bg-[#f0f7ee] border border-[#d4e9ce] flex items-center gap-2">
-            <EventNoteIcon style={{ fontSize: 13, color: "#4c7c70" }} />
+            <EventNoteIcon style={{ fontSize: 14, color: "#4c7c70" }} />
             <div>
-              <p className="text-[7px] font-black uppercase tracking-widest text-[#6a9060]">
+              <p className="text-[14px] font-semibold capitalize  text-[#6a9060]">
                 Stay Period
               </p>
-              <p className="text-[11px] font-bold text-[#002a24]">
+              <p className="text-[12px] font-bold text-[#002a24]">
                 {selectedBooking.stayDetails}
               </p>
             </div>
             {selectedBooking.daysRemaining && (
-              <span className="ml-auto text-[7.5px] font-black uppercase text-[#4c7c70] bg-[#d4e9ce] px-2 py-0.5 rounded-full">
+              <span className="ml-auto text-[10px] font-semibold capitalize  text-[#4c7c70] bg-[#d4e9ce] px-2 py-0.5 rounded">
                 {selectedBooking.daysRemaining}
               </span>
             )}
@@ -117,7 +117,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
         )}
 
         <div className="mx-3 mt-3">
-          <p className="text-[7px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-1.5">
+          <p className="text-[12px] font-semibold capitalize  text-[#6a9060] mb-1.5">
             Stay Experience
           </p>
 
@@ -132,12 +132,12 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <PetIcon
                 style={{
                   fontSize: 14,
-                  color: selectedBooking.petFriendly ? "#3e9d6d" : "#aaa",
+                  color: selectedBooking.petFriendly ? "#3e9d6d" : "green",
                 }}
               />
               <div>
                 <p
-                  className={`text-[8px] font-bold ${
+                  className={`text-[12px] font-bold ${
                     selectedBooking.petFriendly
                       ? "text-emerald-700"
                       : "text-gray-400"
@@ -145,7 +145,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
                 >
                   Pet Friendly
                 </p>
-                <p className="text-[7px] text-gray-400">
+                <p className="text-[10px] text-gray-400">
                   {selectedBooking.petFriendly ? "Allowed" : "Not Opted"}
                 </p>
               </div>
@@ -161,12 +161,12 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <TwinIcon
                 style={{
                   fontSize: 14,
-                  color: selectedBooking.twinsharing ? "#4c7c70" : "#aaa",
+                  color: selectedBooking.twinsharing ? "#4c7c70" : "green",
                 }}
               />
               <div>
                 <p
-                  className={`text-[8px] font-bold ${
+                  className={`text-[12px] font-bold ${
                     selectedBooking.twinsharing
                       ? "text-[#003d33]"
                       : "text-gray-400"
@@ -174,7 +174,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
                 >
                   Twin Sharing
                 </p>
-                <p className="text-[7px] text-gray-400">
+                <p className="text-[10px] text-gray-400">
                   {selectedBooking.twinsharing ? "Double Room" : "Single"}
                 </p>
               </div>
@@ -185,12 +185,12 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <DoctorIcon
                 style={{
                   fontSize: 14,
-                  color: selectedBooking.doctor ? "#3e9d6d" : "#aaa",
+                  color: selectedBooking.doctor ? "#3e9d6d" : "green",
                 }}
               />
               <div>
-                <p className="text-[8px] font-bold text-gray-500">Doctor</p>
-                <p className="text-[7px] text-gray-400">
+                <p className="text-[12px] font-bold text-gray-500">Doctor</p>
+                <p className="text-[10px] text-gray-400">
                   {selectedBooking.doctor || "Not Assigned"}
                 </p>
               </div>
@@ -199,7 +199,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
         </div>
 
         <div className="mx-3 mt-3 mb-3">
-          <p className="text-[7px] font-black uppercase tracking-[0.18em] text-[#6a9060] mb-1.5">
+          <p className="text-[12px] font-semibold capitalize text-[#6a9060] mb-1.5">
             Financial Overview
           </p>
           <div className="bg-white rounded-xl border border-gray-100 px-3 py-2 space-y-1.5">
@@ -225,15 +225,15 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
             </div>
             <div className="h-px bg-gray-100 my-1" />
             <div className="flex justify-between items-center">
-              <span className="text-[10px] font-black text-[#002a24]">
+              <span className="text-[12px] font-black text-[#002a24]">
                 Grand Total
               </span>
               <span
-                className={`text-[10px] font-black ${selectedBooking.financials === "Pending" ? "text-amber-600" : "text-[#003d33]"}`}
+                className={`text-[14px] font-black ${selectedBooking.amount && selectedBooking.amount !== null && selectedBooking.amount !== undefined ? "text-green-600" : "text-[#003d33]"}`}
               >
-                {selectedBooking.financials === "Pending"
-                  ? "Pending"
-                  : selectedBooking.financials || "—"}
+                {selectedBooking.amount && selectedBooking.amount !== null && selectedBooking.amount !== undefined
+                  ? selectedBooking.amount
+                  : "—"}
               </span>
             </div>
           </div>

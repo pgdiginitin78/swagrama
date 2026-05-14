@@ -199,6 +199,13 @@ export const cardVariants = {
       ease: "easeOut",
     },
   },
+  hover: {
+    y: -15,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut",
+    },
+  },
 };
 
 export const getIcon = (specialty) => {

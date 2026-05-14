@@ -9,12 +9,9 @@ import { GetTherapyBookingList } from "../../../../services/adminDashboard/Admin
 import CommonButton from "../../../common/button/CommonButton";
 import CommonPaginationTable from "../../../common/table/CommonPaginationTable";
 import LoadingSpinner from "../../../common/table/LoadingSpinner";
-import {
-  EmptyDetailView
-} from "./BookingComponents";
+import { EmptyDetailView } from "./BookingComponents";
 import TherapyAdminBooking from "./TherapyAdminBooking";
 import TherapyDetailView from "./TherapyDetailView";
-
 
 const THERAPY_DATA = [
   {
@@ -113,6 +110,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
 
   const populateTable = (forPagination) => {
     setLoadingSpinner(true);
+    setSelectedRow(null);
     GetTherapyBookingList(
       5,
       !forPagination ? 1 : page + 1,
@@ -151,6 +149,43 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
     }
   };
 
+  const renderInput = (row, _index, header) => {
+    if (header === "bookingStatus") {
+      const status = row["bookingStatus"]?.trim() || "Pending";
+      
+      const statusConfig = {
+        Confirmed: {
+          pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
+          dot: "bg-emerald-500"
+        },
+        Pending: {
+          pill: "text-amber-600 border-amber-400 bg-amber-100",
+          dot: "bg-amber-400"
+        },
+        Canceled: {
+          pill: "text-red-700 border-red-500 bg-red-100",
+          dot: "bg-red-500"
+        },
+        Default: {
+          pill: "text-gray-600 border-gray-300 bg-gray-100",
+          dot: "bg-gray-400"
+        }
+      };
+
+      const config = statusConfig[status] || statusConfig.Default;
+
+      return (
+        <span
+          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 uppercase text-[10px] font-bold rounded-2xl min-w-[100px] border ${config.pill}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+          {status}
+        </span>
+      );
+    }
+    return row[header];
+  };
+
   useEffect(() => {
     populateTable();
   }, [refreshTrigger]);
@@ -176,16 +211,14 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         </div>
       </div>
 
- 
       <motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 m-4  flex items-center justify-start gap-4 shadow-sm"
       >
         <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
-
           <div className="flex flex-col gap-1 pr-1">
-            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+            <span className="text-[14px] font-semibold text-[#6a9060]">
               Payment
             </span>
             <div className="flex gap-1">
@@ -193,10 +226,10 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 <button
                   key={opt}
                   onClick={() => handleFilter("paymentStatus", opt)}
-                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                  className={`px-5 py-1  rounded text-[12px] font-semibold capitalize transition-all ${
                     filters.paymentStatus === opt
                       ? "bg-[#003d33] text-white shadow-sm"
-                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                      : "text-[#4c7c70] bg-[#d4e9ce]/20"
                   }`}
                 >
                   {opt}
@@ -205,9 +238,8 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
             </div>
           </div>
 
-          {/* Booking Status */}
           <div className="flex flex-col gap-1 pl-6 pr-1">
-            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+            <span className="text-[14px] font-semibold text-[#6a9060]">
               Booking
             </span>
             <div className="flex gap-1">
@@ -215,10 +247,10 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 <button
                   key={opt}
                   onClick={() => handleFilter("bookingStatus", opt)}
-                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                  className={`px-5 py-1 rounded text-[12px] font-semibold capitalize transition-all ${
                     filters.bookingStatus === opt
                       ? "bg-[#003d33] text-white shadow-sm"
-                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                      : "text-[#4c7c70] bg-[#d4e9ce]/20"
                   }`}
                 >
                   {opt}
@@ -273,142 +305,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         </motion.div>
       )}
 
-      {/* <div className="flex-1 overflow-x-auto px-5 [&::-webkit-scrollbar]:h-[3px] [&::-webkit-scrollbar-thumb]:bg-gray-200">
-        <table className="w-full text-left border-separate border-spacing-y-1.5 min-w-[900px]">
-          <thead>
-            <tr>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                BOOKING ID & SCHEDULE
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                CUSTOMER
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                THERAPY & SOURCE
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                TYPE / FACILITY
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                STATUS
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap">
-                PAYMENT STATUS
-              </th>
-              <th className="pb-1 px-3 text-[8.5px] font-bold text-gray-400  tracking-widest whitespace-nowrap text-center">
-                ACTION
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {THERAPY_DATA.map((booking) => {
-              const isSelected = selectedId === booking.id;
-              return (
-                <tr
-                  key={booking.id}
-                  onClick={() => onSelect(booking)}
-                  className={`group cursor-pointer transition-all duration-200 ${isSelected ? "z-10 relative" : ""}`}
-                >
-                  <td
-                    className={`px-4 py-2 bg-white first:rounded-l-xl transition-all duration-200 ${isSelected ? "shadow-sm border-y border-l border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-l border-transparent"}`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-[11.5px] font-bold text-[#002a24]">
-                        {booking.id}
-                      </span>
-                      <span className="text-[9.5px] text-gray-400 font-medium tracking-tighter">
-                        {booking.date} • {booking.time}
-                      </span>
-                    </div>
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white transition-all duration-200 ${isSelected ? "shadow-sm border-y border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-transparent"}`}
-                  >
-                    <div className="flex flex-col">
-                      <span className="text-[11.5px] font-bold text-[#002a24]">
-                        {booking.customer}
-                      </span>
-                      <span className="text-[9.5px] text-gray-400 font-medium tracking-tighter">
-                        {booking.phone}
-                      </span>
-                    </div>
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white transition-all duration-200 ${isSelected ? "shadow-sm border-y border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-transparent"}`}
-                  >
-                    <div className="flex flex-col gap-0.5">
-                      <span className="text-[11.5px] font-bold text-[#002a24]">
-                        {booking.therapy}
-                      </span>
-                      <OriginBadge origin={booking.source} />
-                    </div>
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white transition-all duration-200 ${isSelected ? "shadow-sm border-y border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-transparent"}`}
-                  >
-                    <div className="flex flex-col leading-none">
-                      <span className="text-[10px] font-bold text-gray-400 mb-0.5">
-                        {booking.type}
-                      </span>
-                      {booking.facility !== "—" ? (
-                        <div className="flex flex-col">
-                          <span className="text-[10px] text-[#4c7c70] font-bold underline underline-offset-2 decoration-gray-100">
-                            {booking.facility.split(" ")[0]}
-                          </span>
-                          <span className="text-[10px] text-gray-400 font-normal underline underline-offset-2 decoration-gray-100">
-                            {booking.facility.split(" ").slice(1).join(" ")}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-[10px] text-gray-400">—</span>
-                      )}
-                    </div>
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white transition-all duration-200 ${isSelected ? "shadow-sm border-y border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-transparent"}`}
-                  >
-                    <StatusBadge status={booking.status} />
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white transition-all duration-200 ${isSelected ? "shadow-sm border-y border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-transparent"}`}
-                  >
-                    <PaymentStatusBadge status={booking.paymentStatus} />
-                  </td>
-                  <td
-                    className={`px-4 py-2 bg-white last:rounded-r-xl text-center transition-all duration-200 ${isSelected ? "shadow-sm border-y border-r border-[#002a24]/10" : "group-hover:bg-gray-50/50 border-y border-r border-transparent"}`}
-                  >
-                    <div className="flex items-center justify-center gap-0.5">
-                      <IconButton size="small" className="!p-1.5">
-                        <ViewIcon className="!text-[16px] text-gray-400" />
-                      </IconButton>
-                      <IconButton size="small" className="!p-1.5">
-                        <EditIcon className="!text-[16px] text-gray-400" />
-                      </IconButton>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div> */}
-
-      {/* <footer className="px-5 py-4 flex items-center justify-between shrink-0 border-t border-gray-50">
-        <span className="text-[10px] font-bold text-gray-400 uppercase">
-          Showing 4 of 28 Bookings
-        </span>
-        <div className="flex items-center gap-2">
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-100 text-gray-400 transition-all hover:bg-gray-50 active:scale-95 shadow-sm">
-            <ChevronLeft className="!text-sm" />
-          </button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#003d33] text-white transition-all active:scale-95 shadow-sm text-[10px] font-bold">
-            1
-          </button>
-          <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-gray-100 text-gray-400 transition-all hover:bg-gray-50 active:scale-95 shadow-sm">
-            <ChevronRight className="!text-sm" />
-          </button>
-        </div>
-      </footer> */}
+      
 
       <div className="flex flex-1 gap-2 overflow-hidden h-full">
         <div className="flex-1 transition-all duration-300">
@@ -431,6 +328,8 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 tableClass={"h-[460px] border cursor-pointer"}
                 setDataResult={setTherapyList}
                 populateTable={populateTable}
+                renderInput={renderInput}
+                editableColumns={["bookingStatus"]}
                 handleSelectedRow={(row) => {
                   setSelectedRow(row);
                   if (onSelect) onSelect(row);

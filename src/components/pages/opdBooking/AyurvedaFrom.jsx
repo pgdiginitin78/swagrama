@@ -15,14 +15,11 @@ import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import YardIcon from "@mui/icons-material/Yard";
 import {
   Box,
-  Dialog,
-  DialogContent,
   Divider,
-  Fade,
-  Modal,
+  Modal
 } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import CompostIcon from "@mui/icons-material/Compost";
@@ -39,6 +36,8 @@ import {
 import { Clock, Stethoscope } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
+import bookAppointmentIcon from "../../../assets/bookAppointment.svg";
+import HolisticHealing from "../../../assets/HolisticHealing.svg";
 import abhyangaImg from "../../../assets/images/ayurveda/ayurveda_abhyanga.webp";
 import herbsImg from "../../../assets/images/ayurveda/ayurveda_herbs.webp";
 import kizhiImg from "../../../assets/images/ayurveda/ayurveda_kizhi.webp";
@@ -69,21 +68,19 @@ import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaS
 import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.png";
 import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
 import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
-import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
+import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
+import CommonButton from "../../common/button/CommonButton";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import DatePickerField from "../../common/formFields/DatePickerField";
 import DropdownField from "../../common/formFields/DropdownField";
 import InputArea from "../../common/formFields/InputArea";
 import InputField from "../../common/formFields/InputField";
+import { ModalStyle } from "../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
-import bookAppointmentIcon from "../../../assets/bookAppointment.svg";
-import HolisticHealing from "../../../assets/HolisticHealing.svg";
-import { ModalStyle } from "../../common/modalStyle/ModalStyle";
-import CommonButton from "../../common/button/CommonButton";
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -731,7 +728,7 @@ function AyurvedaForm({
         .then((res) => {
           const data = res?.data;
 
-          if (data?.status == 200) {
+          if (data?.status === 200) {
             const fetchedSlots = data?.data || [];
             setSlotData({
               slots: fetchedSlots,
@@ -1630,16 +1627,16 @@ function AyurvedaForm({
                 <button
                   type="button"
                   onClick={() => reset()}
-                  className="w-full h-10 px-5 rounded-[5px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 sm:w-auto sm:px-6 "
+                  className="w-full h-10 px-4 rounded-[5px] border-2 border-red-200 text-red-500 text-sm font-semibold hover:bg-red-50 hover:border-red-400 active:scale-95 transition-all duration-200 md:w-auto md:px-5 "
                 >
                   Reset
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmBooking}
-                  className="w-full h-10 px-6 rounded-[5px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-bold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 sm:w-auto sm:px-8 sm:gap-2 "
+                  className="w-full h-10 px-4 rounded-[5px] bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/25 hover:from-emerald-700 hover:to-teal-700 hover:shadow-emerald-500/40 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 md:w-auto md:px-6 sm:gap-2 "
                 >
-                  <EventAvailableIcon sx={{ fontSize: 16 }} />
+                  {/* <EventAvailableIcon sx={{ fontSize: 16 }} /> */}
                   Confirm Booking
                 </button>
               </div>

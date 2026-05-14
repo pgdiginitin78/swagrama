@@ -5,19 +5,18 @@ import { memo, useState } from "react";
 import { cardVariants, containerVariants, healers } from "../HomePageConstants";
 import DoctorIcon from "../../../assets/communityHealers.svg";
 
-
 const CommunityHealers = () => {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
-    <div className="min-h-screen py-5 px-4 sm:px-6 lg:px-8">
+    <div className="py-5 px-4 sm:px-6 lg:px-8 bg-[#fdfbf7]">
       <Container maxWidth="xl">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-10"
         >
           <motion.div
             initial={{ scale: 0 }}
@@ -29,11 +28,11 @@ const CommunityHealers = () => {
             <img src={DoctorIcon} alt="Doctor Icon" className="h-10 w-10" />
           </motion.div>
 
-          <h1 className="font-bold text-gray-800 text-3xl">
+          <h1 className="font-bold text-gray-900 text-4xl  tracking-tight mb-4">
             Our Community Healers
           </h1>
 
-          <p className="text-[#6B7280] mt-2 max-w-2xl mx-auto text-base text-center">
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
             Dedicated practitioners bringing together Ayurveda, Yoga,
             Homoeopathy & Modern Medicine
           </p>
@@ -50,54 +49,67 @@ const CommunityHealers = () => {
             <motion.div
               key={healer.id}
               variants={cardVariants}
-              whileHover={{ y: -8, transition: { duration: 0.3 } }}
+              whileHover={{ y: -12 }}
               onHoverStart={() => setHoveredId(healer.id)}
               onHoverEnd={() => setHoveredId(null)}
+              className="relative"
             >
               <Card
-                className="h-full overflow-hidden border"
+                className="relative h-[350px] 2xl:h-[450px] overflow-hidden group cursor-pointer"
                 sx={{
-                  borderRadius: 3,
+                  borderRadius: "24px",
+                  border: "none",
                   boxShadow:
                     hoveredId === healer.id
-                      ? "0 20px 40px rgba(0,0,0,0.15)"
-                      : "0 4px 12px rgba(0,0,0,0.08)",
-                  transition: "box-shadow 0.3s ease",
-                  background:
-                    "linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)",
-                  border: "1px solid brown",
+                      ? "0 25px 50px -12px rgba(0, 0, 0, 0.5)"
+                      : "0 10px 20px rgba(0, 0, 0, 0.1)",
+                  transition: "all 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
                 }}
               >
-                <div className="relative">
-                  <div className="relative h-56 2xl:h-72">
-                    <motion.img
-                      src={healer.image}
-                      alt={healer.name}
-                      className="w-full h-full object-cover object-center"
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.4 }}
-                    />
+                <motion.img
+                  src={healer.image}
+                  alt={healer.name}
+                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  animate={{
+                    scale: hoveredId === healer.id ? 1.1 : 1,
+                    filter:
+                      hoveredId === healer.id
+                        ? "brightness(0.9)"
+                        : "brightness(1)",
+                  }}
+                  transition={{ duration: 0.6 }}
+                />
 
-                    {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" /> */}
-                  </div>
+                {/* Elegant Dark Gradient Overlay */}
+                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" /> */}
 
-                  <div className="mt-5 pb-4 px-6 text-center">
-                    <p className="font-bold text-gray-800 mb-2 whitespace-nowrap">
-                      {healer.name}
-                    </p>
-                    <p className="text-gray-600 font-medium">
-                      {healer.specialty}
-                    </p>
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{
-                        width: hoveredId === healer.id ? "60px" : "40px",
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className="mx-auto mt-4 h-1 rounded-full"
-                      style={{ backgroundColor: healer.color }}
-                    />
-                  </div>
+                {/* Content Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center">
+                  <motion.h3
+                    className="text-white text-lg font-bold mb-1 tracking-tight leading-tight"
+                    animate={{ y: hoveredId === healer.id ? -4 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {healer.name}
+                  </motion.h3>
+
+                  <motion.p
+                    className="text-gray-300 text-sm font-medium tracking-wide uppercase"
+                    animate={{ y: hoveredId === healer.id ? -4 : 0 }}
+                    transition={{ duration: 0.3, delay: 0.05 }}
+                  >
+                    {healer.specialty}
+                  </motion.p>
+
+                  {/* Aesthetic accent line */}
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{
+                      width: hoveredId === healer.id ? "40px" : "0px",
+                      opacity: hoveredId === healer.id ? 1 : 0,
+                    }}
+                    className="h-1 bg-emerald-500 rounded-full mt-2"
+                  />
                 </div>
               </Card>
             </motion.div>

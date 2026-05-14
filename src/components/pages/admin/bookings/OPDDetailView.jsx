@@ -54,7 +54,7 @@ const formatDate = (iso) => {
 
 const OpdDetailRow = ({ icon, label, value, valueEl }) => (
   <div className="flex items-start gap-2 sm:gap-3 py-2 sm:py-3 border-b border-gray-100 last:border-0">
-    <span className="text-gray-400 mt-0.5 flex-shrink-0 text-[14px]">
+    <span className="text-green-600 mt-0.5 flex-shrink-0 text-[14px]">
       {icon}
     </span>
 
@@ -98,7 +98,7 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
         <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-emerald-400 flex items-center justify-center text-white text-lg sm:text-xl font-bold shadow-md">
           {getInitials(selectedBooking.customer)}
         </div>
-        <p className="text-white text-[13px] sm:text-[14px] font-bold text-center">
+        <p className="text-white text-[13px] sm:text-[14px] font-semibold uppercase text-center">
           {selectedBooking.customer}
         </p>
         <span
@@ -141,7 +141,7 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
           label="Payment Status"
           valueEl={
             <span
-              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${
+              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold ${
                 OPD_PAYMENT_PILL[selectedBooking.paymentStatus] || "text-gray-600 bg-gray-100 border border-gray-300"
               }`}
             >

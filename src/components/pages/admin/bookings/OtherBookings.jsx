@@ -50,6 +50,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
     };
     setLoadingSpinner(true);
     setOtherBookingList([]);
+    setSelectedRow(null)
     GetOtherBookingsList(obj)
       .then((res) => {
         setOtherBookingList(res.data.data.data);
@@ -78,6 +79,47 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
     }
   };
 
+  const renderInput = (row, _index, header) => {
+    if (header === "status") {
+      const status = row["status"]?.trim() || "Pending";
+      
+      const statusConfig = {
+        Success: {
+          pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
+          dot: "bg-emerald-500"
+        },
+        Confirmed: {
+          pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
+          dot: "bg-emerald-500"
+        },
+        Pending: {
+          pill: "text-amber-600 border-amber-400 bg-amber-100",
+          dot: "bg-amber-400"
+        },
+        Canceled: {
+          pill: "text-red-700 border-red-500 bg-red-100",
+          dot: "bg-red-500"
+        },
+        Default: {
+          pill: "text-gray-600 border-gray-300 bg-gray-100",
+          dot: "bg-gray-400"
+        }
+      };
+
+      const config = statusConfig[status] || statusConfig.Default;
+
+      return (
+        <span
+          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 uppercase text-[10px] font-bold rounded-2xl min-w-[100px] border ${config.pill}`}
+        >
+          <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
+          {status}
+        </span>
+      );
+    }
+    return row[header];
+  };
+
   useEffect(() => {
     populateTable();
   }, [refreshTrigger]);
@@ -88,7 +130,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
     <div className="flex-1 flex flex-col">
       <div className="flex justify-between items-center mb-2 px-4 pt-4 shrink-0">
         <div>
-          <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter uppercase leading-none">
+          <h1 className="text-[24px] font-semibold capitalize  text-[#003d33]  leading-none">
             Other Bookings
           </h1>
         </div>
@@ -105,16 +147,14 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
         </div>
       </div>
 
-      {/* Ultra-Compact Modern Filter Bar */}
       <motion.div
         initial={{ opacity: 0, y: 5 }}
         animate={{ opacity: 1, y: 0 }}
         className="bg-[#fcfdfc] border border-[#d4e9ce] rounded px-4 py-2.5 mb-4 flex items-center justify-start gap-4 shadow-sm"
       >
         <div className="flex items-center gap-6 divide-x divide-[#d4e9ce]/40">
-          {/* Payment Status */}
           <div className="flex flex-col gap-1 pr-1">
-            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+            <span className="text-[14px] font-semibold capitalize text-[#6a9060]">
               Payment
             </span>
             <div className="flex gap-1">
@@ -122,10 +162,10 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 <button
                   key={opt}
                   onClick={() => handleFilter("paymentStatus", opt)}
-                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                  className={`px-5 py-1 rounded text-[12px] font-semibold capitalize transition-all ${
                     filters.paymentStatus === opt
                       ? "bg-[#003d33] text-white shadow-sm"
-                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                      : "text-[#4c7c70] bg-[#d4e9ce]/20"
                   }`}
                 >
                   {opt}
@@ -134,9 +174,8 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
             </div>
           </div>
 
-          {/* Booking Status */}
           <div className="flex flex-col gap-1 pl-6 pr-1">
-            <span className="text-[7px] font-black uppercase tracking-[0.15em] text-[#6a9060]">
+            <span className="text-[14px] font-semibold capitalize text-[#6a9060]">
               Booking
             </span>
             <div className="flex gap-1">
@@ -144,10 +183,10 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 <button
                   key={opt}
                   onClick={() => handleFilter("bookingStatus", opt)}
-                  className={`px-2 py-0.5 rounded-md text-[8px] font-bold uppercase transition-all ${
+                  className={`px-4 py-1 rounded text-[12px] font-semibold capitalize transition-all ${
                     filters.bookingStatus === opt
                       ? "bg-[#003d33] text-white shadow-sm"
-                      : "text-[#4c7c70] hover:bg-[#d4e9ce]/20"
+                      : "text-[#4c7c70] bg-[#d4e9ce]/20"
                   }`}
                 >
                   {opt}
@@ -223,11 +262,14 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                 tableClass={"h-[420px] border cursor-pointer"}
                 setDataResult={setOtherBookingList}
                 populateTable={populateTable}
+                renderInput={renderInput}
+                editableColumns={["status"]}
                 handleSelectedRow={(row) => {
                   setSelectedRow(row);
                   if (onSelect) onSelect(row);
                 }}
                 customRowBgColor={"#cde8b8"}
+                removeHeaders={['city',"checkIn","checkOut"]}
               />
             </div>
           ) : (

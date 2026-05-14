@@ -101,6 +101,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
 
+  console.log("schedules",schedules);
+  
+
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
@@ -268,10 +271,15 @@ export default function BookTherapySession({ open, onClose, item }) {
     });
   };
 
-  const handleTimeSelect = (time, idx) => {
+  const handleTimeSelect = (slot, idx) => {
     setSchedules((prev) => {
       const next = [...prev];
-      next[idx] = { ...next[idx], time };
+      next[idx] = {
+        ...next[idx],
+        time: slot.slotStartTime,
+        slotStartTime: slot.slotStartTime,
+        slotEndTime: slot.slotEndTime,
+      };
       setTimeout(() => {
         const firstEmptyIdx = next.findIndex((s) => !s.date || !s.time);
         if (firstEmptyIdx !== -1) {
@@ -329,32 +337,30 @@ export default function BookTherapySession({ open, onClose, item }) {
       //     : user?.userId,
       // GuestUserId: selectedGuest?.value || selectedGuest?.id,
       slots: schedules.map((s) => {
-        let displayTime = "N/A";
-        if (s.time) {
+        const parseToDisplay = (timeStr) => {
+          if (!timeStr) return "N/A";
           try {
             let finalDate;
-            if (s.time.includes("AM") || s.time.includes("PM")) {
-              finalDate = parse(s.time, "hh:mm a", new Date());
+            if (timeStr.includes("AM") || timeStr.includes("PM")) {
+              finalDate = parse(timeStr, "hh:mm a", new Date());
             } else {
-              const parsedDate = parse(s.time, "HH:mm:ss", new Date());
+              const parsedDate = parse(timeStr, "HH:mm:ss", new Date());
               finalDate = isNaN(parsedDate.getTime())
-                ? parse(s.time, "HH:mm", new Date())
+                ? parse(timeStr, "HH:mm", new Date())
                 : parsedDate;
             }
-            if (!isNaN(finalDate.getTime())) {
-              displayTime = format(finalDate, "HH:mm:ss");
-            } else {
-              displayTime = s.time;
-            }
+            return !isNaN(finalDate.getTime())
+              ? format(finalDate, "HH:mm:ss")
+              : timeStr;
           } catch (e) {
-            displayTime = s.time || "N/A";
+            return timeStr || "N/A";
           }
-        }
+        };
 
         return {
           SlotDate: s.date ? format(s.date, "yyyy-MM-dd") : "N/A",
-          slotStart: displayTime,
-          slotEnd: displayTime,
+          slotStart: parseToDisplay(s.slotStartTime || s.time),
+          slotEnd: parseToDisplay(s.slotEndTime || s.time),
         };
       }),
     };
@@ -715,7 +721,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           disabled={isDisabledSlot}
                                           onClick={() => {
                                             if (!isDisabledSlot)
-                                              handleTimeSelect(t, idx);
+                                              handleTimeSelect(slot, idx);
                                           }}
                                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border active:scale-95
                                         ${

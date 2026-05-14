@@ -112,9 +112,12 @@ export default function LoginModal({ open, handleClose }) {
       setIsLoading(true);
       setOpenConfirmationModal(false);
 
-      const response = await userLogin(formData);
-      if (response?.data.statusCode === 200 ) {
-        console.log("LOGIN API RESPONSE: ",response.data.data);
+      const response = await userLogin({
+        userName: formData.userName,
+        password: formData.password,
+      });
+      if (response?.data.statusCode === 200) {
+        console.log("LOGIN API RESPONSE: ", response.data.data);
         localStorage.setItem("accessToken", response.data?.data?.accessToken);
         localStorage.setItem("refreshToken", response.data?.data?.refreshToken);
         localStorage.setItem("user", JSON.stringify(response.data?.data?.user));
@@ -142,7 +145,6 @@ export default function LoginModal({ open, handleClose }) {
     const emailToUse = emailFromResend || emailAddressValue;
 
     try {
-      // Manual check for empty since trigger might not work on an optional field in schema
       if (
         !emailToUse ||
         (typeof emailToUse === "string" && emailToUse.trim() === "")

@@ -109,7 +109,7 @@ const AdminDrawer = ({
 
   const handleDrawerToggle = () => {
     setOpen(!open);
-    if (open) setOpenMasters(false); // Close submenus when collapsing drawer
+    if (open) setOpenMasters(false);
   };
 
   const handleMastersClick = (e) => {
@@ -123,7 +123,6 @@ const AdminDrawer = ({
   };
 
   const handleMenuClick = (key) => {
-    console.log("Navigating to:", key); // Debugging aid
     onMenuChange(key);
     if (mobileOpen) onMobileClose();
   };
@@ -139,7 +138,6 @@ const AdminDrawer = ({
     const isDirectActive = isSelected(item.key);
     const active = isDirectActive || isParentActive;
 
-    // Determine if we should show labels/content
     const showContent = isMobile || open;
 
     return (
@@ -228,7 +226,8 @@ const AdminDrawer = ({
               popper: {
                 sx: {
                   [`& .MuiTooltip-tooltip`]: {
-                    background: "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
+                    background:
+                      "linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)",
                     color: "#166534",
                     fontWeight: 700,
                     fontSize: "12px",
@@ -440,10 +439,7 @@ const AdminDrawer = ({
         }}
       >
         <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-          <div className="w-8 h-8 rounded-lg bg-[#16a34a] flex items-center justify-center">
-            <Database size={18} color="white" />
-          </div>
-          <span className="font-bold text-[#16a34a] text-lg">Swagrama</span>
+          <h1 className="font-bold text-[#16a34a] text-lg">Swagrama</h1>
         </Box>
         <Divider sx={{ mb: 1, opacity: 0.5 }} />
         <List sx={{ px: 1 }}>
@@ -465,14 +461,11 @@ const AdminDrawer = ({
             <Box
               sx={{ display: "flex", alignItems: "center", gap: 1.2, ml: 1 }}
             >
-              <div className="w-8 h-8 rounded-lg bg-[#16a34a] flex items-center justify-center shadow-sm">
-                <Database size={18} color="white" />
-              </div>
-              <span
+              <h1
                 style={{ fontWeight: 800, fontSize: "18px", color: "#16a34a" }}
               >
                 Swagrama
-              </span>
+              </h1>
             </Box>
           ) : (
             <div />

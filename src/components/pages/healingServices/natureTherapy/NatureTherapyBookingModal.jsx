@@ -105,7 +105,6 @@ const staticTimeSlots = [
   { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
   { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
   { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
-
 ];
 
 function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
@@ -399,7 +398,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
         const tempObj = {
           amount: watch("totalAmount"),
           userId: user?.userId,
-          patientId: patientFid?.userId,
+          patientId: bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };

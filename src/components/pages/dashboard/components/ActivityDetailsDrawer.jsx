@@ -1,11 +1,23 @@
 import React from "react";
-import { Drawer, IconButton, Stepper, Step, StepLabel } from "@mui/material";
 import {
   Close as CloseIcon,
   EventNote as BookingIcon,
   LocalShipping as ShippingIcon,
   Spa as SpaIcon,
 } from "@mui/icons-material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Drawer,
+  IconButton,
+  Step,
+  StepLabel,
+  Stepper,
+  Typography,
+} from "@mui/material";
 import { StatusBadge } from "./ActivityCard";
 import CommonButton from "../../../common/button/CommonButton";
 
@@ -47,9 +59,20 @@ const getActivityDisplayData = (data) => {
 };
 
 const ActivityDetailsDrawer = ({ item, open, onClose }) => {
+  const [confirmCancelOpen, setConfirmCancelOpen] = React.useState(false);
+
   if (!item) return null;
   const displayData = getActivityDisplayData(item);
-console.log("displayData",item);
+
+  const handleOpenCancelConfirm = () => setConfirmCancelOpen(true);
+  const handleCloseCancelConfirm = () => setConfirmCancelOpen(false);
+
+  console.log("Confirming cancellation for:", item);
+  const handleConfirmCancellation = () => {
+    // Implement cancellation logic here
+    handleCloseCancelConfirm();
+    onClose(); // Close drawer after confirmation
+  };
 
   return (
     <Drawer
@@ -164,10 +187,11 @@ console.log("displayData",item);
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center px-4 ">
+        <div className="flex justify-between items-center px-4 mt-auto mb-4">
           <CommonButton
             type="button"
             label="Cancel"
+            onClick={handleOpenCancelConfirm}
             className=" border border-red-500 text-red-500"
           />
           <CommonButton
@@ -183,6 +207,78 @@ console.log("displayData",item);
           </button>
         </div> */}
       </div>
+      <Dialog
+        open={confirmCancelOpen}
+        onClose={handleCloseCancelConfirm}
+        maxWidth="xs"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: "16px",
+            padding: "8px",
+          },
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 800, color: "#111827" }}>
+            Confirm Cancellation
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <div className="space-y-4">
+            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>
+              Are you sure you want to cancel this booking? This action cannot be undone.
+            </Typography>
+
+            <div className="p-4 bg-gray-50 rounded-xl space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-[12px] font-semibold text-gray-400">Activity</span>
+                <span className="text-sm font-bold text-gray-900">{displayData.name}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[12px] font-semibold text-gray-400">Date</span>
+                <span className="text-sm font-bold text-gray-900">{displayData.date}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-[12px] font-semibold text-gray-400">Time</span>
+                <span className="text-sm font-bold text-gray-900">{displayData.time}</span>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
+          <Button
+            onClick={handleCloseCancelConfirm}
+            sx={{
+              flex: 1,
+              borderRadius: "10px",
+              py: 1,
+              fontWeight: 700,
+              color: "#6b7280",
+              textTransform: "none",
+              border: "1px solid #e5e7eb",
+              "&:hover": { bgcolor: "#f9fafb" },
+            }}
+          >
+            Close
+          </Button>
+          <Button
+            onClick={handleConfirmCancellation}
+            sx={{
+              flex: 1,
+              borderRadius: "10px",
+              py: 1,
+              fontWeight: 700,
+              bgcolor: "#ef4444",
+              color: "white",
+              textTransform: "none",
+              "&:hover": { bgcolor: "#dc2626" },
+            }}
+          >
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Drawer>
   );
 };

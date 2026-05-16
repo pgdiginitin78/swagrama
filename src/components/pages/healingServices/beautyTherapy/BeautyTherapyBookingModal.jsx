@@ -14,10 +14,11 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
+import { GetBeautyTherapySlots } from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
 import {
-  GetBeautyTherapySlots
-} from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
-import { BookDetoxTherapy, GetTherapySlots } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
+  BookDetoxTherapy,
+  GetTherapySlots,
+} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 
 import CommonButton from "../../../common/button/CommonButton";
@@ -103,7 +104,7 @@ const staticTimeSlots = [
   { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
   { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
   { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
-]
+];
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
   return (
@@ -124,7 +125,9 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
       <span className="flex items-center space-x-1 whitespace-nowrap">
         <span className="font-bold">{formatTime(slot.slotStartTime)}</span>
         <NavigateNextIcon sx={{ fontSize: 14 }} />
-        <span className="font-normal opacity-90">{formatTime(slot.slotEndTime)}</span>
+        <span className="font-normal opacity-90">
+          {formatTime(slot.slotEndTime)}
+        </span>
       </span>
     </button>
   );
@@ -144,7 +147,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const [patientOptions, setPatientOptions] = useState([]);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
-
 
   const { setIsLoading } = useLoader();
   const cancelPaymentRef = useRef(null);
@@ -210,17 +212,17 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       .catch((error) => console.error(error));
   }, [setValue]);
 
-    useEffect(() => {
-      if (eventDetails?.serviceId && bookingDate) {
-        const formattedDate = format(new Date(bookingDate), "yyyy-MM-dd");
-        GetTherapySlots(formattedDate, eventDetails?.serviceId, formattedDate, 5)
-          .then((res) => {
-            console.log("slotsData", res?.data.data);
-            setBookedSlots(res.data.data);
-          })
-          .catch((err) => setBookedSlots([]));
-      }
-    }, [eventDetails, bookingDate]);
+  useEffect(() => {
+    if (eventDetails?.serviceId && bookingDate) {
+      const formattedDate = format(new Date(bookingDate), "yyyy-MM-dd");
+      GetTherapySlots(formattedDate, eventDetails?.serviceId, formattedDate, 5)
+        .then((res) => {
+          console.log("slotsData", res?.data.data);
+          setBookedSlots(res.data.data);
+        })
+        .catch((err) => setBookedSlots([]));
+    }
+  }, [eventDetails, bookingDate]);
 
   const handleGetPatientData = () => {
     getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
@@ -369,16 +371,12 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
         const tempObj = {
           amount: watch("totalAmount"),
           userId: user?.userId,
-          patientId: patientFid?.userId,
+          patientId: bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };
 
-        const res = await InitiatePayment(
-          5,
-          patientFid?.userId || user?.userId,
-          tempObj,
-        );
+        const res = await InitiatePayment(5, bookingId?.patientUserId, tempObj);
         const data = res?.data;
 
         if (data?.status === 200) {
@@ -619,17 +617,19 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   Loading slots...
                                 </p>
                               </div>
-                            ) : doctorSlots?.length > 0 ?(
+                            ) : doctorSlots?.length > 0 ? (
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 className="grid grid-cols-2 gap-2 content-start h-full"
                               >
                                 {doctorSlots.map((slot, index) => {
-                                  const matchingBookedSlot = (bookedSlots || []).find(
+                                  const matchingBookedSlot = (
+                                    bookedSlots || []
+                                  ).find(
                                     (bs) =>
                                       bs.slotStartTime === slot.slotStartTime &&
-                                      bs.slotEndTime === slot.slotEndTime
+                                      bs.slotEndTime === slot.slotEndTime,
                                   );
 
                                   let isAvailable = matchingBookedSlot
@@ -638,11 +638,21 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
                                   // Disable past slots if booking for today
                                   const bookingDateStr =
-                                    bookingDate && !isNaN(new Date(bookingDate).getTime())
-                                      ? format(new Date(bookingDate), "yyyy-MM-dd")
+                                    bookingDate &&
+                                    !isNaN(new Date(bookingDate).getTime())
+                                      ? format(
+                                          new Date(bookingDate),
+                                          "yyyy-MM-dd",
+                                        )
                                       : "";
-                                  const today = format(new Date(), "yyyy-MM-dd");
-                                  const currentTime = format(new Date(), "HH:mm:ss");
+                                  const today = format(
+                                    new Date(),
+                                    "yyyy-MM-dd",
+                                  );
+                                  const currentTime = format(
+                                    new Date(),
+                                    "HH:mm:ss",
+                                  );
 
                                   if (bookingDateStr === today) {
                                     if (slot.slotStartTime < currentTime) {
@@ -659,7 +669,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                         slot.slotStartTime
                                       }
                                       onSelect={() => {
-                                        setSelectedTimeSlot({ ...slot, isAvailable });
+                                        setSelectedTimeSlot({
+                                          ...slot,
+                                          isAvailable,
+                                        });
                                         setSlotError("");
                                       }}
                                     />

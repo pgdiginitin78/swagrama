@@ -376,18 +376,18 @@ export default function BookTherapySession({ open, onClose, item }) {
       const bookingRes = await BookDetoxTherapy(finalSaveObj);
       const bookingData = bookingRes?.data;
 
-      console.log("bookingData", bookingData);
-
+      
       if (bookingData?.message) {
         const bookingId = bookingData?.bookingId || bookingData?.data;
-
+        
         const tempObj = {
           amount: total,
           userId: user?.userId,
-          patientId: selectedGuest?.userId,
+          patientId: bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };
+        console.log("bookingData", bookingId);
 
         const res = await InitiatePayment(5, bookingId?.patientUserId, tempObj);
         const data = res?.data;

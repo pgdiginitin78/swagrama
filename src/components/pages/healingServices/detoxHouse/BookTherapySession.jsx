@@ -382,8 +382,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         
         const tempObj = {
           amount: total,
-          userId: user?.userId,
-          patientId: bookingId?.patientUserId,
+          userId:bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };

@@ -222,7 +222,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
           paymentFor: origin,
           bookingId: bookingId,
         };
-        const res = await InitiatePayment(5, null, tempObj);
+        const res = await InitiatePayment(5, innerData?.patientUserId, tempObj);
         const data = res?.data;
         if (data?.status === 200) {
           setIsLoading(false);

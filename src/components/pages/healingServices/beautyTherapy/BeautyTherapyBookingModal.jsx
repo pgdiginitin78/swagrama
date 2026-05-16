@@ -370,8 +370,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
         const tempObj = {
           amount: watch("totalAmount"),
-          userId: user?.userId,
-          patientId: bookingId?.patientUserId,
+          userId: bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };

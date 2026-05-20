@@ -13,44 +13,42 @@ const useUserDashboard = (user) => {
   const [upcomingTherapies, setUpcomingTherapies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchData = async () => {
     if (!user?.userId) return;
+    try {
+      const [countsRes, activitiesRes, opdRes, therapiesRes] =
+        await Promise.all([
+          GetUserDashboardCounts(user.userId),
+          GetUpcomingActivities(user.userId),
+          GetUpcomingOPD(user.userId),
+          GetAllUpcomingTherapies(user.userId),
+        ]);
 
-    setLoading(true);
+      console.log("activitiesRes", activitiesRes);
+      console.log("opdRes", opdRes);
+      console.log("therapiesRes", therapiesRes);
 
-    const fetchData = async () => {
-      try {
-        const [countsRes, activitiesRes, opdRes, therapiesRes] =
-          await Promise.all([
-            GetUserDashboardCounts(user.userId),
-            GetUpcomingActivities(user.userId),
-            GetUpcomingOPD(user.userId),
-            GetAllUpcomingTherapies(user.userId),
-          ]);
-
-        console.log("activitiesRes", activitiesRes);
-        console.log("opdRes", opdRes);
-        console.log("therapiesRes", therapiesRes);
-
-        if (countsRes.data.statusCode === 200) {
-          setUserDashboardCount(countsRes.data.data);
-        }
-        if (activitiesRes?.data) {
-          setUpcomingActivities(activitiesRes.data.data);
-        }
-        if (opdRes?.data) {
-          setUpcomingOPD(opdRes.data.data);
-        }
-        if (therapiesRes?.data) {
-          setUpcomingTherapies(therapiesRes.data.data);
-        }
-      } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-      } finally {
-        setLoading(false);
+      if (countsRes.data.statusCode === 200) {
+        setUserDashboardCount(countsRes.data.data);
       }
-    };
+      if (activitiesRes?.data) {
+        setUpcomingActivities(activitiesRes.data.data);
+      }
+      if (opdRes?.data) {
+        setUpcomingOPD(opdRes.data.data);
+      }
+      if (therapiesRes?.data) {
+        setUpcomingTherapies(therapiesRes.data.data);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
+    setLoading(true);
     fetchData();
   }, [user?.userId]);
 
@@ -60,6 +58,7 @@ const useUserDashboard = (user) => {
     upcomingOPD,
     upcomingTherapies,
     loading,
+    refresh: fetchData,
   };
 };
 

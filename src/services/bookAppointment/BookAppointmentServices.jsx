@@ -33,6 +33,14 @@ export const bookAppointment = (saveObj, userId) => {
   return AxiosInstance.post(`bookAppointment?userId=${userId}`, saveObj);
 };
 
+export const RescheduleAppointment = (saveObj, userId) => {
+  return AxiosInstance.post(`RescheduleAppointment?userId=${userId}`, saveObj);
+};
+
+export const RescheduleBooking = (saveObj, userId) => {
+  return AxiosInstance.post(`RescheduleBooking?userId=${userId}`, saveObj);
+};
+
 export const getDoctorAvailableSlots = (
   doctorId,
   appointmentDate,

@@ -33,6 +33,7 @@ const UserDashboard = () => {
     upcomingActivities,
     upcomingOPD,
     upcomingTherapies,
+    refresh,
   } = useUserDashboard(user);
 
   const activeTabLabel = MENU_ITEMS.find((m) => m.id === activeTab)?.label;
@@ -135,6 +136,7 @@ const UserDashboard = () => {
         item={selectedItem}
         open={!!selectedItem}
         onClose={() => setSelectedItem(null)}
+        onRescheduleSuccess={refresh}
       />
 
       <MembershipUpgradeDrawer

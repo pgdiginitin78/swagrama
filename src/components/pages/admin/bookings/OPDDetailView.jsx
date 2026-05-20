@@ -7,6 +7,11 @@ import {
   MedicalServices as ServiceIcon,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
+import PaymentRefundDialog from "../../dashboard/components/PaymentRefundDialog";
+
+import { useState } from "react";
+import RescheduleAppointments from "../../dashboard/RescheduleAppointments";
 
 const OPD_STATUS_PILL = {
   Pending: "text-amber-700 bg-amber-100 border border-amber-300",
@@ -74,12 +79,18 @@ const OpdDetailRow = ({ icon, label, value, valueEl }) => (
   </div>
 );
 
-const OPDDetailView = ({ selectedBooking, onClose }) => {
+const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
+  const [openCancelModal, setOpenCancelModal] = useState(false);
+  const [openRescheduleModal, setOpenRescheduleModal] = useState(false);
+
   if (!selectedBooking) return null;
   const status = selectedBooking.status?.trim();
-
+  const handleConfirmRefund = () => {
+    console.log("Refund requested for:", selectedBooking);
+    setOpenCancelModal(false);
+  };
   return (
-    <div className="flex flex-col h-auto pb-10 bg-white w-full max-w-full mx-auto border rounded-lg overflow-hidden shadow-sm">
+    <div className="flex flex-col h-auto pb-5 bg-white w-full max-w-full mx-auto border rounded-lg overflow-hidden shadow-sm">
       <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-100">
         <div>
           <p className="text-[7px] sm:text-[8px] font-bold text-gray-400 uppercase tracking-widest">
@@ -89,9 +100,7 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
             OPD Booking Details
           </h2>
         </div>
-        <IconButton size="small" onClick={onClose} className="!p-1">
-          <CloseIcon className="!text-[14px] sm:!text-[15px]" />
-        </IconButton>
+        <CancelButtonModal onClick={onClose} />
       </div>
 
       <div className="bg-gradient-to-br from-[#003d33] to-[#006651] px-4 sm:px-5 py-4 sm:py-5 flex flex-col items-center gap-2">
@@ -103,7 +112,8 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
         </p>
         <span
           className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${
-            OPD_STATUS_PILL[status] || "text-gray-600 bg-gray-100 border border-gray-300"
+            OPD_STATUS_PILL[status] ||
+            "text-gray-600 bg-gray-100 border border-gray-300"
           }`}
         >
           <span
@@ -134,7 +144,9 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
         <OpdDetailRow
           icon={<PaymentsIcon />}
           label="Amount"
-          value={selectedBooking.amount != null ? `₹ ${selectedBooking.amount}` : "—"}
+          value={
+            selectedBooking.amount != null ? `₹ ${selectedBooking.amount}` : "—"
+          }
         />
         <OpdDetailRow
           icon={<PaymentIcon />}
@@ -142,7 +154,8 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
           valueEl={
             <span
               className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold ${
-                OPD_PAYMENT_PILL[selectedBooking.paymentStatus] || "text-gray-600 bg-gray-100 border border-gray-300"
+                OPD_PAYMENT_PILL[selectedBooking.paymentStatus] ||
+                "text-gray-600 bg-gray-100 border border-gray-300"
               }`}
             >
               {selectedBooking.paymentStatus ?? "—"}
@@ -150,15 +163,41 @@ const OPDDetailView = ({ selectedBooking, onClose }) => {
           }
         />
       </div>
-{/* 
-      <div className="flex gap-2 p-3 sm:p-4 border-t border-gray-100 mb-8">
-        <button className="flex-1 py-2 sm:py-2.5 rounded-xl bg-white border border-gray-200 text-[#002a24] text-[9px] sm:text-[10px] font-bold">
+
+      <div className="flex gap-2 px-4 border-t border-gray-100 pt-3">
+        <button
+          type="button"
+          onClick={() => setOpenCancelModal(true)}
+          className="flex-1 py-2.5 rounded text-red-600 border border-red-600 bg-red-50 text-[12px] font-semibold"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpenRescheduleModal(true)}
+          className="flex-1 py-2.5 rounded bg-[#003d33] text-white text-[12px] font-semibold"
+        >
           Reschedule
         </button>
-        <button className="flex-1 py-2 sm:py-2.5 rounded-xl bg-[#003d33] text-white text-[9px] sm:text-[10px] font-bold uppercase">
-          Check-In
-        </button>
-      </div> */}
+      </div>
+
+      {openCancelModal && (
+        <PaymentRefundDialog
+          open={openCancelModal}
+          onClose={() => setOpenCancelModal(false)}
+          onConfirm={handleConfirmRefund}
+          bookingData={selectedBooking}
+        />
+      )}
+
+      {openRescheduleModal && (
+        <RescheduleAppointments
+          open={openRescheduleModal}
+          onClose={() => setOpenRescheduleModal(false)}
+          bookingData={selectedBooking}
+          onSuccess={onRescheduleSuccess}
+        />
+      )}
     </div>
   );
 };

@@ -468,7 +468,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                         sx={{ fontSize: 20, color: "var(--booking-primary)" }}
                       />
                     </span>
-                    Book Nature Therapy1
+                    Book Nature Therapy
                   </h2>
                   <CancelButtonModal onClick={handleClose} />
                 </div>

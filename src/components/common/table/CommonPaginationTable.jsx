@@ -210,7 +210,7 @@ export default function CommonPaginationTable(props) {
                         direction={orderBy === header ? order : "asc"}
                         onClick={createSortHandler(header)}
                       >
-                        <span className="text-gray-600 font-bold">
+                        <span className="text-gray-600 font-bold capitalize">
                           {header}
                         </span>
                         {orderBy === header ? (

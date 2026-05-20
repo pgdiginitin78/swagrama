@@ -9,7 +9,6 @@ import LoadingSpinner from "../../../common/table/LoadingSpinner";
 import { EmptyDetailView } from "./BookingComponents";
 import OtherDetailView from "./OtherDetailView";
 
-
 const OTHER_DATA = Array.from({ length: 3 }, (_, i) => ({
   id: `#OTH-20${i + 1}`,
   date: "Oct 27, 2023",
@@ -50,7 +49,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
     };
     setLoadingSpinner(true);
     setOtherBookingList([]);
-    setSelectedRow(null)
+    setSelectedRow(null);
     GetOtherBookingsList(obj)
       .then((res) => {
         setOtherBookingList(res.data.data.data);
@@ -82,28 +81,28 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   const renderInput = (row, _index, header) => {
     if (header === "status") {
       const status = row["status"]?.trim() || "Pending";
-      
+
       const statusConfig = {
         Success: {
           pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
-          dot: "bg-emerald-500"
+          dot: "bg-emerald-500",
         },
         Confirmed: {
           pill: "text-emerald-700 border-emerald-500 bg-emerald-100",
-          dot: "bg-emerald-500"
+          dot: "bg-emerald-500",
         },
         Pending: {
           pill: "text-amber-600 border-amber-400 bg-amber-100",
-          dot: "bg-amber-400"
+          dot: "bg-amber-400",
         },
         Canceled: {
           pill: "text-red-700 border-red-500 bg-red-100",
-          dot: "bg-red-500"
+          dot: "bg-red-500",
         },
         Default: {
           pill: "text-gray-600 border-gray-300 bg-gray-100",
-          dot: "bg-gray-400"
-        }
+          dot: "bg-gray-400",
+        },
       };
 
       const config = statusConfig[status] || statusConfig.Default;
@@ -269,7 +268,14 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   if (onSelect) onSelect(row);
                 }}
                 customRowBgColor={"#cde8b8"}
-                removeHeaders={['city',"checkIn","checkOut"]}
+                removeHeaders={[
+                  "city",
+                  "checkIn",
+                  "checkOut",
+                  "bookingId",
+                  "patientId",
+                  "userId",
+                ]}
               />
             </div>
           ) : (

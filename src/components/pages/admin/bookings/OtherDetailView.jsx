@@ -5,6 +5,9 @@ import {
   MedicalServices as ServiceIcon,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
+import PaymentRefundDialog from "../../dashboard/components/PaymentRefundDialog";
+import RescheduleBookings from "../../dashboard/components/RescheduleBookings";
+import { useState } from "react";
 
 const getInitials = (name = "") =>
   name
@@ -32,9 +35,7 @@ const OpdDetailRow = ({ icon, label, value }) => (
       {icon}
     </span>
     <div className="flex-1 min-w-0">
-      <p className="text-[12px] font-semibold text-gray-400  mb-0.5">
-        {label}
-      </p>
+      <p className="text-[12px] font-semibold text-gray-400  mb-0.5">{label}</p>
       <p className="text-[12px] font-semibold text-[#1a2e22] truncate">
         {value ?? "—"}
       </p>
@@ -43,6 +44,9 @@ const OpdDetailRow = ({ icon, label, value }) => (
 );
 
 const OtherDetailView = ({ selectedBooking, onClose }) => {
+  const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
+
   if (!selectedBooking) return null;
 
   const status = selectedBooking.status || "Pending";
@@ -50,6 +54,12 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
     status === "Success"
       ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
       : "bg-amber-100 text-amber-700 border border-amber-300";
+  console.log("selectedBooking", selectedBooking);
+
+  const handleConfirmRefund = () => {
+    console.log("Refund requested for:", selectedBooking);
+    setRefundDialogOpen(false);
+  };
 
   return (
     <div className="flex flex-col h-auto pb-10 bg-white w-full overflow-hidden border rounded-lg shadow-sm">
@@ -144,15 +154,42 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
           </div>
         </div>
       </div>
-
-      {/* <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
-        <button className="flex-1 py-2 rounded-lg bg-[#003d33] text-white text-[9px] font-black uppercase tracking-wide">
-          Print Ticket
+      <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
+        <button
+          type="button"
+          onClick={() => setRefundDialogOpen(true)}
+          className="flex-1 py-2 rounded bg-red-100 text-red-600 text-[14px] font-semibold  border border-red-600 "
+        >
+          Cancel
         </button>
-        <button className="flex-1 py-2 rounded-lg bg-[#f0f7ee] text-[#003d33] text-[9px] font-black uppercase tracking-wide border border-[#c8dfc2]">
+        <button
+        type="button"
+        onClick={() => setRescheduleOpen(true)}
+        className="flex-1 py-2 rounded bg-[#f0f7ee] text-[#003d33] text-[14px] font-semibold  border border-[#c8dfc2]">
           Reschedule
         </button>
-      </div> */}
+      </div>
+
+      {refundDialogOpen && (
+        <PaymentRefundDialog
+          open={refundDialogOpen}
+          onClose={() => setRefundDialogOpen(false)}
+          onConfirm={handleConfirmRefund}
+          bookingData={selectedBooking}
+        />
+      )}
+
+      {rescheduleOpen && (
+        <RescheduleBookings
+          open={rescheduleOpen}
+          onClose={() => setRescheduleOpen(false)}
+          bookingData={selectedBooking}
+          onConfirm={(payload) => {
+            console.log("Reschedule payload:", payload);
+            setRescheduleOpen(false);
+          }}
+        />
+      )}
     </div>
   );
 };

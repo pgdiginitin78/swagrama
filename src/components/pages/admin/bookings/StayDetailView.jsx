@@ -3,14 +3,23 @@ import {
   EventNote as EventNoteIcon,
   MeetingRoom as RoomIcon,
   LocalHospital as DoctorIcon,
-   PeopleAlt as TwinIcon,
-   Pets as PetIcon,
+  PeopleAlt as TwinIcon,
+  Pets as PetIcon,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { UpdateStayCheckInOut } from "../../../../services/adminDashboard/AdminDashboardServices";
 import { successAlert } from "../../../common/toast/CustomToast";
+import PaymentRefundDialog from "../../dashboard/components/PaymentRefundDialog";
+import { useState } from "react";
 
 const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
+  const [openCancelModal, setOpenCancelModal] = useState(false);
+
+  const handleConfirmRefund = (refundData) => {
+    console.log("Refund Data:", refundData);
+    setOpenCancelModal(false);
+  };
+
   if (!selectedBooking) return null;
 
   const statusStyles = {
@@ -18,7 +27,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
     Pending: "bg-amber-100  text-amber-700  border border-amber-300",
     "Check-In": "bg-[#3b4b3e] text-[#e7f5ed]",
     "Check-Out": "bg-teal-100 text-teal-700 border border-teal-300",
-    Canceled: "bg-red-100   text-red-700   border border-red-300",
+    Canceled: "bg-red-100 text-red-600 border border-red-300",
   };
 
   const checkInFormatted = (() => {
@@ -231,7 +240,9 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <span
                 className={`text-[14px] font-black ${selectedBooking.amount && selectedBooking.amount !== null && selectedBooking.amount !== undefined ? "text-green-600" : "text-[#003d33]"}`}
               >
-                {selectedBooking.amount && selectedBooking.amount !== null && selectedBooking.amount !== undefined
+                {selectedBooking.amount &&
+                selectedBooking.amount !== null &&
+                selectedBooking.amount !== undefined
                   ? selectedBooking.amount
                   : "—"}
               </span>
@@ -244,14 +255,27 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
         <button
           type="button"
           onClick={() => handleCheckInOut(selectedBooking.bookingId)}
-          className="flex-1 py-2 rounded-lg bg-[#003d33] text-white text-[9px] font-black uppercase tracking-wide shadow-sm hover:bg-[#004d40] transition-colors"
+          className="flex-1 py-2 rounded bg-[#003d33] text-white text-[12px] font-semibold   shadow-sm hover:bg-[#004d40] "
         >
           {selectedBooking?.financials === "Pending" ? "Check-In" : "Check-Out"}
         </button>
-        <button className="flex-1 py-2 rounded-lg bg-[#f0f7ee] text-[#003d33] text-[9px] font-black uppercase tracking-wide border border-[#c8dfc2] hover:bg-[#d4e9ce] transition-colors">
-          View Invoice
+        <button
+          type="button"
+          onClick={() => setOpenCancelModal(true)}
+          className="flex-1 py-2 rounded bg-red-100 text-red-600 text-[12px] font-semibold border border-red-600 "
+        >
+          Cancel
         </button>
       </div>
+
+      {openCancelModal && (
+        <PaymentRefundDialog
+          open={openCancelModal}
+          onClose={() => setOpenCancelModal(false)}
+          onConfirm={handleConfirmRefund}
+          bookingData={selectedBooking}
+        />
+      )}
     </div>
   );
 };

@@ -52,11 +52,16 @@ const DashboardSidebar = ({
             }`}
           >
             <span
-              className={`shrink-0 transition-colors ${
+              className={`shrink-0 transition-all ${
                 activeTab === item.id
                   ? "text-white"
                   : "text-white/30 group-hover:text-white/60"
               }`}
+              style={
+                activeTab === item.id
+                  ? { filter: "brightness(0) invert(1)" }
+                  : { filter: "brightness(0) invert(1)", opacity: 0.35 }
+              }
             >
               {item.icon}
             </span>

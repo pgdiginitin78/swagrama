@@ -1,25 +1,16 @@
-import React from "react";
 import {
-  Close as CloseIcon,
   EventNote as BookingIcon,
   LocalShipping as ShippingIcon,
   Spa as SpaIcon,
+  Hotel as StayIcon,
 } from "@mui/icons-material";
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Drawer,
-  IconButton,
-  Step,
-  StepLabel,
-  Stepper,
-  Typography,
-} from "@mui/material";
-import { StatusBadge } from "./ActivityCard";
+import { Drawer, Step, StepLabel, Stepper } from "@mui/material";
+import React from "react";
 import CommonButton from "../../../common/button/CommonButton";
+import { StatusBadge } from "./ActivityCard";
+import PaymentRefundDialog from "./PaymentRefundDialog";
+import CancelButtonModal from "../../../common/button/CancelButtonModal";
+import RescheduleAppointments from "../RescheduleAppointments";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
@@ -33,252 +24,203 @@ const formatTime = (timeStr) => {
   return timeStr;
 };
 
+const formatDate = (dateStr) =>
+  dateStr?.includes("T")
+    ? new Date(dateStr).toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
+    : dateStr;
+
+const formatAmount = (amount) =>
+  amount != null
+    ? `₹${Number(amount).toLocaleString("en-IN")}`
+    : null;
+
 const getActivityDisplayData = (data) => {
   if (!data) return null;
+  const type = data.type?.toLowerCase();
+  const isStay = data.type === "StayBooking";
 
   return {
-    id: data.id || "N/A",
+    id: data.bookingId || data.id || "N/A",
     name: data.title || data.name || data.doctorName,
-    expert:
-      data.type === "Stay"
-        ? "Wellness Stay"
-        : data.expert || (data.doctorName ? data.department : data.type),
-    date: data.date?.includes("T")
-      ? new Date(data.date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        })
-      : data.date,
-    time: formatTime(data.startTime || data.time || data.total),
-    type: data.type?.toLowerCase(),
+    expert: isStay
+      ? "Wellness Stay"
+      : data.expert || (data.doctorName ? data.department : data.type),
+    date: formatDate(data.date),
+    time: formatTime(data.startTime || data.time),
+    endTime: formatTime(data.endTime),
+    amount: formatAmount(data.amount),
+    type,
+    rawType: data.type,
     status: data.status,
     prep: data.note || "",
     step: data.step,
+    image: data.images || null,
+    doctorName: data.doctorName || null,
+    department: data.department || null,
+    isStay,
   };
 };
 
-const ActivityDetailsDrawer = ({ item, open, onClose }) => {
-  const [confirmCancelOpen, setConfirmCancelOpen] = React.useState(false);
+const TYPE_STYLES = {
+  therapy: { bg: "bg-emerald-100 text-emerald-600", icon: <SpaIcon sx={{ fontSize: 18 }} /> },
+  order: { bg: "bg-amber-100 text-amber-600", icon: <ShippingIcon sx={{ fontSize: 18 }} /> },
+  stay: { bg: "bg-green-100 text-green-600", icon: <BookingIcon sx={{ fontSize: 18 }} /> },
+  staybooking: { bg: "bg-teal-100 text-teal-600", icon: <StayIcon sx={{ fontSize: 18 }} /> },
+};
+
+const SHIP_STEPS = ["Packed", "Picked", "In Transit", "Delivered"];
+
+const Field = ({ label, children, className = "" }) => (
+  <div className={`p-2.5 bg-gray-50 rounded-lg ${className}`}>
+    <p className="text-[10px] font-semibold text-gray-400 mb-0.5">{label}</p>
+    {children}
+  </div>
+);
+
+const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => {
+  const [refundDialogOpen, setRefundDialogOpen] = React.useState(false);
+  const [rescheduleOpen, setRescheduleOpen] = React.useState(false);
 
   if (!item) return null;
-  const displayData = getActivityDisplayData(item);
-
-  const handleOpenCancelConfirm = () => setConfirmCancelOpen(true);
-  const handleCloseCancelConfirm = () => setConfirmCancelOpen(false);
-
-  console.log("Confirming cancellation for:", item);
-  const handleConfirmCancellation = () => {
-    // Implement cancellation logic here
-    handleCloseCancelConfirm();
-    onClose(); // Close drawer after confirmation
-  };
+  const d = getActivityDisplayData(item);
+  const typeStyle = TYPE_STYLES[d.type] || { bg: "bg-amber-100 text-ayuBrown", icon: <BookingIcon sx={{ fontSize: 18 }} /> };
 
   return (
     <Drawer
       anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{ sx: { width: "100%", maxWidth: 420 } }}
+      PaperProps={{
+        sx: { width: "100%", maxWidth: { xs: "100%", sm: 360 } },
+      }}
     >
-      <div className="flex flex-col h-[95%] bg-white">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-          <p className="text-sm font-black text-gray-900">Activity Details </p>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon sx={{ fontSize: 18 }} />
-          </IconButton>
+      <div className="flex flex-col h-full bg-white">
+        <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-100 shrink-0">
+          <p className="text-xs font-black text-gray-900 tracking-wide">Activity Details</p>
+          <CancelButtonModal onClick={onClose} />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4">
-          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-            <div
-              className={`p-3 rounded-xl shrink-0 ${
-                displayData.type === "therapy"
-                  ? "bg-emerald-100 text-emerald-600"
-                  : displayData.type === "order"
-                    ? "bg-amber-100 text-amber-600"
-                    : displayData.type === "stay"
-                      ? "bg-green-100 text-green-600"
-                      : "bg-amber-100 text-ayuBrown"
-              }`}
-            >
-              {displayData.type === "therapy" ? (
-                <SpaIcon />
-              ) : displayData.type === "order" ? (
-                <ShippingIcon />
-              ) : (
-                <BookingIcon />
-              )}
+        <div className="flex-1 overflow-y-auto px-3 py-2.5 space-y-2 no-scrollbar">
+          {d.image && (
+            <div className="w-full h-64 rounded-lg overflow-hidden">
+              <img
+                src={d.image}
+                alt={d.name}
+                className="w-full h-full object-cover object-top "
+              />
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-black text-gray-900 truncate">
-                {displayData.name}
-              </p>
-              <p className="text-[10px] font-bold text-gray-400 mt-0.5  tracking-wide">
-                {displayData.id}
+          )}
+
+          <div className="flex items-center gap-2.5 p-2.5 bg-gray-50 rounded-lg">
+            <div className={`p-2 rounded-lg shrink-0 ${typeStyle.bg}`}>{typeStyle.icon}</div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-black text-gray-900 truncate">{d.name}</p>
+              <p className="text-[9px] font-bold text-gray-400 tracking-wide mt-0.5">
+                #{d.id}
               </p>
             </div>
+            <StatusBadge status={d.status} />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-[14px] font-semibold text-gray-400   mb-1">
-                Date
-              </p>
-              <p className="text-sm font-bold text-gray-800">
-                {displayData.date}
-              </p>
-            </div>
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-[14px] font-semibold text-gray-400   mb-1">
-                Time / Amount
-              </p>
-              <p className="text-sm font-bold text-gray-800">
-                {displayData.time}
-              </p>
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Date">
+              <p className="text-xs font-bold text-gray-800">{d.date}</p>
+            </Field>
+            <Field label="Amount">
+              <p className="text-xs font-bold text-gray-800">{d.amount ?? "—"}</p>
+            </Field>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-[14px] font-semibold text-gray-400   mb-1">
-              Status
-            </p>
-            <StatusBadge status={displayData.status} />
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="Check-in Time">
+              <p className="text-xs font-bold text-gray-800">{d.time || "—"}</p>
+            </Field>
+            <Field label="Check-out Time">
+              <p className="text-xs font-bold text-gray-800">{d.endTime || "—"}</p>
+            </Field>
           </div>
 
-          <div className="p-4 bg-gray-50 rounded-xl">
-            <p className="text-[14px] font-semibold text-gray-400   mb-1">
-              Details
-            </p>
-            <p className="text-sm font-bold text-gray-700">
-              {displayData.expert}
-            </p>
-          </div>
-
-          {displayData.prep && (
-            <div className="p-4 bg-[#f0fdf4] border border-[#dcfce7] rounded-xl">
-              <p className="text-[9px] font-black text-[#4a7c2c] uppercase tracking-widest mb-2">
-                Preparation Note
+          {(d.doctorName || d.department || d.expert) && (
+            <Field label={d.isStay ? "Room Type" : "Details"} className="col-span-2">
+              <p className="text-xs font-bold text-gray-700">
+                {d.doctorName || d.department || d.expert}
               </p>
-              <p className="text-xs font-medium text-green-900 leading-relaxed">
-                "{displayData.prep}"
+            </Field>
+          )}
+
+          {d.prep && (
+            <div className="p-2.5 bg-[#f0fdf4] border border-[#dcfce7] rounded-lg">
+              <p className="text-[9px] font-black text-[#4a7c2c] uppercase tracking-widest mb-1">
+                Prep Note
+              </p>
+              <p className="text-[10px] font-medium text-green-900 leading-relaxed">
+                "{d.prep}"
               </p>
             </div>
           )}
 
-          {displayData.type === "order" && (
-            <div className="p-4 bg-gray-50 rounded-xl">
-              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-4">
+          {d.type === "order" && (
+            <div className="p-2.5 bg-gray-50 rounded-lg">
+              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2.5">
                 Shipping Progress
               </p>
-              <Stepper activeStep={displayData.step} alternativeLabel>
-                {["Packed", "Picked", "In Transit", "Delivered"].map(
-                  (label) => (
-                    <Step key={label}>
-                      <StepLabel>
-                        <span className="text-[9px] font-black uppercase text-gray-500">
-                          {label}
-                        </span>
-                      </StepLabel>
-                    </Step>
-                  ),
-                )}
+              <Stepper activeStep={d.step} alternativeLabel>
+                {SHIP_STEPS.map((label) => (
+                  <Step key={label}>
+                    <StepLabel>
+                      <span className="text-[8px] font-black uppercase text-gray-500">
+                        {label}
+                      </span>
+                    </StepLabel>
+                  </Step>
+                ))}
               </Stepper>
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center px-4 mt-auto mb-4">
+
+        <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
           <CommonButton
             type="button"
-            label="Cancel"
-            onClick={handleOpenCancelConfirm}
-            className=" border border-red-500 text-red-500"
+            label="Cancel Booking"
+            onClick={() => setRefundDialogOpen(true)}
+            className={`text-xs border border-red-500 text-red-500 ${d.isStay ? "w-full" : "flex-1"}`}
           />
-          <CommonButton
-            type="button"
-            label="Reschedule"
-            className=" px-5  bg-ayuMid text-white"
-          />
+          {!d.isStay && (
+            <CommonButton
+              type="button"
+              label="Reschedule"
+              className="flex-1 text-xs bg-ayuMid text-white"
+              onClick={() => setRescheduleOpen(true)}
+            />
+          )}
         </div>
-
-        {/* <div className="p-4 sm:p-5 border-t border-gray-100 shrink-0">
-          <button className="w-full py-3 border-2 border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 active:scale-95 transition-all">
-            Need Help?
-          </button>
-        </div> */}
       </div>
-      <Dialog
-        open={confirmCancelOpen}
-        onClose={handleCloseCancelConfirm}
-        maxWidth="xs"
-        fullWidth
-        PaperProps={{
-          sx: {
-            borderRadius: "16px",
-            padding: "8px",
-          },
-        }}
-      >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 800, color: "#111827" }}>
-            Confirm Cancellation
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <div className="space-y-4">
-            <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 500 }}>
-              Are you sure you want to cancel this booking? This action cannot be undone.
-            </Typography>
 
-            <div className="p-4 bg-gray-50 rounded-xl space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-[12px] font-semibold text-gray-400">Activity</span>
-                <span className="text-sm font-bold text-gray-900">{displayData.name}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[12px] font-semibold text-gray-400">Date</span>
-                <span className="text-sm font-bold text-gray-900">{displayData.date}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-[12px] font-semibold text-gray-400">Time</span>
-                <span className="text-sm font-bold text-gray-900">{displayData.time}</span>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1, gap: 1 }}>
-          <Button
-            onClick={handleCloseCancelConfirm}
-            sx={{
-              flex: 1,
-              borderRadius: "10px",
-              py: 1,
-              fontWeight: 700,
-              color: "#6b7280",
-              textTransform: "none",
-              border: "1px solid #e5e7eb",
-              "&:hover": { bgcolor: "#f9fafb" },
-            }}
-          >
-            Close
-          </Button>
-          <Button
-            onClick={handleConfirmCancellation}
-            sx={{
-              flex: 1,
-              borderRadius: "10px",
-              py: 1,
-              fontWeight: 700,
-              bgcolor: "#ef4444",
-              color: "white",
-              textTransform: "none",
-              "&:hover": { bgcolor: "#dc2626" },
-            }}
-          >
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      {refundDialogOpen && (
+        <PaymentRefundDialog
+          open={refundDialogOpen}
+          onClose={() => setRefundDialogOpen(false)}
+          onConfirm={() => {
+            console.log("Refund requested for:", item);
+            setRefundDialogOpen(false);
+          }}
+          bookingData={item}
+        />
+      )}
+
+      {rescheduleOpen && (
+        <RescheduleAppointments
+          open={rescheduleOpen}
+          onClose={() => setRescheduleOpen(false)}
+          bookingData={item}
+          onSuccess={onRescheduleSuccess}
+        />
+      )}
     </Drawer>
   );
 };

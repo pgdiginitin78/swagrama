@@ -303,7 +303,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                     customRowBgColor={"#cde8b8"}
                     renderInput={renderInput}
                     editableColumns={["status", "customer", "origin"]}
-                    removeHeaders={["paymentStatus", "amount"]}
+                    removeHeaders={["paymentStatus", "amount","paymentFor"]}
                   />
                 </div>
               ) : (
@@ -329,6 +329,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   setSelectedRow(null);
                   if (onSelect) onSelect(null);
                 }}
+                onRescheduleSuccess={() => populateTable(false)}
               />
             </div>
           ) : (

@@ -7,6 +7,12 @@ import {
   EmojiEvents as TrophyIcon
 } from "@mui/icons-material";
 import MembershipOutlineIcon from "../../../../assets/membershipOutlineIcon.svg";
+import OrdersIcon from "../../../../assets/Orders.svg";
+import TherapyIcon from "../../../../assets/Therapy.svg";
+import WellnessIcon from "../../../../assets/WellnessIcon.svg";
+import MembershipIcon from "../../../../assets/MembrshipIcon.svg";
+import ConsultationIcon from "../../../../assets/ConsultationBooking.svg";
+
 
 
 export const MEMBERSHIP_TIERS = [
@@ -66,26 +72,26 @@ export const MENU_ITEMS = [
   {
     id: "overview",
     label: "Wellness Hub",
-    icon: <DashboardIcon sx={{ fontSize: 17 }} />,
+    icon: <img src={WellnessIcon} alt="Membership" className="w-6 h-6" />,
   },
   {
     id: "appointments",
     label: "Consultations",
-    icon: <CalendarIcon sx={{ fontSize: 17 }} />,
+    icon: <img src={ConsultationIcon} alt="Membership" className="w-6 h-6" />,
   },
   {
     id: "therapies",
     label: "Therapies",
-    icon: <SpaIcon sx={{ fontSize: 17 }} />,
+    icon: <img src={TherapyIcon} alt="Membership" className="w-6 h-6" />,
   },
   {
     id: "shop",
     label: "Orders",
-    icon: <img src={MembershipOutlineIcon} alt="Membership" className="w-6 h-6" />,
+    icon: <img src={OrdersIcon} alt="Membership" className="w-6 h-6" />,
   },
   {
     id: "membership",
     label: "Membership",
-    icon: <img src={MembershipOutlineIcon} alt="Membership" className="w-6 h-6" />,
+    icon: <img src={MembershipIcon} alt="Membership" className="w-6 h-6" />,
   },
 ];

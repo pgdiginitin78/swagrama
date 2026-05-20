@@ -98,6 +98,7 @@ const DetailPanel = ({ enquiry, onClose }) => {
     Wellness: "bg-[#ccfbf1] text-[#065f46]",
     Stay: "bg-[#fef3c7] text-[#92400e]",
   };
+  console.log("enquiry", enquiry)
   return (
     <div className="flex flex-col h-full w-full bg-white">
       <div className="flex-shrink-0 p-3 border-b border-[#eef0ea]">

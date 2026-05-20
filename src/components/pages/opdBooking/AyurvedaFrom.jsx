@@ -72,6 +72,7 @@ import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/Vaishali H
 import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
+import { useLoader } from "../../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../../common/ConfirmationModal";
 import DatePickerField from "../../common/formFields/DatePickerField";
 import DropdownField from "../../common/formFields/DropdownField";
@@ -551,6 +552,7 @@ function AyurvedaForm({
   const cancelPaymentRef = useRef(null);
 
   const { user } = useAuth();
+  const { setIsLoading } = useLoader();
 
   const {
     handleSubmit,
@@ -879,9 +881,43 @@ function AyurvedaForm({
     }
   };
 
+  const bookAppointmentDirectly = async () => {
+    try {
+      setIsLoading(true);
+      const userId = user?.userId;
+      const res = await bookAppointment(
+        finalObj,
+        patientFid !== null ? patientFid?.id : userId,
+      );
+
+      if (res?.data?.status === 200) {
+        successAlert(res.data.message || "Appointment booked successfully!");
+        reset();
+        setValue("appointmentDate", new Date());
+        setSelectedTimeSlot(null);
+        setSelectedDoctorId(null);
+        setFinalObj(null);
+        setPreviewOpen(false);
+        setPreviewData(null);
+        setSlotData({ slots: [], loading: false, error: "" });
+      } else {
+        errorAlert(res?.data?.message || "Booking failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Direct booking error:", error);
+      errorAlert("An error occurred while booking the appointment.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleProceed = () => {
     setPreviewOpen(false);
-    initiatePayment();
+    if (previewData?.serviceFid?.label === "Follow-up ") {
+      bookAppointmentDirectly();
+    } else {
+      initiatePayment();
+    }
   };
 
   useEffect(() => {

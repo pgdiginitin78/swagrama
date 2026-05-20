@@ -348,6 +348,8 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   "charges",
                   "totalAmount",
                   "image",
+                  "patientId",
+                  "paymentFor"
                 ]}
               />
             </div>

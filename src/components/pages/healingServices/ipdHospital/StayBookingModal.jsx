@@ -1444,7 +1444,6 @@ function StayBookingModal({
                       <CommonButton
                         type="button"
                         onClick={() => {
-                 
                           setGuestsAnchorEl(null);
                         }}
                         className="bg-booking-primary text-white"
@@ -1701,25 +1700,70 @@ function StayBookingModal({
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
-                    Meal Preference
-                  </p>
-                  <DropdownField
-                    control={control}
-                    name="mealPreference"
-                    placeholder="Selected Meal Plan"
-                    dataArray={[
-                      {
-                        label: "Organic Full Board (Included)",
-                        value: "Organic Full Board (Included)",
-                      },
-                      {
-                        label: "Custom Diet (Requires Consult)",
-                        value: "Custom Diet (Requires Consult)",
-                      },
-                    ]}
+                <div
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className="flex overflow-hidden rounded-xl border border-[rgba(160,130,80,0.18)] bg-[#faf7f2]"
+                >
+                  <div
+                    className="w-[5px] shrink-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg, #9B5E4D 0%, #6E3B2E 50%, #4B241B 100%)",
+                    }}
                   />
+
+                  <div className="flex flex-1 items-center gap-[18px] p-[26px_24px]">
+                    <div
+                      className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl
+          border border-[rgba(160,130,80,0.2)] bg-white shadow-[0_2px_12px_rgba(160,130,80,0.1)]"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="26"
+                        height="26"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="#a08230"
+                        strokeWidth={1.4}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M3 11l1-7h16l1 7" />
+                        <path d="M3 11a9 9 0 0 0 18 0" />
+                        <path d="M12 20v2" />
+                        <path d="M8 22h8" />
+                      </svg>
+                    </div>
+
+                    <div className="flex-1">
+                      <p className="mb-1.5 text-[9px] uppercase tracking-[.28em] text-[#a08230]">
+                        Meal Preference
+                      </p>
+
+                      <p className="mb-3.5 text-[13px] font-light leading-[1.65] text-[#7a6e62]">
+                        Two curated meals daily with artisan green tea, crafted
+                        for a relaxing and luxurious stay.
+                      </p>
+
+                      <div className="flex flex-wrap gap-[7px]">
+                        {[
+                          { label: "Breakfast", icon: <SunIcon /> },
+                          { label: "Dinner", icon: <MoonIcon /> },
+                          { label: "Green Tea", icon: <TeaIcon /> },
+                        ].map(({ label, icon }) => (
+                          <span
+                            key={label}
+                            className="inline-flex items-center gap-[5px] rounded-full border
+                  border-[rgba(160,130,80,0.22)] bg-white px-[11px] py-1
+                  text-[10.5px] tracking-[.04em] text-[#8b6914]"
+                          >
+                            {icon}
+                            {label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="pt-3 border-t border-booking-primary/5 flex flex-col gap-2">
@@ -1897,3 +1941,65 @@ function StayBookingModal({
 }
 
 export default StayBookingModal;
+
+const SunIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#A08230"
+    strokeWidth="1.8"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <circle cx="12" cy="12" r="4" />
+
+    <path d="M12 2V4" />
+    <path d="M12 20V22" />
+
+    <path d="M4.93 4.93L6.34 6.34" />
+    <path d="M17.66 17.66L19.07 19.07" />
+
+    <path d="M2 12H4" />
+    <path d="M20 12H22" />
+
+    <path d="M4.93 19.07L6.34 17.66" />
+    <path d="M17.66 6.34L19.07 4.93" />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#a08230"
+    strokeWidth={1.6}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+  </svg>
+);
+
+const TeaIcon = () => (
+  <svg
+    width="12"
+    height="12"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="#a08230"
+    strokeWidth={1.6}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M17 8h1a4 4 0 0 1 0 8h-1" />
+    <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+    <line x1="6" y1="2" x2="6" y2="4" />
+    <line x1="10" y1="2" x2="10" y2="4" />
+    <line x1="14" y1="2" x2="14" y2="4" />
+  </svg>
+);

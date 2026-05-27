@@ -50,12 +50,13 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
               whileHover="hover"
               className="relative h-[450px] 2xl:h-[600px] rounded-[1rem] overflow-hidden shadow-2xl group cursor-pointer transition-all duration-700"
             >
-              {/* Background Image with Zoom Effect */}
-              <img
-                src={healer.image}
-                alt={healer.name}
-                className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
-              />
+          <img
+  src={healer.image}
+  alt={healer.name}
+  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 ${
+    [2, 5, 8].includes(index) ? "object-bottom" : "object-top"
+  }`}
+/>
               
               {/* Multi-layered Gradient Overlay for better text readability */}
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />

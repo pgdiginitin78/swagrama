@@ -212,11 +212,7 @@ const validationSchema = yup.object().shape({
     .required("Appointment date is required")
     .typeError("Appointment date is required"),
 
-  reasonForVisit: yup
-    .string()
-    .trim()
-    .required("Reason for visit is required")
-    .min(10, "Please provide at least 10 characters"),
+
 });
 
 const ayurvedaSideContent = [
@@ -1647,16 +1643,11 @@ function AyurvedaForm({
                 <InputArea
                   control={control}
                   name="reasonForVisit"
-                  label="Reason For Visit *"
+                  label="Reason For Visit"
                   minRows={3}
                   maxRows={5}
-                  error={errors.reasonForVisit}
                 />
-                {errors.reasonForVisit && (
-                  <p className="text-red-500 text-[11px] mt-0.5">
-                    {errors.reasonForVisit.message}
-                  </p>
-                )}
+          
               </div>
 
               <div className="col-span-1 xs:col-span-2 lg:col-span-4 flex flex-col gap-2.5 pt-2 sm:flex-row sm:justify-end sm:gap-3">

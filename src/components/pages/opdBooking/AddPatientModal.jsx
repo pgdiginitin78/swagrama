@@ -105,10 +105,10 @@ const patientSchema = yup.object().shape({
 
   pinCode: yup
     .string()
-    .test("pincode-format", "Enter a valid 6-digit pin code", (value) => {
-      if (!value) return true;
-      return /^[1-9][0-9]{5}$/.test(value);
-    }),
+    .trim()
+    .matches(/^[1-9][0-9]{5}$/, "Enter valid pin code")
+    .nullable()
+    .notRequired(),
 });
 
 const formatDateToYYYYMMDD = (date) => {
@@ -378,7 +378,7 @@ export default function AddPatientModal({
 
   useEffect(() => {
     if (user) {
-      getUserDetails(user?.userId,null,0)
+      getUserDetails(user?.userId, null, 0)
         .then((res) => {
           const data = res?.data?.data;
           const address = data?.address ?? "";

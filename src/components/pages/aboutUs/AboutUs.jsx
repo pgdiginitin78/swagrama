@@ -32,6 +32,7 @@ import LocalHospital from "@mui/icons-material/LocalHospital";
 import Spa from "@mui/icons-material/Spa";
 import Healing from "@mui/icons-material/Healing";
 import MedicalServices from "@mui/icons-material/MedicalServices";
+import FounderSection from "../../homePage/sections/FounderSection";
 
 const partnersData = [
   {
@@ -505,8 +506,8 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section className="py-12 px-4 md:px-12  ">
-        <div className="w-full mx-auto">
+      <section className="  ">
+        {/* <div className="w-full mx-auto">
           <motion.div
             ref={foundersRef}
             variants={staggerContainer}
@@ -586,7 +587,8 @@ const AboutUs = () => {
               </div>
             </motion.div>
           </motion.div>
-        </div>
+        </div> */}
+        <FounderSection />
       </section>
 
       <section ref={healersRef} className="py-14 px-4 md:px-12  bg-[#fdfbf7]">
@@ -628,20 +630,18 @@ const AboutUs = () => {
                 whileHover="hover"
                 className="relative h-[450px] 2xl:h-[600px] rounded-[1rem] overflow-hidden shadow-2xl group cursor-pointer transition-all duration-700"
               >
-                {/* Background Image with Zoom Effect */}
                 <img
                   src={healer.image}
                   alt={healer.name}
-                  className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-1000 group-hover:scale-110"
+                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 ${
+                    [2, 5, 8].includes(index) ? "object-bottom" : "object-top"
+                  }`}
                 />
 
-                {/* Multi-layered Gradient Overlay for better text readability */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
 
-                {/* Content Container */}
                 <div className="absolute inset-0 p-5 2xl:p-10 flex flex-col justify-end">
-                  {/* Roles List - Full Width and Clean on Hover */}
                   <div className="absolute inset-0 px-4 flex items-center justify-center pointer-events-none z-20">
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
@@ -677,10 +677,7 @@ const AboutUs = () => {
                     </motion.div>
                   </div>
 
-                  {/* Aesthetic Divider Line */}
                   <div className="h-[1px] w-full bg-gradient-to-r from-white/40 via-white/10 to-transparent mb-3" />
-
-                  {/* Name and Professional Title */}
                   <motion.div
                     animate={{
                       y: hoveredIndex === index ? -5 : 0,
@@ -738,7 +735,7 @@ const AboutUs = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {healers.map((healer) => (
+            {healers.map((healer,index) => (
               <motion.div
                 key={healer.id}
                 variants={cardVariants}
@@ -762,8 +759,9 @@ const AboutUs = () => {
                   <motion.img
                     src={healer.image}
                     alt={healer.name}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                    animate={{
+          className={`absolute inset-0 w-full h-full object-cover ${
+                    index === 5 || index===6 ? "object-bottom" : "object-top"
+                  }`}                    animate={{
                       scale: hoveredId === `healer-${healer.id}` ? 1.1 : 1,
                       filter:
                         hoveredId === `healer-${healer.id}`

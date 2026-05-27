@@ -114,7 +114,7 @@ export const partnersData = [
     roles: [
       "Director: JnanaYogAyu Pvt. Ltd.",
       "Partner, SwaGrama Ayurveda Yoga Nisarga Agro Tourism LLP",
-      "Proprietor : Mamata Clinic & Vishwai Chikitsalaya",
+      "Proprietor : Ayurvijnana Yoga Chikitsalaya",
       "Partner : Smart Unity Healthcare LLP",
     ],
   },

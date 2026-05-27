@@ -45,7 +45,7 @@ const CommunityHealers = () => {
           viewport={{ once: true }}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
         >
-          {healers.map((healer) => (
+          {healers.map((healer,index) => (
             <motion.div
               key={healer.id}
               variants={cardVariants}
@@ -69,7 +69,9 @@ const CommunityHealers = () => {
                 <motion.img
                   src={healer.image}
                   alt={healer.name}
-                  className="absolute inset-0 w-full h-full object-cover object-top"
+                  className={`absolute inset-0 w-full h-full object-cover ${
+                    index === 5 || index===6 ? "object-bottom" : "object-top"
+                  }`}
                   animate={{
                     scale: hoveredId === healer.id ? 1.1 : 1,
                     filter:

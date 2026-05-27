@@ -121,7 +121,6 @@ const IPDWellnessStay = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream to-white selection:bg-lime-light selection:text-ayuDark font-sans pb-12 relative overflow-hidden">
-      {/* Decorative Background Elements */}
       <div className="absolute top-0 left-0 w-full h-[400px] bg-gradient-to-b from-lime-light/20 via-lime-light/5 to-transparent pointer-events-none" />
       <motion.div
         animate={{ rotate: 360 }}
@@ -130,7 +129,7 @@ const IPDWellnessStay = () => {
       />
       <div className="absolute bottom-0 left-[-100px] w-[400px] h-[400px] rounded-full bg-gradient-to-tr from-lime-light/20 to-transparent blur-[60px] pointer-events-none opacity-30" />
 
-      <div className="relative max-w-6xl mx-auto px-4 md:px-6 pt-8 lg:pt-7 z-10">
+      <div className="relative w-full mx-auto px-4 md:px-6 pt-8 lg:pt-7 z-10">
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -153,7 +152,7 @@ const IPDWellnessStay = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-20px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-5"
         >
           {dynamicWellnessServices?.length > 0 ? (
             dynamicWellnessServices.map((service, idx) => {
@@ -165,7 +164,7 @@ const IPDWellnessStay = () => {
                 <motion.div
                   key={`${service.serviceName}-${idx}`}
                   variants={cardVariants}
-                  className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-lime-light/30 transition-all duration-300 border border-lime-light/20 flex flex-col ${
+                  className={`group relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:shadow-lime-light/30 transition-all duration-300 border border flex flex-col ${
                     !service.isActive ? "opacity-75 grayscale-[0.3]" : ""
                   }`}
                 >

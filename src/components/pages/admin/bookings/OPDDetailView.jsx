@@ -100,7 +100,9 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
             OPD Booking Details
           </h2>
         </div>
-        <CancelButtonModal onClick={onClose} />
+        <IconButton onClick={onClose}>
+          <CloseIcon height={10} width={10} className="text-red-600  hover:bg-red-50 rounded-full text-lg" />
+        </IconButton>
       </div>
 
       <div className="bg-gradient-to-br from-[#003d33] to-[#006651] px-4 sm:px-5 py-4 sm:py-5 flex flex-col items-center gap-2">
@@ -167,8 +169,13 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
       <div className="flex gap-2 px-4 border-t border-gray-100 pt-3">
         <button
           type="button"
+          disabled={selectedBooking?.origin !== "web"}
           onClick={() => setOpenCancelModal(true)}
-          className="flex-1 py-2.5 rounded text-red-600 border border-red-600 bg-red-50 text-[12px] font-semibold"
+          className={`flex-1 py-2.5 rounded text-[12px] font-semibold border transition-all duration-200 ${
+            selectedBooking?.origin !== "web"
+              ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60"
+              : "text-red-600 border-red-600 bg-red-50 hover:bg-red-100 cursor-pointer"
+          }`}
         >
           Cancel
         </button>
@@ -196,6 +203,7 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
           onClose={() => setOpenRescheduleModal(false)}
           bookingData={selectedBooking}
           onSuccess={onRescheduleSuccess}
+          onRescheduleSuccess={onRescheduleSuccess}
         />
       )}
     </div>

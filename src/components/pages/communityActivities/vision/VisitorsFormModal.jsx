@@ -221,6 +221,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
           userId: innerData?.patientUserId,
           paymentFor: origin,
           bookingId: bookingId,
+        
         };
         const res = await InitiatePayment(5, innerData?.patientUserId, tempObj);
         const data = res?.data;

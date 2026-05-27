@@ -26,7 +26,7 @@ const DetailRow = ({ icon, label, value }) => (
   </div>
 );
 
-const TherapyDetailView = ({ selectedBooking, onClose }) => {
+const TherapyDetailView = ({ selectedBooking, onClose,populateTable }) => {
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
 
@@ -54,8 +54,12 @@ const TherapyDetailView = ({ selectedBooking, onClose }) => {
             Therapy Details
           </h2>
         </div>
-        <IconButton size="small" onClick={onClose} className="!p-1">
-          <CloseIcon className="!text-[14px]" />
+        <IconButton onClick={onClose}>
+          <CloseIcon
+            height={10}
+            width={10}
+            className="text-red-600  hover:bg-red-50 rounded-full text-lg"
+          />
         </IconButton>
       </div>
 
@@ -136,16 +140,28 @@ const TherapyDetailView = ({ selectedBooking, onClose }) => {
         <CommonButton
           type="button"
           label="Reschedule"
-          onClick={() => setRescheduleOpen(true)}
-          className=" px-5  bg-ayuMid text-white flex-1"
+          disabled={
+            selectedBooking?.isCancelBooking === false ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingStatus === "Cancelled"
+          }
+          onClick={() => {
+            setRescheduleOpen(true);
+          }}
+          className="flex-1 px-5 bg-ayuMid text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
         />
         <CommonButton
           type="button"
           label="Cancel"
+          disabled={
+            selectedBooking?.isRefund === false ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingStatus === "Cancelled"
+          }
           onClick={() => {
             setRefundDialogOpen(true);
           }}
-          className=" border border-red-500 text-red-500 flex-1"
+          className="flex-1 border border-red-500 text-red-500 disabled:bg-gray-300  disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
       {/* <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
@@ -174,6 +190,7 @@ const TherapyDetailView = ({ selectedBooking, onClose }) => {
             console.log("Reschedule payload:", payload);
             setRescheduleOpen(false);
           }}
+          populateTable={populateTable}
         />
       )}
     </div>

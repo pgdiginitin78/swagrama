@@ -298,6 +298,7 @@ const OtherBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   setSelectedRow(null);
                   if (onSelect) onSelect(null);
                 }}
+                populateTable={populateTable}
               />
             </div>
           ) : (

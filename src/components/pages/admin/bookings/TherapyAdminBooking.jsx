@@ -313,7 +313,7 @@ export default function TherapyAdminBooking({ open, handleClose }) {
                         <Home className="text-[#003d32]" size={18} />
                       </div>
                       <h2 className="text-lg font-bold text-[#003d32]">
-                        Therapy Details
+                        Therapy Details 
                       </h2>
                     </div>
                     <div className="space-y-5">

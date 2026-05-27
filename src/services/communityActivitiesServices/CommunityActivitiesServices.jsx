@@ -5,8 +5,6 @@ export const SaveActivities = (saveObj) => {
 };
 
 
-//https://ayurmitra.in/WellnessAPILive/refund
-
 export const RefundPayment = (saveObj) => {
   return AxiosInstance.post(`refund`, saveObj);
 };

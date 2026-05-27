@@ -18,19 +18,19 @@ import OPDDetailView from "./OPDDetailView";
 // ── Status style maps ─────────────────────────────────────────────────────────
 const STATUS_PILL = {
   Pending: "text-amber-600 border border-amber-400 bg-amber-100",
-  Confirmed: "text-emerald-700 border border-emerald-500 bg-emerald-100",
-  Canceled: "text-red-700 border border-red-500 bg-red-100",
-  "Check-In": "text-orange-700 border border-orange-400 bg-orange-100",
+  Booked: "text-emerald-700 border border-emerald-500 bg-emerald-100",
+  Cancelled: "text-red-700 border border-red-500 bg-red-100",
+  "Check In": "text-orange-700 border border-orange-400 bg-orange-100",
   Completed: "text-emerald-800 border border-emerald-600 bg-emerald-100",
-  "Check-Out": "text-teal-700 border border-teal-500 bg-teal-100",
+  "Check Out": "text-teal-700 border border-teal-500 bg-teal-100",
 };
 const STATUS_DOT = {
   Pending: "bg-amber-400",
-  Confirmed: "bg-emerald-500",
-  Canceled: "bg-red-500",
-  "Check-In": "bg-orange-400",
+  Booked: "bg-emerald-500",
+  Cancelled: "bg-red-500",
+  "Check In": "bg-orange-400",
   Completed: "bg-emerald-600",
-  "Check-Out": "bg-teal-500",
+  "Check Out": "bg-teal-500",
 };
 
 const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
@@ -97,7 +97,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
       const status = row["status"]?.trim();
       return (
         <span
-          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 uppercase text-xs font-medium rounded-2xl min-w-[110px] ${
+          className={`inline-flex items-center gap-1.5 justify-center px-4 py-1 uppercase text-[10px] font-bold rounded-2xl min-w-[100px] ${
             STATUS_PILL[status] ||
             "text-green-600 border border-green-300 bg-green-100"
           }`}
@@ -329,7 +329,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   setSelectedRow(null);
                   if (onSelect) onSelect(null);
                 }}
-                onRescheduleSuccess={() => populateTable(false)}
+                onRescheduleSuccess={() => populateTable()}
               />
             </div>
           ) : (

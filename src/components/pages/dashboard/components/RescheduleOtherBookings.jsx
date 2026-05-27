@@ -17,6 +17,7 @@ import {
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import { useLoader } from "../../../common/commonLoader/LoaderContext";
+import { SaveActivities } from "../../../../services/communityActivitiesServices/CommunityActivitiesServices";
 
 // ─── Static Time Slots ────────────────────────────────────────────────────────
 const staticTimeSlots = [
@@ -116,18 +117,16 @@ function TimeSlotChip({ slot, isSelected, isPast, isBooked, onSelect }) {
   );
 }
 
-export default function RescheduleBookings({
+export default function RescheduleOtherBookings({
   open,
   onClose,
   onConfirm,
   bookingData = {},
-  populateTable
+  populateTable,
 }) {
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [slotError, setSlotError] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState(null);
-  const [bookedSlots, setBookedSlots] = useState([]);
   const { setIsLoading } = useLoader();
 
   const {
@@ -191,40 +190,24 @@ export default function RescheduleBookings({
   const handleClose = () => {
     reset();
     setSelectedSlot(null);
-    setSlotError("");
     setConfirmOpen(false);
     setPendingPayload(null);
     setIsLoading(false);
     onClose?.();
   };
 
+  console.log("bookingData", bookingData);
+
   const onSubmit = handleSubmit((data) => {
-    if (!selectedSlot) {
-      setSlotError("Please select a time slot");
-      return;
-    }
-
     const payload = {
-      TherapybookingId: bookingData?.bookingId || bookingData?.id,
-      serviceFid:   bookingData?.serviceFid,
-      fromdate: data.rescheduleDate
+      bookingId: bookingData?.bookingId || bookingData?.id,
+      checkin: bookingData?.checkIn,
+      checkOut: bookingData?.checkOut,
+      visitDate: data.rescheduleDate
         ? format(new Date(data.rescheduleDate), "yyyy-MM-dd")
         : "",
-      toDate: data.rescheduleDate
-        ? format(new Date(data.rescheduleDate), "yyyy-MM-dd")
-        : "",
-
-      slots: selectedSlot
-        ? [
-            {
-              SlotDate: data.rescheduleDate
-                ? format(new Date(data.rescheduleDate), "yyyy-MM-dd")
-                : "",
-              slotStart: selectedSlot.slotStartTime,
-              slotEnd: selectedSlot.slotEndTime,
-            },
-          ]
-        : [],
+      origin: bookingData?.paymentFor,
+      ClinicFid: 5,
     };
 
     console.log("payload", payload);
@@ -235,14 +218,14 @@ export default function RescheduleBookings({
   const handleConfirmReschedule = () => {
     if (!pendingPayload) return;
     setIsLoading(true);
-    BookDetoxTherapy(pendingPayload)
+    SaveActivities(pendingPayload)
       .then((res) => {
         const resData = res?.data;
         if (resData?.message) {
           successAlert(resData.message);
           setConfirmOpen(false);
           handleClose();
-          populateTable()
+          populateTable();
         }
       })
       .catch((err) => {
@@ -270,6 +253,7 @@ export default function RescheduleBookings({
     const parsed = new Date(d);
     return isNaN(parsed) ? d : format(parsed, "dd MMM yyyy");
   })();
+
   const currentTime = (() => {
     const t =
       bookingData?.time ||
@@ -286,6 +270,7 @@ export default function RescheduleBookings({
     }
     return "—";
   })();
+
   const serviceName =
     bookingData?.therapy ||
     bookingData?.therapyName ||
@@ -296,74 +281,6 @@ export default function RescheduleBookings({
     "-";
 
   console.log("bookingData", bookingData);
-
-  // {
-  //     "paymentFor": "AnnualEvents",
-  //     "bookingId": 33,
-  //     "amount": 1,
-  //     "userId": 60,
-  //     "customer": "admin admin",
-  //     "city": "dadar",
-  //     "activityName": "वैशाख बुद्ध पोर्णिमा Workers Day",
-  //     "visitDate": "2026-06-20T00:00:00",
-  //     "checkIn": "08:45:00",
-  //     "checkOut": "09:45:00",
-  //     "status": "Pending",
-  //     "service": "AnnualEvents"
-  // }
-
-  //   {
-  //     "paymentFor": "TherapyBooking",
-  //     "bookingId": 1020,
-  //     "userId": null,
-  //     "patientId": 11,
-  //     "patientName": "rashi khanna",
-  //     "serviceName": "Full Body Unguenसर्वांगअभ्यंग ",
-  //     "serviceGroupName": "Unguent Massage & Anointing - अभ्यंग मर्दन एवं लेपन",
-  //     "image": "https://ayurmitra.in/WellnessAPILive/Images/Assets/detoxTherapy/BodyUnguent.webp",
-  //     "doctorName": "SANTOSH SURYAVANSHI",
-  //     "roomName": "Female Detox Room",
-  //     "bookingsource": "Aayurmitra",
-  //     "fromDate": "2026-05-22T00:00:00",
-  //     "toDate": "2026-05-23T00:00:00",
-  //     "duration": 30,
-  //     "charges": 0,
-  //     "slotDetails": [
-  //         {
-  //             "slotDate": "2026-05-22T00:00:00",
-  //             "slotStartTime": "2026-05-22T14:00:00",
-  //             "slotEndTime": "2026-05-22T14:30:00"
-  //         }
-  //     ],
-  //     "isCancelBooking": false,
-  //     "totalAmount": 0,
-  //     "bookingStatus": null,
-  //     "createdDate": "2026-05-22T12:37:31.367"
-  // }
-
-  // ─── Fetch booked slots whenever the selected date changes ────────────────────
-  useEffect(() => {
-    if (!open || !selectedDate) return;
-    const dateStr = format(new Date(selectedDate), "yyyy-MM-dd");
-    GetTherapySlots(
-      dateStr,
-      bookingData?.serviceFid,
-      dateStr,
-      5,
-    )
-      .then((res) => {
-        const apiSlots = res?.data?.data ?? [];
-        setBookedSlots(apiSlots);
-        // If the currently selected slot is now booked, deselect it
-        if (selectedSlot) {
-          const isNowBooked = apiSlots.some(
-            (s) => s.slotStartTime === selectedSlot.slotStartTime,
-          );
-          if (isNowBooked) setSelectedSlot(null);
-        }
-      })
-      .catch(() => setBookedSlots([]));
-  }, [open, selectedDate]);
 
   if (!open) return null;
 
@@ -401,8 +318,8 @@ export default function RescheduleBookings({
               { label: "Booking ID", value: bookingId },
               { label: "Service/Therapy", value: serviceName },
               { label: "Patient", value: patientName },
-              { label: "Current Date", value: currentDate },
-              { label: "Current Time", value: currentTime },
+              { label: "Event Date", value: currentDate },
+              { label: "Event Time", value: currentTime },
             ].map(({ label, value }) => (
               <div key={label}>
                 <span className="block text-[8.5px] uppercase tracking-wider text-slate-400 font-extrabold">
@@ -429,123 +346,6 @@ export default function RescheduleBookings({
                 <p className="text-red-500 text-[10px] font-semibold mt-0.5">
                   {errors.rescheduleDate.message}
                 </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] font-extrabold text-slate-400  tracking-widest">
-                  Select Time Slot <span className="text-red-500">*</span>
-                </label>
-                {selectedSlot && (
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    ✓ Selected
-                  </span>
-                )}
-              </div>
-
-              <div className="bg-slate-50 rounded-xl border border-slate-200 p-3">
-                <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-2">
-                  Morning · AM
-                </p>
-                {(() => {
-                  const amSlots = staticTimeSlots.filter(
-                    (s) => parseInt(s.slotStartTime) < 12,
-                  );
-                  return (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-3">
-                      {amSlots.map((slot, i) => {
-                        const past = isSlotPast(slot, selectedDate);
-                        const booked = bookedSlots.some(
-                          (s) => s.slotStartTime === slot.slotStartTime,
-                        );
-                        return (
-                          <TimeSlotChip
-                            key={i}
-                            slot={slot}
-                            isSelected={
-                              selectedSlot?.slotStartTime === slot.slotStartTime
-                            }
-                            isPast={past}
-                            isBooked={booked}
-                            onSelect={() => {
-                              setSelectedSlot(slot);
-                              setSlotError("");
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
-
-                <p className="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest mb-2 pt-2 border-t border-slate-200">
-                  Afternoon &amp; Evening · PM
-                </p>
-                {(() => {
-                  const pmSlots = staticTimeSlots.filter(
-                    (s) => parseInt(s.slotStartTime) >= 12,
-                  );
-                  return (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                      {pmSlots.map((slot, i) => {
-                        const past = isSlotPast(slot, selectedDate);
-                        const booked = bookedSlots.some(
-                          (s) => s.slotStartTime === slot.slotStartTime,
-                        );
-                        return (
-                          <TimeSlotChip
-                            key={i}
-                            slot={slot}
-                            isSelected={
-                              selectedSlot?.slotStartTime === slot.slotStartTime
-                            }
-                            isPast={past}
-                            isBooked={booked}
-                            onSelect={() => {
-                              setSelectedSlot(slot);
-                              setSlotError("");
-                            }}
-                          />
-                        );
-                      })}
-                    </div>
-                  );
-                })()}
-              </div>
-
-              {slotError && (
-                <p className="text-red-500 text-[10px] font-semibold">
-                  {slotError}
-                </p>
-              )}
-
-              {selectedSlot && (
-                <div className="flex items-center justify-between p-2.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl border border-emerald-200">
-                  <div>
-                    <span className="block text-[8px] font-bold text-emerald-600 uppercase tracking-wider">
-                      Selected Slot
-                    </span>
-                    <span className="text-[12px] font-extrabold text-emerald-800">
-                      {selectedSlot.slotStartTime} – {selectedSlot.slotEndTime}
-                    </span>
-                  </div>
-                  <div className="w-6 h-6 bg-emerald-500 rounded-full flex items-center justify-center shrink-0">
-                    <svg
-                      className="w-3.5 h-3.5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="3"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
               )}
             </div>
 

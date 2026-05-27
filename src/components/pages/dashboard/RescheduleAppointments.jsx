@@ -4,12 +4,20 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Box, Divider, Modal } from "@mui/material";
 import { format } from "date-fns";
-import { CalendarMonth as CalendarMonthIcon, AccessTime as AccessTimeIcon } from "@mui/icons-material";
+import {
+  CalendarMonth as CalendarMonthIcon,
+  AccessTime as AccessTimeIcon,
+} from "@mui/icons-material";
 import { Stethoscope, Clock } from "lucide-react";
 
 import { useAuth } from "../../../context/AuthContext";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
-import { bookAppointment, getDoctorAvailableSlots, RescheduleAppointment, RescheduleBooking } from "../../../services/bookAppointment/BookAppointmentServices";
+import {
+  bookAppointment,
+  getDoctorAvailableSlots,
+  RescheduleAppointment,
+  RescheduleBooking,
+} from "../../../services/bookAppointment/BookAppointmentServices";
 import { getDoctorListByLocationDepartment } from "../../../services/healingServices/opdClinic/OPDClinicServices";
 
 import CancelButtonModal from "../../common/button/CancelButtonModal";
@@ -67,9 +75,9 @@ export default function RescheduleAppointments({
   onClose,
   bookingData,
   onSuccess,
+  onRescheduleSuccess,
 }) {
   const [doctorOptions, setDoctorOptions] = useState([]);
-  const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [doctorSlots, setDoctorSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
@@ -99,18 +107,23 @@ export default function RescheduleAppointments({
   useEffect(() => {
     if (!open || !bookingData) return;
 
-    const rawDept = bookingData?.department || bookingData?.departmentName || bookingData?.service || "Aayurveda";
-    let dept = "Aayurveda";
-    if (rawDept.toLowerCase().includes("yoga")) {
-      dept = "Yoga";
-    } else if (rawDept.toLowerCase().includes("homeopathy")) {
-      dept = "Homeopathy";
+    setValue("appointmentDate", new Date(bookingData.appointmentDate));
+    if (bookingData?.slotTime) {
+      const [start, end] = bookingData.slotTime.split("-");
+      setSelectedTimeSlot({
+        slotStartTime: start?.trim(),
+        slotEndTime: end?.trim(),
+      });
+    } else if (bookingData?.SloteStartTime) {
+      setSelectedTimeSlot({
+        slotStartTime: bookingData.SloteStartTime,
+        slotEndTime: bookingData.SloteEndTime,
+      });
     }
-
     const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
 
-    setLoadingDoctors(true);
-    getDoctorListByLocationDepartment(clinicId, dept)
+   
+    getDoctorListByLocationDepartment(clinicId, bookingData?.departmentName)
       .then((res) => {
         const data = res?.data?.data || [];
         const formatted = data.map((doc) => ({
@@ -127,9 +140,14 @@ export default function RescheduleAppointments({
           const match = formatted.find((d) => d.id === docId);
           if (match) setValue("doctorFid", match);
         } else if (docName) {
-          const match = formatted.find((d) =>
-            `${d.firstName} ${d.lName}`.toLowerCase().includes(docName.toLowerCase()) ||
-            docName.toLowerCase().includes(`${d.firstName} ${d.lName}`.toLowerCase())
+          const match = formatted.find(
+            (d) =>
+              `${d.firstName} ${d.lName}`
+                .toLowerCase()
+                .includes(docName.toLowerCase()) ||
+              docName
+                .toLowerCase()
+                .includes(`${d.firstName} ${d.lName}`.toLowerCase()),
           );
           if (match) setValue("doctorFid", match);
         }
@@ -138,25 +156,60 @@ export default function RescheduleAppointments({
         console.error("Error fetching doctors:", err);
         setDoctorOptions([]);
       })
-      .finally(() => setLoadingDoctors(false));
+
   }, [open, bookingData, setValue]);
 
   useEffect(() => {
     if (doctorValue?.id && appointmentDate) {
-      setSelectedTimeSlot(null);
       setSlotError("");
       setLoadingSlots(true);
       setDoctorSlots([]);
 
-      const formattedDate = appointmentDate && !isNaN(new Date(appointmentDate).getTime())
-        ? format(new Date(appointmentDate), "yyyy-MM-dd")
-        : "";
+      const formattedDate =
+        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+          ? format(new Date(appointmentDate), "yyyy-MM-dd")
+          : "";
       const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
 
       getDoctorAvailableSlots(doctorValue.id, formattedDate, clinicId)
         .then((res) => {
           const data = res?.data?.data || [];
           setDoctorSlots(data);
+
+          let foundMatch = false;
+          const origDate = bookingData?.appointmentDate
+            ? format(new Date(bookingData.appointmentDate), "yyyy-MM-dd")
+            : "";
+          if (formattedDate === origDate) {
+            if (bookingData?.slotTime) {
+              const [start] = bookingData.slotTime.split("-");
+              const match = data.find(
+                (s) => s.slotStartTime?.trim() === start?.trim(),
+              );
+              if (match) {
+                setSelectedTimeSlot(match);
+                foundMatch = true;
+              }
+            } else if (bookingData?.SloteStartTime) {
+              const match = data.find(
+                (s) => s.slotStartTime === bookingData.SloteStartTime,
+              );
+              if (match) {
+                setSelectedTimeSlot(match);
+                foundMatch = true;
+              }
+            }
+          }
+
+          if (!foundMatch && selectedTimeSlot) {
+            const stillExists = data.find(
+              (s) => s.slotStartTime === selectedTimeSlot.slotStartTime,
+            );
+            if (!stillExists) setSelectedTimeSlot(null);
+          } else if (!foundMatch) {
+            setSelectedTimeSlot(null);
+          }
+
           if (data.length === 0) {
             setSlotError("No slots available for this date");
           }
@@ -173,7 +226,7 @@ export default function RescheduleAppointments({
     }
   }, [doctorValue, appointmentDate, bookingData]);
 
-console.log("bookingData",bookingData)
+  console.log("bookingData", bookingData);
 
   const handleReschedule = handleSubmit((data) => {
     if (!selectedTimeSlot) {
@@ -182,68 +235,42 @@ console.log("bookingData",bookingData)
     }
 
     const payload = {
-      bookingId: bookingData?.bookingId || bookingData?.id,
-      clinicFid:5,
-      patientFid: bookingData?.patientFid || bookingData?.patientId,
-      doctorFid: data.doctorFid?.id,
-      appoinmentDate: data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
-        ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
-        : "",
+      bookingId: bookingData?.appointmnetId,
+      clinicFid: 5,
+      AppointmentFid: bookingData?.appointmnetId,
+      appoinmentDate:
+        data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
+          ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
+          : "",
       SloteStartTime: selectedTimeSlot?.slotStartTime,
       SloteEndTime: selectedTimeSlot?.slotEndTime,
       rescheduledBy: user?.userId,
-      status: "Rescheduled",
-      bookingSource: "web",
     };
 
     setIsLoading(true);
     bookAppointment(payload, user?.userId)
       .then((res) => {
         setIsLoading(false);
-        if (res?.data?.status === 200 || res?.data?.statusCode === 200 || res?.data?.status === true) {
-          successAlert(res.data.message || "Appointment rescheduled successfully!");
+        if (res?.data?.status === 200) {
+          successAlert(
+            res.data.message || "Appointment rescheduled successfully!",
+          );
           onSuccess?.();
           onClose();
-        } else {
-          RescheduleBooking(payload, user?.userId)
-            .then((res2) => {
-              if (res2?.data?.status === 200 || res2?.data?.statusCode === 200 || res2?.data?.status === true) {
-                successAlert(res2.data.message || "Appointment rescheduled successfully!");
-                onSuccess?.();
-                onClose();
-              } else {
-                errorAlert(res2?.data?.message || res?.data?.message || "Failed to reschedule booking");
-              }
-            })
-            .catch(() => {
-              errorAlert(res?.data?.message || "Failed to reschedule appointment");
-            });
+          onRescheduleSuccess()
         }
       })
-      .catch(() => {
-        RescheduleBooking(payload, user?.userId)
-          .then((res2) => {
-            setIsLoading(false);
-            if (res2?.data?.status === 200 || res2?.data?.statusCode === 200 || res2?.data?.status === true) {
-              successAlert(res2.data.message || "Appointment rescheduled successfully!");
-              onSuccess?.();
-              onClose();
-            } else {
-              errorAlert(res2?.data?.message || "Failed to reschedule booking");
-            }
-          })
-          .catch((err) => {
-            setIsLoading(false);
-            console.error("Reschedule error:", err);
-            errorAlert("An error occurred while rescheduling the appointment");
-          });
+      .catch((err) => {
+        setIsLoading(false);
+        console.error("Reschedule error:", err);
+        errorAlert("An error occurred while rescheduling the appointment");
       });
   });
 
   if (!open) return null;
 
   return (
-    <Modal open={open} >
+    <Modal open={open}>
       <Box
         sx={ModalStyle}
         className="w-[95%] h-[80%] max-w-2xl rounded-xl bg-white border border-slate-200 shadow-2xl overflow-y-auto no-scrollbar"
@@ -264,22 +291,31 @@ console.log("bookingData",bookingData)
           </div>
           <CancelButtonModal onClick={onClose} />
         </div>
-
-        {/* Current Booking Summary */}
         <div className="p-4 bg-slate-50 border-b border-slate-100 grid grid-cols-2 sm:grid-cols-4 gap-3 text-[11px] font-medium text-slate-600">
           <div>
-            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">Booking ID</span>
-            <span className="text-slate-800 font-bold">{bookingData?.bookingId || bookingData?.id || "—"}</span>
+            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
+              Booking ID
+            </span>
+            <span className="text-slate-800 font-bold">
+              {bookingData?.appointmnetId || "—"}
+            </span>
           </div>
           <div>
-            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">Patient</span>
-            <span className="text-slate-800 font-bold truncate block">{bookingData?.customer || bookingData?.fullName || "—"}</span>
+            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
+              Patient
+            </span>
+            <span className="text-slate-800 font-bold truncate block">
+              {bookingData?.customer || bookingData?.fullName || "—"}
+            </span>
           </div>
           <div>
-            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">Current Date</span>
+            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
+              Current Date
+            </span>
             <span className="text-slate-800 font-bold">
               {(() => {
-                const dateVal = bookingData?.date || bookingData?.appointmentDate;
+                const dateVal =
+                  bookingData?.date || bookingData?.appointmentDate;
                 if (!dateVal) return "—";
                 const d = new Date(dateVal);
                 return isNaN(d) ? dateVal : format(d, "dd MMM yyyy");
@@ -287,17 +323,19 @@ console.log("bookingData",bookingData)
             </span>
           </div>
           <div>
-            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">Current Time</span>
-            <span className="text-slate-800 font-bold">{bookingData?.time || bookingData?.slotTime || "—"}</span>
+            <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
+              Current Time
+            </span>
+            <span className="text-slate-800 font-bold">
+              {bookingData?.time || bookingData?.slotTime || "—"}
+            </span>
           </div>
         </div>
 
         <form onSubmit={handleReschedule} className="p-4 sm:p-5 space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Left side: Doctor & Date */}
             <div className="space-y-4">
               <div className="space-y-1">
-          
                 <DropdownField
                   control={control}
                   name="doctorFid"
@@ -308,7 +346,6 @@ console.log("bookingData",bookingData)
               </div>
 
               <div className="space-y-1">
-            
                 <DatePickerField
                   control={control}
                   name="appointmentDate"
@@ -323,7 +360,10 @@ console.log("bookingData",bookingData)
             {/* Right side: Available Time Slots */}
             <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col min-h-[180px]">
               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 flex items-center gap-1.5">
-                <AccessTimeIcon sx={{ fontSize: 13 }} className="text-slate-500" />
+                <AccessTimeIcon
+                  sx={{ fontSize: 13 }}
+                  className="text-slate-500"
+                />
                 Available Slots *
               </label>
 
@@ -356,7 +396,8 @@ console.log("bookingData",bookingData)
                         <TimeSlotChip
                           slot={slot}
                           isSelected={
-                            selectedTimeSlot?.slotStartTime === slot.slotStartTime
+                            selectedTimeSlot?.slotStartTime ===
+                            slot.slotStartTime
                           }
                           onSelect={() => {
                             setSelectedTimeSlot(slot);
@@ -378,14 +419,27 @@ console.log("bookingData",bookingData)
               {selectedTimeSlot && (
                 <div className="mt-2.5 p-2 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-lg border border-emerald-200 flex items-center justify-between text-[11px]">
                   <div>
-                    <span className="block text-[8px] font-bold text-emerald-600 uppercase">Selected Slot</span>
+                    <span className="block text-[8px] font-bold text-emerald-600 uppercase">
+                      Selected Slot
+                    </span>
                     <span className="font-extrabold text-emerald-800">
-                      {selectedTimeSlot.slotStartTime} - {selectedTimeSlot.slotEndTime}
+                      {selectedTimeSlot.slotStartTime} -{" "}
+                      {selectedTimeSlot.slotEndTime}
                     </span>
                   </div>
                   <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 13l4 4L19 7"
+                      />
                     </svg>
                   </div>
                 </div>

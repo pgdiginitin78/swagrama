@@ -92,9 +92,11 @@ const PaymentRefundDialog = ({
         });
   })();
 
-  const formattedAmount = bookingData?.amount
-    ? `₹ ${Number(bookingData?.amount || bookingData?.totalAmount || 0).toLocaleString("en-IN")}`
+const formattedAmount =
+  bookingData?.amount != null || bookingData?.totalAmount != null
+    ? `₹ ${Number(bookingData?.amount ?? bookingData?.totalAmount).toLocaleString("en-IN")}`
     : "—";
+console.log("formattedAmount",formattedAmount,bookingData);
 
   const activityName =
     bookingData?.title ||

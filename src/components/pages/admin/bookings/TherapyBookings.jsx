@@ -13,80 +13,6 @@ import { EmptyDetailView } from "./BookingComponents";
 import TherapyAdminBooking from "./TherapyAdminBooking";
 import TherapyDetailView from "./TherapyDetailView";
 
-const THERAPY_DATA = [
-  {
-    id: "#BK-9021",
-    date: "Oct 24",
-    time: "10:30 AM",
-    customer: "Elena Rodriguez",
-    phone: "+1 415-555-0123",
-    therapy: "Shirodhara",
-    source: "WEBSITE",
-    type: "IPD",
-    facility: "Lotus Suite 4",
-    status: "CONFIRMED",
-    paymentStatus: "PAID",
-    avatar: "ER",
-    img: "https://images.unsplash.com/photo-1544161515-4ae6ce6db87e?w=800",
-    detail: "Oil Flow",
-    duration: "60 Minutes",
-    intensity: "Soft/Calming",
-  },
-  {
-    id: "#BK-8944",
-    date: "Oct 24",
-    time: "11:45 AM",
-    customer: "Marcus Chen",
-    phone: "+1 212-555-0988",
-    therapy: "Abhyanga",
-    source: "MOBILE",
-    type: "OPD",
-    facility: "—",
-    status: "CHECKED-IN",
-    paymentStatus: "PARTIALLY PAID",
-    avatar: "MC",
-    img: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800",
-    detail: "Full Body",
-    duration: "90 Minutes",
-    intensity: "Medium",
-  },
-  {
-    id: "#BK-9102",
-    date: "Oct 24",
-    time: "02:15 PM",
-    customer: "Sarah Jenkins",
-    phone: "+44 20-7946-0112",
-    therapy: "Udvartana",
-    source: "ADMIN",
-    type: "IPD",
-    facility: "Garden Villa B",
-    status: "RESCHEDULED",
-    paymentStatus: "UNPAID",
-    avatar: "SJ",
-    img: "https://images.unsplash.com/photo-1540555700478-4be289fbecee?w=800",
-    detail: "Powder Massage",
-    duration: "60 Minutes",
-    intensity: "Deep Tissue",
-  },
-  {
-    id: "#BK-8851",
-    date: "Oct 24",
-    time: "04:00 PM",
-    customer: "David Miller",
-    phone: "+1 312-555-0744",
-    therapy: "Pizhichil",
-    source: "WEBSITE",
-    type: "OPD",
-    facility: "—",
-    status: "CONFIRMED",
-    paymentStatus: "PAID",
-    avatar: "DM",
-    img: "https://images.unsplash.com/photo-1620733723572-11c53f7ecba1?w=800",
-    detail: "Royal Bath",
-    duration: "75 Minutes",
-    intensity: "Relaxing",
-  },
-];
 
 const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
   const [openTherapyBookingModal, setOpenTherapyBookingModal] = useState(false);
@@ -349,7 +275,8 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   "totalAmount",
                   "image",
                   "patientId",
-                  "paymentFor"
+                  "paymentFor",
+                  "slots","slotDetails"
                 ]}
               />
             </div>
@@ -374,6 +301,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   setSelectedRow(null);
                   if (onSelect) onSelect(null);
                 }}
+                populateTable={populateTable}
               />
             </div>
           ) : (

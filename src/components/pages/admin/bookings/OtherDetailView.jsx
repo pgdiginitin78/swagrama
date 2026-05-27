@@ -8,6 +8,7 @@ import { IconButton } from "@mui/material";
 import PaymentRefundDialog from "../../dashboard/components/PaymentRefundDialog";
 import RescheduleBookings from "../../dashboard/components/RescheduleBookings";
 import { useState } from "react";
+import RescheduleOtherBookings from "../../dashboard/components/RescheduleOtherBookings";
 
 const getInitials = (name = "") =>
   name
@@ -43,7 +44,7 @@ const OpdDetailRow = ({ icon, label, value }) => (
   </div>
 );
 
-const OtherDetailView = ({ selectedBooking, onClose }) => {
+const OtherDetailView = ({ selectedBooking, onClose, populateTable }) => {
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
 
@@ -72,8 +73,12 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
             Other Booking Details
           </h2>
         </div>
-        <IconButton size="small" onClick={onClose} className="!p-1">
-          <CloseIcon className="!text-[14px]" />
+        <IconButton onClick={onClose}>
+          <CloseIcon
+            height={10}
+            width={10}
+            className="text-red-600  hover:bg-red-50 rounded-full text-lg"
+          />
         </IconButton>
       </div>
 
@@ -157,16 +162,29 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
       <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
         <button
           type="button"
-          onClick={() => setRefundDialogOpen(true)}
-          className="flex-1 py-2 rounded bg-red-100 text-red-600 text-[14px] font-semibold  border border-red-600 "
+          disabled={
+            selectedBooking?.isRefund === false ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingStatus === "Cancelled" ||
+            selectedBooking?.status === "Pending"
+          }
+          onClick={() => setRescheduleOpen(true)}
+          className="flex-1 px-5 py-1 rounded-md bg-ayuMid text-white disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          Cancel
+          Reschedule
         </button>
         <button
-        type="button"
-        onClick={() => setRescheduleOpen(true)}
-        className="flex-1 py-2 rounded bg-[#f0f7ee] text-[#003d33] text-[14px] font-semibold  border border-[#c8dfc2]">
-          Reschedule
+          type="button"
+          disabled={
+            selectedBooking?.isRefund === false ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingStatus === "Cancelled" ||
+            selectedBooking?.status === "Pending"
+          }
+          onClick={() => setRefundDialogOpen(true)}
+          className="flex-1 border py-1 rounded-md border-red-500 text-red-500 disabled:bg-gray-300  disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Cancel
         </button>
       </div>
 
@@ -180,7 +198,7 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
       )}
 
       {rescheduleOpen && (
-        <RescheduleBookings
+        <RescheduleOtherBookings
           open={rescheduleOpen}
           onClose={() => setRescheduleOpen(false)}
           bookingData={selectedBooking}
@@ -188,6 +206,7 @@ const OtherDetailView = ({ selectedBooking, onClose }) => {
             console.log("Reschedule payload:", payload);
             setRescheduleOpen(false);
           }}
+          populateTable={populateTable}
         />
       )}
     </div>

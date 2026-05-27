@@ -65,8 +65,8 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
             Stay Booking Details
           </h2>
         </div>
-        <IconButton size="small" onClick={onClose} className="!p-1">
-          <CloseIcon className="!text-[14px]" />
+       <IconButton onClick={onClose}>
+          <CloseIcon height={10} width={10} className="text-red-600  hover:bg-red-50 rounded-full text-lg" />
         </IconButton>
       </div>
 

@@ -246,6 +246,8 @@ export default function AddPatientModal({
       errorAlert("login first");
       return;
     }
+    console.log("AddPatientData",data);
+    
     const saveObj = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -256,12 +258,14 @@ export default function AddPatientModal({
       relation: data.relation ?? "",
       address: data.address,
       pinCode: data.pinCode,
-      Gender: data.gender?.label ?? "",
+      Gender: data.gender ?? "",  
       macIp: ipAddress ?? "",
       macId: "",
       bloodGroup: data.bloodGroup?.value ?? "",
       city: data.city,
     };
+    console.log("AddPatientData1111",saveObj);
+
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };

@@ -3,11 +3,10 @@ import {
   Button,
   Card,
   Chip,
-  Container,
   Stack,
   Tab,
   Tabs,
-  Typography,
+  Typography
 } from "@mui/material";
 import { useState } from "react";
 import BeautyTherapy from "./beautyTherapy/BeautyTherapy";
@@ -73,6 +72,7 @@ const ServicesTabs = () => {
 
   return (
     <div className="pt-3 md:pt-3">
+ 
       <h1 className="text-xl md:text-2xl font-semibold text-center text-green-800 mb-4">
         स्वउपचारसेवा Healing Services
       </h1>

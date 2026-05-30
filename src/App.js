@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import Skeleton from "@mui/material/Skeleton";
 import { Suspense, lazy } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -32,16 +33,16 @@ const EventCalander = lazy(
   () => import("./components/pages/eventsCalander/EventCalander"),
 );
 const AboutUs = lazy(() => import("./components/pages/aboutUs/AboutUs"));
-const UserDashboard = lazy(() => import("./components/pages/dashboard/UserDashboard"));
+const UserDashboard = lazy(
+  () => import("./components/pages/dashboard/UserDashboard"),
+);
 const SwagramaPrivacyPolicy = lazy(
   () => import("./components/pages/privacypolicy/PrivacyPolicyNew"),
 );
 const TermsAndConditon = lazy(
   () => import("./components/pages/terms&conditon/TermsAndConditon"),
 );
-const AdminLayout = lazy(
-  () => import("./components/pages/admin/AdminLayout"),
-);
+const AdminLayout = lazy(() => import("./components/pages/admin/AdminLayout"));
 
 function PageSkeleton() {
   return (
@@ -65,6 +66,13 @@ export default function App() {
 
   return (
     <>
+      <Helmet>
+        <title>SwaGrama | Ayurveda • Yoga • Nisarga • Agro • Tourism</title>
+        <meta
+          name="description"
+          content="SwaGrama is a self-sufficient village connected to cultural roots, embracing the traditional Indian science of health - Ayurveda and Yoga."
+        />
+      </Helmet>
       <Navbar />
       <div className="pt-16 md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
         <ErrorBoundary>
@@ -93,8 +101,14 @@ export default function App() {
                 element={<EventCalander userData={userData} />}
               />
               <Route path="/aboutUs" element={<AboutUs />} />
-              <Route path="/termsAndConditions" element={<TermsAndConditon />} />
-              <Route path="/privacyPolicy" element={<SwagramaPrivacyPolicy />} />
+              <Route
+                path="/termsAndConditions"
+                element={<TermsAndConditon />}
+              />
+              <Route
+                path="/privacyPolicy"
+                element={<SwagramaPrivacyPolicy />}
+              />
               <Route path="refundPolicy" element={<SwagramaRefundPolicy />} />
               <Route path="feeds" element={<Feeds />} />
               <Route path="/dashboard" element={<UserDashboard />} />

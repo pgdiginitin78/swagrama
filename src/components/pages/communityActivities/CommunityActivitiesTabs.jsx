@@ -70,6 +70,7 @@ const CommunityActivitiesTabs = () => {
         py: { xs: 2, md: 2 },
       }}
     >
+    
       <h1 className="text-2xl font-bold text-center text-green-800 mb-4">
         Community Activities
       </h1>

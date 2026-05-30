@@ -12,19 +12,22 @@ import CommonLoader from "./components/common/commonLoader/CommonLoader.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme.js";
+import { HelmetProvider } from "react-helmet-async";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <Provider store={store}>
-    <BrowserRouter>
-      <ScrollToTop />
-      <ThemeProvider theme={theme}>
-        <AuthProvider>
-          <LoaderProvider>
-            <CommonLoader />
-            <App />
-          </LoaderProvider>
-        </AuthProvider>
-      </ThemeProvider>
-    </BrowserRouter>
-  </Provider>,
+  <HelmetProvider>
+    <Provider store={store}>
+      <BrowserRouter>
+        <ScrollToTop />
+        <ThemeProvider theme={theme}>
+          <AuthProvider>
+            <LoaderProvider>
+              <CommonLoader />
+              <App />
+            </LoaderProvider>
+          </AuthProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </Provider>
+  </HelmetProvider>,
 );

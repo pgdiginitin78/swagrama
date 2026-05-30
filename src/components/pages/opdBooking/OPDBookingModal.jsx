@@ -381,8 +381,8 @@ export default function OPDBookingModal({
               setPatientOptions(
                 data.map((item) => ({
                   ...item,
-                  id: item.patientId,
-                  value: item.patientId,
+                  id: item.userId,
+                  value: item.userId,
                   label: `${item.firstName} ${item.lastName}`,
                 })),
               );

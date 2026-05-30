@@ -51,6 +51,7 @@ import {
 } from "../../../../services/bookAppointment/BookAppointmentServices";
 import {
   checkRoomAvailability,
+  checkRoomGender,
   wellnessStayBooking,
 } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
@@ -63,6 +64,7 @@ import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+import RadioField from "../../../common/formFields/RadioField";
 
 function StayBookingModal({
   open,
@@ -105,6 +107,7 @@ function StayBookingModal({
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
   const [ageDetailsConfig, setAgeDetailsConfig] = useState([]);
+  const [genderCriteria, setGenderCriteria] = useState("");
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
@@ -159,6 +162,7 @@ function StayBookingModal({
       email: "",
       mobile: "",
       city: "",
+      gender: "Male",
       bringingPet: false,
       patientFid: null,
       twinSharing: false,
@@ -561,8 +565,8 @@ function StayBookingModal({
           setPatientOptions(
             dataArray.map((d) => ({
               ...d,
-              id: d.patientId,
-              value: d.patientId,
+              id: d.userId,
+              value: d.userId,
               label: `${d.firstName} ${d.lastName}`,
             })),
           );
@@ -588,16 +592,30 @@ function StayBookingModal({
       setValue("age", patientFid?.age);
       setValue("city", patientFid.city);
       setValue("email", patientFid.emailId);
+      setValue("gender", patientFid?.gender);
+      setValue("noOfAdults", 1);
+      checkRoomGender(selectedService?.roomTypeId, patientFid?.userId)
+        .then((res) => {
+          setGenderCriteria(res?.data?.data);
+        })
+        .catch((err) => setGenderCriteria(""));
+    } else {
+      setGenderCriteria("");
+      setValue("fullName", "");
+      setValue("mobile", "");
+      setValue("age", "");
+      setValue("city", "");
+      setValue("email", "");
+      setValue("gender", "");
       setValue("noOfAdults", 1);
     }
 
     getAgeDetails()
       .then((res) => {
-        console.log("res age details", res.data.data);
         setAgeDetailsConfig(res.data.data);
       })
       .catch((err) => setAgeDetailsConfig([]));
-  }, [patientFid]);
+  }, [patientFid, selectedService]);
 
   useEffect(() => {
     if (!user) return;
@@ -632,7 +650,6 @@ function StayBookingModal({
                 >
                   <div className="flex flex-col md:flex-row items-stretch gap-2">
                     <div className="flex-1 grid grid-cols-1 md:grid-cols-2  gap-2">
-                      {/* Check-in Block */}
                       <div className="flex items-stretch border  rounded-[5px] bg-white  hover:border-booking-primary transition-colors">
                         <div
                           ref={checkInDateRef}
@@ -688,7 +705,6 @@ function StayBookingModal({
                         </div>
                       </div>
 
-                      {/* Check-out Block */}
                       <div className="flex items-stretch border  rounded-[5px] bg-white overflow-hidden hover:border-booking-primary transition-colors">
                         <div
                           ref={checkOutDateRef}
@@ -1558,13 +1574,55 @@ function StayBookingModal({
                       searchIcon={true}
                     />
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="col-span-1 md:col-span-2">
+                  {genderCriteria !== "" && genderCriteria !== "Booking Allowed" && (
+                    <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                      <div className="mt-0.5 text-amber-600">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 9v3m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.66 18h16.68a1 1 0 00.87-1.5l-7.5-13a1 1 0 00-1.74 0z"
+                          />
+                        </svg>
+                      </div>
+
+                      <div>
+                        <h4 className="font-medium text-amber-800">
+                          Gender Restriction
+                        </h4>
+                        <p className="mt-1 text-sm text-amber-700">
+                          {genderCriteria}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="">
                       <InputField
                         control={control}
                         name="fullName"
                         label="Full Name"
                         variant="outlined"
+                      />
+                    </div>
+                    <div className="">
+                      <RadioField
+                        control={control}
+                        name="gender"
+                        label={"Gender"}
+                        dataArray={[
+                          { label: "Male", value: "Male" },
+                          { label: "Female", value: "Female" },
+                          { value: "Other", label: "Other" },
+                        ]}
                       />
                     </div>
                     <InputField

@@ -1,37 +1,33 @@
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { ArrowRight, Award, Briefcase, User } from "lucide-react";
+import {
+  BookOpen,
+  Hospital,
+  Leaf,
+  Sparkles,
+  Sprout,
+  Users,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import heroImage from "../../assets/landing-page/aboutUs/hero-swagrama.webp";
 import farmImage from "../../assets/landing-page/aboutUs/organic-farm.webp";
 import wellnessImage from "../../assets/landing-page/aboutUs/wellness-center.webp";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
+import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
 import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.png";
 import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
-import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
 import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
 import SmitaMehetre from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
-import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
-import {
-  Hospital,
-  BookOpen,
-  Users,
-  Leaf,
-  Sparkles,
-  Sprout,
-} from "lucide-react";
 
+import Healing from "@mui/icons-material/Healing";
+import LocalHospital from "@mui/icons-material/LocalHospital";
+import MedicalServices from "@mui/icons-material/MedicalServices";
+import Spa from "@mui/icons-material/Spa";
 import {
   Card,
-  CardContent,
-  Avatar,
-  Chip,
-  Container,
-  Typography,
+  Container
 } from "@mui/material";
-import LocalHospital from "@mui/icons-material/LocalHospital";
-import Spa from "@mui/icons-material/Spa";
-import Healing from "@mui/icons-material/Healing";
-import MedicalServices from "@mui/icons-material/MedicalServices";
+import { Helmet } from "react-helmet-async";
 import FounderSection from "../../homePage/sections/FounderSection";
 
 const partnersData = [
@@ -166,18 +162,6 @@ const services = [
   },
 ];
 
-const getIcon = (specialty) => {
-  switch (specialty) {
-    case "Ayurveda":
-      return <Spa />;
-    case "Yoga Therapist":
-      return <Healing />;
-    case "Homoeopathy":
-      return <LocalHospital />;
-    default:
-      return <MedicalServices />;
-  }
-};
 
 const AboutUs = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -291,8 +275,10 @@ const AboutUs = () => {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-background overflow-x-hidden"
+      className="min-h-screen bg-background overflow-x-hidden mt-20"
     >
+   
+
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <motion.div
           className="absolute top-20 left-10 w-64 h-64 rounded-full bg-forest/5 blur-3xl"

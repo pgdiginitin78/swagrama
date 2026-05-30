@@ -1,20 +1,20 @@
-import { useMemo, useRef, useState } from "react";
 import { useInView } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
-import BookEventForm from "../pages/bookEventForm/BookEventForm";
 import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
 import { getNextTwoEvents } from "./HomePageConstants";
 
 // Sections
+import VisitorsFormModal from "../pages/communityActivities/vision/VisitorsFormModal";
+import CommunityHealers from "./sections/CommunityHealers";
+import FounderSection from "./sections/FounderSection";
 import HeroSection from "./sections/HeroSection";
+import PillarsSection from "./sections/PillarsSection";
 import ServicesSection from "./sections/ServicesSection";
+import TopStoriesModals from "./sections/TopStoriesModals";
 import TopStoriesSection from "./sections/TopStoriesSection";
 import UpcomingEventsSection from "./sections/UpcomingEventsSection";
-import FounderSection from "./sections/FounderSection";
-import PillarsSection from "./sections/PillarsSection";
-import CommunityHealers from "./sections/CommunityHealers";
-import TopStoriesModals from "./sections/TopStoriesModals";
-import VisitorsFormModal from "../pages/communityActivities/vision/VisitorsFormModal";
 
 export default function AyurvedaLanding({ userData }) {
   const [modal1, setModal1] = useState(false);
@@ -40,6 +40,11 @@ export default function AyurvedaLanding({ userData }) {
 
   return (
     <div className="w-full overflow-x-hidden bg-gradient-to-br from-lime-50 via-green-50 to-amber-50">
+      <Helmet>
+        <title>स्वग्राम SwaGrama | Ayurveda • Yoga • Nisarga • Agro • Tourism</title>
+        <meta name="description" content="SwaGrama is a self-sufficient village connected to cultural roots, embracing the traditional Indian science of health - Ayurveda and Yoga." />
+      </Helmet>
+
       <HeroSection
         userData={userData}
         setOpenAppointmentModal={setOpenAppointmentModal}

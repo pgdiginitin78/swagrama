@@ -114,7 +114,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
   const termsAccepted = watch("termsAccepted");
 
   const getNumericPrice = (priceVal) => {
-    if (!priceVal || priceVal === "Free") return 0;
+    if (!priceVal || String(priceVal).toLowerCase() === "free") return 0;
     if (typeof priceVal === "number") return priceVal;
     return parseInt(priceVal.toString().replace(/[^0-9]/g, "")) || 0;
   };
@@ -141,6 +141,13 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
             })),
           );
           if (filterData) {
+            setValue("patientFid", {
+              ...filterData,
+              id: filterData.userId,
+              value: filterData.userId,
+              label:
+                `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+            });
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
@@ -160,10 +167,15 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       setValue("mobileNumber", String(patientFid.mobileNo || ""));
       setValue("email", patientFid.emailId || "");
       setValue("city", patientFid.city || "");
+    } else {
+      setValue("fullName", "");
+      setValue("mobileNumber", "");
+      setValue("email", "");
+      setValue("city", "");
     }
   }, [patientFid, setValue]);
 
-  console.log("patientFid", patientFid);
+  console.log("serviceDetails", serviceDetails);
 
   useEffect(() => {
     if (!user) return;
@@ -198,7 +210,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       amount: total,
       origin: origin,
     };
-    console.log("saveObj",saveObj)
+    console.log("saveObj", saveObj);
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
@@ -210,18 +222,26 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       setIsLoading(true);
       const bookingRes = await SaveActivities(formData);
       const bookingData = bookingRes?.data;
-      console.log("bookingData",bookingData)
+      console.log("bookingData", bookingData);
 
       if (bookingData?.message) {
         const innerData = bookingData?.data?.data || bookingData?.data;
         const bookingId = innerData?.bookingId;
+
+        if (formData.amount === 0) {
+          setIsLoading(false);
+          successAlert(bookingData.message || "Booking confirmed successfully");
+          setOpenConfirmation(false);
+          handleClose();
+          reset();
+          return;
+        }
 
         const tempObj = {
           amount: formData.amount,
           userId: innerData?.patientUserId,
           paymentFor: origin,
           bookingId: bookingId,
-        
         };
         const res = await InitiatePayment(5, innerData?.patientUserId, tempObj);
         const data = res?.data;
@@ -535,7 +555,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
         confirmationLabel="Confirm Activity Booking"
         confirmationMsg="Are you sure you want to book this activity?"
         confirmationButtonMsg={
-          isPaymentPending ? "Processing..." : "Confirm & Pay"
+          isPaymentPending
+            ? "Processing..."
+            : formData?.amount === 0
+              ? "Confirm Booking"
+              : "Confirm & Pay"
         }
         confirmationHandleClose={() => {
           if (cancelPaymentRef.current) {

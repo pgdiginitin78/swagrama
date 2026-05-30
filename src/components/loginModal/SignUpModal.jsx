@@ -94,10 +94,10 @@ const signupValidationSchema = yup.object().shape({
     .required("Pin code required")
     .matches(/^[0-9]{6}$/, "Must be 6 digits"),
   address: yup.string().required("Address required"),
-  locality: yup
-    .string()
-    .required("Locality required")
-    .min(2, "Min 2 characters"),
+  // locality: yup
+  //   .string()
+  //   .required("Locality required")
+  //   .min(2, "Min 2 characters"),
   city: yup.string().required("City required").min(2, "Min 2 characters"),
   state: yup.string().required("State required").min(2, "Min 2 characters"),
   country: yup.string().required("Country required").min(2, "Min 2 characters"),
@@ -315,6 +315,13 @@ export default function SignUpModal({ open, handleClose }) {
       .catch((error) => console.error("Error fetching IP:", error));
   }, []);
 
+  const onFormError = (errors) => {
+    const firstErrorField = Object.keys(errors)[0];
+    if (firstErrorField && errors[firstErrorField]?.message) {
+      errorAlert(errors[firstErrorField].message);
+    }
+  };
+
   const textFieldSx = {
     "& .MuiOutlinedInput-root": {
       borderRadius: 2,
@@ -417,7 +424,7 @@ export default function SignUpModal({ open, handleClose }) {
                     </p>
 
                     <form
-                      onSubmit={handleSubmit(onSubmit)}
+                      onSubmit={handleSubmit(onSubmit, onFormError)}
                       className="space-y-2 mt-2"
                     >
                       <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
@@ -580,7 +587,7 @@ export default function SignUpModal({ open, handleClose }) {
                             <InputField
                               control={control}
                               name="locality"
-                              label="Locality *"
+                              label="Locality"
                               error={errors.locality}
                             />
                             <InputField

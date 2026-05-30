@@ -82,6 +82,7 @@ import { ModalStyle } from "../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
+import AppointmentRescheduleIcon from "../../assets/AppointmentScheduleIcon.svg"
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -1665,6 +1666,7 @@ function AyurvedaForm({
                 >
                   {/* <EventAvailableIcon sx={{ fontSize: 16 }} /> */}
                   Confirm Booking
+                  <img src={AppointmentRescheduleIcon} alt="" className="h-5 w-5" />
                 </button>
               </div>
             </div>

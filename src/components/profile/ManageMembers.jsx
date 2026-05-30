@@ -252,7 +252,6 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                   )}
                 </div>
               </div>
-
               <div className="md:flex items-center gap-2 shrink-0 flex justify-end">
                 {view === "list" && (
                   <CommonButton

@@ -72,18 +72,18 @@ const DropdownField = ({
       backgroundColor: isDisabled
         ? undefined
         : isSelected
-        ? "rgba(222,235,255,1)"
-        : isFocused
-        ? "rgba(222,235,255,0.5)"
-        : undefined,
+          ? "rgba(222,235,255,1)"
+          : isFocused
+            ? "rgba(222,235,255,0.5)"
+            : undefined,
 
       color: isDisabled
         ? undefined
         : isSelected
-        ? "#073763"
-        : isFocused
-        ? "#000000"
-        : undefined,
+          ? "#073763"
+          : isFocused
+            ? "#000000"
+            : undefined,
     }),
     menuList: (provided) => ({
       ...provided,
@@ -119,13 +119,13 @@ const DropdownField = ({
         ? state.isSelected
           ? "1px solid #DEEBFF"
           : state.isFocused
-          ? "1px solid #DEEBFF"
-          : state.hasValue || state.selectProps.inputValue
-          ? "1px solid #d32f2f"
-          : "1px solid #d32f2f"
+            ? "1px solid #DEEBFF"
+            : state.hasValue || state.selectProps.inputValue
+              ? "1px solid #d32f2f"
+              : "1px solid #d32f2f"
         : state.hasValue || state.selectProps.inputValue
-        ? ""
-        : "",
+          ? ""
+          : "",
     }),
     singleValue: (Singstyles) => ({
       ...Singstyles,
@@ -185,8 +185,8 @@ const DropdownField = ({
             ? "#073763"
             : "#1976D2"
           : isError
-          ? "#d32f2f"
-          : "#9e9e9e",
+            ? "#d32f2f"
+            : "#9e9e9e",
 
       fontSize:
         (state.menuIsOpen ||
@@ -205,8 +205,8 @@ const DropdownField = ({
             ? -14
             : -13
           : isSearchable
-          ? 4
-          : "18%",
+            ? 4
+            : "18%",
 
       paddingLeft:
         state.menuIsOpen ||
@@ -270,7 +270,7 @@ const DropdownField = ({
           {props.selectProps.placeholder}
         </Placeholder>
         {React.Children.map(children, (child) =>
-          child && child.type !== Placeholder ? child : null
+          child && child.type !== Placeholder ? child : null,
         )}
       </ValueContainer>
     );
@@ -288,7 +288,16 @@ const DropdownField = ({
               isDisabled={isDisabled}
               inputRef={inputRef}
               {...field}
-              ref={referance}
+              ref={(e) => {
+                field.ref(e);
+                if (referance) {
+                  if (typeof referance === "function") {
+                    referance(e);
+                  } else {
+                    referance.current = e;
+                  }
+                }
+              }}
               onKeyDown={onKeyDown}
               isMulti={isMulti}
               closeMenuOnSelect={isMulti ? false : true}
@@ -303,6 +312,7 @@ const DropdownField = ({
               blurInputOnSelect={true}
               menuPlacement={menuPlacement}
               menuShouldBlockScroll={menuShouldBlockScroll}
+              closeMenuOnScroll={true}
               onInputChange={onInputChange}
               menuPortalTarget={document.body}
               components={{

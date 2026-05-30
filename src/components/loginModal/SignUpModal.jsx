@@ -223,32 +223,45 @@ export default function SignUpModal({ open, handleClose }) {
     setOpenConfirmationModal(true);
   };
 
-  const handleUserSignup = async () => {
-    try {
-      setOpenConfirmationModal(false);
-      setIsLoading(true);
-      const response = await signupJYA(formData);
-      console.log("response", response);
+const handleUserSignup = async () => {
+  try {
+    setOpenConfirmationModal(false);
+    setIsLoading(true);
 
-      const apiData = response?.data;
-      if (response.status === 200 && apiData) {
-        successAlert(apiData);
-        handleClose();
-        reset();
-        setIsLoading(false);
-      } else {
-        errorAlert("Registration failed");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.log("errorMassage", error);
+    const response = await signupJYA(formData);
 
-      const errorMessage = error?.response?.data?.message || error?.message;
-      errorAlert(errorMessage);
-    } finally {
-      setIsLoading(false);
+    const apiData = response?.data;
+
+    if (response?.status === 200 && apiData) {
+      successAlert(
+        typeof apiData === "string"
+          ? apiData
+          : apiData?.message || "Registration successful"
+      );
+
+      handleClose();
+      reset();
+    } else {
+      errorAlert("Registration failed");
     }
-  };
+  } catch (error) {
+    console.log("Signup Error:", error);
+    console.log("Error Response:", error?.response?.data);
+
+    const errorMessage =
+      error?.response?.data?.message ||
+      error?.response?.data?.error ||
+      error?.response?.data?.msg ||
+      (typeof error?.response?.data === "string"
+        ? error.response.data
+        : null) ||
+      "Something went wrong";
+
+    errorAlert(errorMessage);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   useEffect(() => {
     if (dob) {

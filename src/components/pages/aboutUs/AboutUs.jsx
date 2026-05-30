@@ -115,7 +115,7 @@ const healers = [
     id: 6,
     name: "Dr. Manisha Suryawanshi",
     qualification: "MBBS, D.Y.ed",
-    specialty: "Yoga Therapist",
+    specialty: "Yoga",
     image: ManishaSuryawanshi,
     color: "#8b5cf6",
   },
@@ -123,7 +123,7 @@ const healers = [
     id: 7,
     name: "Dr. Vaishali Holmukhe",
     qualification: "MD Homoeopath",
-    specialty: "Homoeopathy",
+    specialty: "Homeopathy",
     image: VaishaliHolmukhe,
     color: "#3b82f6",
   },
@@ -275,7 +275,7 @@ const AboutUs = () => {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen bg-background overflow-x-hidden mt-20"
+      className="min-h-screen bg-background overflow-x-hidden"
     >
    
 

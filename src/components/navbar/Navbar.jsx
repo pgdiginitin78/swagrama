@@ -149,7 +149,7 @@ const Navbar = () => {
     { name: "स्वसदस्यत्व Membership", path: "/membership" },
     { name: "स्वकर्मण्य Community Activities", path: "/community-activities" },
     { name: "स्वगुरुकुल Commune", path: "/commune" },
-    { name: "स्वविपणि E Shop", path: "/eShop" },
+    // { name: "स्वविपणि E Shop", path: "/eShop" },
     { name: "स्वप्राप्त Feeds", path: "/feeds" },
     { name: "स्ववर्षपद Calendar", path: "/calendar" },
     // { name: "स्वफलक Dashboard", path: "/dashboard" },
@@ -289,7 +289,7 @@ const Navbar = () => {
                 </button>
               )}
 
-              <button
+              {/* <button
                 onClick={() => setOpenStore(true)}
                 className="store-btn relative flex items-center justify-center px-3 py-1.5 text-white rounded-lg font-medium shadow-md focus:outline-none"
               >
@@ -302,7 +302,7 @@ const Navbar = () => {
                 >
                   <ShoppingCartIcon fontSize="small" />
                 </Badge>
-              </button>
+              </button> */}
             </div>
 
             <div className="flex lg:hidden items-center gap-2 sm:gap-3">
@@ -335,7 +335,7 @@ const Navbar = () => {
                 </button>
               )}
 
-              <button
+              {/* <button
                 onClick={() => setOpenStore(true)}
                 className="store-btn relative flex items-center justify-center p-2 text-white rounded-lg shadow-md active:scale-95 focus:outline-none"
               >
@@ -348,7 +348,7 @@ const Navbar = () => {
                 >
                   <ShoppingCartIcon sx={{ fontSize: 20 }} />
                 </Badge>
-              </button>
+              </button> */}
 
               <button
                 className="flex items-center justify-center p-2 text-gray-700 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors active:scale-95 focus:outline-none"

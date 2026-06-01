@@ -50,8 +50,8 @@ const IPDWellnessStay = () => {
     3: PerpetualRoom,
     4: FirmnessRoom,
     5: InfiniteRoom,
-    8: OutdoorLeavingImg,
-    9: WellHouse,
+    8: WellHouse,
+    9:OutdoorLeavingImg ,
   };
 
   const getRoomImage = (room) => {
@@ -62,9 +62,9 @@ const IPDWellnessStay = () => {
     if (name.includes("firmness")) return FirmnessRoom;
     if (name.includes("infinite")) return InfiniteRoom;
     if (name.includes("well house") || name.includes("wellhouse"))
-      return WellHouse;
+      return OutdoorLeavingImg ;
     if (name.includes("outdoor") || name.includes("out door"))
-      return OutdoorLeavingImg;
+      return WellHouse;
 
     return roomImageMap[room.roomTypeId] || EternityRoom;
   };

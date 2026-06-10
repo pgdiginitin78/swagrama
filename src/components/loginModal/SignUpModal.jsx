@@ -173,6 +173,7 @@ export default function SignUpModal({ open, handleClose }) {
     reset,
     setValue,
     getValues,
+    register,
     watch,
   } = useForm({
     mode: "onChange",
@@ -201,6 +202,7 @@ export default function SignUpModal({ open, handleClose }) {
       agreeToTerms: false,
       relation: "self",
       bloodGroup: null,
+      sameAsMobileNumber: false,
     },
   });
 
@@ -218,50 +220,51 @@ export default function SignUpModal({ open, handleClose }) {
           : "",
       macIp: ipAddress,
       bloodGroup: data.bloodGroup?.value,
+      whatsappNo:data.whatsappNo !== ""? data.whatsappNo:null
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
   };
 
-const handleUserSignup = async () => {
-  try {
-    setOpenConfirmationModal(false);
-    setIsLoading(true);
+  const handleUserSignup = async () => {
+    try {
+      setOpenConfirmationModal(false);
+      setIsLoading(true);
 
-    const response = await signupJYA(formData);
+      const response = await signupJYA(formData);
 
-    const apiData = response?.data;
+      const apiData = response?.data;
 
-    if (response?.status === 200 && apiData) {
-      successAlert(
-        typeof apiData === "string"
-          ? apiData
-          : apiData?.message || "Registration successful"
-      );
+      if (response?.status === 200 && apiData) {
+        successAlert(
+          typeof apiData === "string"
+            ? apiData
+            : apiData?.message || "Registration successful",
+        );
 
-      handleClose();
-      reset();
-    } else {
-      errorAlert("Registration failed");
+        handleClose();
+        reset();
+      } else {
+        errorAlert("Registration failed");
+      }
+    } catch (error) {
+      console.log("Signup Error:", error);
+      console.log("Error Response:", error?.response?.data);
+
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.response?.data?.msg ||
+        (typeof error?.response?.data === "string"
+          ? error.response.data
+          : null) ||
+        "Something went wrong";
+
+      errorAlert(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
-  } catch (error) {
-    console.log("Signup Error:", error);
-    console.log("Error Response:", error?.response?.data);
-
-    const errorMessage =
-      error?.response?.data?.message ||
-      error?.response?.data?.error ||
-      error?.response?.data?.msg ||
-      (typeof error?.response?.data === "string"
-        ? error.response.data
-        : null) ||
-      "Something went wrong";
-
-    errorAlert(errorMessage);
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   useEffect(() => {
     if (dob) {
@@ -341,6 +344,8 @@ const handleUserSignup = async () => {
       bgcolor: "#ffffff",
     },
   };
+
+  console.log("sameAsMobileNumber", watch("sameAsMobileNumber"));
 
   return (
     <>
@@ -486,11 +491,6 @@ const handleUserSignup = async () => {
                                 dataArray={bloodGroupOptions}
                                 error={errors.bloodGroup}
                               />
-                              {errors.bloodGroup && (
-                                <p className="text-red-500 text-[11px] mt-0.5">
-                                  {errors.bloodGroup.message}
-                                </p>
-                              )}
                             </div>
                             <div className="md:col-span-2 xl:col-span-1">
                               <RadioField
@@ -527,7 +527,20 @@ const handleUserSignup = async () => {
                         </div>
                         <div className="p-4 sm:p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-                            <div className="space-y-2">
+                            <div
+                              className="space-y-2"
+                              onChange={(e) => {
+                                if (e.target.value === "") {
+                                  setValue("whatsappNo", "");
+                                }
+                                if (
+                                  watch("sameAsMobileNumber") === true &&
+                                  e.target.value !== ""
+                                ) {
+                                  setValue("whatsappNo", e.target.value);
+                                }
+                              }}
+                            >
                               <InputField
                                 control={control}
                                 name="mobileNo"
@@ -538,11 +551,14 @@ const handleUserSignup = async () => {
                                 control={
                                   <Switch
                                     onChange={(e) => {
-                                      if (e.target.checked)
+                                      if (e.target.checked === true) {
                                         setValue(
                                           "whatsappNo",
                                           watch("mobileNo"),
                                         );
+                                      } else {
+                                        setValue("whatsappNo", "");
+                                      }
                                     }}
                                     sx={{
                                       "& .MuiSwitch-switchBase.Mui-checked": {
@@ -554,6 +570,8 @@ const handleUserSignup = async () => {
                                   />
                                 }
                                 label="Same as Mobile Number"
+                                {...register("sameAsMobileNumber")}
+                                name="sameAsMobileNumber"
                                 sx={{
                                   "& .MuiFormControlLabel-label": {
                                     fontSize: "0.875rem",

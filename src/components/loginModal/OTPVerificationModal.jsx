@@ -13,7 +13,6 @@ const OTPVerificationModal = ({
   handleClose,
   onVerify,
   handleResend,
-  phoneNumber = "",
   emailFromResend,
   setOtpEmailForVerification,
 }) => {
@@ -77,15 +76,15 @@ const OTPVerificationModal = ({
     inputRefs[focusIndex].current.focus();
   };
 
-  const handleInternalResend = () => {
-    if (canResend) {
-      if (handleResend) {
-        handleResend(phoneNumber);
-      }
-      setTimer(30);
-      setCanResend(false);
+const handleInternalResend = () => {
+  if (canResend) {
+    if (handleResend) {
+      handleResend(emailFromResend);
     }
-  };
+    setTimer(30);
+    setCanResend(false);
+  }
+};
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -127,7 +126,6 @@ const OTPVerificationModal = ({
     }),
   };
 
-  console.log("emailAddressValue", emailFromResend);
 
   const handleVerifyOtp = () => {
     const otpString = otp.join("");
@@ -222,7 +220,7 @@ const OTPVerificationModal = ({
                   <p className="text-gray-500 text-xs leading-relaxed max-w-[220px]">
                     Enter the code sent to
                     <span className="block font-semibold text-green-600 mt-0.5 text-sm">
-                      {phoneNumber}
+                      {emailFromResend}
                     </span>
                   </p>
                 </div>

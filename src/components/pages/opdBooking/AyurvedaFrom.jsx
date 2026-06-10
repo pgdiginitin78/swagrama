@@ -712,46 +712,46 @@ function AyurvedaForm({
     }
   }, [patientFid]);
 
-  useEffect(() => {
-    if (selectedDoctorId !== null) {
-      setSelectedTimeSlot(null);
-      setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
+useEffect(() => {
+  if (selectedDoctorId !== null) {
+    setSelectedTimeSlot(null);
+    setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
 
-      getDoctorAvailableSlots(
-        selectedDoctorId?.userId,
-        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
-          ? format(new Date(appointmentDate), "yyyy-MM-dd")
-          : "",
-        5,
-      )
-        .then((res) => {
-          const data = res?.data;
+    getDoctorAvailableSlots(
+      selectedDoctorId?.userId,
+      appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+        ? format(new Date(appointmentDate), "yyyy-MM-dd")
+        : "",
+      5,
+    )
+      .then((res) => {
+        const data = res?.data;
 
-          if (data?.status === 200) {
-            const fetchedSlots = data?.data || [];
-            setSlotData({
-              slots: fetchedSlots,
-              loading: false,
-              error: fetchedSlots.length === 0 ? "No slots available" : "",
-            });
-          } else {
-            setSlotData({
-              slots: [],
-              loading: false,
-              error: data?.message || "No slots available",
-            });
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching slots:", err);
+        if (data?.status === 200) {
+          const fetchedSlots = data?.data || [];
+          setSlotData({
+            slots: fetchedSlots,
+            loading: false,
+            error: fetchedSlots.length === 0 ? "No slots available" : "",
+          });
+        } else {
           setSlotData({
             slots: [],
             loading: false,
-            error: "Failed to fetch slots",
+            error: data?.message || "Something went wrong",
           });
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching slots:", err);
+        setSlotData({
+          slots: [],
+          loading: false,
+          error: err?.response?.data?.message || "Failed to fetch slots",
         });
-    }
-  }, [selectedDoctorId, appointmentDate]);
+      });
+  }
+}, [selectedDoctorId, appointmentDate]);
 
   const handleConfirmBooking = handleSubmit(
     (data) => {
@@ -901,7 +901,6 @@ function AyurvedaForm({
         errorAlert(res?.data?.message || "Booking failed. Please try again.");
       }
     } catch (error) {
-      console.error("Direct booking error:", error);
       errorAlert("An error occurred while booking the appointment.");
     } finally {
       setIsLoading(false);
@@ -1476,11 +1475,7 @@ function AyurvedaForm({
                   </div>
                 )}
 
-                {slotData.error && !slotData.loading && (
-                  <p className="text-red-500 text-[10px] font-bold mt-2.5 text-center bg-red-50 py-1.5 rounded-lg sm:mt-3">
-                    {slotData.error}
-                  </p>
-                )}
+            
               </div>
             </div>
           </div>

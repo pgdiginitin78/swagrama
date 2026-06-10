@@ -26,6 +26,16 @@ import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import { useLoader } from "../common/commonLoader/LoaderContext";
 import ConfirmationModal from "../common/ConfirmationModal";
 import { ModalStyle } from "../common/modalStyle/ModalStyle";
+import DropdownField from "../common/formFields/DropdownField";
+
+const dropdownObjectSchema = yup
+  .object()
+  .shape({
+    id: yup.mixed().required(),
+    label: yup.string().required(),
+  })
+  .nullable()
+  .required("This field is required");
 
 const schema = yup.object().shape({
   FirstName: yup.string().required("First name is required"),
@@ -47,7 +57,7 @@ const schema = yup.object().shape({
   state: yup.string().required("State is required"),
   country: yup.string().required("Country is required"),
   userName: yup.string().required("Username is required"),
-  occupation: yup.string().nullable(),
+  bloodGroup: dropdownObjectSchema.typeError("Blood group is required"),
   gender: yup.string().required("Gender is required"),
 });
 
@@ -64,6 +74,17 @@ const genderOptions = [
   { id: "Male", value: "Male", label: "Male" },
   { id: "Female", value: "Female", label: "Female" },
   { id: "Other", value: "Other", label: "Other" },
+];
+
+const bloodGroupOptions = [
+  { id: 1, value: "A+", label: "A+" },
+  { id: 2, value: "A-", label: "A-" },
+  { id: 3, value: "B+", label: "B+" },
+  { id: 4, value: "B-", label: "B-" },
+  { id: 5, value: "AB+", label: "AB+" },
+  { id: 6, value: "AB-", label: "AB-" },
+  { id: 7, value: "O+", label: "O+" },
+  { id: 8, value: "O-", label: "O-" },
 ];
 
 const SectionLabel = ({ icon, iconBg, iconColor, title }) => (
@@ -84,9 +105,30 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [ipAddress, setIpAddress] = useState(null);
+  const [userSignUpData, setUserSignUpData] = useState(null);
 
   const fileRef = useRef();
   const { setIsLoading } = useLoader();
+
+  const defaultValues = {
+    FirstName: "",
+    middleName: "",
+    lastName: "",
+    dob: null,
+    age: "",
+    gender: "Male",
+    mobileNo: "",
+    whatsappNo: "",
+    emailId: "",
+    pinCode: "",
+    address: "",
+    locality: "",
+    city: "",
+    state: "",
+    country: "",
+    userName: "",
+    bloodGroup: null,
+  };
 
   const {
     control,
@@ -97,29 +139,15 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
     reset,
   } = useForm({
     resolver: yupResolver(schema),
-    defaultValues: {
-      FirstName: "",
-      lastName: "",
-      dob: null,
-      age: "",
-      gender: "Male",
-      mobileNo: "",
-      whatsappNo: "",
-      emailId: "",
-      pinCode: "",
-      address: "",
-      locality: "",
-      city: "",
-      state: "",
-      country: "",
-      userName: "",
-      occupation: "",
-    },
+    defaultValues: defaultValues,
     mode: "onChange",
   });
 
   const dobValue = watch("dob");
   const pinCodeValue = watch("pinCode");
+  const ageValue = watch("age");
+  const isAgeUpdate = useRef(false);
+  const isDobUpdate = useRef(false);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files?.[0];
@@ -138,6 +166,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
           : "",
       macIp: ipAddress,
       userId: user?.userId,
+      bloodGroup: data.bloodGroup.label,
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
@@ -173,12 +202,18 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       )
         .then((res) => {
           const userData = res?.data?.data;
+          setUserSignUpData(userData);
           if (userData) {
             setValue("FirstName", userData.firstName || "");
-            setValue("lastName", userData.lastName || userData?.lName ||"");
-            setValue("mobileNo", userData.whatsappNo || userData?.contactNumber || "");
+            setValue("middleName", userData.middleName || "");
+            setValue("lastName", userData.lastName || userData?.lName || "");
+            setValue("bloodGroup", userData.bloodGroup || "");
+            setValue(
+              "mobileNo",
+              userData.whatsappNo || userData?.contactNumber || "",
+            );
             setValue("whatsappNo", userData.whatsappNo || "");
-            setValue("emailId", userData.emailId || userData?.email||"");
+            setValue("emailId", userData.emailId || userData?.email || "");
             if (userData.dob) setValue("dob", new Date(userData.dob));
             const filterGender = genderOptions.find(
               (item) =>
@@ -193,7 +228,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
             setValue("locality", userData.locality || "");
             setValue("country", userData.country || "India");
             setValue("userName", userData.userName || "");
-            setValue("occupation", userData.occupation || "");
+
             if (userData.avatar) setAvatarPreview(userData.avatar);
           }
         })
@@ -219,6 +254,46 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       if (calculatedAge >= 0) setValue("age", calculatedAge);
     }
   }, [dobValue, setValue]);
+
+  useEffect(() => {
+    if (isDobUpdate.current) {
+      isDobUpdate.current = false;
+      return;
+    }
+    if (dobValue) {
+      const birthDate = new Date(dobValue);
+      const today = new Date();
+      let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (
+        monthDiff < 0 ||
+        (monthDiff === 0 && today.getDate() < birthDate.getDate())
+      ) {
+        calculatedAge--;
+      }
+      if (calculatedAge >= 0) {
+        isAgeUpdate.current = true;
+        setValue("age", calculatedAge);
+      }
+    }
+  }, [dobValue, setValue]);
+
+  useEffect(() => {
+    if (isAgeUpdate.current) {
+      isAgeUpdate.current = false;
+      return;
+    }
+    if (!ageValue || isNaN(ageValue)) return;
+    const today = new Date();
+    const birthYear = today.getFullYear() - Number(ageValue);
+    const calculatedDob = new Date(
+      birthYear,
+      today.getMonth(),
+      today.getDate(),
+    );
+    isDobUpdate.current = true;
+    setValue("dob", calculatedDob);
+  }, [ageValue, setValue]);
 
   useEffect(() => {
     const fetchPinData = async () => {
@@ -293,7 +368,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                   onSubmit={handleSubmit(onSubmit)}
                   className="p-3 space-y-4"
                 >
-                  <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
+                  {/* <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
                     <div className="flex items-center gap-3">
                       <div
                         className="relative group cursor-pointer shrink-0"
@@ -337,7 +412,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
                     <SectionLabel
@@ -347,6 +422,15 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                       title="Basic Info"
                     />
                     <div className="grid grid-cols-2 gap-2.5">
+                      <div className="col-span-2">
+                        <InputField
+                          control={control}
+                          name="userName"
+                          label="Username *"
+                          error={errors.userName}
+                          disabled={true}
+                        />
+                      </div>
                       <InputField
                         control={control}
                         name="FirstName"
@@ -355,24 +439,29 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                       />
                       <InputField
                         control={control}
+                        name="middleName"
+                        label="Middle Name"
+                        error={errors.middleName}
+                      />
+                      <InputField
+                        control={control}
                         name="lastName"
                         label="Last Name *"
                         error={errors.lastName}
                       />
-                      <div className="col-span-2">
-                        <InputField
+                      <div>
+                        <DropdownField
                           control={control}
-                          name="userName"
-                          label="Username *"
-                          error={errors.userName}
+                          name="bloodGroup"
+                          placeholder="Select Blood Group *"
+                          dataArray={bloodGroupOptions}
+                          error={errors.bloodGroup}
                         />
-                      </div>
-                      <div className="col-span-2">
-                        <InputField
-                          control={control}
-                          name="occupation"
-                          label="Occupation"
-                        />
+                        {errors.bloodGroup && (
+                          <p className="text-red-500 text-[11px] mt-0.5">
+                            {errors.bloodGroup.message}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -397,7 +486,6 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                         name="age"
                         label="Age"
                         error={errors.age}
-                        disabled
                       />
                       <div className="col-span-2">
                         <RadioField
@@ -502,7 +590,12 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                     <CommonButton
                       type="button"
                       label="Reset"
-                      onClick={reset}
+                      onClick={() => {
+                        reset({
+                          ...defaultValues,
+                          userName: userSignUpData?.userName || "",
+                        });
+                      }}
                       className="flex-1 sm:flex-initial text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 active:scale-95 transition-all text-sm"
                     />
                     <CommonButton

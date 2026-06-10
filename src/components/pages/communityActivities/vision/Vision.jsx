@@ -1,14 +1,11 @@
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AgricultureIcon from "@mui/icons-material/Agriculture";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import BuildIcon from "@mui/icons-material/Build";
 import GroupsIcon from "@mui/icons-material/Groups";
 import HealingIcon from "@mui/icons-material/Healing";
 import HomeIcon from "@mui/icons-material/Home";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import NatureIcon from "@mui/icons-material/Nature";
 import PetsIcon from "@mui/icons-material/Pets";
-import PublicIcon from "@mui/icons-material/Public";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import SchoolIcon from "@mui/icons-material/School";
 import SpaIcon from "@mui/icons-material/Spa";
@@ -17,9 +14,10 @@ import TempleBuddhistIcon from "@mui/icons-material/TempleBuddhist";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, isValidElement } from "react";
+import { isValidElement, useState } from "react";
 import EveningVisionWholeMealImg from "../../../assets/community-activities/Evening Vision Whole Meal.webp";
 import EveningSwagramaImg from "../../../assets/community-activities/EveningSwagrama.webp";
+import MainPageImg from "../../../assets/community-activities/mainPage.webp";
 import MorningVisionWholeMealImg from "../../../assets/community-activities/Morning Vision Whole Meal.webp";
 import MorningVisionImg from "../../../assets/community-activities/MorningVision.webp";
 import DailyBarterImg from "../../../assets/healingServices/vision/DailyBarter.webp";
@@ -27,14 +25,17 @@ import eveningMealImg from "../../../assets/healingServices/vision/eveningMeal.w
 import MorningMealImg from "../../../assets/healingServices/vision/morningMeal.webp";
 import PatientCampImg from "../../../assets/healingServices/vision/PatientCamp.webp";
 import weaklyBarterImg from "../../../assets/healingServices/vision/weaklyBarter.webp";
-import VisitorsFormModal from "./VisitorsFormModal";
-import MainPageImg from "../../../assets/community-activities/mainPage.webp";
 import MembershipRegistrationModal from "../../membership/communityMembership/MembershipRegistrationModal";
+import VisitorsFormModal from "./VisitorsFormModal";
 
+import Marquee from "react-fast-marquee";
+import { IoEarthSharp } from "react-icons/io5";
+import { TbUniverse } from "react-icons/tb";
 import img1 from "../../../assets/community-activities/visionImages/20231111_111902.webp";
 import img2 from "../../../assets/community-activities/visionImages/20231111_112006.webp";
 import img3 from "../../../assets/community-activities/visionImages/20231225_224343.webp";
 import img4 from "../../../assets/community-activities/visionImages/20240410_082533.webp";
+import img14 from "../../../assets/community-activities/visionImages/DSC_0310-1.webp";
 import img5 from "../../../assets/community-activities/visionImages/IMG_20180106_110559.webp";
 import img6 from "../../../assets/community-activities/visionImages/IMG_20180106_122141.webp";
 import img7 from "../../../assets/community-activities/visionImages/IMG_20220103_115609.webp";
@@ -44,9 +45,6 @@ import img10 from "../../../assets/community-activities/visionImages/IMG_2022012
 import img11 from "../../../assets/community-activities/visionImages/IMG_20220713_100044~2.webp";
 import img12 from "../../../assets/community-activities/visionImages/IMG_20220713_105048~2.webp";
 import img13 from "../../../assets/community-activities/visionImages/IMG_20230923_094519.webp";
-import img14 from "../../../assets/community-activities/visionImages/DSC_0310-1.webp";
-import { IoEarthSharp } from "react-icons/io5";
-import { TbUniverse } from "react-icons/tb";
 
 const carouselImages = [
   img1,
@@ -344,30 +342,40 @@ const OurVision = () => {
       </div>
 
       {/* 2. AUTO-SLIDER CAROUSEL */}
-      <div className="w-full py-6 md:py-8 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] overflow-hidden border-b border-[#8bc34a]/20">
-        <motion.div
-          className="flex gap-4 sm:gap-6 w-max px-4"
-          animate={{ x: ["0%", "-50%"] }}
-          transition={{ ease: "linear", duration: 50, repeat: Infinity }}
-        >
-          {[...carouselImages, ...carouselImages].map((img, index) => (
-            <div
-              key={index}
-              className="w-48 sm:w-64 md:w-80 h-32 sm:h-44 md:h-56 flex-shrink-0 rounded-xl overflow-hidden shadow-md border border-[#8bc34a]/30 relative group"
-            >
-              <img
-                src={img}
-                alt={`Vision Slider ${index}`}
-                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300" />
-            </div>
-          ))}
-        </motion.div>
+  <div className="w-full py-6 md:py-8 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] ">
+  <Marquee speed={50} gradient={false} pauseOnHover={true}>
+    {carouselImages.map((img, index) => (
+      <div
+        key={index}
+        className="rounded-tr-[30px] rounded-bl-[30px]"
+        style={{
+          marginRight: "16px",
+          // borderRadius: "12px",
+          overflow: "hidden",
+          width: "280px",
+          height: "200px",
+          border: "1px solid rgba(139,195,74,0.3)",
+          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+          flexShrink: 0,
+        }}
+      >
+        <img
+          src={img}
+          alt={`Swagrama ${index}`}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            display: "block",
+          }}
+        />
       </div>
+    ))}
+  </Marquee>
+</div>
 
       {/* 3. THE JOURNEY INCLUDES */}
-      <div className="py-10 px-2 md:px-12 sm:py-16 bg-gradient-to-b from-[#c8e6c9] to-[#e8f5e9]">
+      <div className="py-10 px-2 md:px-12 sm:py-6 bg-gradient-to-b from-[#c8e6c9] to-[#e8f5e9]">
         <div className="w-full mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -505,7 +513,7 @@ const OurVision = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 px-2 md:px-12 "
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-6 px-2 md:px-12"
             >
               {visitorServices.map((service, index) => (
                 <motion.div
@@ -521,7 +529,6 @@ const OurVision = () => {
                         alt={service.serviceName}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                       />
-                      {/* <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" /> */}
                       <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-green-700 shadow-sm">
                         {service.price}
                       </div>
@@ -593,7 +600,7 @@ const OurVision = () => {
                         }}
                         className="w-full bg-gradient-to-r from-lime-500 to-green-600 text-white font-semibold py-2.5 rounded-xl hover:from-lime-600 hover:to-green-700 transition-all text-sm shadow-sm"
                       >
-                        Book Now 
+                        Book Now
                       </button>
                     </div>
                   </div>
@@ -637,9 +644,8 @@ const OurVision = () => {
                     <div className="absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-bold text-green-700 shadow-sm">
                       {service.price}
                     </div>
-                    
+
                     <div className="relative h-48">
-                      {/* <div className="absolute inset-0 bg-gradient-to-t from-green-900/60 to-transparent z-10" /> */}
                       <img
                         src={service.image}
                         alt={service.serviceName}
@@ -703,7 +709,6 @@ const OurVision = () => {
                           ></lord-icon>
                           <span>Enquire Now</span>
                         </div>
-
                       </button>
                     </div>
                     <div className="h-1 bg-gradient-to-r from-lime-400 via-green-500 to-emerald-500" />
@@ -714,6 +719,7 @@ const OurVision = () => {
           </div>
         </div>
       </div>
+
       {openEnquiryModal && (
         <VisitorsFormModal
           open={openEnquiryModal}

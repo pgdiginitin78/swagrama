@@ -174,7 +174,7 @@ export default function LoginModal({ open, handleClose }) {
         ClinicId: 5,
       });
       if (response.status === 200) {
-        successAlert(response.data?.message || "Password reset email sent!");
+        successAlert(response.data);
         setOtpEmailForVerification(emailToUse);
         setOpenForgotModal(false);
         reset({
@@ -184,12 +184,10 @@ export default function LoginModal({ open, handleClose }) {
         });
         setOpenOTPModal(true);
       } else {
-        errorAlert(response.data?.message || "Something went wrong");
+        errorAlert(response.data);
       }
     } catch (error) {
-      errorAlert(
-        error?.response?.data?.message || "Failed to send reset email",
-      );
+      errorAlert(error?.response?.data);
     } finally {
       setIsLoading(false);
     }

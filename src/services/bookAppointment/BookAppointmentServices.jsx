@@ -25,8 +25,8 @@ export const getPatientDataByMobileNo = (
   );
 };
 
-export const getServicesByClinicId = (clinicId, userId) => {
-  return AxiosInstance.get(`Services?ClinicFid=${clinicId}&userId=${userId}`);
+export const getServicesByClinicId = (clinicId, userId, doctorId) => {
+  return AxiosInstance.get(`Services?ClinicFid=${clinicId}&userId=${userId}&doctorId=${doctorId}`);
 };
 
 export const bookAppointment = (saveObj, userId) => {

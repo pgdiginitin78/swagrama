@@ -26,6 +26,7 @@ const InputField = ({
   minRows,
   maxRows,
   multiline,
+  onChange,
 }) => {
   return (
     <FormControl fullWidth size="small" sx={sx}>
@@ -41,11 +42,12 @@ const InputField = ({
               id={id}
               inputRef={inputRef}
               ref={ref ? ref : null}
-              autoComplete="off"
+              autoComplete="new-password"
               onKeyDown={onKeyDown}
               InputProps={{
                 disabled: disabled,
               }}
+              onChange={onChange ? onChange : field.onChange}
               minRows={minRows}
               maxRows={maxRows}
               multiline={multiline}
@@ -53,7 +55,10 @@ const InputField = ({
               InputLabelProps={InputLabelProps}
               inputProps={{
                 ...inputProps,
+                autoComplete: "new-password",
+                autoCapitalize: dontCapitalize ? "none" : "words",
                 style: {
+                  textTransform: dontCapitalize ? "none" : "capitalize",
                   fontSize: tableInputField ? "12px" : "14px",
                   height: tableInputField ? "10px" : "20px",
                 },

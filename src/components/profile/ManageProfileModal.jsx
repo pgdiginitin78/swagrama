@@ -15,7 +15,11 @@ import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../context/AuthContext";
-import { getUserDetails, signupJYA } from "../../services/login/LoginServices";
+import {
+  getUserDetails,
+  signupJYA,
+  verifyUser,
+} from "../../services/login/LoginServices";
 import CancelButtonModal from "../common/button/CancelButtonModal";
 import CommonButton from "../common/button/CommonButton";
 import DatePickerField from "../common/formFields/DatePickerField";
@@ -106,8 +110,9 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [ipAddress, setIpAddress] = useState(null);
   const [userSignUpData, setUserSignUpData] = useState(null);
+  const [verifyEmail, setVerifyEmail] = useState("");
 
-  const fileRef = useRef();
+  const debounceRef = useRef();
   const { setIsLoading } = useLoader();
 
   const defaultValues = {
@@ -517,13 +522,45 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                         name="whatsappNo"
                         label="WhatsApp Number"
                       />
-                      <div className="col-span-2">
+                      <div
+                        className="col-span-2"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setVerifyEmail("");
+                          if (debounceRef.current) {
+                            clearTimeout(debounceRef.current);
+                          }
+                          if (!value.trim()) return;
+                          debounceRef.current = setTimeout(() => {
+                            verifyUser({
+                              userName: null,
+                              email: value,
+                            })
+                              .then((res) => {
+                                console.log("verifyUser", res.data.message);
+
+                                setVerifyEmail(res.data.message);
+                              })
+                              .catch(() => {
+                                setVerifyEmail("");
+                              });
+                          }, 500);
+                        }}
+                      >
                         <InputField
                           control={control}
                           name="emailId"
                           label="Email Address *"
                           error={errors.emailId}
+                          dontCapitalize="none"
                         />
+                        {verifyEmail === "Username is available" ? (
+                          <p className="text-green-500 text-xs m-1">
+                            {verifyEmail}
+                          </p>
+                        ) : (
+                          <p className="text-red-500 text-xs m-1">{verifyEmail}</p>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -9,6 +9,10 @@ export const signupJYA = (postObj) => {
   return API.post(`/signupJYA`, postObj);
 };
 
+export const verifyUser = (postObj) => {
+  return API.post(`/VerifyUser`, postObj);
+};
+
 export const DeleteLoggedAccount = (password) => {
   return AxiosInstance.post(`/DeleteAccount?password=${password}`);
 };

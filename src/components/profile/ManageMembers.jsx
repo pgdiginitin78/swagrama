@@ -40,6 +40,17 @@ const relationOptions = [
   { value: "Other", label: "Other" },
 ];
 
+const bloodGroupOptions = [
+  { id: 1, value: "A+", label: "A+" },
+  { id: 2, value: "A-", label: "A-" },
+  { id: 3, value: "B+", label: "B+" },
+  { id: 4, value: "B-", label: "B-" },
+  { id: 5, value: "AB+", label: "AB+" },
+  { id: 6, value: "AB-", label: "AB-" },
+  { id: 7, value: "O+", label: "O+" },
+  { id: 8, value: "O-", label: "O-" },
+];
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
@@ -98,12 +109,14 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   } = useForm({
     defaultValues: {
       firstName: "",
+      middleName:"",
       lastName: "",
       mobileNo: "",
       dob: null,
       relation: null,
       address: "",
       pinCode: "",
+      bloodGroup:null,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
@@ -112,10 +125,15 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   const handleEdit = (member) => {
     setEditingId(member.userId);
     setValue("firstName", member.firstName);
+    setValue("middleName", member.middleName);
     setValue("lastName", member.lastName);
     setValue("mobileNo", member.mobileNo);
     setValue("pinCode", member.pinCode);
     setValue("dob", new Date(member.dob));
+    const bloodGroup = bloodGroupOptions.find(
+      (opt) => opt.value.toLowerCase() === member?.bloodGroup?.toLowerCase(),
+    ) || null;
+    setValue("bloodGroup",bloodGroup);
     setValue(
       "relation",
       relationOptions.find(
@@ -387,6 +405,11 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                           error={errors.firstName}
                         />
                         <InputField
+                          name="middleName"
+                          label="Middle Name"
+                          control={control}
+                        />
+                        <InputField
                           name="lastName"
                           label="Last Name"
                           control={control}
@@ -417,6 +440,14 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                           label="Pin Code"
                           control={control}
                           error={errors.pinCode}
+                        />
+                        <DropdownField
+                          name="bloodGroup"
+                          label="Blood Group"
+                          placeholder="Select Blood Group"
+                          control={control}
+                          dataArray={bloodGroupOptions}
+                          error={errors.bloodGroup}
                         />
                       </div>
 

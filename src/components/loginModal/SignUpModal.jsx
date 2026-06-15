@@ -17,7 +17,7 @@ import {
 import LockIcon from "@mui/icons-material/Lock";
 import PersonIcon from "@mui/icons-material/Person";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import DatePickerField from "../common/formFields/DatePickerField";
 import InputArea from "../common/formFields/InputArea";
@@ -28,7 +28,7 @@ import axios from "axios";
 import { format } from "date-fns";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import ConfirmationModal from "../common/ConfirmationModal";
-import { signupJYA } from "../../services/login/LoginServices";
+import { signupJYA, verifyUser } from "../../services/login/LoginServices";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useLoader } from "../common/commonLoader/LoaderContext";
@@ -94,10 +94,10 @@ const signupValidationSchema = yup.object().shape({
     .required("Pin code required")
     .matches(/^[0-9]{6}$/, "Must be 6 digits"),
   address: yup.string().required("Address required"),
-  // locality: yup
-  //   .string()
-  //   .required("Locality required")
-  //   .min(2, "Min 2 characters"),
+  locality: yup
+    .string()
+    .required("Locality required")
+    .min(2, "Min 2 characters"),
   city: yup.string().required("City required").min(2, "Min 2 characters"),
   state: yup.string().required("State required").min(2, "Min 2 characters"),
   country: yup.string().required("Country required").min(2, "Min 2 characters"),
@@ -164,6 +164,8 @@ export default function SignUpModal({ open, handleClose }) {
   const [ipAddress, setIpAddress] = useState(null);
   const [formData, setFormData] = useState(null);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
+  const [userNameAvailable, setUserNameAvailable] = useState("");
+  const [verifyEmail, setVerifyEmail] = useState("");
 
   const { setIsLoading } = useLoader();
   const {
@@ -210,6 +212,7 @@ export default function SignUpModal({ open, handleClose }) {
   const pinCodeValue = watch("pinCode");
   const agreeToTerms = watch("agreeToTerms");
   const watchedAge = watch("age");
+  const debounceRef = useRef(null);
 
   const onSubmit = (data) => {
     const formattedData = {
@@ -220,11 +223,13 @@ export default function SignUpModal({ open, handleClose }) {
           : "",
       macIp: ipAddress,
       bloodGroup: data.bloodGroup?.value,
-      whatsappNo:data.whatsappNo !== ""? data.whatsappNo:null
+      whatsappNo: data.whatsappNo !== "" ? data.whatsappNo : null,
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
   };
+
+  console.log("formData", formData);
 
   const handleUserSignup = async () => {
     try {
@@ -345,8 +350,6 @@ export default function SignUpModal({ open, handleClose }) {
     },
   };
 
-  console.log("sameAsMobileNumber", watch("sameAsMobileNumber"));
-
   return (
     <>
       <Modal
@@ -442,8 +445,9 @@ export default function SignUpModal({ open, handleClose }) {
                     </p>
 
                     <form
-                      onSubmit={handleSubmit(onSubmit, onFormError)}
+                      onSubmit={handleSubmit(onSubmit)}
                       className="space-y-2 mt-2"
+                      autoComplete="off"
                     >
                       <div className="bg-white rounded-[9px] shadow-md border border-[#e6efe3] overflow-hidden">
                         <div className="bg-gradient-to-r from-[#22c55e] to-[#84cc16] px-4 py-3">
@@ -456,18 +460,33 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                         <div className="p-4 sm:p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-                            <InputField
+                            <div>
+                              <InputField
                               control={control}
                               name="FirstName"
                               label="First Name *"
                               error={errors.FirstName}
                             />
+                              {errors.FirstName && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.FirstName.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="lastName"
                               label="Last Name *"
                               error={errors.lastName}
                             />
+                              {errors.lastName && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.lastName.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <DatePickerField
                               control={control}
                               name="dob"
@@ -477,12 +496,35 @@ export default function SignUpModal({ open, handleClose }) {
                               error={errors.dob}
                               dob={true}
                             />
+                              {errors.dob && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.dob.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="age"
                               label="Age *"
                               error={errors.age}
+                              inputProps={{ inputMode: "numeric" }}
+                              onKeyDown={(e) => {
+                                if (
+                                  !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
+                                    e.key,
+                                  )
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
                             />
+                              {errors.age && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.age.message}
+                                </FormHelperText>
+                              )}
+                            </div>
                             <div>
                               <DropdownField
                                 control={control}
@@ -491,6 +533,11 @@ export default function SignUpModal({ open, handleClose }) {
                                 dataArray={bloodGroupOptions}
                                 error={errors.bloodGroup}
                               />
+                              {errors.bloodGroup && (
+                                  <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                    {errors.bloodGroup.message}
+                                  </FormHelperText>
+                                )}
                             </div>
                             <div className="md:col-span-2 xl:col-span-1">
                               <RadioField
@@ -511,6 +558,11 @@ export default function SignUpModal({ open, handleClose }) {
                                   },
                                 ]}
                               />
+                              {errors.gender && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.gender.message}
+                                </FormHelperText>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -541,12 +593,29 @@ export default function SignUpModal({ open, handleClose }) {
                                 }
                               }}
                             >
+                              <div className="w-full">
                               <InputField
                                 control={control}
                                 name="mobileNo"
                                 label="Mobile Number *"
                                 error={errors.mobileNo}
+                                inputProps={{ inputMode: "numeric" }}
+                                onKeyDown={(e) => {
+                                  if (
+                                    !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
+                                      e.key,
+                                    )
+                                  ) {
+                                    e.preventDefault();
+                                  }
+                                }}
                               />
+                                {errors.mobileNo && (
+                                  <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                    {errors.mobileNo.message}
+                                  </FormHelperText>
+                                )}
+                              </div>
                               <FormControlLabel
                                 control={
                                   <Switch
@@ -580,19 +649,73 @@ export default function SignUpModal({ open, handleClose }) {
                                 }}
                               />
                             </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="whatsappNo"
                               label="WhatsApp Number"
+                              inputProps={{ inputMode: "numeric" }}
+                              onKeyDown={(e) => {
+                                if (
+                                  !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
+                                    e.key,
+                                  )
+                                ) {
+                                  e.preventDefault();
+                                }
+                              }}
                             />
-                            <div className="sm:col-span-2">
+                              {errors.whatsappNo && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.whatsappNo.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div
+                              className="sm:col-span-2"
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                setVerifyEmail("");
+                                if (debounceRef.current) {
+                                  clearTimeout(debounceRef.current);
+                                }
+                                if (!value.trim()) return;
+                                debounceRef.current = setTimeout(() => {
+                                  verifyUser({
+                                    userName: null,
+                                    email: value,
+                                  })
+                                    .then((res) => {
+                                      setVerifyEmail(res.data.data.message);
+                                    })
+                                    .catch(() => {
+                                      setVerifyEmail("");
+                                    });
+                                }, 500);
+                              }}
+                            >
                               <InputField
                                 control={control}
                                 type="email"
                                 name="emailId"
                                 label="Email *"
                                 error={errors.emailId}
+                                dontCapitalize="none"
                               />
+                              {errors.emailId && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.emailId.message}
+                                </FormHelperText>
+                              )}
+                              {verifyEmail === "Username is available" ? (
+                                <p className="text-green-500 text-xs m-1">
+                                  {verifyEmail}
+                                </p>
+                              ) : (
+                                <p className="text-red-500 text-xs m-1">
+                                  {verifyEmail}
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -609,42 +732,85 @@ export default function SignUpModal({ open, handleClose }) {
                         </div>
                         <div className="p-4 sm:p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="pinCode"
                               label="Pin Code *"
                               error={errors.pinCode}
                             />
+                              {errors.pinCode && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.pinCode.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="locality"
                               label="Locality"
                               error={errors.locality}
                             />
+                              {errors.locality && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.locality.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="city"
                               label="City *"
                               error={errors.city}
                             />
+                              {errors.city && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.city.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="state"
                               label="State *"
                               error={errors.state}
                             />
+                              {errors.state && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.state.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="country"
                               label="Country *"
                               error={errors.country}
                             />
+                              {errors.country && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.country.message}
+                                </FormHelperText>
+                              )}
+                            </div>
+                            <div className="w-full">
                             <InputField
                               control={control}
                               name="landmark"
                               label="Landmark"
                             />
+                              {errors.landmark && (
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.landmark.message}
+                                </FormHelperText>
+                              )}
+                            </div>
                             <div className="sm:col-span-2">
+                              <div className="w-full">
                               <InputArea
                                 control={control}
                                 name="address"
@@ -653,6 +819,12 @@ export default function SignUpModal({ open, handleClose }) {
                                 minRows={2}
                                 maxRows={3}
                               />
+                                {errors.address && (
+                                  <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                    {errors.address.message}
+                                  </FormHelperText>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -681,6 +853,34 @@ export default function SignUpModal({ open, handleClose }) {
                                     label="Username *"
                                     error={!!errors.userName}
                                     helperText={errors.userName?.message}
+                                    onChange={(e) => {
+                                      field.onChange(e);
+
+                                      const value = e.target.value;
+
+                                      setUserNameAvailable("");
+
+                                      if (debounceRef.current) {
+                                        clearTimeout(debounceRef.current);
+                                      }
+
+                                      if (!value.trim()) return;
+
+                                      debounceRef.current = setTimeout(() => {
+                                        verifyUser({
+                                          userName: value,
+                                          email:null
+                                        })
+                                          .then((res) => {
+                                            setUserNameAvailable(
+                                              res.data.data.message,
+                                            );
+                                          })
+                                          .catch(() => {
+                                            setUserNameAvailable("");
+                                          });
+                                      }, 500);
+                                    }}
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
@@ -697,6 +897,15 @@ export default function SignUpModal({ open, handleClose }) {
                                   />
                                 )}
                               />
+                              {userNameAvailable === "Username is available" ? (
+                                <p className="text-green-500 text-xs">
+                                  {userNameAvailable}
+                                </p>
+                              ) : (
+                                <p className="text-red-500 text-xs">
+                                  {userNameAvailable}
+                                </p>
+                              )}
                             </div>
                             <Controller
                               name="passWord"

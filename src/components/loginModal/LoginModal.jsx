@@ -78,7 +78,7 @@ export default function LoginModal({ open, handleClose }) {
   const [openResetModal, setOpenResetModal] = useState(false);
   const [openOTPModal, setOpenOTPModal] = useState(false);
   const [otpEmailForVerification, setOtpEmailForVerification] = useState("");
-
+  const [timer, setTimer] = useState(20);
   const [emailFromResend, setEmailFromResend] = useState("");
 
   const { setIsLoading } = useLoader();
@@ -175,6 +175,7 @@ export default function LoginModal({ open, handleClose }) {
       });
       if (response.status === 200) {
         successAlert(response.data);
+        setTimer(20);
         setOtpEmailForVerification(emailToUse);
         setOpenForgotModal(false);
         reset({
@@ -633,6 +634,8 @@ export default function LoginModal({ open, handleClose }) {
         handleResend={handleForgotPassword}
         emailFromResend={emailFromResend}
         setOtpEmailForVerification={setOtpEmailForVerification}
+        timer={timer}
+        setTimer={setTimer}
       />
     </>
   );

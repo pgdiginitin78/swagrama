@@ -37,7 +37,7 @@ const UpcomingEventsSection = ({
           {eventsDataUpdated.map((event, i) => (
             <motion.div
               key={i}
-              className="relative h-[350px] 2xl:h-[450px] rounded-[1rem] overflow-hidden group cursor-pointer shadow-2xl"
+              className="relative h-[350px] 2xl:h-[550px] rounded-[1rem] overflow-hidden group cursor-pointer shadow-2xl"
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}

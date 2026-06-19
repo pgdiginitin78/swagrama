@@ -15,9 +15,10 @@ const OTPVerificationModal = ({
   handleResend,
   emailFromResend,
   setOtpEmailForVerification,
+  setTimer,timer
 }) => {
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
-  const [timer, setTimer] = useState(30);
+
   const [canResend, setCanResend] = useState(false);
 
   const inputRefs = [
@@ -76,15 +77,16 @@ const OTPVerificationModal = ({
     inputRefs[focusIndex].current.focus();
   };
 
-const handleInternalResend = () => {
-  if (canResend) {
-    if (handleResend) {
-      handleResend(emailFromResend);
+  const handleInternalResend = () => {
+    if (canResend) {
+      if (handleResend) {
+        handleResend(emailFromResend);
+        
+      }
+
+      setCanResend(false);
     }
-    setTimer(30);
-    setCanResend(false);
-  }
-};
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -125,7 +127,6 @@ const handleInternalResend = () => {
       },
     }),
   };
-
 
   const handleVerifyOtp = () => {
     const otpString = otp.join("");

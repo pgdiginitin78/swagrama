@@ -1,13 +1,13 @@
 import React, { memo, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
 
 const fly = (delay = 0) => ({
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 20 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.65, ease: [0.22, 1, 0.36, 1], delay },
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay },
   },
 });
 
@@ -25,139 +25,109 @@ const FounderSection = ({ foundersRef, isFoundersInView }) => {
   const show = isFoundersInView !== undefined ? isFoundersInView : inView;
 
   return (
-    <section ref={ref} className="relative py-16 px-4 sm:px-8 lg:px-16">
-      <div className="max-w-6xl mx-auto">
+    <section
+      ref={ref}
+      className="relative py-12 px-4 sm:py-16 sm:px-8 lg:py-20 lg:px-16 xl:py-24 xl:px-24 2xl:py-32 2xl:px-12"
+    >
+      <div className="max-w-4xl sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl 2xl:max-w-7xl mx-auto">
         <motion.div
           variants={fly(0)}
           initial="hidden"
           animate={show ? "visible" : "hidden"}
-          className="flex items-center justify-center gap-2 mb-8"
+          className="flex items-center justify-center gap-3 mb-8 sm:mb-10 lg:mb-14 2xl:mb-16"
         >
-          <div className="w-6 h-px" style={{ background: "#991b1b" }} />
-          <span
-            className="text-[9px] tracking-[0.4em] uppercase font-black"
-            style={{ color: "#991b1b" }}
-          >
-            Mentor & Founder
+          <div className="w-8 sm:w-10 lg:w-12 2xl:w-16 h-px bg-ayuBrown" />
+          <span className="text-[9px] sm:text-[10px] lg:text-[11px] 2xl:text-xs tracking-[0.45em] uppercase font-medium text-ayuBrown">
+            Mentor &amp; Founder
           </span>
-          <div className="w-6 h-px" style={{ background: "#991b1b" }} />
+          <div className="w-8 sm:w-10 lg:w-12 2xl:w-16 h-px bg-ayuBrown" />
         </motion.div>
-        <div className="grid grid-cols-12 grid-rows-[auto] gap-3">
-          <motion.div
-            variants={fly(0.1)}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-            className="col-span-12 sm:col-span-5 lg:col-span-4 row-span-2 relative rounded-2xl overflow-hidden"
-            style={{ minHeight: 400, background: "#e8f5e0" }}
-          >
+
+        <motion.div
+          variants={fly(0.1)}
+          initial="hidden"
+          animate={show ? "visible" : "hidden"}
+          className="grid grid-cols-1 sm:grid-cols-12 border border-amber-200/40 rounded-sm overflow-hidden bg-white"
+        >
+          <div className="sm:col-span-5 lg:col-span-4 relative min-h-64 sm:min-h-96 lg:min-h-[520px] xl:min-h-[580px] 2xl:min-h-[600px] bg-stone-100 flex flex-col justify-end overflow-hidden">
             <img
               src={SantoshSuryavanshi}
               alt="Vaidya Santosh Suryawanshi"
               className="absolute inset-0 w-full h-full object-cover object-top"
             />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(to top, rgba(10,40,15,0.72) 0%, transparent 50%)",
-              }}
-            />
-            <div className="absolute bottom-4 left-[30%]">
-              <span
-                className="inline-block text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1.5 rounded-lg text-white"
-                style={{
-                  background: "rgba(255,255,255,0.15)",
-                  backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,255,255,0.25)",
-                }}
-              >
+            <div className="absolute inset-x-0 bottom-0 h-24 lg:h-32 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="relative z-10 text-center mb-4 sm:mb-5 lg:mb-6 2xl:mb-8">
+              <span className="inline-block text-[9px] sm:text-[10px] lg:text-[11px] 2xl:text-xs tracking-[0.35em] uppercase font-medium text-white px-4 py-1.5 border border-white/40 bg-white/15 backdrop-blur-md rounded-sm">
                 MD Ayurveda
               </span>
             </div>
-            <div
-              className="absolute top-0 right-0 w-1 h-full"
-              style={{
-                background:
-                  "linear-gradient(to bottom, #a3e635, #15803d, #991b1b)",
-              }}
-            />
-          </motion.div>
-          <motion.div
-            variants={fly(0.15)}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-            className="col-span-12 sm:col-span-7 lg:col-span-8 rounded-2xl px-6 py-5 flex flex-col justify-between"
-            style={{
-              background: "linear-gradient(135deg,#fff 60%,#f0fce8)",
-              border: "1px solid #d1fae5",
-              boxShadow: "0 4px 20px rgba(21,128,61,0.07)",
-            }}
-          >
-            <div>
-              <p
-                className="text-[10px] tracking-[0.3em] uppercase font-semibold mb-2"
-                style={{ color: "#991b1b" }}
-              >
-                Guiding Force
-              </p>
-              <h2
-                className="text-3xl sm:text-4xl font-black leading-[1.1] tracking-tight"
-                style={{ fontFamily: "'Georgia',serif", color: "#14532d" }}
-              >
-                Vaidya Santosh &nbsp;
-                <span >
-                  Suryawanshi
-                </span>
-              </h2>
-            </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            variants={fly(0.22)}
-            initial="hidden"
-            animate={show ? "visible" : "hidden"}
-            className="col-span-12 sm:col-span-7 lg:col-span-8 rounded-2xl px-6 py-5"
-            style={{
-              background: "#fff",
-              border: "1px solid #d1fae5",
-              boxShadow: "0 4px 20px rgba(21,128,61,0.07)",
-            }}
-          >
-            <p
-              className="text-[9px] tracking-[0.35em] uppercase font-bold mb-4"
-              style={{ color: "#6b7280" }}
+          <div className="sm:col-span-7 lg:col-span-8 flex flex-col p-6 sm:p-8 lg:p-10 xl:p-12 2xl:p-16 border-t sm:border-t-0 sm:border-l border-ayuBrown">
+            <div className="w-8 sm:w-10 lg:w-12 2xl:w-14 h-px bg-ayuBrown mb-4 sm:mb-5 lg:mb-6" />
+
+            <motion.p
+              variants={fly(0.18)}
+              initial="hidden"
+              animate={show ? "visible" : "hidden"}
+              className="text-[9px] sm:text-[10px] lg:text-[11px] 2xl:text-xs tracking-[0.45em] uppercase font-medium text-amber-500 mb-2 sm:mb-3"
             >
-              Roles & Affiliations
+              Guiding Force
+            </motion.p>
+
+            <motion.h2
+              variants={fly(0.22)}
+              initial="hidden"
+              animate={show ? "visible" : "hidden"}
+              className="font-serif text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-light leading-[1.1] tracking-tight text-stone-800 mb-1"
+            >
+              Vaidya Santosh
+              <br />
+              <em className="italic font-light">Suryawanshi</em>
+            </motion.h2>
+
+            <motion.p
+              variants={fly(0.26)}
+              initial="hidden"
+              animate={show ? "visible" : "hidden"}
+              className="text-[9px] sm:text-[10px] lg:text-[11px] 2xl:text-xs tracking-[0.25em] uppercase font-medium text-amber-700/70 mb-6 sm:mb-8 lg:mb-10 2xl:mb-12"
+            >
+              Ayurvedic Physician &amp; Visionary Leader
+            </motion.p>
+
+            <div className="h-px bg-stone-100 mb-5 sm:mb-6 lg:mb-8 2xl:mb-10" />
+
+            <p className="text-[8px] sm:text-[9px] lg:text-[10px] 2xl:text-[11px] tracking-[0.55em] uppercase font-medium text-stone-300 mb-4 sm:mb-5 lg:mb-6 2xl:mb-8">
+              Roles &amp; Affiliations
             </p>
-            <div className="space-y-3">
+
+            <div className="flex flex-col gap-3 sm:gap-4 lg:gap-5 2xl:gap-6 flex-1">
               {credentials.map(({ role, org }, i) => (
                 <motion.div
                   key={i}
-                  variants={fly(0.28 + i * 0.07)}
+                  variants={fly(0.3 + i * 0.08)}
                   initial="hidden"
                   animate={show ? "visible" : "hidden"}
-                  className="flex items-start gap-3"
+                  className="flex items-start gap-3 sm:gap-4 lg:gap-5"
                 >
                   <span
-                    className="mt-[5px] flex-shrink-0 w-[6px] h-[6px] rounded-full"
-                    style={{ background: i % 2 === 0 ? "#16a34a" : "#991b1b" }}
+                    className={`mt-1.5 flex-shrink-0 w-1 h-1 sm:w-1.5 sm:h-1.5 2xl:w-2 2xl:h-2 rounded-full ${
+                      i % 2 === 0 ? "bg-amber-400" : "bg-green-600"
+                    }`}
                   />
-                  <div className="leading-snug">
-                    <span
-                      className="text-[11px] font-bold uppercase tracking-wider mr-2"
-                      style={{ color: "#991b1b" }}
-                    >
+                  <div>
+                    <p className="text-[9px] sm:text-[10px] lg:text-[11px] 2xl:text-xs tracking-[0.3em] uppercase font-medium text-amber-700 mb-0.5">
                       {role}
-                    </span>
-                    <span className="text-sm" style={{ color: "#374151" }}>
+                    </p>
+                    <p className="text-xs sm:text-sm lg:text-base 2xl:text-lg text-stone-600 font-light leading-snug">
                       {org}
-                    </span>
+                    </p>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </motion.div>
-        </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

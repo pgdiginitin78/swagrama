@@ -1,4 +1,6 @@
-import Close from "@mui/icons-material/Close";
+import { yupResolver } from "@hookform/resolvers/yup";
+import LockIcon from "@mui/icons-material/Lock";
+import PersonIcon from "@mui/icons-material/Person";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import {
@@ -14,26 +16,23 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
-import PersonIcon from "@mui/icons-material/Person";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import DatePickerField from "../common/formFields/DatePickerField";
-import InputArea from "../common/formFields/InputArea";
-import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
-import InputField from "../common/formFields/InputField";
-import RadioField from "../common/formFields/RadioField";
 import axios from "axios";
 import { format } from "date-fns";
-import { errorAlert, successAlert } from "../common/toast/CustomToast";
-import ConfirmationModal from "../common/ConfirmationModal";
-import { signupJYA, verifyUser } from "../../services/login/LoginServices";
+import { AnimatePresence, motion } from "framer-motion";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useLoader } from "../common/commonLoader/LoaderContext";
+import { signupJYA, verifyUser } from "../../services/login/LoginServices";
+import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import CancelButtonModal from "../common/button/CancelButtonModal";
+import { useLoader } from "../common/commonLoader/LoaderContext";
+import ConfirmationModal from "../common/ConfirmationModal";
+import DatePickerField from "../common/formFields/DatePickerField";
 import DropdownField from "../common/formFields/DropdownField";
+import InputArea from "../common/formFields/InputArea";
+import InputField from "../common/formFields/InputField";
+import RadioField from "../common/formFields/RadioField";
+import { errorAlert, successAlert } from "../common/toast/CustomToast";
 
 const modalVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -67,10 +66,8 @@ const signupValidationSchema = yup.object().shape({
     .string()
     .required("Last name is required")
     .matches(/^[a-zA-Z\s]+$/, "Only letters allowed"),
-  dob: yup
-    .date()
-    .required("Date of birth is required")
-    .max(new Date(), "Cannot be in future"),
+  dob: yup.date().required("Date of birth is required"),
+
   age: yup
     .number()
     .typeError("Age is required")
@@ -158,6 +155,28 @@ const bloodGroupOptions = [
   { id: 8, value: "O-", label: "O-" },
 ];
 
+const genderOptions = [
+  { id: "Male", value: "Male", label: "Male" },
+  { id: "Female", value: "Female", label: "Female" },
+  { id: "Other", value: "Other", label: "Other" },
+];
+
+const numericKeyFilter = (e) => {
+  if (!/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(e.key)) {
+    e.preventDefault();
+  }
+};
+
+const textFieldSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: 2,
+    bgcolor: "#ffffff",
+  },
+};
+
+const TODAY = new Date();
+const INITIAL_AGE = calculateAgeFromDOB(TODAY);
+
 export default function SignUpModal({ open, handleClose }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -166,8 +185,12 @@ export default function SignUpModal({ open, handleClose }) {
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [userNameAvailable, setUserNameAvailable] = useState("");
   const [verifyEmail, setVerifyEmail] = useState("");
+  const [verifyMobile, setVerifyMobile] = useState("");
 
   const { setIsLoading } = useLoader();
+  const usernameDebounceRef = useRef(null);
+  const emailDebounceRef = useRef(null);
+  const mobileDebounceRef = useRef(null);
   const {
     control,
     handleSubmit,
@@ -178,13 +201,13 @@ export default function SignUpModal({ open, handleClose }) {
     register,
     watch,
   } = useForm({
-    mode: "onChange",
+    mode: "onTouched",
     resolver: yupResolver(signupValidationSchema),
     defaultValues: {
       FirstName: "",
       lastName: "",
-      dob: null,
-      age: "",
+      dob: TODAY,
+      age: INITIAL_AGE,
       gender: "Male",
       mobileNo: "",
       whatsappNo: "",
@@ -200,7 +223,7 @@ export default function SignUpModal({ open, handleClose }) {
       passWord: "",
       confirmPassword: "",
       macId: "",
-      macIp: ipAddress,
+      macIp: "",
       agreeToTerms: false,
       relation: "self",
       bloodGroup: null,
@@ -212,50 +235,55 @@ export default function SignUpModal({ open, handleClose }) {
   const pinCodeValue = watch("pinCode");
   const agreeToTerms = watch("agreeToTerms");
   const watchedAge = watch("age");
-  const debounceRef = useRef(null);
+  const watchedMobileNo = watch("mobileNo");
+  const watchedSameAsMobile = watch("sameAsMobileNumber");
 
-  const onSubmit = (data) => {
-    const formattedData = {
-      ...data,
-      dob:
-        data.dob && !isNaN(new Date(data.dob).getTime())
-          ? format(new Date(data.dob), "yyyy-MM-dd")
-          : "",
-      macIp: ipAddress,
-      bloodGroup: data.bloodGroup?.value,
-      whatsappNo: data.whatsappNo !== "" ? data.whatsappNo : null,
-    };
-    setFormData(formattedData);
-    setOpenConfirmationModal(true);
-  };
+  const isDobEffectFromAge = useRef(false);
+  const isAgeEffectFromDob = useRef(false);
 
-  console.log("formData", formData);
+  const isFieldUnavailable =
+    userNameAvailable === "Username is already taken" ||
+    verifyEmail === "Email ID is already taken" ||
+    verifyMobile === "Mobile No is already taken";
 
-  const handleUserSignup = async () => {
+  const isDisabled = !agreeToTerms || isFieldUnavailable;
+
+  const onSubmit = useCallback(
+    (data) => {
+      const formattedData = {
+        ...data,
+        dob:
+          data.dob && !isNaN(new Date(data.dob).getTime())
+            ? format(new Date(data.dob), "yyyy-MM-dd")
+            : "",
+        macIp: ipAddress,
+        bloodGroup: data.bloodGroup?.value,
+        whatsappNo: data.whatsappNo !== "" ? data.whatsappNo : null,
+      };
+      setFormData(formattedData);
+      setOpenConfirmationModal(true);
+    },
+    [ipAddress],
+  );
+
+  const handleUserSignup = useCallback(async () => {
     try {
       setOpenConfirmationModal(false);
       setIsLoading(true);
-
       const response = await signupJYA(formData);
-
       const apiData = response?.data;
-
       if (response?.status === 200 && apiData) {
         successAlert(
           typeof apiData === "string"
             ? apiData
             : apiData?.message || "Registration successful",
         );
-
         handleClose();
         reset();
       } else {
         errorAlert("Registration failed");
       }
     } catch (error) {
-      console.log("Signup Error:", error);
-      console.log("Error Response:", error?.response?.data);
-
       const errorMessage =
         error?.response?.data?.message ||
         error?.response?.data?.error ||
@@ -264,31 +292,56 @@ export default function SignUpModal({ open, handleClose }) {
           ? error.response.data
           : null) ||
         "Something went wrong";
-
       errorAlert(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [formData, handleClose, reset, setIsLoading]);
+
+  const onFormError = useCallback((errs) => {
+    const firstErrorField = Object.keys(errs)[0];
+    if (firstErrorField && errs[firstErrorField]?.message) {
+      errorAlert(errs[firstErrorField].message);
+    }
+  }, []);
+
+  const handleTogglePassword = useCallback(
+    () => setShowPassword((p) => !p),
+    [],
+  );
+  const handleToggleConfirmPassword = useCallback(
+    () => setShowConfirmPassword((p) => !p),
+    [],
+  );
+  const handleCloseConfirmation = useCallback(
+    () => setOpenConfirmationModal(false),
+    [],
+  );
 
   useEffect(() => {
-    if (dob) {
-      const calculatedAge = calculateAgeFromDOB(dob);
-      const currentAge = getValues("age");
-      if (calculatedAge !== "" && calculatedAge !== String(currentAge)) {
-        setValue("age", calculatedAge, { shouldValidate: true });
-      }
+    if (isDobEffectFromAge.current) {
+      isDobEffectFromAge.current = false;
+      return;
+    }
+    if (!dob) return;
+    const calculatedAge = calculateAgeFromDOB(dob);
+    const currentAge = getValues("age");
+    if (calculatedAge !== "" && calculatedAge !== String(currentAge)) {
+      isAgeEffectFromDob.current = true;
+      setValue("age", calculatedAge, { shouldValidate: true });
     }
   }, [dob, setValue, getValues]);
 
   useEffect(() => {
+    if (isAgeEffectFromDob.current) {
+      isAgeEffectFromDob.current = false;
+      return;
+    }
     if (!watchedAge) {
       if (getValues("dob") !== null) {
-        setValue("dob", null, { shouldValidate: true });
       }
       return;
     }
-
     const ageNum = Number(watchedAge);
     if (
       !isNaN(ageNum) &&
@@ -301,6 +354,7 @@ export default function SignUpModal({ open, handleClose }) {
       if (currentAgeFromDOB !== String(watchedAge)) {
         const calculatedDOB = calculateDOBFromAge(watchedAge);
         if (calculatedDOB) {
+          isDobEffectFromAge.current = true;
           setValue("dob", calculatedDOB, { shouldValidate: true });
         }
       }
@@ -322,9 +376,7 @@ export default function SignUpModal({ open, handleClose }) {
           setValue("state", pinCodeData.State);
           setValue("country", pinCodeData.Country);
         }
-      } catch (error) {
-        console.log("PIN Fetch Error:", error);
-      }
+      } catch {}
     };
     fetchPinData();
   }, [pinCodeValue, setValue]);
@@ -333,22 +385,92 @@ export default function SignUpModal({ open, handleClose }) {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => setIpAddress(data?.ip))
-      .catch((error) => console.error("Error fetching IP:", error));
+      .catch(() => {});
+    setValue("dob", new Date(), { shouldValidate: true });
   }, []);
 
-  const onFormError = (errors) => {
-    const firstErrorField = Object.keys(errors)[0];
-    if (firstErrorField && errors[firstErrorField]?.message) {
-      errorAlert(errors[firstErrorField].message);
-    }
-  };
-
-  const textFieldSx = {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: 2,
-      bgcolor: "#ffffff",
+  const handleSameAsMobileToggle = useCallback(
+    (e) => {
+      if (e.target.checked) {
+        setValue("whatsappNo", watchedMobileNo);
+      } else {
+        setValue("whatsappNo", "");
+      }
     },
-  };
+    [watchedMobileNo, setValue],
+  );
+
+  const handleEmailChange = useCallback((e) => {
+    const value = e.target.value;
+    setVerifyEmail("");
+    if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
+    if (!value.trim()) return;
+    emailDebounceRef.current = setTimeout(() => {
+      verifyUser({ userName: null, emailId: value, mobileNo: null })
+        .then((res) => {
+          setVerifyEmail(res.data.message);
+          if (res.data.message === "Email ID is already taken") {
+            errorAlert(res.data.message);
+          }
+        })
+        .catch(() => setVerifyEmail(""));
+    }, 500);
+  }, []);
+
+  const handleUsernameChange = useCallback(
+    (field) => (e) => {
+      field.onChange(e);
+      const value = e.target.value;
+      setUserNameAvailable("");
+      if (usernameDebounceRef.current)
+        clearTimeout(usernameDebounceRef.current);
+      if (!value.trim()) return;
+      usernameDebounceRef.current = setTimeout(() => {
+        verifyUser({ userName: value, email: null, mobileNo: null })
+          .then((res) => {
+            setUserNameAvailable(res.data.message);
+            if (res.data.message == "Username is already taken") {
+              errorAlert(res.data.message);
+            }
+          })
+          .catch(() => setUserNameAvailable(""));
+      }, 500);
+    },
+    [],
+  );
+
+  const handleMobileNoChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      if (value === "") setValue("whatsappNo", "");
+      if (watchedSameAsMobile && value !== "") setValue("whatsappNo", value);
+      setVerifyMobile("");
+      if (mobileDebounceRef.current) clearTimeout(mobileDebounceRef.current);
+      if (!value.trim() || value.length !== 10) return;
+      mobileDebounceRef.current = setTimeout(() => {
+        verifyUser({ userName: null, email: null, mobileNo: value })
+          .then((res) => {
+            console.log("SignUpModal", res.data);
+            setVerifyMobile(res.data.message);
+            if (res.data.message == "Mobile No is already taken") {
+              errorAlert(res.data.message);
+            }
+          })
+          .catch(() => setVerifyMobile(""));
+      }, 500);
+    },
+    [watchedSameAsMobile, setValue],
+  );
+
+  const switchSx = useMemo(
+    () => ({
+      "& .MuiSwitch-switchBase.Mui-checked": { color: "#16a34a" },
+      "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+        backgroundColor: "lightgreen",
+      },
+    }),
+    [],
+  );
 
   return (
     <>
@@ -379,10 +501,7 @@ export default function SignUpModal({ open, handleClose }) {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                style={{
-                  willChange: "transform, opacity",
-                  borderRadius: 12,
-                }}
+                style={{ willChange: "transform, opacity", borderRadius: 12 }}
               >
                 <Box
                   sx={{
@@ -395,38 +514,17 @@ export default function SignUpModal({ open, handleClose }) {
                     flexDirection: "column",
                   }}
                 >
-                  {/* Cancel button fixed outside the scroll area */}
                   <CancelButtonModal onClick={handleClose} />
 
-                  <style>{`
-                      .custom-green-scrollbar {
-                        scrollbar-width: thin;
-                        scrollbar-color: #22c55e #f3f4f6;
-                      }
-                      .custom-green-scrollbar::-webkit-scrollbar {
-                        width: 8px;
-                      }
-                      .custom-green-scrollbar::-webkit-scrollbar-track {
-                        background: #f3f4f6;
-                        border-radius: 10px;
-                      }
-                      .custom-green-scrollbar::-webkit-scrollbar-thumb {
-                        background: #22c55e;
-                        border-radius: 10px;
-                      }
-                      .custom-green-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: #16a34a;
-                      }
-                    `}</style>
-
                   <Box
-                    className="custom-green-scrollbar"
                     sx={{
                       p: 4,
                       pt: 3,
                       overflowY: "auto",
                       flex: 1,
                       overscrollBehavior: "contain",
+                      scrollbarWidth: "none",
+                      "&::-webkit-scrollbar": { display: "none" },
                     }}
                   >
                     <div className="flex justify-center">
@@ -445,7 +543,7 @@ export default function SignUpModal({ open, handleClose }) {
                     </p>
 
                     <form
-                      onSubmit={handleSubmit(onSubmit)}
+                      onSubmit={handleSubmit(onSubmit, onFormError)}
                       className="space-y-2 mt-2"
                       autoComplete="off"
                     >
@@ -462,11 +560,11 @@ export default function SignUpModal({ open, handleClose }) {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
                             <div>
                               <InputField
-                              control={control}
-                              name="FirstName"
-                              label="First Name *"
-                              error={errors.FirstName}
-                            />
+                                control={control}
+                                name="FirstName"
+                                label="First Name *"
+                                error={errors.FirstName}
+                              />
                               {errors.FirstName && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.FirstName.message}
@@ -474,12 +572,12 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="lastName"
-                              label="Last Name *"
-                              error={errors.lastName}
-                            />
+                              <InputField
+                                control={control}
+                                name="lastName"
+                                label="Last Name *"
+                                error={errors.lastName}
+                              />
                               {errors.lastName && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.lastName.message}
@@ -487,15 +585,16 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <DatePickerField
-                              control={control}
-                              name="dob"
-                              label="Date Of Birth *"
-                              disableFuture={true}
-                              inputFormat="dd-MM-yyyy"
-                              error={errors.dob}
-                              dob={true}
-                            />
+                              <DatePickerField
+                                control={control}
+                                name="dob"
+                                label="Date Of Birth *"
+                                disableFuture={true}
+                                inputFormat="dd-MM-yyyy"
+                                error={errors.dob}
+                                dob={true}
+                                defaultValue={TODAY}
+                              />
                               {errors.dob && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.dob.message}
@@ -503,22 +602,14 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="age"
-                              label="Age *"
-                              error={errors.age}
-                              inputProps={{ inputMode: "numeric" }}
-                              onKeyDown={(e) => {
-                                if (
-                                  !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
-                                    e.key,
-                                  )
-                                ) {
-                                  e.preventDefault();
-                                }
-                              }}
-                            />
+                              <InputField
+                                control={control}
+                                name="age"
+                                label="Age *"
+                                error={errors.age}
+                                inputProps={{ inputMode: "numeric" }}
+                                onKeyDown={numericKeyFilter}
+                              />
                               {errors.age && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.age.message}
@@ -534,29 +625,17 @@ export default function SignUpModal({ open, handleClose }) {
                                 error={errors.bloodGroup}
                               />
                               {errors.bloodGroup && (
-                                  <FormHelperText error sx={{ ml: 2, mt: 0 }}>
-                                    {errors.bloodGroup.message}
-                                  </FormHelperText>
-                                )}
+                                <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                                  {errors.bloodGroup.message}
+                                </FormHelperText>
+                              )}
                             </div>
                             <div className="md:col-span-2 xl:col-span-1">
                               <RadioField
                                 control={control}
                                 name="gender"
                                 label="Gender *"
-                                dataArray={[
-                                  { id: "Male", value: "Male", label: "Male" },
-                                  {
-                                    id: "Female",
-                                    value: "Female",
-                                    label: "Female",
-                                  },
-                                  {
-                                    id: "Other",
-                                    value: "Other",
-                                    label: "Other",
-                                  },
-                                ]}
+                                dataArray={genderOptions}
                               />
                               {errors.gender && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
@@ -581,61 +660,39 @@ export default function SignUpModal({ open, handleClose }) {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                             <div
                               className="space-y-2"
-                              onChange={(e) => {
-                                if (e.target.value === "") {
-                                  setValue("whatsappNo", "");
-                                }
-                                if (
-                                  watch("sameAsMobileNumber") === true &&
-                                  e.target.value !== ""
-                                ) {
-                                  setValue("whatsappNo", e.target.value);
-                                }
-                              }}
+                              onChange={handleMobileNoChange}
                             >
                               <div className="w-full">
-                              <InputField
-                                control={control}
-                                name="mobileNo"
-                                label="Mobile Number *"
-                                error={errors.mobileNo}
-                                inputProps={{ inputMode: "numeric" }}
-                                onKeyDown={(e) => {
-                                  if (
-                                    !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
-                                      e.key,
-                                    )
-                                  ) {
-                                    e.preventDefault();
-                                  }
-                                }}
-                              />
+                                <InputField
+                                  control={control}
+                                  name="mobileNo"
+                                  label="Mobile Number *"
+                                  error={errors.mobileNo}
+                                  inputProps={{ inputMode: "numeric" }}
+                                  onKeyDown={numericKeyFilter}
+                                />
                                 {errors.mobileNo && (
                                   <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                     {errors.mobileNo.message}
                                   </FormHelperText>
                                 )}
+                                {verifyMobile && (
+                                  <p
+                                    className={`text-xs m-1 ${
+                                      verifyMobile === "Mobile No is available"
+                                        ? "text-green-500"
+                                        : "text-red-500"
+                                    }`}
+                                  >
+                                    {verifyMobile}
+                                  </p>
+                                )}
                               </div>
                               <FormControlLabel
                                 control={
                                   <Switch
-                                    onChange={(e) => {
-                                      if (e.target.checked === true) {
-                                        setValue(
-                                          "whatsappNo",
-                                          watch("mobileNo"),
-                                        );
-                                      } else {
-                                        setValue("whatsappNo", "");
-                                      }
-                                    }}
-                                    sx={{
-                                      "& .MuiSwitch-switchBase.Mui-checked": {
-                                        color: "#16a34a",
-                                      },
-                                      "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track":
-                                        { backgroundColor: "lightgreen" },
-                                    }}
+                                    onChange={handleSameAsMobileToggle}
+                                    sx={switchSx}
                                   />
                                 }
                                 label="Same as Mobile Number"
@@ -650,21 +707,13 @@ export default function SignUpModal({ open, handleClose }) {
                               />
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="whatsappNo"
-                              label="WhatsApp Number"
-                              inputProps={{ inputMode: "numeric" }}
-                              onKeyDown={(e) => {
-                                if (
-                                  !/[0-9]|Backspace|Delete|Tab|ArrowLeft|ArrowRight/.test(
-                                    e.key,
-                                  )
-                                ) {
-                                  e.preventDefault();
-                                }
-                              }}
-                            />
+                              <InputField
+                                control={control}
+                                name="whatsappNo"
+                                label="WhatsApp Number"
+                                inputProps={{ inputMode: "numeric" }}
+                                onKeyDown={numericKeyFilter}
+                              />
                               {errors.whatsappNo && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.whatsappNo.message}
@@ -673,26 +722,7 @@ export default function SignUpModal({ open, handleClose }) {
                             </div>
                             <div
                               className="sm:col-span-2"
-                              onChange={(e) => {
-                                const value = e.target.value;
-                                setVerifyEmail("");
-                                if (debounceRef.current) {
-                                  clearTimeout(debounceRef.current);
-                                }
-                                if (!value.trim()) return;
-                                debounceRef.current = setTimeout(() => {
-                                  verifyUser({
-                                    userName: null,
-                                    email: value,
-                                  })
-                                    .then((res) => {
-                                      setVerifyEmail(res.data.data.message);
-                                    })
-                                    .catch(() => {
-                                      setVerifyEmail("");
-                                    });
-                                }, 500);
-                              }}
+                              onChange={handleEmailChange}
                             >
                               <InputField
                                 control={control}
@@ -707,12 +737,14 @@ export default function SignUpModal({ open, handleClose }) {
                                   {errors.emailId.message}
                                 </FormHelperText>
                               )}
-                              {verifyEmail === "Username is available" ? (
-                                <p className="text-green-500 text-xs m-1">
-                                  {verifyEmail}
-                                </p>
-                              ) : (
-                                <p className="text-red-500 text-xs m-1">
+                              {verifyEmail && (
+                                <p
+                                  className={`text-xs m-1 ${
+                                    verifyEmail === "Email ID is available"
+                                      ? "text-green-500"
+                                      : "text-red-500"
+                                  }`}
+                                >
                                   {verifyEmail}
                                 </p>
                               )}
@@ -733,12 +765,12 @@ export default function SignUpModal({ open, handleClose }) {
                         <div className="p-4 sm:p-6">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="pinCode"
-                              label="Pin Code *"
-                              error={errors.pinCode}
-                            />
+                              <InputField
+                                control={control}
+                                name="pinCode"
+                                label="Pin Code *"
+                                error={errors.pinCode}
+                              />
                               {errors.pinCode && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.pinCode.message}
@@ -746,12 +778,12 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="locality"
-                              label="Locality"
-                              error={errors.locality}
-                            />
+                              <InputField
+                                control={control}
+                                name="locality"
+                                label="Locality"
+                                error={errors.locality}
+                              />
                               {errors.locality && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.locality.message}
@@ -759,12 +791,12 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="city"
-                              label="City *"
-                              error={errors.city}
-                            />
+                              <InputField
+                                control={control}
+                                name="city"
+                                label="City *"
+                                error={errors.city}
+                              />
                               {errors.city && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.city.message}
@@ -772,12 +804,12 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="state"
-                              label="State *"
-                              error={errors.state}
-                            />
+                              <InputField
+                                control={control}
+                                name="state"
+                                label="State *"
+                                error={errors.state}
+                              />
                               {errors.state && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.state.message}
@@ -785,12 +817,12 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="country"
-                              label="Country *"
-                              error={errors.country}
-                            />
+                              <InputField
+                                control={control}
+                                name="country"
+                                label="Country *"
+                                error={errors.country}
+                              />
                               {errors.country && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.country.message}
@@ -798,11 +830,11 @@ export default function SignUpModal({ open, handleClose }) {
                               )}
                             </div>
                             <div className="w-full">
-                            <InputField
-                              control={control}
-                              name="landmark"
-                              label="Landmark"
-                            />
+                              <InputField
+                                control={control}
+                                name="landmark"
+                                label="Landmark"
+                              />
                               {errors.landmark && (
                                 <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                   {errors.landmark.message}
@@ -811,14 +843,14 @@ export default function SignUpModal({ open, handleClose }) {
                             </div>
                             <div className="sm:col-span-2">
                               <div className="w-full">
-                              <InputArea
-                                control={control}
-                                name="address"
-                                label="Address"
-                                error={errors.address}
-                                minRows={2}
-                                maxRows={3}
-                              />
+                                <InputArea
+                                  control={control}
+                                  name="address"
+                                  label="Address"
+                                  error={errors.address}
+                                  minRows={2}
+                                  maxRows={3}
+                                />
                                 {errors.address && (
                                   <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                                     {errors.address.message}
@@ -853,34 +885,7 @@ export default function SignUpModal({ open, handleClose }) {
                                     label="Username *"
                                     error={!!errors.userName}
                                     helperText={errors.userName?.message}
-                                    onChange={(e) => {
-                                      field.onChange(e);
-
-                                      const value = e.target.value;
-
-                                      setUserNameAvailable("");
-
-                                      if (debounceRef.current) {
-                                        clearTimeout(debounceRef.current);
-                                      }
-
-                                      if (!value.trim()) return;
-
-                                      debounceRef.current = setTimeout(() => {
-                                        verifyUser({
-                                          userName: value,
-                                          email:null
-                                        })
-                                          .then((res) => {
-                                            setUserNameAvailable(
-                                              res.data.data.message,
-                                            );
-                                          })
-                                          .catch(() => {
-                                            setUserNameAvailable("");
-                                          });
-                                      }, 500);
-                                    }}
+                                    onChange={handleUsernameChange(field)}
                                     InputProps={{
                                       startAdornment: (
                                         <InputAdornment position="start">
@@ -897,12 +902,15 @@ export default function SignUpModal({ open, handleClose }) {
                                   />
                                 )}
                               />
-                              {userNameAvailable === "Username is available" ? (
-                                <p className="text-green-500 text-xs">
-                                  {userNameAvailable}
-                                </p>
-                              ) : (
-                                <p className="text-red-500 text-xs">
+                              {userNameAvailable && (
+                                <p
+                                  className={`text-xs ${
+                                    userNameAvailable ===
+                                    "Username is available"
+                                      ? "text-green-500"
+                                      : "text-red-500"
+                                  }`}
+                                >
                                   {userNameAvailable}
                                 </p>
                               )}
@@ -935,16 +943,14 @@ export default function SignUpModal({ open, handleClose }) {
                                       <InputAdornment position="end">
                                         <IconButton
                                           size="small"
-                                          onClick={() =>
-                                            setShowPassword(!showPassword)
-                                          }
+                                          onClick={handleTogglePassword}
                                         >
-                                          {showPassword === false ? (
-                                            <VisibilityOffIcon
+                                          {showPassword ? (
+                                            <VisibilityIcon
                                               sx={{ fontSize: 20 }}
                                             />
                                           ) : (
-                                            <VisibilityIcon
+                                            <VisibilityOffIcon
                                               sx={{ fontSize: 20 }}
                                             />
                                           )}
@@ -986,18 +992,14 @@ export default function SignUpModal({ open, handleClose }) {
                                       <InputAdornment position="end">
                                         <IconButton
                                           size="small"
-                                          onClick={() =>
-                                            setShowConfirmPassword(
-                                              !showConfirmPassword,
-                                            )
-                                          }
+                                          onClick={handleToggleConfirmPassword}
                                         >
-                                          {showConfirmPassword === false ? (
-                                            <VisibilityOffIcon
+                                          {showConfirmPassword ? (
+                                            <VisibilityIcon
                                               sx={{ fontSize: 20 }}
                                             />
                                           ) : (
-                                            <VisibilityIcon
+                                            <VisibilityOffIcon
                                               sx={{ fontSize: 20 }}
                                             />
                                           )}
@@ -1018,7 +1020,7 @@ export default function SignUpModal({ open, handleClose }) {
                           <h4 className="text-base sm:text-lg font-bold text-[#2f3e2e] mb-3">
                             Terms and Conditions
                           </h4>
-                          <div className="max-h-48 overflow-y-auto p-3 sm:p-4 bg-[#f8fbf6] rounded-xl border border-[#e6efe3] text-xs sm:text-sm text-[#4b5563] leading-relaxed no-scrollbar">
+                          <div className="max-h-48 overflow-y-auto p-3 sm:p-4 bg-[#f8fbf6] rounded-xl border border-[#e6efe3] text-xs sm:text-sm text-[#4b5563] leading-relaxed [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             <p className="mb-3">
                               <strong>1. Acceptance of Terms</strong>
                             </p>
@@ -1182,21 +1184,37 @@ export default function SignUpModal({ open, handleClose }) {
                         <Button
                           type="submit"
                           fullWidth
-                          disabled={!agreeToTerms}
+                          disabled={isDisabled}
                           sx={{
                             borderRadius: 3,
                             py: 1.5,
                             textTransform: "none",
                             fontWeight: 700,
                             fontSize: "1rem",
-                            background: agreeToTerms
-                              ? "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)"
-                              : "#e0e0e0",
-                            color: "white",
-                            boxShadow: agreeToTerms
-                              ? "0 4px 15px rgba(127, 176, 105, 0.3)"
-                              : "none",
-                            "&:disabled": { cursor: "not-allowed" },
+                            background: isDisabled
+                              ? "#e0e0e0"
+                              : "linear-gradient(135deg, #22c55e 0%, #84cc16 100%)",
+                            color: isDisabled ? "#9e9e9e" : "#ffffff",
+                            boxShadow: isDisabled
+                              ? "none"
+                              : "0 4px 15px rgba(127, 176, 105, 0.3)",
+                            transition: "all 0.3s ease",
+
+                            "&:hover": {
+                              background: isDisabled
+                                ? "#e0e0e0"
+                                : "linear-gradient(135deg, #16a34a 0%, #65a30d 100%)",
+                              boxShadow: isDisabled
+                                ? "none"
+                                : "0 6px 18px rgba(127, 176, 105, 0.4)",
+                            },
+
+                            "&.Mui-disabled": {
+                              background: "#e0e0e0",
+                              color: "#9e9e9e",
+                              cursor: "not-allowed",
+                              boxShadow: "none",
+                            },
                           }}
                         >
                           Sign Up
@@ -1225,7 +1243,7 @@ export default function SignUpModal({ open, handleClose }) {
       </Modal>
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
-        confirmationHandleClose={() => setOpenConfirmationModal(false)}
+        confirmationHandleClose={handleCloseConfirmation}
         confirmationSubmitFunc={handleUserSignup}
         confirmationLabel="Confirm Registration"
         confirmationMsg="Are you sure you want to create this account?"

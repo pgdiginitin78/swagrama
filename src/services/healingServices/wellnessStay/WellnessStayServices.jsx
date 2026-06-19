@@ -28,3 +28,10 @@ export const checkRoomAvailability = (
 export const checkRoomGender = (roomId, patientId) => {
   return AxiosInstance.get(`/CheckRoomGender?roomId=${roomId}&userId=${patientId}`);
 };
+
+
+//https://ayurmitra.in/WellnessAPILive/Getroomtype?roomTypeId=1
+
+export const getRoomBookingDetails = (roomTypeId) => {
+  return AxiosInstance.get(`/Getroomtype?roomTypeId=${roomTypeId}`);
+};

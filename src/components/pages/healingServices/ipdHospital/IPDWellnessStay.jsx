@@ -70,7 +70,7 @@ const IPDWellnessStay = () => {
   };
 
   const dynamicWellnessServices = roomList.map((room) => {
-    const image = getRoomImage(room); // Prioritize matching by room name for accuracy
+    const image = getRoomImage(room); 
 
     const occ = room.maxOccupancy ?? 0;
     let occupancyLabel = "Flexible";
@@ -168,7 +168,7 @@ const IPDWellnessStay = () => {
                     !service.isActive ? "opacity-75 grayscale-[0.3]" : ""
                   }`}
                 >
-                  <div className="relative h-[220px] overflow-hidden">
+                  <div className="relative h-[220px] 2xl:h-[360px] overflow-hidden">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -326,9 +326,11 @@ const IPDWellnessStay = () => {
               );
             })
           ) : (
-            <div className="text-center text-gray-500 text-sm flex justify-center w-full my-32 col-span-3">
+            <>
+            <div className="text-center text-gray-500 text-sm flex justify-center  w-full my-32 col-span-4">
               <p>No Rooms Available...</p>
             </div>
+            </>
           )}
         </div>
 

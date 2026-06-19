@@ -11,23 +11,16 @@ import { useRef, useState } from "react";
 import heroImage from "../../assets/landing-page/aboutUs/hero-swagrama.webp";
 import farmImage from "../../assets/landing-page/aboutUs/organic-farm.webp";
 import wellnessImage from "../../assets/landing-page/aboutUs/wellness-center.webp";
-import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
-import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.webp";
-import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.webp";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
-import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.webp";
-import SmitaMehetre from "../../assets/landing-page/ourexperts/Vd Smita mehetre.webp";
+import AvantiNitsure from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
+import ManishaSuryawanshi from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
+import PradipTaware from "../../assets/landing-page/ourexperts/Pradip Taware.png";
+import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
+import SmitaMehetre from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 
-import Healing from "@mui/icons-material/Healing";
-import LocalHospital from "@mui/icons-material/LocalHospital";
 import MedicalServices from "@mui/icons-material/MedicalServices";
-import Spa from "@mui/icons-material/Spa";
-import {
-  Card,
-  Container
-} from "@mui/material";
-import { Helmet } from "react-helmet-async";
+import { Card, Container } from "@mui/material";
 import FounderSection from "../../homePage/sections/FounderSection";
 
 const partnersData = [
@@ -58,13 +51,13 @@ const partnersData = [
   },
   {
     name: "Dr. Manisha Suryawanshi",
-    title: "MBBS, D.Y ed. Yoga Therapiest",
-    specialty: "Yoga Therapy",
+    title: "MBBS, D.Y ed. Yoga Consultant",
+    specialty: "Yoga Consultant",
     image: ManishaSuryawanshi,
     roles: [
       "Director: JnanaYogAyu Pvt. Ltd.",
       "Partner, SwaGrama Ayurveda Yoga Nisarga Agro Tourism LLP",
-      "Proprietor : Mamata Clinic & Vishwai Chikitsalaya",
+      "Proprietor : Ayurvijnana Yoga Chikitsalaya",
       "Partner : Smart Unity Healthcare LLP",
     ],
   },
@@ -115,7 +108,7 @@ const healers = [
     id: 6,
     name: "Dr. Manisha Suryawanshi",
     qualification: "MBBS, D.Y.ed",
-    specialty: "Yoga",
+    specialty: "Yoga Consultant",
     image: ManishaSuryawanshi,
     color: "#8b5cf6",
   },
@@ -131,7 +124,7 @@ const healers = [
 
 const services = [
   {
-    title: "SwaChikitsalaya & SwaNaturaliya",
+    title: "SwaChikitsalaya & SwaAturalaya",
     desc: "Healing Centre OPD & IPD - Consulting, Counselling, Diagnosis, Treatment & Therapy",
     icon: Hospital,
   },
@@ -161,7 +154,6 @@ const services = [
     icon: Sprout,
   },
 ];
-
 
 const AboutUs = () => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
@@ -277,8 +269,6 @@ const AboutUs = () => {
       ref={containerRef}
       className="min-h-screen bg-background overflow-x-hidden"
     >
-   
-
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         <motion.div
           className="absolute top-20 left-10 w-64 h-64 rounded-full bg-forest/5 blur-3xl"
@@ -372,7 +362,7 @@ const AboutUs = () => {
 
       <section
         ref={missionRef}
-        className="relative px-4 md:px-12 py-12  bg-background"
+        className="relative px-4 md:px-12 py-12  2xl:py-40 bg-background"
       >
         <div className="w-full mx-auto">
           <motion.div
@@ -416,7 +406,7 @@ const AboutUs = () => {
                 <img
                   src={farmImage}
                   alt="Organic Farming"
-                  className="relative rounded-2xl shadow-elevated w-full h-[400px] object-cover"
+                  className="relative rounded-2xl shadow-elevated w-full h-[400px] 2xl:h-[600px] object-cover"
                 />
                 <motion.div
                   className="absolute -bottom-6 -left-6 bg-[#EFECE6]/60   backdrop-blur-xl  border-[#EFECE6]/40 p-6 rounded-xl shadow"
@@ -435,7 +425,10 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section ref={visionRef} className="relative  py-12 overflow-hidden">
+      <section
+        ref={visionRef}
+        className="relative  py-12 2xl:py-40 overflow-hidden"
+      >
         <div className="absolute inset-0">
           <img
             src={wellnessImage}
@@ -605,7 +598,7 @@ const AboutUs = () => {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mx-auto px-3 md:px-5"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mx-auto px-3 md:px-5 2xl:px-60"
           >
             {partnersData.map((healer, index) => (
               <motion.div
@@ -614,14 +607,14 @@ const AboutUs = () => {
                 onMouseEnter={() => setHoveredIndex(index)}
                 onMouseLeave={() => setHoveredIndex(null)}
                 whileHover="hover"
-                className="relative h-[450px] 2xl:h-[600px] rounded-[1rem] overflow-hidden shadow-2xl group cursor-pointer transition-all duration-700"
+                className="relative h-[450px] 2xl:h-[800px] rounded-[1rem] overflow-hidden shadow-2xl group cursor-pointer transition-all duration-700"
               >
                 <img
                   src={healer.image}
                   alt={healer.name}
-                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 ${
-                    [2, 5, 8].includes(index) ? "object-bottom" : "object-top"
-                  }`}
+                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 
+                   object-bottom
+                  `}
                 />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90 group-hover:opacity-100 transition-opacity duration-500" />
@@ -685,7 +678,7 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <div className="py-14 px-4 sm:px-6 lg:px-8 bg-white">
+      <div className="py-14 px-4 sm:px-6 lg:px-8 2xl:px-0 bg-white">
         <Container maxWidth="xl">
           <motion.div
             initial={{ opacity: 0, y: -30 }}
@@ -721,7 +714,7 @@ const AboutUs = () => {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
           >
-            {healers.map((healer,index) => (
+            {healers.map((healer, index) => (
               <motion.div
                 key={healer.id}
                 variants={cardVariants}
@@ -745,9 +738,8 @@ const AboutUs = () => {
                   <motion.img
                     src={healer.image}
                     alt={healer.name}
-          className={`absolute inset-0 w-full h-full object-cover ${
-                    index === 5 || index===6 ? "object-bottom" : "object-top"
-                  }`}                    animate={{
+                    className={`absolute inset-0 w-full h-full object-cover `}
+                    animate={{
                       scale: hoveredId === `healer-${healer.id}` ? 1.1 : 1,
                       filter:
                         hoveredId === `healer-${healer.id}`
@@ -813,7 +805,7 @@ const AboutUs = () => {
           <motion.div
             initial="hidden"
             animate={isServicesInView ? "visible" : "hidden"}
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-4"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 2xl:px-60"
           >
             {services.map((service, index) => {
               const Icon = service.icon;
@@ -864,8 +856,8 @@ const AboutUs = () => {
         </div>
       </section>
 
-      <section className="py-12 px-4 md:px-12  bg-background">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="py-12 px-4 md:px-12 2xl:px-0  bg-background">
+        <div className="max-w-5xl 2xl:max-w-7xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}

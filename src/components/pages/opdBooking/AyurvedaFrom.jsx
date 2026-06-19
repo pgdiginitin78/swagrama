@@ -62,14 +62,14 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../services/bookAppointment/BookAppointmentServices";
-import AvantiNitsureImg from "../../assets/landing-page/ourexperts/Avanti Nitsure.webp";
+import AvantiNitsureImg from "../../assets/landing-page/ourexperts/Avanti Nitsure.png";
 import DhananjayAnvikarImg from "../../assets/landing-page/ourexperts/DhananjayAnvikar.webp";
-import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
-import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.webp";
-import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.webp";
-import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
-import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.webp";
-import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.webp";
+import ManishaSuryawanshiImg from "../../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
+import PradipTawareImg from "../../assets/landing-page/ourexperts/Pradip Taware.png";
+import SandipMehetreImg from "../../assets/landing-page/ourexperts/Sandip Mehetre.png";
+import SantoshSuryawanshiImg from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import VaishaliHolmukheImg from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
+import SmitaMehetreImg from "../../assets/landing-page/ourexperts/Vd Smita mehetre.png";
 import CancelButtonModal from "../../common/button/CancelButtonModal";
 import CommonButton from "../../common/button/CommonButton";
 import { useLoader } from "../../common/commonLoader/LoaderContext";
@@ -957,7 +957,7 @@ useEffect(() => {
         .ayur-scroll { scrollbar-width: thin; scrollbar-color: #059669 #d1fae5; }
       `}</style>
 
-      <div className="px-1 py-4 space-y-5 sm:py-5 md:px-5">
+      <div className="px-1 py-4 space-y-5 sm:py-5 md:px-5 ">
         <div className="flex flex-col gap-4 lg:grid lg:grid-cols-4">
           <div className="flex flex-col gap-4 lg:col-span-3">
             <div className="flex flex-col gap-3">
@@ -974,7 +974,7 @@ useEffect(() => {
                       )}
                     </span>
                     Our {activeDept || "Ayurveda"}
-                    {isYoga ? "Sessions" : "Treatments"}
+                    {activeDept === "Homeopathy" ? " Remedies" : " Treatments"}
                   </h2>
                   <p className="text-[10px] text-gray-400 mt-0.5 pl-6 sm:text-xs">
                     {isYoga
@@ -1066,7 +1066,7 @@ useEffect(() => {
                       fontSize="small"
                       className="text-emerald-600"
                     />
-                    Choose Your Vaidya
+                   Community Healers (By Appointment only) 
                   </h3>
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 </div>

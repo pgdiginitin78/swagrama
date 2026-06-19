@@ -52,6 +52,7 @@ import {
 import {
   checkRoomAvailability,
   checkRoomGender,
+  getRoomBookingDetails,
   wellnessStayBooking,
 } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
@@ -108,6 +109,8 @@ function StayBookingModal({
   const [patientOptions, setPatientOptions] = useState([]);
   const [ageDetailsConfig, setAgeDetailsConfig] = useState([]);
   const [genderCriteria, setGenderCriteria] = useState("");
+  const [selectedRoomDetails, setSelectedRoomDetails] = useState(null);
+
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
@@ -228,6 +231,7 @@ function StayBookingModal({
 
   const handleDateClick = (date) => {
     if (isBefore(date, startOfToday())) return;
+    if (isDateBooked(date)) return; // block booked dates
 
     if (selectingFor === "checkIn") {
       setCheckIn(date);
@@ -330,6 +334,36 @@ function StayBookingModal({
 
   const costs = calculateTotal();
 
+  // ── Booked-dates helpers ─────────────────────────────────────────────────
+  // Build an array of {start, end} intervals from the API response.
+  // Only bookings that have a checkInDate AND checkOutDate are considered.
+  const getBookedDateRanges = () => {
+    if (!Array.isArray(selectedRoomDetails) || selectedRoomDetails.length === 0)
+      return [];
+    return selectedRoomDetails
+      .filter((b) => b.checkInDate && b.checkOutDate)
+      .map((b) => ({
+        start: new Date(b.checkInDate),
+        end: new Date(b.checkOutDate),
+        bookingId: b.bookingId,
+      }));
+  };
+
+  const bookedRanges = getBookedDateRanges();
+
+  const isDateBooked = (date) => {
+    return bookedRanges.some((range) =>
+      isWithinInterval(date, { start: range.start, end: range.end }),
+    );
+  };
+
+  const isBookedRangeStart = (date) =>
+    bookedRanges.some((r) => isSameDay(date, r.start));
+
+  const isBookedRangeEnd = (date) =>
+    bookedRanges.some((r) => isSameDay(date, r.end));
+  // ────────────────────────────────────────────────────────────────────────
+
   const isDateSelected = (date) =>
     (checkIn && isSameDay(date, checkIn)) ||
     (checkOut && isSameDay(date, checkOut));
@@ -360,44 +394,81 @@ function StayBookingModal({
         const currentDay = day;
         const isCurrentMonth = isSameMonth(currentDay, monthStart);
         const isPast = isBefore(currentDay, startOfToday());
+        const booked = isCurrentMonth && !isPast && isDateBooked(currentDay);
+        const bookedStart = booked && isBookedRangeStart(currentDay);
+        const bookedEnd   = booked && isBookedRangeEnd(currentDay);
         const selected = isDateSelected(currentDay);
-        const inRange = isDateInRange(currentDay);
-        const isStart = checkIn && isSameDay(currentDay, checkIn);
-        const isEnd = checkOut && isSameDay(currentDay, checkOut);
+        const inRange  = isDateInRange(currentDay);
+        const isStart  = checkIn  && isSameDay(currentDay, checkIn);
+        const isEnd    = checkOut && isSameDay(currentDay, checkOut);
+        const isDisabled = isPast || booked;
+        const isToday    = isSameDay(currentDay, new Date());
 
         days.push(
           <div
             key={currentDay.toString()}
+            title={booked ? "Not available" : undefined}
             onMouseEnter={() =>
-              isCurrentMonth && !isPast && setHoveredDate(currentDay)
+              isCurrentMonth && !isDisabled && setHoveredDate(currentDay)
             }
             onMouseLeave={() => setHoveredDate(null)}
             onClick={() =>
-              isCurrentMonth && !isPast && handleDateClick(currentDay)
+              isCurrentMonth && !isDisabled && handleDateClick(currentDay)
             }
             onTouchEnd={(e) => {
-              if (isCurrentMonth && !isPast) {
+              if (isCurrentMonth && !isDisabled) {
                 e.preventDefault();
                 handleDateClick(currentDay);
               }
             }}
-            className={`relative flex items-center justify-center h-8 w-8 md:h-10 md:w-10 cursor-pointer text-[13px] font-medium transition-all
-                ${!isCurrentMonth ? "opacity-0 pointer-events-none" : isPast ? "text-gray-300 pointer-events-none" : "text-gray-700"}
-                ${inRange && isCurrentMonth ? "bg-booking-primaryLight/60" : ""}
-                ${isStart && isCurrentMonth ? "rounded-l-full" : ""}
-                ${isEnd && isCurrentMonth ? "rounded-r-full" : ""}
-                ${checkIn && !checkOut && isSameDay(currentDay, hoveredDate) && isCurrentMonth ? "rounded-r-full" : ""}
-              `}
+            className={[
+              "relative flex items-center justify-center h-8 w-8 md:h-10 md:w-10 text-[13px] transition-all",
+              !isCurrentMonth ? "opacity-0 pointer-events-none" : "",
+              booked       ? "cursor-not-allowed"            : "",
+              isDisabled && !booked ? "cursor-default pointer-events-none" : "",
+              !booked ? "cursor-pointer" : "",
+              // ── green selection band ──
+              !booked && inRange && isCurrentMonth ? "bg-booking-primaryLight/50" : "",
+              isStart && isCurrentMonth && !booked ? "rounded-l-full" : "",
+              isEnd   && isCurrentMonth && !booked ? "rounded-r-full" : "",
+              checkIn && !checkOut && isSameDay(currentDay, hoveredDate) && isCurrentMonth && !booked
+                ? "rounded-r-full" : "",
+              // ── rose band for booked dates ──
+              booked && isCurrentMonth             ? "bg-rose-50"      : "",
+              bookedStart                          ? "rounded-l-full"  : "",
+              bookedEnd                            ? "rounded-r-full"  : "",
+            ].filter(Boolean).join(" ")}
           >
-            {inRange && isCurrentMonth && (
-              <div className="absolute inset-0 bg-booking-primaryLight/40 z-0"></div>
+            {/* green range overlay */}
+            {!booked && inRange && isCurrentMonth && (
+              <div className="absolute inset-0 bg-booking-primaryLight/30 z-0" />
             )}
+
+            {/* date circle — no overflow-hidden so slash SVG is visible */}
             <div
-              className={`relative z-10 w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full transition-all
-                ${selected && isCurrentMonth ? "bg-booking-primary text-white shadow-sm scale-110" : "hover:bg-gray-100"}
-              `}
+              className={[
+                "relative z-10 w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full text-[12px] md:text-[13px] font-medium transition-all",
+                // selected
+                selected && isCurrentMonth && !booked
+                  ? "bg-booking-primary text-white font-semibold shadow-sm"
+                  : "",
+                // today ring
+                isToday && !booked && !selected
+                  ? "ring-1 ring-booking-primary text-booking-primary font-semibold"
+                  : "",
+                // normal hover
+                !booked && !selected && !isDisabled && isCurrentMonth
+                  ? "hover:bg-gray-100 text-gray-700"
+                  : "",
+                // booked circle
+                booked && isCurrentMonth ? "bg-rose-100 text-rose-300" : "",
+                // past
+                isPast && !booked ? "text-gray-300" : "",
+              ].filter(Boolean).join(" ")}
             >
               {format(currentDay, "d")}
+
+             
             </div>
           </div>,
         );
@@ -413,20 +484,20 @@ function StayBookingModal({
 
     return (
       <div className="w-full">
-        <div className="text-center font-bold text-gray-800 mb-2 text-sm">
+        <div className="text-center font-semibold text-gray-700 mb-3 text-sm">
           {format(monthDate, "MMMM yyyy")}
         </div>
-        <div className="flex mb-1">
-          {["M", "T", "W", "T", "F", "S", "S"].map((d, index) => (
+        <div className="flex mb-2">
+          {["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].map((d, index) => (
             <div
               key={index}
-              className="w-8 md:w-9 text-[9px] font-bold text-booking-primary/40 text-center uppercase"
+              className="w-8 md:w-9 text-[9px] font-semibold text-gray-400 text-center uppercase tracking-wider"
             >
               {d}
             </div>
           ))}
         </div>
-        <div className="space-y-px">{rows}</div>
+        <div className="space-y-0.5">{rows}</div>
       </div>
     );
   };
@@ -622,6 +693,25 @@ function StayBookingModal({
     handleGetPatientData();
   }, [user]);
 
+  useEffect(() => {
+    if (
+      selectedService &&
+      selectedService !== null &&
+      selectedService !== undefined
+    ) {
+      setSelectedRoomDetails(null);
+      getRoomBookingDetails(selectedService?.roomTypeId)
+        .then((res) => {
+          setSelectedRoomDetails(res.data.data);
+        })
+        .catch(
+          (err) => console.error("Error fetching room booking details:", err),
+          setSelectedRoomDetails(null),
+        );
+      }
+    }, [selectedService]);
+    
+    console.log("selectedRoomDetails",selectedRoomDetails);
   return (
     <>
       <Modal
@@ -1104,6 +1194,22 @@ function StayBookingModal({
                               {renderCalendar(addMonths(calendarViewDate, 1))}
                             </div>
                           </div>
+
+                          {/* Legend */}
+                          <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-booking-primary inline-block"></span>
+                              <span className="text-[10px] text-gray-500">Selected</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-booking-primaryLight inline-block"></span>
+                              <span className="text-[10px] text-gray-500">Your stay</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-3 h-3 rounded-full bg-rose-300 inline-block"></span>
+                              <span className="text-[10px] text-rose-300 ">Not available</span>
+                            </div>
+                          </div>
                         </div>
                       )}
 
@@ -1574,35 +1680,36 @@ function StayBookingModal({
                       searchIcon={true}
                     />
                   </div>
-                  {genderCriteria !== "" && genderCriteria !== "Booking Allowed" && (
-                    <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
-                      <div className="mt-0.5 text-amber-600">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 9v3m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.66 18h16.68a1 1 0 00.87-1.5l-7.5-13a1 1 0 00-1.74 0z"
-                          />
-                        </svg>
-                      </div>
+                  {genderCriteria !== "" &&
+                    genderCriteria !== "Booking Allowed" && (
+                      <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                        <div className="mt-0.5 text-amber-600">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M12 9v3m0 4h.01M10.29 3.86l-7.5 13A1 1 0 003.66 18h16.68a1 1 0 00.87-1.5l-7.5-13a1 1 0 00-1.74 0z"
+                            />
+                          </svg>
+                        </div>
 
-                      <div>
-                        <h4 className="font-medium text-amber-800">
-                          Gender Restriction
-                        </h4>
-                        <p className="mt-1 text-sm text-amber-700">
-                          {genderCriteria}
-                        </p>
+                        <div>
+                          <h4 className="font-medium text-amber-800">
+                            Gender Restriction
+                          </h4>
+                          <p className="mt-1 text-sm text-amber-700">
+                            {genderCriteria}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="">

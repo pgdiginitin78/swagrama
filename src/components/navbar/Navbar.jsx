@@ -134,6 +134,7 @@ const Navbar = () => {
   const handleLogout = () => {
     setShowDropdown(false);
     logout();
+    
   };
 
   const handleManageProfile = () => {
@@ -149,7 +150,7 @@ const Navbar = () => {
     { name: "स्वसदस्यत्व Membership", path: "/membership" },
     { name: "स्वकर्मण्य Community Activities", path: "/community-activities" },
     { name: "स्वगुरुकुल Commune", path: "/commune" },
-    // { name: "स्वविपणि E Shop", path: "/eShop" },
+    { name: "स्वविपणि E Shop", path: "/eShop" },
     { name: "स्वप्राप्त Feeds", path: "/feeds" },
     { name: "स्ववर्षपद Calendar", path: "/calendar" },
     // { name: "स्वफलक Dashboard", path: "/dashboard" },
@@ -215,11 +216,11 @@ const Navbar = () => {
         }`}
       >
         <div className="w-full px-3 sm:px-5 lg:px-8 xl:px-10">
-          <div className="flex items-center justify-between h-14 sm:h-16 lg:h-18 xl:h-20">
+          <div className="flex items-center justify-between h-14 sm:h-16 lg:h-20 2xl:h-28">
             <Link to="/" className="flex-shrink-0 z-10 focus:outline-none">
               <img
                 src={SwagramaLogo}
-                className="h-12 lg:h-16 xl:h-20 w-auto object-contain cursor-pointer"
+                className="h-12 lg:h-16 xl:h-20 2xl:h-28 2xl:w-32 w-auto object-contain cursor-pointer"
                 alt="Swagrama Logo"
               />
             </Link>

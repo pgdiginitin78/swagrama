@@ -60,7 +60,7 @@ const TopStoriesSection = ({ setModal1, setModal2 }) => {
               transition={{ delay: idx * 0.2, duration: 0.6 }}
               className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 overflow-hidden border border-green-100"
             >
-              <div className="w-full h-[260px] overflow-hidden rounded-t-3xl">
+              <div className="w-full h-[260px] 2xl:h-[460px] overflow-hidden rounded-t-3xl">
                 <img
                   src={story.img}
                   alt={story.title}

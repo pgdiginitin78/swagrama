@@ -1,15 +1,14 @@
-import { MedicalServices } from "@mui/icons-material";
 import { Card, Container } from "@mui/material";
 import { motion } from "framer-motion";
 import { memo, useState } from "react";
-import { cardVariants, containerVariants, healers } from "../HomePageConstants";
 import DoctorIcon from "../../../assets/communityHealers.svg";
+import { cardVariants, containerVariants, healers } from "../HomePageConstants";
 
 const CommunityHealers = () => {
   const [hoveredId, setHoveredId] = useState(null);
 
   return (
-    <div className="py-5 px-4 sm:px-6 lg:px-8 bg-[#fdfbf7]">
+    <div className="py-5 px-4 sm:px-6 lg:px-8 2xl:px-0 ">
       <Container maxWidth="xl">
         <motion.div
           initial={{ opacity: 0, y: -30 }}
@@ -69,9 +68,7 @@ const CommunityHealers = () => {
                 <motion.img
                   src={healer.image}
                   alt={healer.name}
-                  className={`absolute inset-0 w-full h-full object-cover ${
-                    index === 5 || index===6 ? "object-bottom" : "object-top"
-                  }`}
+                  className={`absolute inset-0 w-full h-full object-cover `}
                   animate={{
                     scale: hoveredId === healer.id ? 1.1 : 1,
                     filter:
@@ -82,10 +79,9 @@ const CommunityHealers = () => {
                   transition={{ duration: 0.6 }}
                 />
 
-                {/* Elegant Dark Gradient Overlay */}
-                {/* <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" /> */}
+          
 
-                {/* Content Overlay */}
+         
                 <div className="absolute bottom-0 left-0 right-0 flex flex-col items-center text-center">
                   <motion.h3
                     className="text-white text-lg font-bold mb-1 tracking-tight leading-tight"
@@ -103,7 +99,6 @@ const CommunityHealers = () => {
                     {healer.specialty}
                   </motion.p>
 
-                  {/* Aesthetic accent line */}
                   <motion.div
                     initial={{ width: 0, opacity: 0 }}
                     animate={{

@@ -1,5 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Box, Modal } from "@mui/material";
+import { Box, FormHelperText, Modal } from "@mui/material";
 import axios from "axios";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
@@ -11,7 +11,7 @@ import {
   Phone,
   User as UserIcon,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../context/AuthContext";
@@ -172,10 +172,18 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
       macIp: ipAddress,
       userId: user?.userId,
       bloodGroup: data.bloodGroup.label,
+      middleName: data.middleName,
     };
     setFormData(formattedData);
     setOpenConfirmationModal(true);
   };
+
+  const onFormError = useCallback((errs) => {
+    const firstErrorField = Object.keys(errs)[0];
+    if (firstErrorField && errs[firstErrorField]?.message) {
+      errorAlert(errs[firstErrorField].message);
+    }
+  }, []);
 
   const handleUserSignup = async () => {
     try {
@@ -370,7 +378,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
 
               <div className="flex-1 overflow-y-auto overscroll-contain bg-slate-50/40 no-scrollbar">
                 <form
-                  onSubmit={handleSubmit(onSubmit)}
+                  onSubmit={handleSubmit(onSubmit, onFormError)}
                   className="p-3 space-y-4"
                 >
                   {/* <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-3">
@@ -435,25 +443,44 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                           error={errors.userName}
                           disabled={true}
                         />
+                        {errors.userName && (
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            {errors.userName.message}
+                          </FormHelperText>
+                        )}
                       </div>
-                      <InputField
-                        control={control}
-                        name="FirstName"
-                        label="First Name *"
-                        error={errors.FirstName}
-                      />
+                      <div>
+                        <InputField
+                          control={control}
+                          name="FirstName"
+                          label="First Name *"
+                          error={errors.FirstName}
+                        />
+                        {errors.FirstName && (
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            {errors.FirstName.message}
+                          </FormHelperText>
+                        )}
+                      </div>
                       <InputField
                         control={control}
                         name="middleName"
                         label="Middle Name"
                         error={errors.middleName}
                       />
-                      <InputField
-                        control={control}
-                        name="lastName"
-                        label="Last Name *"
-                        error={errors.lastName}
-                      />
+                      <div>
+                        <InputField
+                          control={control}
+                          name="lastName"
+                          label="Last Name *"
+                          error={errors.lastName}
+                        />
+                        {errors.lastName && (
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            {errors.lastName.message}
+                          </FormHelperText>
+                        )}
+                      </div>
                       <div>
                         <DropdownField
                           control={control}
@@ -463,9 +490,9 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                           error={errors.bloodGroup}
                         />
                         {errors.bloodGroup && (
-                          <p className="text-red-500 text-[11px] mt-0.5">
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                             {errors.bloodGroup.message}
-                          </p>
+                          </FormHelperText>
                         )}
                       </div>
                     </div>
@@ -559,7 +586,9 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                             {verifyEmail}
                           </p>
                         ) : (
-                          <p className="text-red-500 text-xs m-1">{verifyEmail}</p>
+                          <p className="text-red-500 text-xs m-1">
+                            {verifyEmail}
+                          </p>
                         )}
                       </div>
                     </div>

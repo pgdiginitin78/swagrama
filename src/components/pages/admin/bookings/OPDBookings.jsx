@@ -155,16 +155,20 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
 
   console.log("selectedRow", onSelect);
   return (
-    <div className="h-full overflow-y-auto px-2 no-scrollbar">
+    <div className="h-full overflow-y-auto px-2 no-scrollbar font-inter">
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
         *, body {  box-sizing: border-box; }
         @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
         .pulse-dot { animation: pulse-dot 1.5s infinite; }
+        .font-inter {
+  font-family: 'Inter', sans-serif;
+}
       `}</style>
       {/* Header */}
-      <div className="flex justify-between items-center mb-2 px-2 pt-4 shrink-0">
+      <div className="flex justify-between items-center mb-2 px-2 pt-4 shrink-0 ">
         <div>
-          <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter leading-none">
+          <h1 className="text-[20px] font-bold text-[#003d33] tracking-tighter leading-none ">
             OPD Bookings
           </h1>
         </div>
@@ -293,7 +297,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                     count={totalCount}
                     setCount={setTotalCount}
                     setRowsPerPage={setRowsPerPage}
-                    tableClass={"h-[460px] border cursor-pointer"}
+                    tableClass={"h-[530px] border cursor-pointer"}
                     setDataResult={setOpdList}
                     populateTable={populateTable}
                     handleSelectedRow={(row) => {

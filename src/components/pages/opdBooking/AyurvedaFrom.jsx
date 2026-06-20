@@ -752,6 +752,7 @@ useEffect(() => {
       });
   }
 }, [selectedDoctorId, appointmentDate]);
+console.log("selectedPatient",patientFid)
 
   const handleConfirmBooking = handleSubmit(
     (data) => {
@@ -789,6 +790,7 @@ useEffect(() => {
         EncounterStatus: data?.EncounterStatus,
         reason: data.reasonForVisit,
         bookingSource: "web",
+        createdBy:patientFid?.userId
       };
       setFinalObj(saveObj);
       setPreviewData({ ...data, selectedTimeSlot });

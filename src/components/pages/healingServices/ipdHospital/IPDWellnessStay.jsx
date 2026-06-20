@@ -80,6 +80,7 @@ const IPDWellnessStay = () => {
     else if (occ > 2) occupancyLabel = `Up to ${occ} Guests`;
 
     return {
+      ...room,
       serviceName: room.roomName ?? room.name ?? "",
       price: room.basePrice ?? 0,
       image,
@@ -291,7 +292,7 @@ const IPDWellnessStay = () => {
                       <div>
                         <div className="flex items-baseline gap-1">
                           <span className="text-xl font-display font-semibold text-ayuDark">
-                            ₹{(service.price || 0).toLocaleString("en-IN")}
+                            ₹{(service.price || 0).toLocaleString("en-IN")} / PP
                           </span>
                         </div>
                       </div>

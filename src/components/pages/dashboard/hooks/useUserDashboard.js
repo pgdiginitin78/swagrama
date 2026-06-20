@@ -23,11 +23,6 @@ const useUserDashboard = (user) => {
           GetUpcomingOPD(user.userId),
           GetAllUpcomingTherapies(user.userId),
         ]);
-
-      console.log("activitiesRes", activitiesRes);
-      console.log("opdRes", opdRes);
-      console.log("therapiesRes", therapiesRes);
-
       if (countsRes.data.statusCode === 200) {
         setUserDashboardCount(countsRes.data.data);
       }
@@ -41,7 +36,7 @@ const useUserDashboard = (user) => {
         setUpcomingTherapies(therapiesRes.data.data);
       }
     } catch (error) {
-      console.error("Error fetching dashboard data:", error);
+      setLoading(false);
     } finally {
       setLoading(false);
     }

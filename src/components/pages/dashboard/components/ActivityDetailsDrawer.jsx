@@ -89,6 +89,9 @@ const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => 
   const d = getActivityDisplayData(item);
   const typeStyle = TYPE_STYLES[d.type] || { bg: "bg-amber-100 text-ayuBrown", icon: <BookingIcon sx={{ fontSize: 18 }} /> };
 
+
+  console.log("item", item);
+
   return (
     <Drawer
       anchor="right"

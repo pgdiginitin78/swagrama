@@ -50,7 +50,7 @@ const TopStoriesSection = ({ setModal1, setModal2 }) => {
           />
         </motion.h2>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:px-20">
           {stories.map((story, idx) => (
             <motion.div
               key={idx}

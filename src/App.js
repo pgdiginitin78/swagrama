@@ -65,7 +65,7 @@ export default function App() {
   useTokenRefresh();
 
   return (
-    <>
+    <div className=" font-inter">
       <Helmet>
         <title>SwaGrama | Ayurveda • Yoga • Nisarga • Agro • Tourism</title>
         <meta
@@ -132,6 +132,6 @@ export default function App() {
       </div>
 
       <Footer />
-    </>
+    </div>
   );
 }

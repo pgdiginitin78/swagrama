@@ -1,75 +1,75 @@
 import CloseIcon from "@mui/icons-material/Close";
+import EditIcon from "@mui/icons-material/Edit";
 import LoginIcon from "@mui/icons-material/Login";
-import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
-import EditIcon from "@mui/icons-material/Edit";
-import { Badge, Drawer } from "@mui/material";
+import DashboardIcon from "@mui/icons-material/SpaceDashboard";
+import { Drawer } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
 import LoginModal from "../loginModal/LoginModal";
 import ShopCart from "../pages/eShop/ShopCart";
-import { successAlert } from "../common/toast/CustomToast";
-import { useAuth } from "../../context/AuthContext";
-import ManageProfileModal from "../profile/ManageProfileModal";
 import ManageMembers from "../profile/ManageMembers";
+import ManageProfileModal from "../profile/ManageProfileModal";
+import ConfirmationModal from "../common/ConfirmationModal";
 
 const ProfileDropdown = ({
   user,
   onManage,
-  onLogout,
   onClose,
   setOpenManageMembers,
+  setOpenConfirmationDialog,
 }) => (
-
   console.log("user", user),
-  <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999] animate-[fadeInDown_0.15s_ease_forwards]">
-    <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
-      <p className="text-sm font-bold text-green-800 truncate">
-        {user?.firstName} {user?.lastName}
-      </p>
-      <p className="text-xs text-green-500 truncate">
-        {user?.email || (user?.userName ? `@${user.userName}` : "")}
-      </p>
+  (
+    <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999] animate-[fadeInDown_0.15s_ease_forwards]">
+      <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+        <p className="text-sm font-bold text-green-800 truncate">
+          {user?.firstName} {user?.lastName}
+        </p>
+        <p className="text-xs text-green-500 truncate">
+          {user?.email || (user?.userName ? `@${user.userName}` : "")}
+        </p>
+      </div>
+      <Link
+        to={user?.role === "Admin" ? "/admin/dashboard" : "/dashboard"}
+        onClick={onClose}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
+      >
+        <DashboardIcon fontSize="small" style={{ color: "#10b981" }} />
+        My Dashboard
+      </Link>
+      <button
+        onClick={onManage}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
+      >
+        <EditIcon fontSize="small" style={{ color: "#10b981" }} />
+        Manage Profile
+      </button>
+      <button
+        onClick={() => {
+          setOpenManageMembers(true);
+          onClose();
+        }}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
+      >
+        <EditIcon fontSize="small" style={{ color: "#10b981" }} />
+        Manage Members
+      </button>
+      <div className="border-t border-gray-100" />
+      <button
+        onClick={() => setOpenConfirmationDialog(true)}
+        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
+      >
+        <LogoutIcon fontSize="small" />
+        Logout
+      </button>
     </div>
-    <Link
-      to={user?.role === "Admin" ? "/admin/dashboard" : "/dashboard"}
-      onClick={onClose}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
-    >
-      <DashboardIcon fontSize="small" style={{ color: "#10b981" }} />
-      My Dashboard
-    </Link>
-    <button
-      onClick={onManage}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
-    >
-      <EditIcon fontSize="small" style={{ color: "#10b981" }} />
-      Manage Profile
-    </button>
-    <button
-      onClick={() => {
-        setOpenManageMembers(true);
-        onClose();
-      }}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors focus:outline-none"
-    >
-      <EditIcon fontSize="small" style={{ color: "#10b981" }} />
-      Manage Members
-    </button>
-    <div className="border-t border-gray-100" />
-    <button
-      onClick={onLogout}
-      className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors focus:outline-none"
-    >
-      <LogoutIcon fontSize="small" />
-      Logout
-    </button>
-  </div>
+  )
 );
 
 const AvatarIcon = ({ user, size = 32 }) => (
@@ -98,6 +98,8 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
   const [openManageMembers, setOpenManageMembers] = useState(false);
+  const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
+
   const profileRef = useRef(null);
   const mobileProfileRef = useRef(null);
 
@@ -134,7 +136,7 @@ const Navbar = () => {
   const handleLogout = () => {
     setShowDropdown(false);
     logout();
-    
+    setOpenConfirmationDialog(false);
   };
 
   const handleManageProfile = () => {
@@ -274,9 +276,9 @@ const Navbar = () => {
                     <ProfileDropdown
                       user={user}
                       onManage={handleManageProfile}
-                      onLogout={handleLogout}
                       onClose={() => setShowDropdown(false)}
                       setOpenManageMembers={setOpenManageMembers}
+                      setOpenConfirmationDialog={setOpenConfirmationDialog}
                     />
                   )}
                 </div>
@@ -320,9 +322,9 @@ const Navbar = () => {
                     <ProfileDropdown
                       user={user}
                       onManage={handleManageProfile}
-                      onLogout={handleLogout}
                       onClose={() => setShowDropdown(false)}
                       setOpenManageMembers={setOpenManageMembers}
+                      setOpenConfirmationDialog={setOpenConfirmationDialog}
                     />
                   )}
                 </div>
@@ -497,6 +499,14 @@ const Navbar = () => {
           setOpen={setOpen}
         />
       )}
+            <ConfirmationModal
+              confirmationOpen={openConfirmationDialog}
+              confirmationHandleClose={() => setOpenConfirmationDialog(false)}
+              confirmationSubmitFunc={handleLogout}
+              confirmationLabel="Confirmation"
+              confirmationMsg="Are you sure you want to log out?"
+              confirmationButtonMsg="Confirm"
+            />
     </>
   );
 };

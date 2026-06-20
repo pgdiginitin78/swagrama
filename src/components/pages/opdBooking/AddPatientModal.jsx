@@ -9,10 +9,11 @@ import {
   DialogTitle,
   Divider,
   FormControlLabel,
+  FormHelperText,
   Switch,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import * as yup from "yup";
 import { useAuth } from "../../../context/AuthContext";
@@ -234,6 +235,9 @@ export default function AddPatientModal({
       pinCode: "",
       city: "",
       gender: "Male",
+      country:"",
+      state:"",
+      localty:"",
     },
     mode: "onChange",
   });
@@ -246,8 +250,8 @@ export default function AddPatientModal({
       errorAlert("login first");
       return;
     }
-    console.log("AddPatientData",data);
-    
+    console.log("AddPatientData", data);
+
     const saveObj = {
       firstName: data.firstName,
       lastName: data.lastName,
@@ -257,14 +261,17 @@ export default function AddPatientModal({
       age: Number(data.age),
       relation: data.relation ?? "",
       address: data.address,
-      pinCode: data.pinCode,
-      Gender: data.gender ?? "",  
+      pinCode:  data.pinCode,
+      Gender: data.gender ?? "",
       macIp: ipAddress ?? "",
       macId: "",
       bloodGroup: data.bloodGroup?.value ?? "",
-      city: data.city,
+      city: sameAddress === true ? data.city : "",
+      country: sameAddress === true ? data.country : "",
+      state: sameAddress === true ? data.state : "",
+      locality: sameAddress === true ? data.locality : "",
     };
-    console.log("AddPatientData1111",saveObj);
+    console.log("AddPatientData1111", saveObj);
 
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -305,6 +312,13 @@ export default function AddPatientModal({
     reset();
     handleClose();
   };
+
+  const onFormError = useCallback((errs) => {
+    const firstErrorField = Object.keys(errs)[0];
+    if (firstErrorField && errs[firstErrorField]?.message) {
+      errorAlert(errs[firstErrorField].message);
+    }
+  }, []);
 
   console.log("user", user);
 
@@ -390,6 +404,11 @@ export default function AddPatientModal({
           setUserAddressData({ address, pinCode });
           setValue("address", address);
           setValue("pinCode", pinCode);
+          setValue("city", data?.city ?? "");
+          setValue("state",data?.state ?? "");
+          setValue("country",data?.country ?? "");
+          setValue("landmark",data?.landmark ?? "");
+          setValue("locality",data?.locality ?? "");
         })
         .catch((err) => err);
     }
@@ -415,7 +434,7 @@ export default function AddPatientModal({
         }}
       >
         <form
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, onFormError)}
           id="patient-form"
           noValidate
           style={{
@@ -506,47 +525,90 @@ export default function AddPatientModal({
                   gap: 2,
                 }}
               >
-                <InputField
-                  name="firstName"
-                  control={control}
-                  label="First Name *"
-                  error={errors.firstName}
-                />
-                <InputField
-                  name="lastName"
-                  control={control}
-                  label="Last Name *"
-                  error={errors.lastName}
-                />
-                <InputField
-                  name="mobileNO"
-                  control={control}
-                  label="Registerd Mobile No."
-                  error={errors.mobileNO}
-                  disabled={user?.role === "Admin" ? false : true}
-                />
-                <DatePickerField
-                  name="dob"
-                  control={control}
-                  label="Date of Birth *"
-                  error={errors.dob}
-                  maxDate={new Date()}
-                  dob={true}
-                />
-                <InputField
-                  name="age"
-                  control={control}
-                  label="Age *"
-                  error={errors.age}
-                  inputProps={{ maxLength: 3 }}
-                  onInput={handleAgeInput}
-                />
-                <InputField
-                  name="emailId"
-                  control={control}
-                  label="Email *"
-                  error={errors.emailId}
-                />
+                <div>
+                  <InputField
+                    name="firstName"
+                    control={control}
+                    label="First Name *"
+                    error={errors.firstName}
+                  />
+                  {errors.firstName && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.firstName.message}
+                    </FormHelperText>
+                  )}
+                </div>
+                <div>
+                  <InputField
+                    name="lastName"
+                    control={control}
+                    label="Last Name *"
+                    error={errors.lastName}
+                  />
+                  {errors.lastName && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.lastName.message}
+                    </FormHelperText>
+                  )}
+                </div>
+                <div>
+                  <InputField
+                    name="mobileNO"
+                    control={control}
+                    label="Registerd Mobile No."
+                    error={errors.mobileNO}
+                    disabled={user?.role === "Admin" ? false : true}
+                  />
+                  {errors.mobileNO && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.mobileNO.message}
+                    </FormHelperText>
+                  )}
+                </div>
+                <div>
+                  <DatePickerField
+                    name="dob"
+                    control={control}
+                    label="Date of Birth *"
+                    error={errors.dob}
+                    maxDate={new Date()}
+                    dob={true}
+                  />
+                  {errors.dob && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.dob.message}
+                    </FormHelperText>
+                  )}
+                </div>
+                <div>
+                  <InputField
+                    name="age"
+                    control={control}
+                    label="Age *"
+                    error={errors.age}
+                    inputProps={{ maxLength: 3 }}
+                    onInput={handleAgeInput}
+                  />
+                  {errors.age && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.age.message}
+                    </FormHelperText>
+                  )}
+                </div>
+                <div>
+                  <InputField
+                    name="emailId"
+                    control={control}
+                    label="Email *"
+                    error={errors.emailId}
+                    dontCapitalize="none"
+                  />
+                  {errors.emailId && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.emailId.message}
+                    </FormHelperText>
+                  )}
+                </div>
                 <div>
                   <RadioField
                     control={control}
@@ -559,6 +621,11 @@ export default function AddPatientModal({
                       { id: "Other", value: "Other", label: "Other" },
                     ]}
                   />
+                  {errors.gender && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.gender.message}
+                    </FormHelperText>
+                  )}
                 </div>
 
                 <div>
@@ -579,17 +646,24 @@ export default function AddPatientModal({
                     error={errors.bloodGroup}
                   />
                   {errors.bloodGroup && (
-                    <p className="text-red-500 text-[11px] mt-0.5">
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
                       {errors.bloodGroup.message}
-                    </p>
+                    </FormHelperText>
                   )}
                 </div>
-                <InputField
-                  name="relation"
-                  control={control}
-                  label="Relation"
-                  error={errors.relation}
-                />
+                <div>
+                  <InputField
+                    name="relation"
+                    control={control}
+                    label="Relation"
+                    error={errors.relation}
+                  />
+                  {errors.relation && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.relation.message}
+                    </FormHelperText>
+                  )}
+                </div>
               </Box>
             </Box>
 
@@ -638,13 +712,20 @@ export default function AddPatientModal({
                   gap: 2,
                 }}
               >
-                <InputField
-                  name="pinCode"
-                  control={control}
-                  label="Pin Code"
-                  error={errors.pinCode}
-                  disabled={sameAddress}
-                />
+                <div>
+                  <InputField
+                    name="pinCode"
+                    control={control}
+                    label="Pin Code"
+                    error={errors.pinCode}
+                    disabled={sameAddress}
+                  />
+                  {errors.pinCode && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.pinCode.message}
+                    </FormHelperText>
+                  )}
+                </div>
                 <Box sx={{ gridColumn: { xs: "1", sm: "1 / -1" } }}>
                   <InputArea
                     name="address"
@@ -654,6 +735,11 @@ export default function AddPatientModal({
                     disabled={sameAddress}
                     rows={3}
                   />
+                  {errors.address && (
+                    <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                      {errors.address.message}
+                    </FormHelperText>
+                  )}
                 </Box>
               </Box>
             </Box>

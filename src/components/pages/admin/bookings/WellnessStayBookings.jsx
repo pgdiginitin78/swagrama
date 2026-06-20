@@ -473,7 +473,9 @@ export default function WellnessStayBookings({
                     "petFriendly",
                     "daysRemaining",
                     "images",
-                    "amount"
+                    "amount",
+                    "isRefund",
+                    "paymentFor"
                   ]}
                 />
               </main>

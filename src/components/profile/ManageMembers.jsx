@@ -1,8 +1,8 @@
-import { Box, Modal } from "@mui/material";
+import { Box, FormHelperText, Modal } from "@mui/material";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, Calendar, Heart, Pencil, Phone, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -18,15 +18,8 @@ import InputArea from "../common/formFields/InputArea";
 import InputField from "../common/formFields/InputField";
 import { errorAlert, successAlert } from "../common/toast/CustomToast";
 import AddPatientModal from "../pages/opdBooking/AddPatientModal";
+import { ModalStyle } from "../common/modalStyle/ModalStyle";
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  outline: "none",
-  border: "none",
-};
 
 const relationOptions = [
   { value: "Self", label: "Self" },
@@ -109,14 +102,14 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
   } = useForm({
     defaultValues: {
       firstName: "",
-      middleName:"",
+      middleName: "",
       lastName: "",
       mobileNo: "",
       dob: null,
       relation: null,
       address: "",
       pinCode: "",
-      bloodGroup:null,
+      bloodGroup: null,
     },
     resolver: yupResolver(validationSchema),
     mode: "onChange",
@@ -130,10 +123,11 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
     setValue("mobileNo", member.mobileNo);
     setValue("pinCode", member.pinCode);
     setValue("dob", new Date(member.dob));
-    const bloodGroup = bloodGroupOptions.find(
-      (opt) => opt.value.toLowerCase() === member?.bloodGroup?.toLowerCase(),
-    ) || null;
-    setValue("bloodGroup",bloodGroup);
+    const bloodGroup =
+      bloodGroupOptions.find(
+        (opt) => opt.value.toLowerCase() === member?.bloodGroup?.toLowerCase(),
+      ) || null;
+    setValue("bloodGroup", bloodGroup);
     setValue(
       "relation",
       relationOptions.find(
@@ -162,10 +156,19 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
       macId: "",
       macIp: ipAddress ?? "",
       Relation: data.relation?.value || "",
+      bloodGroup: data.bloodGroup?.value,
+      middleName:data.middleName,
     };
     setFinalSaveObj(payload);
     setOpenConfirmationModal(true);
   };
+
+  const onFormError = useCallback((errs) => {
+    const firstErrorField = Object.keys(errs)[0];
+    if (firstErrorField && errs[firstErrorField]?.message) {
+      errorAlert(errs[firstErrorField].message);
+    }
+  }, []);
 
   const handleUpdatePatient = () => {
     setIsLoading(true);
@@ -231,8 +234,8 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
         closeAfterTransition
       >
         <Box
-          sx={modalStyle}
-          className="w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] md:w-[720px] lg:w-[950px] focus:outline-none h-full max-h-[85vh]"
+          sx={ModalStyle}
+          className="w-[calc(100vw-16px)] sm:w-[calc(100vw-32px)] md:w-[720px] lg:w-[950px] focus:outline-none h-full max-h-[85vh] no-scrollbar rounded-2xl"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 24 }}
@@ -394,70 +397,126 @@ export default function ManageMembers({ open, onClose, user, setOpen }) {
                     className="p-3 sm:p-5 lg:p-8"
                   >
                     <form
-                      onSubmit={handleSubmit(onSubmit)}
+                      onSubmit={handleSubmit(onSubmit, onFormError)}
                       className="space-y-4 sm:space-y-6"
                     >
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-x-6 sm:gap-y-5">
-                        <InputField
-                          name="firstName"
-                          label="First Name"
-                          control={control}
-                          error={errors.firstName}
-                        />
+                        <div>
+                          <InputField
+                            name="firstName"
+                            label="First Name *"
+                            control={control}
+                            error={errors.firstName}
+                          />
+                          {errors.firstName && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.firstName.message}
+                            </FormHelperText>
+                          )}
+                        </div>
                         <InputField
                           name="middleName"
                           label="Middle Name"
                           control={control}
                         />
-                        <InputField
-                          name="lastName"
-                          label="Last Name"
-                          control={control}
-                          error={errors.lastName}
-                        />
-                        <InputField
-                          name="mobileNo"
-                          label="Mobile Number"
-                          control={control}
-                          error={errors.mobileNo}
-                        />
-                        <DatePickerField
-                          name="dob"
-                          label="Date of Birth"
-                          control={control}
-                          error={errors.dob}
-                        />
-                        <DropdownField
-                          name="relation"
-                          label="Relationship"
-                          placeholder="Select Relation"
-                          control={control}
-                          dataArray={relationOptions}
-                          error={errors.relation}
-                        />
-                        <InputField
-                          name="pinCode"
-                          label="Pin Code"
-                          control={control}
-                          error={errors.pinCode}
-                        />
-                        <DropdownField
-                          name="bloodGroup"
-                          label="Blood Group"
-                          placeholder="Select Blood Group"
-                          control={control}
-                          dataArray={bloodGroupOptions}
-                          error={errors.bloodGroup}
-                        />
+                        <div>
+                          <InputField
+                            name="lastName"
+                            label="Last Name *"
+                            control={control}
+                            error={errors.lastName}
+                          />
+                          {errors.lastName && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.lastName.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <InputField
+                            name="mobileNo"
+                            label="Mobile Number *"
+                            control={control}
+                            error={errors.mobileNo}
+                          />
+                          {errors.mobileNo && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.mobileNo.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <DatePickerField
+                            name="dob"
+                            label="Date of Birth *"
+                            control={control}
+                            error={errors.dob}
+                          />
+                          {errors.dob && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.dob.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <DropdownField
+                            name="relation"
+                            label="Relationship"
+                            placeholder="Select Relation *"
+                            control={control}
+                            dataArray={relationOptions}
+                            error={errors.relation}
+                          />
+                          {errors.relation && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.relation.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <InputField
+                            name="pinCode"
+                            label="Pin Code *"
+                            control={control}
+                            error={errors.pinCode}
+                          />
+                          {errors.pinCode && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.pinCode.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <DropdownField
+                            name="bloodGroup"
+                            label="Blood Group"
+                            placeholder="Select Blood Group *"
+                            control={control}
+                            dataArray={bloodGroupOptions}
+                            error={errors.bloodGroup}
+                          />
+                          {errors.bloodGroup && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.bloodGroup.message}
+                            </FormHelperText>
+                          )}
+                        </div>
                       </div>
 
-                      <InputArea
-                        name="address"
-                        label="Address"
-                        control={control}
-                        error={errors.address}
-                        minRows={3}
-                      />
+                      <div>
+                        <InputArea
+                          name="address"
+                          label="Address *"
+                          control={control}
+                          error={errors.address}
+                          minRows={3}
+                        />
+                        {errors.address && (
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            {errors.address.message}
+                          </FormHelperText>
+                        )}
+                      </div>
 
                       <div className="flex flex-col-reverse sm:flex-row gap-3 sm:justify-end pt-1">
                         <CommonButton

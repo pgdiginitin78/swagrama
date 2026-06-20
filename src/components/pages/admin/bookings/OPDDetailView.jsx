@@ -1,9 +1,12 @@
 import {
   AccessTime as AccessTimeIcon,
+  Apartment as DepartmentIcon,
   Close as CloseIcon,
   EventNote as EventNoteIcon,
+  Info as OriginIcon,
   CreditCard as PaymentIcon,
   Payments as PaymentsIcon,
+  Person as DoctorIcon,
   MedicalServices as ServiceIcon,
 } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
@@ -85,10 +88,13 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
 
   if (!selectedBooking) return null;
   const status = selectedBooking.status?.trim();
+  console.log("Refund requested for:", selectedBooking);
   const handleConfirmRefund = () => {
-    console.log("Refund requested for:", selectedBooking);
     setOpenCancelModal(false);
   };
+
+  const patientId = selectedBooking.userId ?? selectedBooking.appointmnetId;
+
   return (
     <div className="flex flex-col h-auto pb-5 bg-white w-full max-w-full mx-auto border rounded-lg overflow-hidden shadow-sm">
       <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-b border-gray-100">
@@ -101,7 +107,11 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
           </h2>
         </div>
         <IconButton onClick={onClose}>
-          <CloseIcon height={10} width={10} className="text-red-600  hover:bg-red-50 rounded-full text-lg" />
+          <CloseIcon
+            height={10}
+            width={10}
+            className="text-red-600  hover:bg-red-50 rounded-full text-lg"
+          />
         </IconButton>
       </div>
 
@@ -112,6 +122,11 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
         <p className="text-white text-[13px] sm:text-[14px] font-semibold uppercase text-center">
           {selectedBooking.customer}
         </p>
+        {patientId != null && (
+          <p className="text-emerald-200 text-[10px] sm:text-[11px] font-medium -mt-1">
+            Patient ID: {patientId}
+          </p>
+        )}
         <span
           className={`inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 rounded-full text-[10px] sm:text-[11px] font-semibold ${
             OPD_STATUS_PILL[status] ||
@@ -120,18 +135,34 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
         >
           <span
             className={`w-1.5 h-1.5 rounded-full ${
-              OPD_STATUS_DOT[status] || "bg-gray-400"
+              OPD_STATUS_DOT[status] || "bg-green-600"
             }`}
           />
           {status}
         </span>
       </div>
 
+
+
       <div className=" grid grid-cols-2 gap-2 overflow-y-auto px-3 py-2">
         <OpdDetailRow
           icon={<ServiceIcon />}
           label="Service"
           value={selectedBooking.service}
+        />
+        <OpdDetailRow
+          icon={<DepartmentIcon />}
+          label="Department"
+          value={selectedBooking.departmentName}
+        />
+        <OpdDetailRow
+          icon={<DoctorIcon />}
+          label="Doctor"
+          value={
+            selectedBooking.doctorName
+              ? `Dr. ${selectedBooking.doctorName}`
+              : "—"
+          }
         />
         <OpdDetailRow
           icon={<EventNoteIcon />}
@@ -164,15 +195,22 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
             </span>
           }
         />
+        <OpdDetailRow
+          icon={<OriginIcon />}
+          label="Booking Source"
+          value={selectedBooking.origin}
+        />
       </div>
 
       <div className="flex gap-2 px-4 border-t border-gray-100 pt-3">
         <button
           type="button"
-          disabled={selectedBooking?.origin !== "web"}
+          disabled={
+            selectedBooking?.origin !== "web" || selectedBooking?.amount === 0
+          }
           onClick={() => setOpenCancelModal(true)}
           className={`flex-1 py-2.5 rounded text-[12px] font-semibold border transition-all duration-200 ${
-            selectedBooking?.origin !== "web"
+            selectedBooking?.origin !== "web" || selectedBooking?.amount === 0
               ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60"
               : "text-red-600 border-red-600 bg-red-50 hover:bg-red-100 cursor-pointer"
           }`}
@@ -181,8 +219,16 @@ const OPDDetailView = ({ selectedBooking, onClose, onRescheduleSuccess }) => {
         </button>
         <button
           type="button"
+          disabled={
+            selectedBooking?.origin !== "web" || selectedBooking?.amount === 0
+          }
           onClick={() => setOpenRescheduleModal(true)}
-          className="flex-1 py-2.5 rounded bg-[#003d33] text-white text-[12px] font-semibold"
+          className={`flex-1 py-2.5 rounded text-[12px] font-semibold border transition-all duration-200 
+            ${
+              selectedBooking?.origin !== "web" || selectedBooking?.amount === 0
+                ? "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed opacity-60"
+                : "text-white bg-[#003d33] hover:bg-[#002a24] border-[#003d33] cursor-pointer"
+            }`}
         >
           Reschedule
         </button>

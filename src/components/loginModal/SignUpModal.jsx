@@ -228,6 +228,7 @@ export default function SignUpModal({ open, handleClose }) {
       relation: "self",
       bloodGroup: null,
       sameAsMobileNumber: false,
+      middleName: "",
     },
   });
 
@@ -259,6 +260,7 @@ export default function SignUpModal({ open, handleClose }) {
         macIp: ipAddress,
         bloodGroup: data.bloodGroup?.value,
         whatsappNo: data.whatsappNo !== "" ? data.whatsappNo : null,
+        middleName: data.middleName || "",
       };
       setFormData(formattedData);
       setOpenConfirmationModal(true);
@@ -405,16 +407,18 @@ export default function SignUpModal({ open, handleClose }) {
     setVerifyEmail("");
     if (emailDebounceRef.current) clearTimeout(emailDebounceRef.current);
     if (!value.trim()) return;
-    emailDebounceRef.current = setTimeout(() => {
-      verifyUser({ userName: null, emailId: value, mobileNo: null })
-        .then((res) => {
-          setVerifyEmail(res.data.message);
-          if (res.data.message === "Email ID is already taken") {
-            errorAlert(res.data.message);
-          }
-        })
-        .catch(() => setVerifyEmail(""));
-    }, 500);
+    if(errors?.emailId?.message !== "Invalid email format"){
+      emailDebounceRef.current = setTimeout(() => {
+        verifyUser({ userName: null, emailId: value, mobileNo: null })
+          .then((res) => {
+            setVerifyEmail(res.data.message);
+            if (res.data.message === "Email ID is already taken") {
+              errorAlert(res.data.message);
+            }
+          })
+          .catch(() => setVerifyEmail(""));
+      }, 500);
+    }
   }, []);
 
   const handleUsernameChange = useCallback(

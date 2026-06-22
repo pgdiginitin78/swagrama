@@ -220,7 +220,12 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
             setValue("FirstName", userData.firstName || "");
             setValue("middleName", userData.middleName || "");
             setValue("lastName", userData.lastName || userData?.lName || "");
-            setValue("bloodGroup", userData.bloodGroup || "");
+
+            const bloodGroup = bloodGroupOptions.filter(
+              (list) => list.label === userData.bloodGroup,
+            );
+
+            setValue("bloodGroup", bloodGroup || null);
             setValue(
               "mobileNo",
               userData.whatsappNo || userData?.contactNumber || "",
@@ -434,7 +439,7 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
                       iconColor="text-purple-600"
                       title="Basic Info"
                     />
-                    <div className="grid grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="col-span-2">
                         <InputField
                           control={control}

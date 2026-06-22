@@ -54,7 +54,7 @@ function ServiceCard({ item }) {
                 onClick={() => setModalOpen(true)}
                 className="group/btn flex-shrink-0 flex items-center gap-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium text-white bg-[#4f8f73] rounded-lg transition-all duration-300 hover:bg-[#2a5f46] hover:shadow-md active:scale-95"
               >
-                View Details
+               Book Now
                 <ArrowForward
                   className="transition-transform duration-300 group-hover/btn:translate-x-0.5"
                   style={{ fontSize: 13 }}

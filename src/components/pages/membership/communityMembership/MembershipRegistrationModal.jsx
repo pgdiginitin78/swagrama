@@ -388,7 +388,7 @@ const MembershipRegistrationModal = ({
         confirmationHandleClose={() => setConfirmationOpen(false)}
         confirmationSubmitFunc={handleConfirmSubmit}
         confirmationLabel="Confirm Enquiry"
-        confirmationMsg="Are you sure you want to submit this membership enquiry? Our team will contact you soon."
+        confirmationMsg="Are you sure you want to submit this enquiry? Our team will contact you soon."
         confirmationButtonMsg={loading ? "Submitting..." : "Submit Now"}
         disabled={loading}
       />

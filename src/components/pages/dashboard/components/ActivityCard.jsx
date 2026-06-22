@@ -60,11 +60,15 @@ const getActivityDisplayData = (data) => {
     status: data.status,
     prep: data.prep,
     step: data.step,
+    userName: data.userName,
+    department:data.department
   };
 };
 
 const ActivityCard = ({ data, onClick }) => {
   const displayData = getActivityDisplayData(data);
+
+  console.log(displayData, data,"displayData12233");
 
   return (
     <motion.div
@@ -101,10 +105,10 @@ const ActivityCard = ({ data, onClick }) => {
 
       <div className="mb-3 flex-1 min-w-0">
         <p className="text-sm font-bold text-gray-900 leading-tight">
-          {displayData.name}
+          {displayData.userName}
         </p>
         <p className="text-[11px] text-gray-400 font-medium mt-0.5">
-          {displayData.expert}
+          {displayData.department}
         </p>
       </div>
 

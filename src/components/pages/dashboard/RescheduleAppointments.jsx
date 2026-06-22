@@ -107,7 +107,7 @@ export default function RescheduleAppointments({
   useEffect(() => {
     if (!open || !bookingData) return;
 
-    setValue("appointmentDate", new Date(bookingData.appointmentDate));
+    setValue("appointmentDate", new Date(bookingData.date));
     if (bookingData?.slotTime) {
       const [start, end] = bookingData.slotTime.split("-");
       setSelectedTimeSlot({
@@ -122,8 +122,7 @@ export default function RescheduleAppointments({
     }
     const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
 
-   
-    getDoctorListByLocationDepartment(clinicId, bookingData?.departmentName)
+    getDoctorListByLocationDepartment(clinicId, bookingData?.department)
       .then((res) => {
         const data = res?.data?.data || [];
         const formatted = data.map((doc) => ({
@@ -155,30 +154,32 @@ export default function RescheduleAppointments({
       .catch((err) => {
         console.error("Error fetching doctors:", err);
         setDoctorOptions([]);
-      })
-
+      });
   }, [open, bookingData, setValue]);
 
+  console.log("bookingData",bookingData)
+
   useEffect(() => {
-    if (doctorValue?.id && appointmentDate) {
+    if (doctorValue && bookingData) {
       setSlotError("");
       setLoadingSlots(true);
       setDoctorSlots([]);
 
       const formattedDate =
-        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
-          ? format(new Date(appointmentDate), "yyyy-MM-dd")
+        bookingData.date &&
+        !isNaN(new Date(bookingData.date).getTime())
+          ? format(new Date(bookingData.date), "yyyy-MM-dd")
           : "";
       const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
 
-      getDoctorAvailableSlots(doctorValue.id, formattedDate, clinicId)
+      getDoctorAvailableSlots(doctorValue.userId, formattedDate, clinicId)
         .then((res) => {
           const data = res?.data?.data || [];
           setDoctorSlots(data);
 
           let foundMatch = false;
-          const origDate = bookingData?.appointmentDate
-            ? format(new Date(bookingData.appointmentDate), "yyyy-MM-dd")
+          const origDate = bookingData?.date
+            ? format(new Date(bookingData.date), "yyyy-MM-dd")
             : "";
           if (formattedDate === origDate) {
             if (bookingData?.slotTime) {
@@ -235,9 +236,9 @@ export default function RescheduleAppointments({
     }
 
     const payload = {
-      bookingId: bookingData?.appointmnetId,
+      bookingId: bookingData?.bookingId,
       clinicFid: 5,
-      AppointmentFid: bookingData?.appointmnetId,
+      AppointmentFid: bookingData?.bookingId,
       appoinmentDate:
         data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
           ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
@@ -257,7 +258,7 @@ export default function RescheduleAppointments({
           );
           onSuccess?.();
           onClose();
-          onRescheduleSuccess()
+          onRescheduleSuccess();
         }
       })
       .catch((err) => {
@@ -297,7 +298,7 @@ export default function RescheduleAppointments({
               Booking ID
             </span>
             <span className="text-slate-800 font-bold">
-              {bookingData?.appointmnetId || "—"}
+              {bookingData?.bookingId || "—"}
             </span>
           </div>
           <div>
@@ -305,7 +306,7 @@ export default function RescheduleAppointments({
               Patient
             </span>
             <span className="text-slate-800 font-bold truncate block">
-              {bookingData?.customer || bookingData?.fullName || "—"}
+              {bookingData?.customer || bookingData?.userName || "—"}
             </span>
           </div>
           <div>
@@ -324,10 +325,10 @@ export default function RescheduleAppointments({
           </div>
           <div>
             <span className="block text-[9px] uppercase tracking-wider text-slate-400 font-extrabold">
-              Current Time
+              Slot Time
             </span>
             <span className="text-slate-800 font-bold">
-              {bookingData?.time || bookingData?.slotTime || "—"}
+              {bookingData?.time || bookingData?.startTime || "—"}
             </span>
           </div>
         </div>

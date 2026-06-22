@@ -19,6 +19,9 @@ import {
   Popover,
   Select,
   Switch,
+  Checkbox,
+  FormControlLabel,
+  Typography,
 } from "@mui/material";
 import { LocalizationProvider, TimeClock } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -78,6 +81,10 @@ function StayBookingModal({
   const [checkOut, setCheckOut] = useState(null);
   const [checkOutTime, setCheckOutTime] = useState("11:15:00");
   const [selectingFor, setSelectingFor] = useState("checkIn");
+
+  const [openTermsModal, setOpenTermsModal] = useState(false);
+  const [tempTermsAccepted, setTempTermsAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const [inTimeAnchorEl, setInTimeAnchorEl] = useState(null);
   const [outTimeAnchorEl, setOutTimeAnchorEl] = useState(null);
@@ -165,6 +172,7 @@ function StayBookingModal({
       bringingPet: false,
       patientFid: null,
       twinSharing: false,
+      sameGenderRules: false,
       noOfAdults: 1,
       noOfChildren0to5: 0,
       noOfChildren6to12: 0,
@@ -263,7 +271,6 @@ function StayBookingModal({
     if (!selectedService)
       return {
         stay: 0,
-        wellness: 0,
         taxes: 0,
         petSurcharge: 0,
         adultSurcharge: 0,
@@ -277,9 +284,21 @@ function StayBookingModal({
       checkIn && checkOut ? differenceInCalendarDays(checkOut, checkIn) : 1;
     const effectiveDays = days > 0 ? days : 1;
 
-    const stayTotal = dailyBase * effectiveDays;
+    const noOfAdults = Number(formValues?.noOfAdults) || 1;
+    const isTwinSharing = formValues?.twinSharing;
+
+    let baseAdultsToCharge = Math.min(2, noOfAdults);
+    let singleOccupancySurcharge = 0;
+
+    if (noOfAdults === 1 && !isTwinSharing) {
+      baseAdultsToCharge = 1;
+      singleOccupancySurcharge = dailyBase * 0.75 * effectiveDays;
+    } else if (isTwinSharing && noOfAdults === 1) {
+      baseAdultsToCharge = 1;
+    }
+
+    const stayTotal = dailyBase * baseAdultsToCharge * effectiveDays;
     const wellness = 0;
-    const taxes = (stayTotal + wellness) * 0;
 
     const petConfig = (ageDetailsConfig || []).find(
       (d) => d.criterialType === "Pet",
@@ -313,20 +332,19 @@ function StayBookingModal({
         children6to12Count * dailyBase * (kid6to12Pct / 100)) *
       effectiveDays;
 
+    const totalWithoutTaxes =
+      stayTotal + wellness + petSurcharge + adultSurcharge + childrenSurcharge + singleOccupancySurcharge;
+    const taxes = totalWithoutTaxes * 0;
+
     return {
       stay: stayTotal,
       wellness: wellness,
       taxes: taxes,
       petSurcharge: petSurcharge,
       adultSurcharge: adultSurcharge,
+      singleOccupancySurcharge: singleOccupancySurcharge,
       childrenSurcharge: childrenSurcharge,
-      total:
-        stayTotal +
-        wellness +
-        taxes +
-        petSurcharge +
-        adultSurcharge +
-        childrenSurcharge,
+      total: totalWithoutTaxes + taxes,
       days: effectiveDays,
       petPct,
       kid0to5Pct,
@@ -730,14 +748,14 @@ function StayBookingModal({
           sx={ModalStyle}
           className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[95dvh] overflow-hidden rounded-xl bg-booking-bg p-0 flex flex-col no-scrollbar"
         >
-          <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-4 py-3 border-b border-booking-border shadow-sm">
+          <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-3 py-2 border-b border-booking-border shadow-sm">
             <h1 className="text-booking-primaryDark  text-lg md:text-2xl font-bold leading-tight">
               Stay Booking
             </h1>
             <CancelButtonModal onClick={handleClose} />
           </div>
 
-          <div className="p-3 sm:p-4 flex-1 overflow-y-auto no-scrollbar">
+          <div className="p-2 sm:p-3 flex-1 overflow-y-auto no-scrollbar">
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <div className="relative group/searchbar">
                 <motion.div
@@ -1540,11 +1558,11 @@ function StayBookingModal({
                 </Popover>
               </div>
             </LocalizationProvider>
-            <div className="flex flex-col gap-3 pt-3 border rounded-[9px] p-2 mt-2">
+            <div className="flex flex-col gap-2 pt-2 border rounded-[9px] p-2 mt-2">
               <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
                 Preferences
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
                   {
                     label: "Bringing a Pet?",
@@ -1554,14 +1572,20 @@ function StayBookingModal({
                   },
                   {
                     label: "Twin Sharing?",
-                    sub: "*Same-gender rules",
-                    subColor: "text-red-500",
+                    sub: "Share with another guest",
+                    subColor: "text-booking-primary",
                     field: "twinSharing",
+                  },
+                  {
+                    label: "Same-gender rules?",
+                    sub: "*Only share with same gender",
+                    subColor: "text-red-500",
+                    field: "sameGenderRules",
                   },
                 ].map(({ label, sub, subColor, field }) => (
                   <div
                     key={field}
-                    className="flex items-center justify-between bg-gray-50/50 p-3 rounded-xl border  hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between bg-gray-50/50 p-2 rounded-xl border  hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm flex-shrink-0">
@@ -1596,12 +1620,12 @@ function StayBookingModal({
               </div>
             </div>
 
-            <div className="w-full mt-4">
+            <div className="w-full mt-2">
               <motion.div
                 layout
                 initial={{ opacity: 0, scale: 0.98 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-white rounded-[9px] p-4 sm:p-5 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex flex-col gap-5"
+                className="bg-white rounded-[9px] p-3 border border-gray-100 shadow-[0_10px_40px_rgba(0,0,0,0.06)] flex flex-col gap-3"
               >
                 <div className="border-b border-booking-primary/10 pb-2">
                   <h2 className="text-base sm:text-lg font-serif text-ayuBrown font-bold">
@@ -1622,7 +1646,7 @@ function StayBookingModal({
                   </span>
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
                     <p className="text-[10px] font-bold text-booking-primary uppercase tracking-widest">
                       Guest Information
@@ -1634,7 +1658,7 @@ function StayBookingModal({
                       className="bg-booking-primary text-white  hover:bg-booking-primaryDark transition-all shadow-sm shrink-0"
                     />
                   </div>
-                  <div className="mt-3">
+                  <div className="mt-2">
                     <DropdownField
                       control={control}
                       name="patientFid"
@@ -1646,11 +1670,11 @@ function StayBookingModal({
                   </div>
                   {genderCriteria !== "" &&
                     genderCriteria !== "Booking Allowed" && (
-                      <div className="flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4">
+                      <div className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-2.5">
                         <div className="mt-0.5 text-amber-600">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
+                            className="h-4 w-4"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -1665,17 +1689,17 @@ function StayBookingModal({
                         </div>
 
                         <div>
-                          <h4 className="font-medium text-amber-800">
+                          <h4 className="font-semibold text-[11px] text-amber-800">
                             Gender Restriction
                           </h4>
-                          <p className="mt-1 text-sm text-amber-700">
+                          <p className="mt-0.5 text-[10px] text-amber-700">
                             {genderCriteria}
                           </p>
                         </div>
                       </div>
                     )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div className="">
                       <InputField
                         control={control}
@@ -1723,7 +1747,7 @@ function StayBookingModal({
                       type="number"
                       inputProps={{ min: 1, max: 3 }}
                     />
-                    <div className="flex items-center justify-between p-3 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
+                    <div className="flex items-center justify-between p-2 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
                       <div className="flex flex-col">
                         <p className="text-[11px] font-bold text-booking-primary uppercase tracking-wider">
                           Children (0-5 Years)
@@ -1774,7 +1798,7 @@ function StayBookingModal({
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between p-3 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
+                    <div className="flex items-center justify-between p-2 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
                       <div className="flex flex-col">
                         <p className="text-[11px] font-bold text-booking-primary uppercase tracking-wider">
                           Children (6-12 Years)
@@ -1840,15 +1864,15 @@ function StayBookingModal({
                     }}
                   />
 
-                  <div className="flex flex-1 items-center gap-[18px] p-[26px_24px]">
+                  <div className="flex flex-1 items-center gap-3 p-[12px_14px]">
                     <div
-                      className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl
           border border-[rgba(160,130,80,0.2)] bg-white shadow-[0_2px_12px_rgba(160,130,80,0.1)]"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        width="26"
-                        height="26"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="#a08230"
@@ -1864,11 +1888,11 @@ function StayBookingModal({
                     </div>
 
                     <div className="flex-1">
-                      <p className="mb-1.5 text-[9px] uppercase tracking-[.28em] text-[#a08230]">
+                      <p className="mb-1 text-[9px] uppercase tracking-[.28em] text-[#a08230]">
                         Meal Preference
                       </p>
 
-                      <p className="mb-3.5 text-[13px] font-light leading-[1.65] text-[#7a6e62]">
+                      <p className="mb-2 text-[13px] font-light leading-[1.65] text-[#7a6e62]">
                         Two Curated Sunrise–Sunset Ayurveda Routine, Veg
                         Wholesome Meals, and Herbal Gud Green Tea crafted for a
                         relaxing and Natural Healing.
@@ -1880,8 +1904,8 @@ function StayBookingModal({
                             <span
                               key={label}
                               className="inline-flex items-center gap-[5px] rounded-full border
-                  border-[rgba(160,130,80,0.22)] bg-white px-[11px] py-1
-                  text-[10.5px] tracking-[.04em] text-[#8b6914]"
+                                        border-[rgba(160,130,80,0.22)] bg-white px-[11px] py-1
+                                        text-[10.5px] tracking-[.04em] text-[#8b6914]"
                             >
                               {icon}
                               {label}
@@ -1893,13 +1917,12 @@ function StayBookingModal({
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-booking-primary/5 flex flex-col gap-2">
+                <div className="pt-2 border-t border-booking-primary/5 flex flex-col gap-1.5">
                   {[
                     {
                       label: `Stay (${costs.days} Day${costs.days > 1 ? "s" : ""})`,
                       value: costs.stay,
                     },
-                    { label: "Wellness Access", value: costs.wellness },
                     {
                       label: "Taxes & Service",
                       value: Math.round(costs.taxes),
@@ -1928,6 +1951,14 @@ function StayBookingModal({
                           },
                         ]
                       : []),
+                    ...(costs.singleOccupancySurcharge > 0
+                      ? [
+                          {
+                            label: "Single Occupancy (75%)",
+                            value: Math.round(costs.singleOccupancySurcharge),
+                          },
+                        ]
+                      : []),
                   ].map(({ label, value }) => (
                     <div
                       key={label}
@@ -1943,7 +1974,7 @@ function StayBookingModal({
                   ))}
                 </div>
 
-                <div className="flex items-center justify-between gap-4 pt-3 border-t border-dashed border-booking-primary/20">
+                <div className="flex items-center justify-between gap-4 pt-2 border-t border-dashed border-booking-primary/20">
                   <div>
                     <h3 className="text-base font-serif text-ayuBrown font-bold leading-none mb-1">
                       Total Amount
@@ -1957,23 +1988,38 @@ function StayBookingModal({
                   </span>
                 </div>
 
-                <div className="flex justify-end space-x-2 border-t border-dashed pt-2">
-                  <CommonButton
-                    type="button"
-                    label="Reset"
-                    className="border border-red-600 text-red-600 bg-red-50"
-                    onClick={reset}
-                  />
-                  <CommonButton
-                    label={"Book Now"}
-                    onClick={handleConfirmBooking}
-                    className={`w-full text-sm transition-all active:scale-[0.98]  tracking-widest bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white shadow-lg shadow-booking-primary/10  
-                    `}
-                  />
+                <div className="flex flex-col pt-2 border-t border-dashed border-booking-primary/20">
+                  <span
+                    className="text-[11px] text-booking-primaryDark font-semibold cursor-pointer hover:underline mb-2 inline-block"
+                    onClick={() => {
+                      setTempTermsAccepted(termsAccepted);
+                      setOpenTermsModal(true);
+                    }}
+                  >
+                    View Terms & Conditions and Policy
+                  </span>
+                  <div className="flex justify-end space-x-2">
+                    <CommonButton
+                      type="button"
+                      label="Reset"
+                      className="border border-red-600 text-red-600 bg-red-50"
+                      onClick={reset}
+                    />
+                    <CommonButton
+                      label={"Book Now"}
+                      onClick={handleConfirmBooking}
+                      disabled={!termsAccepted}
+                      className={`w-full text-sm transition-all active:scale-[0.98] tracking-widest ${
+                        termsAccepted
+                          ? "bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white shadow-lg shadow-booking-primary/10"
+                          : "bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                      }`}
+                    />
+                  </div>
                 </div>
               </motion.div>
 
-              <div className="mt-3 mb-2 grid grid-cols-3 gap-2">
+              <div className="mt-2 mb-1 grid grid-cols-3 gap-2">
                 {[
                   {
                     icon: <PeopleAlt sx={{ fontSize: 18 }} />,
@@ -1990,7 +2036,7 @@ function StayBookingModal({
                 ].map((badge, i) => (
                   <div
                     key={i}
-                    className="bg-booking-primaryLight/30 py-3 px-2 rounded-xl flex flex-col items-center justify-center text-center gap-1.5 border border-booking-primary/5 shadow-sm hover:bg-booking-primaryLight/50 transition-all"
+                    className="bg-booking-primaryLight/30 py-2 px-2 rounded-xl flex flex-col items-center justify-center text-center gap-1 border border-booking-primary/5 shadow-sm hover:bg-booking-primaryLight/50 transition-all"
                   >
                     <div className="text-booking-primary bg-white h-8 w-8 rounded-full shadow-sm flex items-center justify-center">
                       {badge.icon}
@@ -2003,6 +2049,111 @@ function StayBookingModal({
               </div>
             </div>
           </div>
+        </Box>
+      </Modal>
+
+      <Modal open={openTermsModal} onClose={() => setOpenTermsModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "90%",
+            maxWidth: 500,
+            bgcolor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 24,
+            p: 4,
+          }}
+        >
+          <Typography
+            variant="h6"
+            component="h2"
+            mb={2}
+            fontWeight="bold"
+            color="primary"
+          >
+            Terms & Conditions and Policy
+          </Typography>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[10px] text-gray-600 leading-snug">
+                  You can cancel your booking up to 24 hours before check-in.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[10px] text-gray-600 leading-snug">
+                  <span className="font-semibold text-booking-primaryDark">
+                    25% of the booking amount
+                  </span>{" "}
+                  will be deducted as a cancellation fee.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[10px] text-gray-600 leading-snug">
+                  <span className="font-semibold text-booking-primaryDark">
+                    No refund
+                  </span>{" "}
+                  will be provided for cancellations made less than 24 hours
+                  before check-in.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[10px] text-gray-600 leading-snug">
+                  <span className="font-semibold text-booking-primaryDark">
+                    No refund
+                  </span>{" "}
+                  will be provided if you do not check in on your scheduled
+                  booking date.
+                </p>
+              </div>
+
+              <div className="flex items-start gap-2">
+                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[10px] text-gray-600 leading-snug">
+                  Date changes are subject to room availability.
+                </p>
+              </div>
+            </div>
+          </div>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={tempTermsAccepted}
+                onChange={(e) => setTempTermsAccepted(e.target.checked)}
+                color="primary"
+              />
+            }
+            label={
+              <Typography variant="body2" fontWeight="medium">
+                I accept the terms & conditions and policy.
+              </Typography>
+            }
+          />
+          <Box display="flex" justifyContent="flex-end" gap={2} mt={1}>
+            <CommonButton
+              label="Cancel"
+              onClick={() => setOpenTermsModal(false)}
+              className="border border-gray-300 text-gray-700 bg-white"
+            />
+            <CommonButton
+              label="Confirm"
+              onClick={() => {
+                setTermsAccepted(tempTermsAccepted);
+                setOpenTermsModal(false);
+              }}
+              className="bg-booking-primary text-white"
+            />
+          </Box>
         </Box>
       </Modal>
 

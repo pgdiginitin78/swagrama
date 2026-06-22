@@ -123,7 +123,7 @@ const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => 
             <div className="min-w-0 flex-1">
               <p className="text-xs font-black text-gray-900 truncate">{d.name}</p>
               <p className="text-[9px] font-bold text-gray-400 tracking-wide mt-0.5">
-                #{d.id}
+                {d.department}
               </p>
             </div>
             <StatusBadge status={d.status} />

@@ -790,7 +790,7 @@ console.log("selectedPatient",patientFid)
         EncounterStatus: data?.EncounterStatus,
         reason: data.reasonForVisit,
         bookingSource: "web",
-        createdBy:patientFid?.userId
+        createdBy:user?.userId
       };
       setFinalObj(saveObj);
       setPreviewData({ ...data, selectedTimeSlot });
@@ -1613,6 +1613,7 @@ console.log("selectedPatient",patientFid)
                   label="Email Address"
                   error={errors.emailAddress}
                   disabled={true}
+                  dontCapitalize={"none"}
                 />
                 {errors.emailAddress && (
                   <p className="text-red-500 text-[11px] mt-0.5">

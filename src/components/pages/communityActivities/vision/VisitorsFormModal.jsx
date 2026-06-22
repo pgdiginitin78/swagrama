@@ -182,6 +182,21 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     handleGetPatientData();
   }, [user]);
 
+  useEffect(() => {
+    if (origin === "AnnualEvents" && serviceDetails?.date) {
+      let dateParts = [];
+      if (serviceDetails.date.includes("/")) {
+        dateParts = serviceDetails.date.split("/");
+      } else if (serviceDetails.date.includes("-")) {
+        dateParts = serviceDetails.date.split("-");
+      }
+      if (dateParts.length === 3) {
+        const [day, month, year] = dateParts;
+        setValue("appointmentDate", new Date(year, month - 1, day));
+      }
+    }
+  }, [origin, serviceDetails, setValue]);
+
   const onSubmit = (data) => {
     if (!user) {
       errorAlert("login first");
@@ -210,10 +225,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       amount: total,
       origin: origin,
     };
-    console.log("saveObj", saveObj);
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
+  console.log("serviceDetails", serviceDetails);
   const cancelPaymentRef = useRef(null);
 
   const handleConfirmBooking = async () => {

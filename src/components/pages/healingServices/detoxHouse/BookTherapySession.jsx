@@ -57,28 +57,32 @@ const formatTime = (timeStr) => {
   }
 };
 
-const staticTimeSlots = [
-  { slotStartTime: "09:00:00", slotEndTime: "09:30:00", isAvailable: true },
-  { slotStartTime: "09:30:00", slotEndTime: "10:00:00", isAvailable: true },
-  { slotStartTime: "10:00:00", slotEndTime: "10:30:00", isAvailable: true },
-  { slotStartTime: "10:30:00", slotEndTime: "11:00:00", isAvailable: true },
-  { slotStartTime: "11:00:00", slotEndTime: "11:30:00", isAvailable: true },
-  { slotStartTime: "11:30:00", slotEndTime: "12:00:00", isAvailable: true },
-  { slotStartTime: "12:00:00", slotEndTime: "12:30:00", isAvailable: true },
-  { slotStartTime: "12:30:00", slotEndTime: "13:00:00", isAvailable: true },
-  { slotStartTime: "13:00:00", slotEndTime: "13:30:00", isAvailable: true },
-  { slotStartTime: "13:30:00", slotEndTime: "14:00:00", isAvailable: true },
-  { slotStartTime: "14:00:00", slotEndTime: "14:30:00", isAvailable: true },
-  { slotStartTime: "14:30:00", slotEndTime: "15:00:00", isAvailable: true },
-  { slotStartTime: "15:00:00", slotEndTime: "15:30:00", isAvailable: true },
-  { slotStartTime: "15:30:00", slotEndTime: "16:00:00", isAvailable: true },
-  { slotStartTime: "16:00:00", slotEndTime: "16:30:00", isAvailable: true },
-  { slotStartTime: "16:30:00", slotEndTime: "17:00:00", isAvailable: true },
-  { slotStartTime: "17:00:00", slotEndTime: "17:30:00", isAvailable: true },
-  { slotStartTime: "17:30:00", slotEndTime: "18:00:00", isAvailable: true },
-  { slotStartTime: "18:00:00", slotEndTime: "18:30:00", isAvailable: true },
-  { slotStartTime: "18:30:00", slotEndTime: "19:00:00", isAvailable: true },
-];
+const generateTimeSlots = (durationInMinutes) => {
+  const duration = parseInt(durationInMinutes) || 30;
+  const slots = [];
+  let currentMinutes = 9 * 60; // 9:00 AM
+  const endMinutes = 19 * 60; // 7:00 PM
+
+  while (currentMinutes + duration <= endMinutes) {
+    const startH = Math.floor(currentMinutes / 60);
+    const startM = currentMinutes % 60;
+    const endMins = currentMinutes + duration;
+    const endH = Math.floor(endMins / 60);
+    const endM = endMins % 60;
+
+    const formatTimeStr = (h, m) =>
+      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`;
+
+    slots.push({
+      slotStartTime: formatTimeStr(startH, startM),
+      slotEndTime: formatTimeStr(endH, endM),
+      isAvailable: true,
+    });
+
+    currentMinutes += duration;
+  }
+  return slots;
+};
 
 export default function BookTherapySession({ open, onClose, item }) {
   const backdropRef = useRef(null);
@@ -93,7 +97,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
-  const [therapySlots, setTherapySlots] = useState(staticTimeSlots);
+  const [therapySlots, setTherapySlots] = useState(() => generateTimeSlots(item?.duration));
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
@@ -179,7 +183,7 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   useEffect(() => {
     if (activePickerIndex === null || !user?.userId) {
-      setTherapySlots(staticTimeSlots);
+      setTherapySlots(generateTimeSlots(item?.duration));
       return;
     }
 
@@ -193,19 +197,19 @@ export default function BookTherapySession({ open, onClose, item }) {
           if (Array.isArray(data?.data) && data.data.length > 0) {
             setTherapySlots(data.data);
           } else {
-            setTherapySlots(staticTimeSlots);
+            setTherapySlots(generateTimeSlots(item?.duration));
           }
         })
         .catch(() => {
-          setTherapySlots(staticTimeSlots);
+          setTherapySlots(generateTimeSlots(item?.duration));
         })
         .finally(() => {
           setIsSlotsLoading(false);
         });
     } else {
-      setTherapySlots(staticTimeSlots);
+      setTherapySlots(generateTimeSlots(item?.duration));
     }
-  }, [activePickerIndex, schedules[activePickerIndex]?.date, user?.userId]);
+  }, [activePickerIndex, schedules[activePickerIndex]?.date, user?.userId, item?.duration]);
 
   useEffect(() => {
     if (activePickerIndex !== null) {

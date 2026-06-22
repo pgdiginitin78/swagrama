@@ -7,7 +7,6 @@ import {
 import { Drawer, Step, StepLabel, Stepper } from "@mui/material";
 import React from "react";
 import CommonButton from "../../../common/button/CommonButton";
-import { StatusBadge } from "./ActivityCard";
 import PaymentRefundDialog from "./PaymentRefundDialog";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import RescheduleAppointments from "../RescheduleAppointments";
@@ -34,14 +33,13 @@ const formatDate = (dateStr) =>
     : dateStr;
 
 const formatAmount = (amount) =>
-  amount != null
-    ? `₹${Number(amount).toLocaleString("en-IN")}`
-    : null;
+  amount != null ? `₹${Number(amount).toLocaleString("en-IN")}` : null;
 
 const getActivityDisplayData = (data) => {
   if (!data) return null;
   const type = data.type?.toLowerCase();
   const isStay = data.type === "StayBooking";
+  const isOPD = data.type === "OPD";
 
   return {
     id: data.bookingId || data.id || "N/A",
@@ -61,36 +59,59 @@ const getActivityDisplayData = (data) => {
     image: data.images || null,
     doctorName: data.doctorName || null,
     department: data.department || null,
+    userName: data.userName || data.patientName || data.createdByName || null,
     isStay,
+    isOPD,
   };
 };
 
 const TYPE_STYLES = {
-  therapy: { bg: "bg-emerald-100 text-emerald-600", icon: <SpaIcon sx={{ fontSize: 18 }} /> },
-  order: { bg: "bg-amber-100 text-amber-600", icon: <ShippingIcon sx={{ fontSize: 18 }} /> },
-  stay: { bg: "bg-green-100 text-green-600", icon: <BookingIcon sx={{ fontSize: 18 }} /> },
-  staybooking: { bg: "bg-teal-100 text-teal-600", icon: <StayIcon sx={{ fontSize: 18 }} /> },
+  therapy: {
+    bg: "bg-green-50",
+    icon: <SpaIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  },
+  order: {
+    bg: "bg-green-50",
+    icon: <ShippingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  },
+  stay: {
+    bg: "bg-green-50",
+    icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  },
+  staybooking: {
+    bg: "bg-green-50",
+    icon: <StayIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  },
 };
 
 const SHIP_STEPS = ["Packed", "Picked", "In Transit", "Delivered"];
 
 const Field = ({ label, children, className = "" }) => (
-  <div className={`p-2.5 bg-gray-50 rounded-lg ${className}`}>
-    <p className="text-[10px] font-semibold text-gray-400 mb-0.5">{label}</p>
+  <div
+    className={`p-2 2xl:p-3 bg-green-50/50 rounded-[10px] 2xl:rounded-[12px] border border-green-100 shadow-[0_2px_8px_rgba(21,128,61,0.03)] ${className}`}
+  >
+    <p className="text-[8px] 2xl:text-[9px] font-bold text-green-800/60 uppercase tracking-[0.15em] mb-0.5 2xl:mb-1">
+      {label}
+    </p>
     {children}
   </div>
 );
 
-const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => {
+const ActivityDetailsDrawer = ({
+  item,
+  open,
+  onClose,
+  onRescheduleSuccess,
+}) => {
   const [refundDialogOpen, setRefundDialogOpen] = React.useState(false);
   const [rescheduleOpen, setRescheduleOpen] = React.useState(false);
 
   if (!item) return null;
   const d = getActivityDisplayData(item);
-  const typeStyle = TYPE_STYLES[d.type] || { bg: "bg-amber-100 text-ayuBrown", icon: <BookingIcon sx={{ fontSize: 18 }} /> };
-
-
-  console.log("item", item);
+  const typeStyle = TYPE_STYLES[d.type] || {
+    bg: "bg-green-50",
+    icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  };
 
   return (
     <Drawer
@@ -98,84 +119,145 @@ const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => 
       open={open}
       onClose={onClose}
       PaperProps={{
-        sx: { width: "100%", maxWidth: { xs: "100%", sm: 360 } },
+        sx: {
+          width: "100%",
+          maxWidth: { xs: "100%", sm: 380 },
+          backgroundColor: "#FDFDFB",
+        },
       }}
     >
-      <div className="flex flex-col h-full bg-white">
-        <div className="flex items-center justify-between px-3 py-2.5 border-b border-gray-100 shrink-0">
-          <p className="text-xs font-black text-gray-900 tracking-wide">Activity Details</p>
+      <div className="flex flex-col h-full bg-[#FDFDFB]">
+        <div className="flex items-center justify-between px-3 2xl:px-5 py-3 2xl:py-4 border-b border-green-100 shrink-0 bg-white shadow-[0_2px_10px_rgba(21,128,61,0.02)]">
+          <p className="text-xs 2xl:text-sm font-bold text-green-800 tracking-wider uppercase font-serif">
+            Activity Details
+          </p>
           <CancelButtonModal onClick={onClose} />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-2.5 space-y-2 no-scrollbar">
+        <div className="flex-1 overflow-y-auto px-3 2xl:px-4 py-3 2xl:py-5 space-y-3 2xl:space-y-4 no-scrollbar">
           {d.image && (
-            <div className="w-full h-64 rounded-lg overflow-hidden">
+            <div className="w-full h-40 2xl:h-56 rounded-xl 2xl:rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(21,128,61,0.08)] border border-green-100">
               <img
                 src={d.image}
                 alt={d.name}
-                className="w-full h-full object-cover object-top "
+                className="w-full h-full object-cover object-top"
               />
             </div>
           )}
 
-          <div className="flex items-center gap-2.5 p-2.5 bg-gray-50 rounded-lg">
-            <div className={`p-2 rounded-lg shrink-0 ${typeStyle.bg}`}>{typeStyle.icon}</div>
-            <div className="min-w-0 flex-1">
-              <p className="text-xs font-black text-gray-900 truncate">{d.name}</p>
-              <p className="text-[9px] font-bold text-gray-400 tracking-wide mt-0.5">
-                {d.department}
-              </p>
+          <div className="flex items-start justify-between gap-2 2xl:gap-3 p-3 2xl:p-4 bg-white border border-green-100 rounded-xl 2xl:rounded-2xl shadow-[0_4px_16px_rgba(21,128,61,0.04)]">
+            <div className="flex items-start gap-2 2xl:gap-3 flex-1 min-w-0">
+              <div
+                className={`p-2 2xl:p-2.5 rounded-[10px] 2xl:rounded-[12px] shrink-0 ${typeStyle.bg} shadow-inner mt-0.5`}
+              >
+                {typeStyle.icon}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-[8px] 2xl:text-[10px] font-bold text-green-800/60 uppercase tracking-[0.1em] mb-px 2xl:mb-0.5">
+                  {d.isOPD
+                    ? "Consultation For"
+                    : d.isStay
+                      ? "Stay Booking"
+                      : "Activity"}
+                </p>
+                <p className="text-[12px] 2xl:text-[14px] font-bold text-green-800 tracking-wide leading-snug break-words">
+                  {d.userName || d.name}
+                </p>
+                <p className="text-[9px] 2xl:text-[11px] font-medium text-green-800/60 tracking-widest uppercase mt-0.5 2xl:mt-1">
+                  {d.department || d.expert}
+                </p>
+              </div>
             </div>
-            <StatusBadge status={d.status} />
+            {d.status && (
+              <div className="flex flex-col items-end shrink-0">
+                <span className="text-[8px] 2xl:text-[9px] font-bold text-green-800/60 uppercase tracking-widest mb-1 2xl:mb-1.5">
+                  Status
+                </span>
+                <div className="bg-lime-50 border border-lime-200 px-2 2xl:px-2.5 py-1 2xl:py-1.5 rounded-full flex items-center gap-1 2xl:gap-1.5 shadow-sm">
+                  <span className="w-1 h-1 2xl:w-1.5 2xl:h-1.5 rounded-full bg-lime-500"></span>
+                  <span className="text-[9px] 2xl:text-[10px] font-bold text-lime-600 uppercase tracking-wider">
+                    {d.status}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 gap-2 2xl:gap-3">
             <Field label="Date">
-              <p className="text-xs font-bold text-gray-800">{d.date}</p>
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
+                {d.date}
+              </p>
             </Field>
             <Field label="Amount">
-              <p className="text-xs font-bold text-gray-800">{d.amount ?? "—"}</p>
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
+                {d.amount ?? "—"}
+              </p>
             </Field>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <Field label="Check-in Time">
-              <p className="text-xs font-bold text-gray-800">{d.time || "—"}</p>
+          <div className="grid grid-cols-2 gap-2 2xl:gap-3">
+            <Field
+              label={
+                d.isStay
+                  ? "Check-in Time"
+                  : d.isOPD
+                    ? "Appointment Time"
+                    : "Time"
+              }
+            >
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
+                {d.time || "—"}
+              </p>
             </Field>
-            <Field label="Check-out Time">
-              <p className="text-xs font-bold text-gray-800">{d.endTime || "—"}</p>
+            <Field
+              label={
+                d.isStay ? "Check-out Time" : d.isOPD ? "End Time" : "End Time"
+              }
+            >
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
+                {d.endTime || "—"}
+              </p>
             </Field>
           </div>
 
-          {(d.doctorName || d.department || d.expert) && (
-            <Field label={d.isStay ? "Room Type" : "Details"} className="col-span-2">
-              <p className="text-xs font-bold text-gray-700">
-                {d.doctorName || d.department || d.expert}
+          {d.doctorName && (
+            <Field label="Consulting Doctor" className="col-span-2">
+              <p className="text-[12px] 2xl:text-[14px] font-bold text-green-800 tracking-wide leading-relaxed">
+                Dr. {d.doctorName}
+              </p>
+            </Field>
+          )}
+
+          {d.isStay && d.expert && (
+            <Field label="Room Type" className="col-span-2">
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide leading-relaxed">
+                {d.expert}
               </p>
             </Field>
           )}
 
           {d.prep && (
-            <div className="p-2.5 bg-[#f0fdf4] border border-[#dcfce7] rounded-lg">
-              <p className="text-[9px] font-black text-[#4a7c2c] uppercase tracking-widest mb-1">
+            <div className="p-2.5 2xl:p-3.5 bg-green-50/50 border border-green-100 rounded-xl 2xl:rounded-2xl shadow-[0_2px_8px_rgba(21,128,61,0.02)]">
+              <p className="text-[8px] 2xl:text-[9px] font-bold text-green-800 uppercase tracking-[0.15em] mb-1 2xl:mb-1.5">
                 Prep Note
               </p>
-              <p className="text-[10px] font-medium text-green-900 leading-relaxed">
+              <p className="text-[10px] 2xl:text-[12px] font-medium text-green-800/80 leading-relaxed italic">
                 "{d.prep}"
               </p>
             </div>
           )}
 
           {d.type === "order" && (
-            <div className="p-2.5 bg-gray-50 rounded-lg">
-              <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2.5">
+            <div className="p-2.5 2xl:p-3.5 bg-white border border-green-100 rounded-xl 2xl:rounded-2xl shadow-[0_4px_16px_rgba(21,128,61,0.04)]">
+              <p className="text-[8px] 2xl:text-[9px] font-bold text-green-800/60 uppercase tracking-[0.15em] mb-2 2xl:mb-3">
                 Shipping Progress
               </p>
               <Stepper activeStep={d.step} alternativeLabel>
                 {SHIP_STEPS.map((label) => (
                   <Step key={label}>
                     <StepLabel>
-                      <span className="text-[8px] font-black uppercase text-gray-500">
+                      <span className="text-[8px] 2xl:text-[9px] font-bold uppercase text-green-800/70 tracking-wider">
                         {label}
                       </span>
                     </StepLabel>
@@ -186,18 +268,18 @@ const ActivityDetailsDrawer = ({ item, open, onClose, onRescheduleSuccess }) => 
           )}
         </div>
 
-        <div className="flex gap-2 px-3 py-2.5 border-t border-gray-100 shrink-0">
+        <div className="flex gap-2 2xl:gap-3 px-3 2xl:px-4 py-3 2xl:py-4 border-t border-green-100 bg-white shrink-0 shadow-[0_-4px_16px_rgba(21,128,61,0.02)]">
           <CommonButton
             type="button"
             label="Cancel Booking"
             onClick={() => setRefundDialogOpen(true)}
-            className={`text-xs border border-red-500 text-red-500 ${d.isStay ? "w-full" : "flex-1"}`}
+            className={`text-[10px] 2xl:text-xs border bg-white text-green-700 border-green-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
           />
           {!d.isStay && (
             <CommonButton
               type="button"
               label="Reschedule"
-              className="flex-1 text-xs bg-ayuMid text-white"
+              className="flex-1 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
               onClick={() => setRescheduleOpen(true)}
             />
           )}

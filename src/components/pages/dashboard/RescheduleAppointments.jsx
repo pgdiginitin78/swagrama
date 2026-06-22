@@ -4,6 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Box, Divider, Modal } from "@mui/material";
 import { format } from "date-fns";
+import { motion } from "framer-motion";
 import {
   CalendarMonth as CalendarMonthIcon,
   AccessTime as AccessTimeIcon,
@@ -29,26 +30,50 @@ import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 
 function TimeSlotChip({ slot, isSelected, onSelect }) {
   return (
-    <button
+    <motion.button
+      whileHover={{ y: -1 }}
+      whileTap={{ scale: 0.97 }}
       type="button"
       onClick={onSelect}
-      disabled={!slot.slotStartTime}
+      disabled={!slot.slotStartTime || slot?.count === 0}
       className={`
-        relative px-2 py-1.5 rounded-md font-semibold text-[10px] transition-all duration-200 w-full text-center
-        ${
-          isSelected
-            ? "bg-emerald-600 text-white shadow-sm border border-emerald-600"
-            : "bg-white text-slate-700 hover:bg-emerald-50/50 border border-slate-200"
-        }
-        disabled:opacity-40 disabled:cursor-not-allowed
-      `}
+    relative w-full px-2 py-1.5 rounded-lg text-[10px] font-medium
+    flex items-center justify-between gap-2 border
+    transition-all duration-150
+    ${
+      isSelected
+        ? "bg-emerald-500 border-emerald-500 text-white"
+        : slot?.count === 0
+          ? "bg-slate-100 border-slate-200 text-slate-400"
+          : slot?.count <= 3
+            ? "bg-amber-100 border-amber-300 text-amber-900"
+            : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
+    }
+    disabled:opacity-60 disabled:cursor-not-allowed
+  `}
     >
-      <span className="flex items-center justify-center space-x-1 whitespace-nowrap">
-        <span>{slot.slotStartTime}</span>
-        <span>-</span>
-        <span>{slot.slotEndTime}</span>
+      <span className="whitespace-normal leading-tight text-left">
+        {slot?.slotStartTime} - {slot?.slotEndTime}
       </span>
-    </button>
+
+      <span
+        className={`
+      flex-shrink-0 flex items-center justify-center min-w-[20px] h-5 px-1.5
+      rounded-md text-[9px] font-bold
+      ${
+        isSelected
+          ? "bg-white/20 text-white"
+          : slot?.count === 0
+            ? "bg-red-100 text-red-600"
+            : slot?.count <= 3
+              ? "bg-amber-200 text-amber-900"
+              : "bg-emerald-100 text-emerald-700"
+      }
+    `}
+      >
+        {slot?.count}
+      </span>
+    </motion.button>
   );
 }
 
@@ -104,6 +129,7 @@ export default function RescheduleAppointments({
   const doctorValue = watch("doctorFid");
   const appointmentDate = watch("appointmentDate");
 
+
   useEffect(() => {
     if (!open || !bookingData) return;
 
@@ -157,7 +183,7 @@ export default function RescheduleAppointments({
       });
   }, [open, bookingData, setValue]);
 
-  console.log("bookingData",bookingData)
+  console.log("appointmentDate",appointmentDate)
 
   useEffect(() => {
     if (doctorValue && bookingData) {
@@ -166,9 +192,9 @@ export default function RescheduleAppointments({
       setDoctorSlots([]);
 
       const formattedDate =
-        bookingData.date &&
-        !isNaN(new Date(bookingData.date).getTime())
-          ? format(new Date(bookingData.date), "yyyy-MM-dd")
+        appointmentDate &&
+        !isNaN(new Date(appointmentDate).getTime())
+          ? format(new Date(appointmentDate), "yyyy-MM-dd")
           : "";
       const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
 
@@ -212,12 +238,12 @@ export default function RescheduleAppointments({
           }
 
           if (data.length === 0) {
-            setSlotError("No slots available for this date");
+            setSlotError(res?.data?.message || "");
           }
         })
         .catch((err) => {
           console.error("Error fetching slots:", err);
-          setSlotError("Failed to fetch slots");
+          setSlotError(err?.response?.data?.message || "");
           setDoctorSlots([]);
         })
         .finally(() => setLoadingSlots(false));
@@ -274,7 +300,7 @@ export default function RescheduleAppointments({
     <Modal open={open}>
       <Box
         sx={ModalStyle}
-        className="w-[95%] h-[80%] max-w-2xl rounded-xl bg-white border border-slate-200 shadow-2xl overflow-y-auto no-scrollbar"
+        className="w-[95%] h-[80%] xl:h-[80%] 2xl:h-[60%] max-w-2xl rounded-xl bg-white border shadow-2xl overflow-y-auto no-scrollbar"
       >
         <div className="bg-gradient-to-br from-emerald-800 to-teal-800 px-5 py-4 relative text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -343,6 +369,7 @@ export default function RescheduleAppointments({
                   placeholder="Choose Doctor *"
                   dataArray={doctorOptions}
                   error={errors.doctorFid}
+                  isDisabled={true}
                 />
               </div>
 
@@ -360,7 +387,7 @@ export default function RescheduleAppointments({
 
             {/* Right side: Available Time Slots */}
             <div className="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col min-h-[180px]">
-              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2 flex items-center gap-1.5">
+              <label className="text-[10px] font-black text-slate-400  tracking-widest block mb-2 flex items-center gap-1.5">
                 <AccessTimeIcon
                   sx={{ fontSize: 13 }}
                   className="text-slate-500"
@@ -391,7 +418,7 @@ export default function RescheduleAppointments({
                     </p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-2 max-h-[110px] overflow-y-auto pr-1 no-scrollbar">
+                  <div className="grid grid-cols-2 gap-2 max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
                     {doctorSlots.map((slot, index) => (
                       <div key={index} className="w-full">
                         <TimeSlotChip

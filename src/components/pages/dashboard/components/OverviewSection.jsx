@@ -19,7 +19,7 @@ const OverviewSection = ({
   setSelectedItem,
 }) => {
   const activities = [...upcomingActivities];
-
+console.log("activities",activities)
   return (
     <motion.div
       initial={{ opacity: 0 }}

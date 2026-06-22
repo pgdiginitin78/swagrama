@@ -5,7 +5,8 @@ import {
   LocalShipping as ShippingIcon,
 } from "@mui/icons-material";
 import TherapyIcon from "../../../../assets/TherapyIcon.svg";
-import DoctorIcon from "../../../../assets/doctorIcon.svg";
+import MaleIcon from "../../../../assets/3d_male_avatar.png";
+import FemaleIcon from "../../../../assets/3d_female_avatar.png";
 import BedRoomIcon from "../../../assets/bedRoomIcon.svg";
 
 export const StatusBadge = ({ status }) => {
@@ -61,7 +62,8 @@ const getActivityDisplayData = (data) => {
     prep: data.prep,
     step: data.step,
     userName: data.userName,
-    department:data.department
+    department: data.department,
+    gender: data.gender || data.userGender || "male",
   };
 };
 
@@ -80,14 +82,14 @@ const ActivityCard = ({ data, onClick }) => {
     >
       <div className="flex items-start justify-between gap-2 mb-3">
         <div
-          className={`p-2.5 rounded-lg shrink-0 ${
+          className={`p-2.5 rounded-lg shrink-0 flex items-center justify-center overflow-hidden ${
             displayData.type?.includes("therapy")
               ? "bg-emerald-50 text-emerald-600"
               : displayData.type === "order"
                 ? "bg-amber-50 text-amber-600"
                 : displayData.type === "stay"
                   ? "bg-purple-50 text-green-600"
-                  : "bg-blue-50 text-blue-600"
+                  : "bg-blue-50/50"
           }`}
         >
           {displayData.type?.includes("therapy") ? (
@@ -97,7 +99,13 @@ const ActivityCard = ({ data, onClick }) => {
           ) : displayData.type === "stay" ? (
             <img src={BedRoomIcon} alt="" className="w-6 h-6" />
           ) : (
-            <img src={DoctorIcon} alt="Expert" className="w-6 h-6" />
+            <motion.img 
+              src={displayData.gender?.toLowerCase() === "female" ? FemaleIcon : MaleIcon} 
+              alt="User" 
+              className="w-8 h-8 object-cover rounded-full shadow-sm" 
+              animate={{ y: [-2, 2, -2] }}
+              transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+            />
           )}
         </div>
         <StatusBadge status={displayData.status} />

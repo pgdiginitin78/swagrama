@@ -143,10 +143,10 @@ console.log("formattedAmount",formattedAmount,bookingData);
             </div>
             <div>
               <p className="text-[0.95rem] sm:text-base font-bold text-slate-900 leading-tight">
-                Payment Refund
+               Cancel Booking
               </p>
               <p className="text-[0.7rem] text-slate-400 font-medium mt-0.5">
-                Review &amp; submit refund request
+                Review &amp; submit cancel request
               </p>
             </div>
           </div>
@@ -230,7 +230,7 @@ console.log("formattedAmount",formattedAmount,bookingData);
             onClick={handleConfirm}
             className="w-full sm:flex-1 rounded py-3 text-sm font-bold text-white bg-green-500 hover:bg-green-600 active:scale-[0.98] transition-all shadow-[0_4px_14px_rgba(37,99,235,0.35)] hover:shadow-[0_6px_18px_rgba(37,99,235,0.4)]"
           >
-            Request Refund
+            Cancel Booking
           </button>
         </div>
       </div>

@@ -187,6 +187,8 @@ function StayBookingModal({
   const patientFid = watch("patientFid");
   const formValues = watch();
 
+  console.log("formValues", formValues);
+
   useEffect(() => {
     setRoomStatus(null);
   }, [
@@ -277,6 +279,9 @@ function StayBookingModal({
         childrenSurcharge: 0,
         total: 0,
         days: 0,
+        petPct: 0,
+        kid0to5Pct: 0,
+        kid6to12Pct: 0,
       };
 
     const dailyBase = Number(selectedService.price) || 0;
@@ -284,16 +289,11 @@ function StayBookingModal({
       checkIn && checkOut ? differenceInCalendarDays(checkOut, checkIn) : 1;
     const effectiveDays = days > 0 ? days : 1;
 
-    const noOfAdults = Number(formValues?.noOfAdults) || 1;
-    const isTwinSharing = formValues?.twinSharing;
+    const noOfAdults = parseInt(formValues?.noOfAdults, 10) || 1;
+    const isTwinSharing = Boolean(formValues?.twinSharing);
 
-    let baseAdultsToCharge = Math.min(2, noOfAdults);
-    let singleOccupancySurcharge = 0;
-
-    if (noOfAdults === 1 && !isTwinSharing) {
-      baseAdultsToCharge = 1;
-      singleOccupancySurcharge = dailyBase * 0.75 * effectiveDays;
-    } else if (isTwinSharing && noOfAdults === 1) {
+    let baseAdultsToCharge = 2;
+    if (isTwinSharing && noOfAdults === 1) {
       baseAdultsToCharge = 1;
     }
 
@@ -320,12 +320,12 @@ function StayBookingModal({
     }
 
     let adultSurcharge = 0;
-    if (Number(formValues?.noOfAdults) === 3) {
+    if (!isTwinSharing) {
       adultSurcharge = dailyBase * 0.75 * effectiveDays;
     }
 
-    const children0to5Count = Number(formValues?.noOfChildren0to5) || 0;
-    const children6to12Count = Number(formValues?.noOfChildren6to12) || 0;
+    const children0to5Count = parseInt(formValues?.noOfChildren0to5, 10) || 0;
+    const children6to12Count = parseInt(formValues?.noOfChildren6to12, 10) || 0;
 
     const childrenSurcharge =
       (children0to5Count * dailyBase * (kid0to5Pct / 100) +
@@ -333,7 +333,7 @@ function StayBookingModal({
       effectiveDays;
 
     const totalWithoutTaxes =
-      stayTotal + wellness + petSurcharge + adultSurcharge + childrenSurcharge + singleOccupancySurcharge;
+      stayTotal + wellness + petSurcharge + adultSurcharge + childrenSurcharge;
     const taxes = totalWithoutTaxes * 0;
 
     return {
@@ -342,7 +342,6 @@ function StayBookingModal({
       taxes: taxes,
       petSurcharge: petSurcharge,
       adultSurcharge: adultSurcharge,
-      singleOccupancySurcharge: singleOccupancySurcharge,
       childrenSurcharge: childrenSurcharge,
       total: totalWithoutTaxes + taxes,
       days: effectiveDays,
@@ -443,7 +442,6 @@ function StayBookingModal({
               booked ? "cursor-not-allowed" : "",
               isDisabled && !booked ? "cursor-default pointer-events-none" : "",
               !booked ? "cursor-pointer" : "",
-
               !booked && inRange && isCurrentMonth
                 ? "bg-booking-primaryLight/50"
                 : "",
@@ -456,7 +454,6 @@ function StayBookingModal({
               !booked
                 ? "rounded-r-full"
                 : "",
-
               booked && isCurrentMonth ? "bg-rose-50" : "",
               bookedStart ? "rounded-l-full" : "",
               bookedEnd ? "rounded-r-full" : "",
@@ -471,21 +468,16 @@ function StayBookingModal({
             <div
               className={[
                 "relative z-10 w-7 h-7 md:w-9 md:h-9 flex items-center justify-center rounded-full text-[12px] md:text-[13px] font-medium transition-all",
-
                 selected && isCurrentMonth && !booked
                   ? "bg-booking-primary text-white font-semibold shadow-sm"
                   : "",
-
                 isToday && !booked && !selected
                   ? "ring-1 ring-booking-primary text-booking-primary font-semibold"
                   : "",
-
                 !booked && !selected && !isDisabled && isCurrentMonth
                   ? "hover:bg-gray-100 text-gray-700"
                   : "",
-
                 booked && isCurrentMonth ? "bg-rose-100 text-rose-300" : "",
-
                 isPast && !booked ? "text-gray-300" : "",
               ]
                 .filter(Boolean)
@@ -586,7 +578,9 @@ function StayBookingModal({
       emailId: formValues?.email || "",
       mobile: String(formValues?.mobile || ""),
       city: formValues?.city || "",
+      sameGender: formValues?.sameGenderRules || false,
     };
+    console.log("saveObj", formValues, saveObj);
 
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
@@ -598,7 +592,6 @@ function StayBookingModal({
       setIsLoading(true);
       const bookingRes = await wellnessStayBooking(finalSaveObj);
       const bookingData = bookingRes?.data;
-      console.log("bookingData", bookingData);
 
       if (bookingData?.message) {
         const bookingId = bookingData?.data;
@@ -736,7 +729,44 @@ function StayBookingModal({
     }
   }, [selectedService]);
 
-  console.log("selectedRoomDetails", selectedRoomDetails);
+  const currentAdults = parseInt(formValues?.noOfAdults, 10) || 1;
+  const currentTwinSharing = Boolean(formValues?.twinSharing);
+  const showSurcharge =
+    costs.adultSurcharge > 0 && currentAdults === 1 && !currentTwinSharing;
+
+  const breakdownItems = [
+    {
+      label: `Stay (${costs.days} Day${costs.days > 1 ? "s" : ""})`,
+      value: costs.stay,
+      show: true,
+    },
+    {
+      label: "Taxes & Service",
+      value: Math.round(costs.taxes),
+      show: true,
+    },
+    {
+      label: `Pet Charges (${costs.petPct}%)`,
+      value: Math.round(costs.petSurcharge),
+      show: costs.petSurcharge > 0,
+    },
+    {
+      label: "Children Surcharge",
+      value: Math.round(costs.childrenSurcharge),
+      show: costs.childrenSurcharge > 0,
+    },
+    {
+      label: "Extra Person Surcharge (75%)",
+      value:
+        currentAdults === 1
+          ? 0
+          : currentAdults > 2
+            ? Math.round(costs.adultSurcharge)
+            : 0,
+      show: showSurcharge,
+    },
+  ].filter((item) => item.show);
+
   return (
     <>
       <Modal
@@ -746,7 +776,7 @@ function StayBookingModal({
       >
         <Box
           sx={ModalStyle}
-          className="w-[98%] sm:w-[95%] md:w-[90%] lg:w-[80%] xl:w-[65%] max-h-[95dvh] overflow-hidden rounded-xl bg-booking-bg p-0 flex flex-col no-scrollbar"
+          className="w-[98%]  md:w-[90%] lg:w-[80%] xl:w-[65%] 2xl:w-[45%] max-h-[95dvh] overflow-hidden rounded-xl bg-booking-bg p-0 flex flex-col no-scrollbar"
         >
           <div className="sticky top-0 z-30 bg-white flex items-center justify-between px-3 py-2 border-b border-booking-border shadow-sm">
             <h1 className="text-booking-primaryDark  text-lg md:text-2xl font-bold leading-tight">
@@ -1548,6 +1578,17 @@ function StayBookingModal({
                       <CommonButton
                         type="button"
                         onClick={() => {
+                          setValue("noOfAdults", guests.adults);
+                          let children0to5 = 0;
+                          let children6to12 = 0;
+                          guests.childrenAges.forEach((age) => {
+                            if (age !== "" && age >= 0 && age <= 5)
+                              children0to5++;
+                            else if (age !== "" && age >= 6 && age <= 12)
+                              children6to12++;
+                          });
+                          setValue("noOfChildren0to5", children0to5);
+                          setValue("noOfChildren6to12", children6to12);
                           setGuestsAnchorEl(null);
                         }}
                         className="bg-booking-primary text-white"
@@ -1699,7 +1740,7 @@ function StayBookingModal({
                       </div>
                     )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div className="">
                       <InputField
                         control={control}
@@ -1746,6 +1787,7 @@ function StayBookingModal({
                       variant="outlined"
                       type="number"
                       inputProps={{ min: 1, max: 3 }}
+                      disabled={!formValues?.twinSharing}
                     />
                     <div className="flex items-center justify-between p-2 border rounded-[9px] bg-white hover:border-booking-primary transition-colors">
                       <div className="flex flex-col">
@@ -1760,7 +1802,8 @@ function StayBookingModal({
                         <button
                           type="button"
                           disabled={
-                            (Number(formValues?.noOfChildren0to5) || 0) <= 0
+                            (Number(formValues?.noOfChildren0to5) || 0) <= 0 ||
+                            !formValues?.twinSharing
                           }
                           onClick={() =>
                             setValue(
@@ -1781,9 +1824,11 @@ function StayBookingModal({
                         <button
                           type="button"
                           disabled={
+                            !formValues?.twinSharing ||
                             (Number(formValues?.noOfChildren0to5) || 0) +
                               (Number(formValues?.noOfChildren6to12) || 0) >=
-                              2 || (Number(formValues?.noOfAdults) || 0) >= 3
+                              2 ||
+                            (Number(formValues?.noOfAdults) || 0) >= 3
                           }
                           onClick={() =>
                             setValue(
@@ -1811,7 +1856,8 @@ function StayBookingModal({
                         <button
                           type="button"
                           disabled={
-                            (Number(formValues?.noOfChildren6to12) || 0) <= 0
+                            (Number(formValues?.noOfChildren6to12) || 0) <= 0 ||
+                            !formValues?.twinSharing
                           }
                           onClick={() =>
                             setValue(
@@ -1833,9 +1879,11 @@ function StayBookingModal({
                         <button
                           type="button"
                           disabled={
+                            !formValues?.twinSharing ||
                             (Number(formValues?.noOfChildren0to5) || 0) +
                               (Number(formValues?.noOfChildren6to12) || 0) >=
-                              2 || (Number(formValues?.noOfAdults) || 0) >= 3
+                              2 ||
+                            (Number(formValues?.noOfAdults) || 0) >= 3
                           }
                           onClick={() =>
                             setValue(
@@ -1918,53 +1966,12 @@ function StayBookingModal({
                 </div>
 
                 <div className="pt-2 border-t border-booking-primary/5 flex flex-col gap-1.5">
-                  {[
-                    {
-                      label: `Stay (${costs.days} Day${costs.days > 1 ? "s" : ""})`,
-                      value: costs.stay,
-                    },
-                    {
-                      label: "Taxes & Service",
-                      value: Math.round(costs.taxes),
-                    },
-                    ...(costs.petSurcharge > 0
-                      ? [
-                          {
-                            label: `Pet Charges (${costs.petPct}%)`,
-                            value: Math.round(costs.petSurcharge),
-                          },
-                        ]
-                      : []),
-                    ...(costs.childrenSurcharge > 0
-                      ? [
-                          {
-                            label: `Children Surcharge`,
-                            value: Math.round(costs.childrenSurcharge),
-                          },
-                        ]
-                      : []),
-                    ...(costs.adultSurcharge > 0
-                      ? [
-                          {
-                            label: "Extra Adult (75%)",
-                            value: Math.round(costs.adultSurcharge),
-                          },
-                        ]
-                      : []),
-                    ...(costs.singleOccupancySurcharge > 0
-                      ? [
-                          {
-                            label: "Single Occupancy (75%)",
-                            value: Math.round(costs.singleOccupancySurcharge),
-                          },
-                        ]
-                      : []),
-                  ].map(({ label, value }) => (
+                  {breakdownItems.map(({ label, value }) => (
                     <div
                       key={label}
                       className="flex justify-between items-center"
                     >
-                      <span className="text-gray-500 font-semibold  text-[10px] tracking-wider">
+                      <span className="text-gray-500 font-semibold text-[10px] tracking-wider">
                         {label}
                       </span>
                       <span className="text-booking-primaryDark font-semibold text-sm">
@@ -1990,7 +1997,7 @@ function StayBookingModal({
 
                 <div className="flex flex-col pt-2 border-t border-dashed border-booking-primary/20">
                   <span
-                    className="text-[11px] text-booking-primaryDark font-semibold cursor-pointer hover:underline mb-2 inline-block"
+                    className="text-[11px] text-blue-600 font-semibold cursor-pointer underline mb-2 inline-block"
                     onClick={() => {
                       setTempTermsAccepted(termsAccepted);
                       setOpenTermsModal(true);
@@ -2059,18 +2066,18 @@ function StayBookingModal({
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "90%",
-            maxWidth: 500,
+            width: "95%",
+            maxWidth: 600,
             bgcolor: "background.paper",
             borderRadius: 2,
             boxShadow: 24,
-            p: 4,
+            p: 3,
           }}
         >
           <Typography
             variant="h6"
             component="h2"
-            mb={2}
+            mb={1}
             fontWeight="bold"
             color="primary"
           >
@@ -2079,15 +2086,15 @@ function StayBookingModal({
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
-                <p className="text-[10px] text-gray-600 leading-snug">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[14px] xl:text-[15px] text-gray-600 leading-snug">
                   You can cancel your booking up to 24 hours before check-in.
                 </p>
               </div>
 
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
-                <p className="text-[10px] text-gray-600 leading-snug">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[14px] xl:text-[15px] text-gray-600 leading-snug">
                   <span className="font-semibold text-booking-primaryDark">
                     25% of the booking amount
                   </span>{" "}
@@ -2096,8 +2103,8 @@ function StayBookingModal({
               </div>
 
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
-                <p className="text-[10px] text-gray-600 leading-snug">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[14px] xl:text-[15px] text-gray-600 leading-snug">
                   <span className="font-semibold text-booking-primaryDark">
                     No refund
                   </span>{" "}
@@ -2107,8 +2114,8 @@ function StayBookingModal({
               </div>
 
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
-                <p className="text-[10px] text-gray-600 leading-snug">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[14px] xl:text-[15px] text-gray-600 leading-snug">
                   <span className="font-semibold text-booking-primaryDark">
                     No refund
                   </span>{" "}
@@ -2118,8 +2125,8 @@ function StayBookingModal({
               </div>
 
               <div className="flex items-start gap-2">
-                <span className="mt-1 h-1 w-1 rounded-full bg-booking-primaryDark flex-shrink-0" />
-                <p className="text-[10px] text-gray-600 leading-snug">
+                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-booking-primaryDark flex-shrink-0" />
+                <p className="text-[14px] xl:text-[15px] text-gray-600 leading-snug">
                   Date changes are subject to room availability.
                 </p>
               </div>
@@ -2213,16 +2220,12 @@ const SunIcon = () => (
     strokeLinejoin="round"
   >
     <circle cx="12" cy="12" r="4" />
-
     <path d="M12 2V4" />
     <path d="M12 20V22" />
-
     <path d="M4.93 4.93L6.34 6.34" />
     <path d="M17.66 17.66L19.07 19.07" />
-
     <path d="M2 12H4" />
     <path d="M20 12H22" />
-
     <path d="M4.93 19.07L6.34 17.66" />
     <path d="M17.66 6.34L19.07 4.93" />
   </svg>

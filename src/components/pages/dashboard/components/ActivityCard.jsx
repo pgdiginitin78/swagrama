@@ -29,12 +29,16 @@ export const StatusBadge = ({ status }) => {
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
-  if (timeStr.includes(":") && timeStr.split(":").length >= 2) {
-    const [hours, minutes] = timeStr.split(":");
-    let h = parseInt(hours);
+
+  const cleanTimeStr = timeStr.replace(/\s*(AM|PM|am|pm)\s*/g, "");
+
+  if (cleanTimeStr.includes(":") && cleanTimeStr.split(":").length >= 2) {
+    const [hours, minutes] = cleanTimeStr.split(":");
+    let h = parseInt(hours, 10);
     const ampm = h >= 12 ? "PM" : "AM";
     h = h % 12 || 12;
-    return `${h}:${minutes} ${ampm}`;
+    const m = minutes.substring(0, 2);
+    return `${h}:${m} ${ampm}`;
   }
   return timeStr;
 };
@@ -70,7 +74,7 @@ const getActivityDisplayData = (data) => {
 const ActivityCard = ({ data, onClick }) => {
   const displayData = getActivityDisplayData(data);
 
-  console.log(displayData, data,"displayData12233");
+  console.log(displayData, data, "displayData12233");
 
   return (
     <motion.div
@@ -99,10 +103,14 @@ const ActivityCard = ({ data, onClick }) => {
           ) : displayData.type === "stay" ? (
             <img src={BedRoomIcon} alt="" className="w-6 h-6" />
           ) : (
-            <motion.img 
-              src={displayData.gender?.toLowerCase() === "female" ? FemaleIcon : MaleIcon} 
-              alt="User" 
-              className="w-8 h-8 object-cover rounded-full shadow-sm" 
+            <motion.img
+              src={
+                displayData.gender?.toLowerCase() === "female"
+                  ? FemaleIcon
+                  : MaleIcon
+              }
+              alt="User"
+              className="w-8 h-8 object-cover rounded-full shadow-sm"
               animate={{ y: [-2, 2, -2] }}
               transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
             />
@@ -123,9 +131,7 @@ const ActivityCard = ({ data, onClick }) => {
       <div className="flex items-center justify-between pt-3 border-t border-gray-50 gap-2">
         <div className="flex items-center gap-1.5 text-gray-500 min-w-0">
           <TimeIcon sx={{ fontSize: 12, color: "#4a7c2c", flexShrink: 0 }} />
-          <span className="text-[10px] font-semibold">
-            {displayData.date}
-          </span>
+          <span className="text-[10px] font-semibold">{displayData.date}</span>
         </div>
         <span className="text-[10px] font-bold text-gray-400 shrink-0">
           {displayData.time}

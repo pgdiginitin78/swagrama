@@ -320,6 +320,9 @@ function StayBookingModal({
     }
 
     let adultSurcharge = 0;
+    if (noOfAdults === 3) {
+      adultSurcharge = dailyBase * 0.75 * effectiveDays;
+    }
 
     const children0to5Count = parseInt(formValues?.noOfChildren0to5, 10) || 0;
     const children6to12Count = parseInt(formValues?.noOfChildren6to12, 10) || 0;
@@ -744,6 +747,11 @@ function StayBookingModal({
       label: `Pet Charges (${costs.petPct}%)`,
       value: Math.round(costs.petSurcharge),
       show: costs.petSurcharge > 0,
+    },
+    {
+      label: "Extra Adult Surcharge (75%)",
+      value: Math.round(costs.adultSurcharge),
+      show: costs.adultSurcharge > 0,
     },
     {
       label: "Children Surcharge",

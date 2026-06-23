@@ -6,6 +6,8 @@ import { Filter, Leaf, Menu, Search, ShoppingCart, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, updateQuantity } from "../../redux/CartSlice";
+import ProductDetailsModal from "./ProductDetailsModal";
+import BathPowder from "./productImages/Bath Powder.png";
 
 const getAllProducts = () => {
   const allProducts = [];
@@ -126,7 +128,7 @@ const ProductCardSkeleton = ({ index }) => {
   );
 };
 
-const LazyProductCard = ({ product, index }) => {
+const LazyProductCard = ({ product, index, onOpenModal }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const cardRef = useRef(null);
@@ -164,7 +166,11 @@ const LazyProductCard = ({ product, index }) => {
   return (
     <div ref={cardRef}>
       {isVisible && isLoaded ? (
-        <ProductCard product={product} index={index} />
+        <ProductCard
+          product={product}
+          index={index}
+          onOpenModal={onOpenModal}
+        />
       ) : (
         <ProductCardSkeleton index={index} />
       )}
@@ -172,7 +178,7 @@ const LazyProductCard = ({ product, index }) => {
   );
 };
 
-const ProductCard = ({ product, index }) => {
+const ProductCard = ({ product, index, onOpenModal }) => {
   const dispatch = useDispatch();
   const cartItems = useSelector((state) => state.cart.items);
   const cartItem = cartItems.find((item) => item.id === product.id);
@@ -184,121 +190,56 @@ const ProductCard = ({ product, index }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="group relative border bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-500 h-full flex flex-col"
+      className="group relative bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden border border-green-100 shadow-md hover:shadow-xl transition-all duration-500 flex flex-col"
     >
-      <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-lime-200/30 to-green-300/30 rounded-bl-full -z-0" />
+      <div className="w-full aspect-square overflow-hidden relative flex-shrink-0 bg-green-50">
+        {product?.image && (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.target.style.display = "none";
+              e.target.nextSibling.style.display = "flex";
+            }}
+          />
+        )}
 
-      <div className="relative p-3 flex flex-col h-full">
-        <div className="flex items-start justify-between mb-2">
-          <div className="bg-gradient-to-r from-green-600 to-lime-600 text-white px-2 py-1 rounded-full text-[11px] font-semibold w-auto">
-            {product.category}
-          </div>
-          <Leaf className="w-4 h-4 text-green-600 opacity-60" />
+        <div
+          className="w-full h-full items-center justify-center"
+          style={{ display: product?.image ? "none" : "flex" }}
+        >
+          <Leaf className="w-10 h-10 text-green-300 opacity-50" />
         </div>
 
+        <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
+          <Leaf className="w-3.5 h-3.5 text-green-600" />
+        </div>
+      </div>
+
+      <div className="px-3 pt-2 pb-0 flex flex-col flex-1">
         <motion.h3
-          className="text-sm sm:text-base font-bold text-green-900 mb-1 sm:mb-2 line-clamp-2 min-h-[2.5rem]"
+          className="text-sm font-bold 2xl:text-[12px] text-green-900 mb-2 line-clamp-2 "
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           {product.name}
         </motion.h3>
+      </div>
 
-        <p className="text-[11px] text-green-700 mb-2 italic line-clamp-1 min-h-[1.2rem]">
-          {product.tagline}
-        </p>
-
-        <div className="space-y-1 mb-2">
-          <div className="flex items-center text-[10px] text-green-800">
-            <span className="font-semibold mr-1 whitespace-nowrap">
-              Package :
-            </span>
-            <span className="text-green-600 truncate">{product.package}</span>
-          </div>
-          <div className="flex items-start text-[10px] text-green-800 min-h-[2.8em]">
-            <span className="font-semibold mr-1 whitespace-nowrap">
-              Ingredients :
-            </span>
-            <span className="text-green-600 line-clamp-2">
-              {product.ingredients}
-            </span>
-          </div>
-        </div>
-
-        <div className="border-t border-green-200 py-1.5 mt-auto">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-bold text-green-900">
-                <span className="text-[10px] text-green-600">Price</span> ₹
-                {product.value}
-              </p>
-            </div>
-
-            {cartItem ? (
-              <div className="flex items-center gap-1.5">
-                <button
-                  onClick={() =>
-                    dispatch(
-                      updateQuantity({
-                        id: product.id,
-                        quantity: cartItem.quantity - 1,
-                      }),
-                    )
-                  }
-                  className="bg-red-500 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold hover:bg-red-600 transition-colors text-sm"
-                >
-                  <RemoveSharp />
-                </button>
-
-                <span className="font-bold text-green-900 min-w-[1.5rem] text-center text-sm">
-                  {cartItem.quantity}
-                </span>
-
-                <button
-                  onClick={() =>
-                    dispatch(
-                      updateQuantity({
-                        id: product.id,
-                        quantity: cartItem.quantity + 1,
-                      }),
-                    )
-                  }
-                  className="bg-green-600 text-white w-7 h-7 rounded-full flex items-center justify-center font-bold hover:bg-green-700 transition-colors text-sm"
-                >
-                  <AddSharp />
-                </button>
-              </div>
-            ) : (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => dispatch(addToCart(product))}
-                className="bg-gradient-to-r from-green-600 to-lime-600 text-white px-3 py-1.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1.5 text-xs"
-              >
-                <ShoppingCart className="w-3 h-3" />
-                Add
-              </motion.button>
-            )}
-          </div>
-        </div>
-
-        <div className="border-t border-green-200 pt-2 min-h-[3.5rem]">
-          <p className="text-[10px] font-semibold text-green-800 mb-1">
-            Key Benefits :
-          </p>
-
-          <ul className="list-none">
-            {product.benefits.slice(0, 2).map((benefit, i) => (
-              <li
-                key={i}
-                className="text-[10px] text-green-700 flex space-x-2 items-center m-0"
-              >
-                <span className="line-clamp-1">{benefit}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="border-t border-green-200 px-3 py-2 flex justify-end">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenModal(product);
+          }}
+          className="bg-gradient-to-r from-green-600 to-lime-600 text-white px-3 py-1.5 rounded font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-xs"
+        >
+          Read More
+        </motion.button>
       </div>
     </motion.div>
   );
@@ -312,6 +253,19 @@ const EShop = () => {
   const [sortBy, setSortBy] = useState("name");
   const [isDesktop, setIsDesktop] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = (product) => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setTimeout(() => setSelectedProduct(null), 300); // clear after animation
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -389,7 +343,7 @@ const EShop = () => {
   }, [allProducts, searchQuery, selectedCategory, priceRange, sortBy]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-lime-50 to-green-100 w-full">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-lime-50 to-green-100 w-full ">
       <h1
         className="text-center pt-5 text-2xl font-semibold 
                     text-transparent bg-clip-text 
@@ -520,33 +474,7 @@ const EShop = () => {
                         ))}
                   </div>
                 </div>
-                <div className="mb-4">
-                  <label className="block text-xs font-semibold text-green-800 mb-2">
-                    Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
-                  </label>
-                  <div className="space-y-2">
-                    <input
-                      type="range"
-                      min="0"
-                      max="2000"
-                      value={priceRange[0]}
-                      onChange={(e) =>
-                        setPriceRange([parseInt(e.target.value), priceRange[1]])
-                      }
-                      className="w-full accent-green-600"
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max="2000"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([priceRange[0], parseInt(e.target.value)])
-                      }
-                      className="w-full accent-green-600"
-                    />
-                  </div>
-                </div>
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
@@ -595,13 +523,14 @@ const EShop = () => {
               ) : (
                 <motion.div
                   layout
-                  className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3"
+                  className="grid grid-cols-2  md:grid-cols-2 lg:grid-cols-3  2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
                 >
                   {filteredProducts.map((product, index) => (
                     <LazyProductCard
                       key={product.id}
                       product={product}
                       index={index}
+                      onOpenModal={handleOpenModal}
                     />
                   ))}
                 </motion.div>
@@ -610,6 +539,12 @@ const EShop = () => {
           </div>
         </div>
       </div>
+
+      <ProductDetailsModal
+        open={isModalOpen}
+        handleClose={handleCloseModal}
+        product={selectedProduct}
+      />
     </div>
   );
 };
@@ -1012,7 +947,7 @@ const medicineProducts = [
       },
       {
         id: 43,
-        name: "6 वनोषधि पाणी : षडङ्गपानीय Six Herbs Infusion",
+        name: "वनोषधि पाणी : षडङ्गपानीय Six Herbs Infusion",
         tagline: "Think Fever, Think Six Herbs Infusion",
         benefits: ["Fever relief", "Detoxifying", "Supports immunity"],
         ingredients: "Musta, Parpatak, Usheera, Chandana, Uddichya, Nagar",
@@ -1230,6 +1165,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 140,
+        image: BathPowder,
       },
       {
         id: 65,

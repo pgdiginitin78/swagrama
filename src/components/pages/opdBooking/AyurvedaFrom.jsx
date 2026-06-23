@@ -1182,7 +1182,7 @@ console.log("selectedPatient",patientFid)
                                 {doctorName}
                               </p>
                               <span
-                                className={`shrink-0 flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-full sm:text-[10px] sm:px-2 ${
+                                className={`shrink-0 flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-full sm:text-[12px] sm:px-2 ${
                                   isSelected
                                     ? "bg-emerald-100 text-emerald-700"
                                     : "bg-gray-100 text-gray-600"
@@ -1190,23 +1190,22 @@ console.log("selectedPatient",patientFid)
                               >
                                 <Clock
                                   size={8}
-                                  className="sm:w-[9px] sm:h-[9px]"
+                                  className="w-[12px] h-[12px]"
                                 />
-                                {doctor?.sessions?.[idx]?.timeSlot || ""} min
+                                {doctor?.sessions?.[0]?.timeSlot || ""} Min
                               </span>
                             </div>
 
                             {doctor.degree?.trim() && (
-                              <p className="text-[10px] text-gray-500 truncate mt-0.5 sm:text-xs">
+                              <p className="text-[12px] text-gray-500 truncate mt-0.5 sm:text-xs">
                                 {doctor?.degree?.trim()}
                               </p>
                             )}
 
-                            <p className="text-[10px] text-ayuBrown truncate sm:text-xs">
+                            <p className="text-[12px] text-ayuBrown truncate sm:text-xs">
                               {doctor?.clinicName}
                             </p>
 
-                            {/* Unified Days Row */}
                             {(() => {
                               const allUniqueDays = Array.from(
                                 new Set(
@@ -1231,7 +1230,7 @@ console.log("selectedPatient",patientFid)
                                   {allUniqueDays.map((day, di) => (
                                     <span
                                       key={di}
-                                      className={`text-[9px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
+                                      className={`text-[12px] px-1.5 py-0.5 rounded font-semibold sm:text-[10px] sm:px-2 ${
                                         isSelected
                                           ? "bg-emerald-100 text-emerald-700"
                                           : "bg-gray-100 text-gray-600"
@@ -1244,7 +1243,6 @@ console.log("selectedPatient",patientFid)
                               );
                             })()}
 
-                            {/* Combined Times Section */}
                             <div className="mt-1 space-y-1">
                               {doctor?.sessions?.map((session, sIdx) => (
                                 <div
@@ -1255,28 +1253,42 @@ console.log("selectedPatient",patientFid)
                                     style={{ fontSize: 13 }}
                                     className="text-gray-400"
                                   />
-                                  {session.morning && (
-                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                      {session.morning}
-                                    </p>
-                                  )}
-                                  {session.morning && session.evening && (
-                                    <span className="text-[9px] text-gray-400">
-                                      -
-                                    </span>
-                                  )}
-                                  {session.evening && (
-                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                      {session.evening}
-                                    </p>
-                                  )}
-                                  {!session.morning && !session.evening && (
-                                    <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[10px] sm:px-2">
-                                      —
-                                    </p>
-                                  )}
+                                  {(() => {
+                                    const isValid = (t) => {
+                                      if (!t) return false;
+                                      const str = t.trim();
+                                      return !(str.includes("00:00 - 00:00") || str.includes("00:00:00") || str === "00:00");
+                                    };
+                                    const hasMorning = isValid(session.morning);
+                                    const hasEvening = isValid(session.evening);
+
+                                    return (
+                                      <>
+                                        {hasMorning && (
+                                          <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[12px] sm:px-2">
+                                            {session.morning}
+                                          </p>
+                                        )}
+                                        {hasMorning && hasEvening && (
+                                          <span className="text-[9px] text-gray-400">
+                                            -
+                                          </span>
+                                        )}
+                                        {hasEvening && (
+                                          <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[12px] sm:px-2">
+                                            {session.evening}
+                                          </p>
+                                        )}
+                                        {!hasMorning && !hasEvening && (
+                                          <p className="text-[9px] text-gray-500 font-medium bg-gray-100 px-1.5 py-0.5 rounded sm:text-[12px] sm:px-2">
+                                            —
+                                          </p>
+                                        )}
+                                      </>
+                                    );
+                                  })()}
                                   {doctor.sessions.length > 1 && (
-                                    <span className="text-[8px] text-gray-400 italic ml-1">
+                                    <span className="text-[12px] text-gray-400 italic ml-1">
                                       (
                                       {session.weekDays
                                         ?.split(",")
@@ -1454,7 +1466,7 @@ console.log("selectedPatient",patientFid)
                 ) : slotData?.slots?.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-5 text-center sm:py-6">
                     <Clock className="w-7 h-7 text-slate-300 mb-2 sm:w-8 sm:h-8" />
-                    <p className="text-slate-400 font-bold text-[11px]">
+                    <p className="text-slate-400 font-bold text-[12px]">
                       {slotData.error || "No slots this day"}
                     </p>
                   </div>

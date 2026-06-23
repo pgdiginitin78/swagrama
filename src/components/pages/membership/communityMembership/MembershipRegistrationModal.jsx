@@ -103,7 +103,7 @@ const MembershipRegistrationModal = ({
     if (open) {
       reset();
       if (user?.userId) {
-        getUserDetails(user.userId,null,0)
+        getUserDetails(user.userId, null, 0)
           .then((res) => {
             const userData = res?.data?.data;
             if (userData) {
@@ -271,6 +271,7 @@ const MembershipRegistrationModal = ({
                             label="Email Address *"
                             type="email"
                             error={errors.email}
+                            dontCapitalize="none"
                           />
                         </div>
                         <div className="lg:col-span-6">

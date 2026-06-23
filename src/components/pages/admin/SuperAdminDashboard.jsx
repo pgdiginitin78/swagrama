@@ -507,7 +507,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             </div>
           </div>
         </section>
-
+{console.log("filteredDoctors", filteredDoctors)}
         <section
           id="staff-assignments"
           className="bg-white rounded-[18px] border border-[#eef0ea] overflow-hidden mb-5"
@@ -592,7 +592,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                             {doc.doctorName}
                           </div>
                           <div className="text-[9px] text-[#9aa090] font-medium">
-                            {doc.email || "N/A"}
+                            {doc.departmentName || "N/A"}
                           </div>
                         </div>
                       </div>

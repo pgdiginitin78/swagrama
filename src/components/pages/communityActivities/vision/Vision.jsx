@@ -65,29 +65,6 @@ const carouselImages = [
 
 const walkInServices = [
   {
-    nameHindi: "प्रातःपूर्णाहार",
-    serviceName: "Morning Whole Meal",
-    checkIn: "06:45",
-    checkOut: "09:15",
-    description: "Morning wholesome meal provided at Swagrama.",
-    benefits: "Nutritious start to the day, energizes body and mind.",
-    price: "₹500",
-    image: MorningMealImg,
-    icon: RestaurantIcon,
-  },
-  {
-    nameHindi: "सायम्पूर्णाहार",
-    serviceName: "Evening Whole Meal",
-    checkIn: "16:00",
-    checkOut: "18:00",
-    description: "Evening wholesome meal provided at Swagrama.",
-    benefits:
-      "Balanced nutrition to relax and rejuvenate after day's activities.",
-    price: "₹500",
-    image: eveningMealImg,
-    icon: RestaurantIcon,
-  },
-  {
     nameHindi: "दैनिक विनिमय",
     serviceName: "Daily Barter",
     checkIn: "10:00",
@@ -177,6 +154,29 @@ const visitorServices = [
       "Knowledge sharing + nourishing meal for comprehensive understanding.",
     price: "₹1000",
     image: EveningVisionWholeMealImg,
+    icon: RestaurantIcon,
+  },
+  {
+    nameHindi: "प्रातःपूर्णाहार",
+    serviceName: "Morning Whole Meal",
+    checkIn: "06:45",
+    checkOut: "09:15",
+    description: "Morning wholesome meal provided at Swagrama.",
+    benefits: "Nutritious start to the day, energizes body and mind.",
+    price: "₹750",
+    image: MorningMealImg,
+    icon: RestaurantIcon,
+  },
+  {
+    nameHindi: "सायम्पूर्णाहार",
+    serviceName: "Evening Whole Meal",
+    checkIn: "16:00",
+    checkOut: "18:00",
+    description: "Evening wholesome meal provided at Swagrama.",
+    benefits:
+      "Balanced nutrition to relax and rejuvenate after day's activities.",
+    price: "₹750",
+    image: eveningMealImg,
     icon: RestaurantIcon,
   },
 ];
@@ -342,37 +342,37 @@ const OurVision = () => {
       </div>
 
       {/* 2. AUTO-SLIDER CAROUSEL */}
-  <div className="w-full py-6 md:py-8 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] ">
-  <Marquee speed={50} gradient={false} pauseOnHover={true}>
-    {carouselImages.map((img, index) => (
-      <div
-        key={index}
-        className="rounded-tr-[30px] rounded-bl-[30px]"
-        style={{
-          marginRight: "16px",
-          // borderRadius: "12px",
-          overflow: "hidden",
-          width: "280px",
-          height: "200px",
-          border: "1px solid rgba(139,195,74,0.3)",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-          flexShrink: 0,
-        }}
-      >
-        <img
-          src={img}
-          alt={`Swagrama ${index}`}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            display: "block",
-          }}
-        />
+      <div className="w-full py-6 md:py-8 bg-gradient-to-b from-[#e8f5e9] to-[#c8e6c9] ">
+        <Marquee speed={50} gradient={false} pauseOnHover={true}>
+          {carouselImages.map((img, index) => (
+            <div
+              key={index}
+              className="rounded-tr-[30px] rounded-bl-[30px]"
+              style={{
+                marginRight: "16px",
+                // borderRadius: "12px",
+                overflow: "hidden",
+                width: "280px",
+                height: "200px",
+                border: "1px solid rgba(139,195,74,0.3)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                flexShrink: 0,
+              }}
+            >
+              <img
+                src={img}
+                alt={`Swagrama ${index}`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+            </div>
+          ))}
+        </Marquee>
       </div>
-    ))}
-  </Marquee>
-</div>
 
       {/* 3. THE JOURNEY INCLUDES */}
       <div className="py-10 px-2 md:px-12 sm:py-6 bg-gradient-to-b from-[#c8e6c9] to-[#e8f5e9]">
@@ -610,7 +610,7 @@ const OurVision = () => {
           </div>
 
           {/* WALK-IN SERVICES */}
-          <div>
+          {/* <div>
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -716,7 +716,7 @@ const OurVision = () => {
                 </motion.div>
               ))}
             </motion.div>
-          </div>
+          </div> */}
         </div>
       </div>
 

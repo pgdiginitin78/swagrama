@@ -113,6 +113,8 @@ const ActivityDetailsDrawer = ({
     icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
   };
 
+  console.log("1234567",d,item)
+
   return (
     <Drawer
       anchor="right"
@@ -128,7 +130,7 @@ const ActivityDetailsDrawer = ({
     >
       <div className="flex flex-col h-full bg-[#FDFDFB]">
         <div className="flex items-center justify-between px-3 2xl:px-5 py-3 2xl:py-4 border-b border-green-100 shrink-0 bg-white shadow-[0_2px_10px_rgba(21,128,61,0.02)]">
-          <p className="text-xs 2xl:text-sm font-bold text-green-800 tracking-wider uppercase font-serif">
+          <p className="text-xs 2xl:text-sm font-bold text-green-800 tracking-wider  font-serif">
             Activity Details
           </p>
           <CancelButtonModal onClick={onClose} />
@@ -270,10 +272,10 @@ const ActivityDetailsDrawer = ({
 
         <div className="flex gap-2 2xl:gap-3 px-3 2xl:px-4 py-3 2xl:py-4 border-t border-green-100 bg-white shrink-0 shadow-[0_-4px_16px_rgba(21,128,61,0.02)]">
           <CommonButton
-            type="button"
+            type="button"        
             label="Cancel Booking"
             onClick={() => setRefundDialogOpen(true)}
-            className={`text-[10px] 2xl:text-xs border bg-white text-green-700 border-green-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
+            className={`text-[10px] 2xl:text-xs border bg-red-50 text-red-700 border-red-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
           />
           {!d.isStay && (
             <CommonButton

@@ -65,7 +65,7 @@ export default function App() {
   useTokenRefresh();
 
   return (
-    <div className=" font-inter">
+    <div className=" font-inter ">
       <Helmet>
         <title>SwaGrama | Ayurveda • Yoga • Nisarga • Agro • Tourism</title>
         <meta
@@ -74,7 +74,7 @@ export default function App() {
         />
       </Helmet>
       <Navbar />
-      <div className="pt-16 md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none">
+      <div className="pt-16 md:pt-20 bg-gradient-to-br from-[#FFF8D6]/60 via-[#F1FFF5]/70 to-[#FFF9F1]/60 outline-none 2xl:mt-8">
         <ErrorBoundary>
           <Suspense fallback={<PageSkeleton />}>
             <Routes location={location} key={location.pathname}>

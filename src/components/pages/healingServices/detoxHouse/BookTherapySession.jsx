@@ -8,6 +8,7 @@ import {
 } from "@mui/icons-material";
 import { Box, Modal } from "@mui/material";
 import {
+  addDays,
   addMonths,
   eachDayOfInterval,
   endOfMonth,
@@ -140,7 +141,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         }
         while (next.length < sessionsCount) {
           const lastValidDate = next[next.length - 1]?.date;
-          next.push({ date: lastValidDate || startOfToday(), time: null });
+          next.push({ date: lastValidDate ? addDays(lastValidDate, 1) : startOfToday(), time: null });
         }
         if (next.length > sessionsCount) {
           next.length = sessionsCount;
@@ -436,6 +437,15 @@ export default function BookTherapySession({ open, onClose, item }) {
           "An unexpected error occurred during the booking process.",
       );
     }
+  };
+  const handleReset = () => {
+    reset();
+    setSessionsCount(1);
+    setSchedules([{ date: startOfToday(), time: null }]);
+    setActivePickerIndex(0);
+    setCalendarBaseDate(startOfToday());
+    setIsFirstTime(false);
+    setGenderPreference("No Preference");
   };
 
   return (
@@ -960,7 +970,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                   type="button"
                   label="Reset"
                   className={"border border-red-600 text-red-600 bg-red-100"}
-                  onClick={reset}
+                  onClick={handleReset}
                 />
                 <CommonButton
                   type="button"

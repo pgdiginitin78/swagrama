@@ -61,6 +61,7 @@ const schema = yup.object().shape({
   mobile: yup.string().required("Mobile number is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   city: yup.string().nullable(),
+  patientFid: dropdownObjectSchema.typeError("Patient is required"),
   serviceFid: dropdownObjectSchema.typeError("Therapy is required"),
   bookingDate: yup.date().required("Booking date is required").nullable(),
   termsAccepted: yup
@@ -244,10 +245,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+              { shouldValidate: true }
             );
-            setValue("email", filterData.emailId || "");
-            setValue("mobile", String(filterData.mobileNo || ""));
-            setValue("city", filterData.city || "");
+            setValue("email", filterData.emailId || "", { shouldValidate: true });
+            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true });
+            setValue("city", filterData.city || "", { shouldValidate: true });
           }
         }
       })
@@ -256,10 +258,15 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
-      setValue("fullName", patientFid.label);
-      setValue("mobile", String(patientFid.mobileNo || ""));
-      setValue("email", patientFid.emailId || "");
-      setValue("city", patientFid.city || "");
+      setValue("fullName", patientFid.label, { shouldValidate: true });
+      setValue("mobile", String(patientFid.mobileNo || ""), { shouldValidate: true });
+      setValue("email", patientFid.emailId || "", { shouldValidate: true });
+      setValue("city", patientFid.city || "", { shouldValidate: true });
+    } else {
+      setValue("fullName", "");
+      setValue("mobile", "");
+      setValue("email", "");
+      setValue("city", "");
     }
   }, [patientFid, setValue]);
 
@@ -323,6 +330,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
+      errorAlert("Please select a time slot");
       return;
     }
     setSlotError("");
@@ -458,7 +466,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         variants={sectionVariants}
                         className="lg:col-span-2 space-y-5"
                       >
-                        {/* Patient & Therapy Info */}
                         <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border overflow-hidden">
                           <div className="bg-booking-primaryLight px-4 py-2 md:flex justify-between items-center gap-2 font-bold text-booking-primary">
                             <div className="p-1.5 flex space-x-3 items-center rounded-[9px]">
@@ -477,18 +484,20 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                             </div>
                           </div>
                           <div className="p-4 sm:p-5">
-                            <div className="mb-4">
+                            <div className="mb-4 flex flex-col">
                               <DropdownField
                                 control={control}
                                 name="patientFid"
-                                placeholder="Select Patient"
+                                placeholder="Select Patient *"
                                 dataArray={patientOptions}
                                 isClearable={true}
                                 searchIcon={true}
+                                error={errors.patientFid}
                               />
+                              {errors.patientFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.patientFid.message}</p>}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div className="md:col-span-2">
+                              <div className="md:col-span-2 flex flex-col">
                                 <InputField
                                   control={control}
                                   name="fullName"
@@ -496,8 +505,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   error={errors.fullName}
                                   shrink={true}
                                 />
+                                {errors.fullName && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fullName.message}</p>}
                               </div>
-                              <div>
+                              <div className="flex flex-col">
                                 <InputField
                                   control={control}
                                   name="mobile"
@@ -505,15 +515,18 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   error={errors.mobile}
                                   shrink={true}
                                 />
+                                {errors.mobile && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.mobile.message}</p>}
                               </div>
-                              <div>
+                              <div className="flex flex-col">
                                 <InputField
                                   control={control}
                                   name="email"
                                   label="Email Address *"
                                   error={errors.email}
                                   shrink={true}
+                                  dontCapitalize="none"
                                 />
+                                {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email.message}</p>}
                               </div>
                               <div className="md:col-span-2">
                                 <InputField
@@ -549,18 +562,21 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   error={errors.doctorFid}
                                 /> */}
 
-                                <DropdownField
-                                  control={control}
-                                  name="serviceFid"
-                                  placeholder="Select Therapy *"
-                                  dataArray={servicesOptions}
-                                  error={errors.serviceFid}
-                                  isDisabled={
-                                    eventDetails?.serviceName ? true : false
-                                  }
-                                />
+                                <div className="flex flex-col">
+                                  <DropdownField
+                                    control={control}
+                                    name="serviceFid"
+                                    placeholder="Select Therapy *"
+                                    dataArray={servicesOptions}
+                                    error={errors.serviceFid}
+                                    isDisabled={
+                                      eventDetails?.serviceName ? true : false
+                                    }
+                                  />
+                                  {errors.serviceFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.serviceFid.message}</p>}
+                                </div>
                               </div>
-                              <div className="md:col-span-2 sm:col-span-1">
+                              <div className="md:col-span-2 sm:col-span-1 flex flex-col">
                                 <DatePickerField
                                   control={control}
                                   name="bookingDate"
@@ -569,6 +585,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   disablePast={true}
                                   error={errors.bookingDate}
                                 />
+                                {errors.bookingDate && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.bookingDate.message}</p>}
                               </div>
                             </div>
                           </div>
@@ -583,13 +600,14 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                             placeholder="Type your message here..."
                             error={errors.specialRequest}
                           />
-                          <div className="mt-4">
+                          <div className="mt-4 flex flex-col">
                             <CheckBoxField
                               name="termsAccepted"
                               control={control}
                               label="I agree to the terms and conditions and clinical guidelines."
                               error={errors.termsAccepted}
                             />
+                            {errors.termsAccepted && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.termsAccepted.message}</p>}
                           </div>
                         </div>
                       </motion.div>

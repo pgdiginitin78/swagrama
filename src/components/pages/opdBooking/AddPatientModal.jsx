@@ -270,6 +270,7 @@ export default function AddPatientModal({
       country: sameAddress === true ? data.country : "",
       state: sameAddress === true ? data.state : "",
       locality: sameAddress === true ? data.locality : "",
+      ParentId:user?.userId,
     };
     console.log("AddPatientData1111", saveObj);
 

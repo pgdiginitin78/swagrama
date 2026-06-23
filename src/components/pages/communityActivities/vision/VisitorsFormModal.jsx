@@ -1,7 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import PaymentOutlinedIcon from "@mui/icons-material/PaymentOutlined";
-import { Box, Modal } from "@mui/material";
+import { Box, FormHelperText, Modal } from "@mui/material";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -19,6 +18,7 @@ import {
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
 import { SaveActivities } from "../../../../services/communityActivitiesServices/CommunityActivitiesServices";
+import BillSummaryIcon from "../../../assets/BillSummary.svg";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
 import { useLoader } from "../../../common/commonLoader/LoaderContext";
@@ -28,11 +28,10 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
+import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
-import BillSummaryIcon from "../../../assets/BillSummary.svg";
-import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 
 const schema = yup.object().shape({
   fullName: yup
@@ -151,10 +150,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+              { shouldValidate: true }
             );
-            setValue("mobileNumber", filterData.mobileNo || "");
-            setValue("email", filterData.emailId || "");
-            setValue("city", filterData.city || "");
+            setValue("mobileNumber", filterData.mobileNo || "", { shouldValidate: true });
+            setValue("email", filterData.emailId || "", { shouldValidate: true });
+            setValue("city", filterData.city || "", { shouldValidate: true });
           }
         }
       })
@@ -163,15 +163,15 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
 
   useEffect(() => {
     if (patientFid !== null) {
-      setValue("fullName", patientFid.label);
-      setValue("mobileNumber", String(patientFid.mobileNo || ""));
-      setValue("email", patientFid.emailId || "");
-      setValue("city", patientFid.city || "");
+      setValue("fullName", patientFid.label, { shouldValidate: true });
+      setValue("mobileNumber", String(patientFid.mobileNo || ""), { shouldValidate: true });
+      setValue("email", patientFid.emailId || "", { shouldValidate: true });
+      setValue("city", patientFid.city || "", { shouldValidate: true });
     } else {
-      setValue("fullName", "");
-      setValue("mobileNumber", "");
-      setValue("email", "");
-      setValue("city", "");
+      setValue("fullName", "", { shouldValidate: true });
+      setValue("mobileNumber", "", { shouldValidate: true });
+      setValue("email", "", { shouldValidate: true });
+      setValue("city", "", { shouldValidate: true });
     }
   }, [patientFid, setValue]);
 
@@ -192,7 +192,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       }
       if (dateParts.length === 3) {
         const [day, month, year] = dateParts;
-        setValue("appointmentDate", new Date(year, month - 1, day));
+        setValue("appointmentDate", new Date(year, month - 1, day), { shouldValidate: true });
       }
     }
   }, [origin, serviceDetails, setValue]);
@@ -383,14 +383,21 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                         Configuration
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <DatePickerField
-                          control={control}
-                          name="appointmentDate"
-                          label="Visit Date *"
-                          inputFormat="dd-MM-yyyy"
-                          disablePast={true}
-                          error={errors.appointmentDate}
-                        />
+                        <div>
+                          <DatePickerField
+                            control={control}
+                            name="appointmentDate"
+                            label="Visit Date *"
+                            inputFormat="dd-MM-yyyy"
+                            disablePast={true}
+                            error={errors.appointmentDate}
+                          />
+                          {errors.appointmentDate && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.appointmentDate.message}
+                            </FormHelperText>
+                          )}
+                        </div>
                         <div className="relative">
                           <InputField
                             control={control}
@@ -401,6 +408,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             inputProps={{ min: 1, max: 20 }}
                             error={errors.noOfPerson}
                           />
+                          {errors.noOfPerson && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.noOfPerson.message}
+                            </FormHelperText>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -438,20 +450,40 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             label="Full Name *"
                             error={errors.fullName}
                           />
+                          {errors.fullName && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.fullName.message}
+                            </FormHelperText>
+                          )}
                         </div>
-                        <InputField
-                          control={control}
-                          name="mobileNumber"
-                          label="Contact No. *"
-                          type="tel"
-                          error={errors.mobileNumber}
-                        />
-                        <InputField
-                          control={control}
-                          name="email"
-                          label="Email Address *"
-                          error={errors.email}
-                        />
+                        <div>
+                          <InputField
+                            control={control}
+                            name="mobileNumber"
+                            label="Contact No. *"
+                            type="tel"
+                            error={errors.mobileNumber}
+                          />
+                          {errors.mobileNumber && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.mobileNumber.message}
+                            </FormHelperText>
+                          )}
+                        </div>
+                        <div>
+                          <InputField
+                            control={control}
+                            name="email"
+                            label="Email Address *"
+                            error={errors.email}
+                            dontCapitalize="none"
+                          />
+                          {errors.email && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.email.message}
+                            </FormHelperText>
+                          )}
+                        </div>
                         <div className="col-span-1 sm:col-span-2">
                           <InputField
                             control={control}
@@ -459,6 +491,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             label="City *"
                             error={errors.city}
                           />
+                          {errors.city && (
+                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                              {errors.city.message}
+                            </FormHelperText>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -479,6 +516,11 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                           label="I acknowledge my booking request and agree to follow community guidelines."
                           error={errors.termsAccepted}
                         />
+                        {errors.termsAccepted && (
+                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            {errors.termsAccepted.message}
+                          </FormHelperText>
+                        )}
                       </div>
                     </div>
                   </div>

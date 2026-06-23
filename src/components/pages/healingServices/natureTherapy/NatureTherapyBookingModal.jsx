@@ -28,10 +28,10 @@ import DatePickerField from "../../../common/formFields/DatePickerField";
 import DropdownField from "../../../common/formFields/DropdownField";
 import InputArea from "../../../common/formFields/InputArea";
 import InputField from "../../../common/formFields/InputField";
+import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
-import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 
 const schema = yup.object().shape({
   serviceFid: yup.object().nullable().required("Therapy is required"),
@@ -55,6 +55,7 @@ const schema = yup.object().shape({
   mobile: yup.string().required("Mobile number is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   city: yup.string().nullable(),
+  patientFid: yup.object().nullable().required("Patient is required"),
 });
 
 const containerVariants = {
@@ -252,10 +253,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
+              { shouldValidate: true }
             );
-            setValue("email", filterData.emailId || "");
-            setValue("mobile", String(filterData.mobileNo || ""));
-            setValue("city", filterData.city || "");
+            setValue("email", filterData.emailId || "", { shouldValidate: true });
+            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true });
+            setValue("city", filterData.city || "", { shouldValidate: true });
           }
         }
       })
@@ -264,10 +266,15 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
-      setValue("fullName", patientFid.label);
-      setValue("mobile", String(patientFid.mobileNo || ""));
-      setValue("email", patientFid.emailId || "");
-      setValue("city", patientFid.city || "");
+      setValue("fullName", patientFid.label, { shouldValidate: true });
+      setValue("mobile", String(patientFid.mobileNo || ""), { shouldValidate: true });
+      setValue("email", patientFid.emailId || "", { shouldValidate: true });
+      setValue("city", patientFid.city || "", { shouldValidate: true });
+    } else {
+      setValue("fullName", "");
+      setValue("mobile", "");
+      setValue("email", "");
+      setValue("city", "");
     }
   }, [patientFid, setValue]);
 
@@ -347,6 +354,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
     }
     if (!selectedTimeSlot) {
       setSlotError("Please select a time slot");
+      errorAlert("Please select a time slot");
       return;
     }
     setSlotError("");
@@ -458,9 +466,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
               animate="visible"
               exit="hidden"
             >
-              {/* Modal Card */}
               <div className="relative bg-[#f8fafc] rounded-xl shadow-2xl border border-slate-200 overflow-hidden">
-                {/* ── Sticky Header ── */}
                 <div className="sticky top-0 z-20 bg-white border-b border-slate-200 px-4 sm:px-6 py-3 shadow-sm flex items-center justify-between">
                   <h2 className="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
                     <span className="bg-emerald-50 p-1.5 rounded-lg flex items-center justify-center">
@@ -473,17 +479,13 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                   <CancelButtonModal onClick={handleClose} />
                 </div>
 
-                {/* ── Scrollable Body ── */}
                 <div className="max-h-[calc(90vh-64px)] overflow-y-auto px-4 sm:px-6 py-6 no-scrollbar">
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                    {/* ── Main Grid: left 8 cols | right 4 cols ── */}
                     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                      {/* ════════════ LEFT COLUMN ════════════ */}
                       <motion.div
                         variants={sectionVariants}
                         className="lg:col-span-8 flex flex-col gap-5"
                       >
-                        {/* — Patient Information Card — */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                           <div className="bg-emerald-50 px-5 py-3 flex items-center gap-3">
                             <User className="w-4 h-4 text-emerald-700 shrink-0" />
@@ -499,41 +501,53 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
 
                           <div className="p-5 space-y-4">
-                            {/* Patient selector */}
-                            <DropdownField
-                              control={control}
-                              name="patientFid"
-                              placeholder="Select Patient"
-                              dataArray={patientOptions}
-                              isClearable={true}
-                              searchIcon={true}
-                            />
+                            <div className="flex flex-col">
+                              <DropdownField
+                                control={control}
+                                name="patientFid"
+                                placeholder="Select Patient *"
+                                dataArray={patientOptions}
+                                isClearable={true}
+                                searchIcon={true}
+                                error={errors.patientFid}
+                              />
+                              {errors.patientFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.patientFid.message}</p>}
+                            </div>
 
-                            {/* Fields grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-1 sm:col-span-2">
+                                <div className="flex flex-col">
+                                  <InputField
+                                    control={control}
+                                    name="fullName"
+                                    label="Full Name *"
+                                    error={errors.fullName}
+                                    shrink={true}
+                                  />
+                                  {errors.fullName && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fullName.message}</p>}
+                                </div>
+                              </div>
+                              <div className="flex flex-col">
                                 <InputField
                                   control={control}
-                                  name="fullName"
-                                  label="Full Name *"
-                                  error={errors.fullName}
+                                  name="mobile"
+                                  label="Mobile Number *"
+                                  error={errors.mobile}
                                   shrink={true}
                                 />
+                                {errors.mobile && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.mobile.message}</p>}
                               </div>
-                              <InputField
-                                control={control}
-                                name="mobile"
-                                label="Mobile Number *"
-                                error={errors.mobile}
-                                shrink={true}
-                              />
-                              <InputField
-                                control={control}
-                                name="email"
-                                label="Email Address *"
-                                error={errors.email}
-                                shrink={true}
-                              />
+                              <div className="flex flex-col">
+                                <InputField
+                                  control={control}
+                                  name="email"
+                                  label="Email Address *"
+                                  error={errors.email}
+                                  shrink={true}
+                                  dontCapitalize="none"
+                                />
+                                {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email.message}</p>}
+                              </div>
                               <div className="col-span-1 sm:col-span-2">
                                 <InputField
                                   control={control}
@@ -547,7 +561,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
                         </div>
 
-                        {/* — Therapy & Schedule Card — */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                           <div className="bg-emerald-50 px-5 py-3 flex items-center gap-3">
                             <Calendar className="w-4 h-4 text-emerald-700 shrink-0" />
@@ -559,36 +572,44 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           <div className="p-5">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div className="col-span-1 sm:col-span-2">
-                                <DropdownField
-                                  control={control}
-                                  name="serviceFid"
-                                  placeholder="Select Therapy *"
-                                  dataArray={[]}
-                                  error={errors.serviceFid}
-                                  isDisabled={true}
-                                />
+                                <div className="flex flex-col">
+                                  <DropdownField
+                                    control={control}
+                                    name="serviceFid"
+                                    placeholder="Select Therapy *"
+                                    dataArray={[]}
+                                    error={errors.serviceFid}
+                                    isDisabled={true}
+                                  />
+                                  {errors.serviceFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.serviceFid.message}</p>}
+                                </div>
                               </div>
-                              <DatePickerField
-                                control={control}
-                                name="fromDate"
-                                label="Appointment Date *"
-                                inputFormat="dd-MM-yyyy"
-                                disablePast={true}
-                                error={errors.fromDate}
-                              />
-                              <InputField
-                                control={control}
-                                name="noOfPerson"
-                                label="Number of Persons *"
-                                type="number"
-                                error={errors.noOfPerson}
-                                InputProps={{ inputProps: { min: 1, max: 20 } }}
-                              />
+                              <div className="flex flex-col">
+                                <DatePickerField
+                                  control={control}
+                                  name="fromDate"
+                                  label="Appointment Date *"
+                                  inputFormat="dd-MM-yyyy"
+                                  disablePast={true}
+                                  error={errors.fromDate}
+                                />
+                                {errors.fromDate && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fromDate.message}</p>}
+                              </div>
+                              <div className="flex flex-col">
+                                <InputField
+                                  control={control}
+                                  name="noOfPerson"
+                                  label="Number of Persons *"
+                                  type="number"
+                                  error={errors.noOfPerson}
+                                  InputProps={{ inputProps: { min: 1, max: 20 } }}
+                                />
+                                {errors.noOfPerson && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.noOfPerson.message}</p>}
+                              </div>
                             </div>
                           </div>
                         </div>
 
-                        {/* — Special Requests Card — */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden p-5 space-y-4">
                           <InputArea
                             name="specialRequest"
@@ -597,21 +618,22 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                             placeholder="Please mention any special requirements..."
                             error={errors.specialRequest}
                           />
-                          <CheckBoxField
-                            name="termsAccepted"
-                            control={control}
-                            label="I agree to the clinical guidelines and terms."
-                            error={errors.termsAccepted}
-                          />
+                          <div className="flex flex-col">
+                            <CheckBoxField
+                              name="termsAccepted"
+                              control={control}
+                              label="I agree to the clinical guidelines and terms."
+                              error={errors.termsAccepted}
+                            />
+                            {errors.termsAccepted && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.termsAccepted.message}</p>}
+                          </div>
                         </div>
                       </motion.div>
 
-                      {/* ════════════ RIGHT COLUMN ════════════ */}
                       <motion.div
                         variants={sectionVariants}
                         className="lg:col-span-4 flex flex-col gap-5 lg:sticky lg:top-0 h-fit"
                       >
-                        {/* — Time Slots Card — */}
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                           <div className="bg-sky-50 px-5 py-3 flex items-center gap-3">
                             <Clock className="w-4 h-4 text-sky-600 shrink-0" />
@@ -622,15 +644,12 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
                           <div className="p-4 min-h-[180px] flex flex-col">
                             {loading ? (
-                              /* Spinner */
                               <div className="flex flex-1 items-center justify-center h-40">
                                 <div className="w-8 h-8 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
                               </div>
                             ) : doctorSlots?.length > 0 ? (
-                              /* Slot chips grid */
                               <div className="grid grid-cols-2 gap-2">
                                 {doctorSlots.map((slot, index) => {
-                                  // Disable past slots only when the selected date is today
                                   const isToday =
                                     fromDate &&
                                     new Date(fromDate).toDateString() ===
@@ -679,7 +698,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                                 })}
                               </div>
                             ) : (
-                              /* Empty state */
                               <div className="flex flex-col flex-1 items-center justify-center h-40 text-center p-4 bg-slate-50 rounded-lg border border-dashed border-slate-200">
                                 <Clock className="w-8 h-8 text-slate-300 mb-2" />
                                 <p className="text-[11px] text-slate-400 font-medium leading-snug">
@@ -698,7 +716,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
                         </div>
 
-                        {/* — Bill Summary Card — */}
                         <div className="bg-emerald-50 rounded-xl shadow-sm border border-emerald-100 p-5">
                           <div className="flex items-center gap-2 mb-4 pb-3 border-b border-emerald-100">
                             <Banknote className="w-4 h-4 text-emerald-700 shrink-0" />
@@ -708,7 +725,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                           </div>
 
                           <div className="space-y-2.5">
-                            {/* Price / Person */}
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-slate-500 font-medium">
                                 Price / Person
@@ -718,7 +734,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                               </span>
                             </div>
 
-                            {/* Persons */}
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-slate-500 font-medium">
                                 Persons
@@ -728,7 +743,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                               </span>
                             </div>
 
-                            {/* GST */}
                             <div className="flex justify-between items-center text-xs">
                               <span className="text-slate-500 font-medium">
                                 GST &amp; TC
@@ -738,7 +752,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                               </span>
                             </div>
 
-                            {/* Total + CTA */}
                             <div className="pt-3 border-t border-emerald-200 flex justify-between items-end gap-3">
                               <div>
                                 <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider mb-0.5">
@@ -760,7 +773,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                       </motion.div>
                     </div>
 
-                    {/* ── Mobile-only footer CTA (hidden on lg+) ── */}
                     <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 lg:hidden">
                       <CommonButton
                         type="button"
@@ -784,7 +796,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
 
       <ConfirmationModal
         confirmationOpen={openConfirmation}
-        // confirmationHandleClose={() => setOpenConfirmation(false)}
         confirmationSubmitFunc={handleConfirmBooking}
         confirmationLabel="Confirm Therapy Booking"
         confirmationMsg="Are you sure you want to book this nature therapy for the selected slot?"

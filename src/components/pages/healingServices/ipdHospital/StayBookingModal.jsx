@@ -320,9 +320,6 @@ function StayBookingModal({
     }
 
     let adultSurcharge = 0;
-    if (!isTwinSharing) {
-      adultSurcharge = dailyBase * 0.75 * effectiveDays;
-    }
 
     const children0to5Count = parseInt(formValues?.noOfChildren0to5, 10) || 0;
     const children6to12Count = parseInt(formValues?.noOfChildren6to12, 10) || 0;
@@ -731,8 +728,6 @@ function StayBookingModal({
 
   const currentAdults = parseInt(formValues?.noOfAdults, 10) || 1;
   const currentTwinSharing = Boolean(formValues?.twinSharing);
-  const showSurcharge =
-    costs.adultSurcharge > 0 && currentAdults === 1 && !currentTwinSharing;
 
   const breakdownItems = [
     {
@@ -754,16 +749,6 @@ function StayBookingModal({
       label: "Children Surcharge",
       value: Math.round(costs.childrenSurcharge),
       show: costs.childrenSurcharge > 0,
-    },
-    {
-      label: "Extra Person Surcharge (75%)",
-      value:
-        currentAdults === 1
-          ? 0
-          : currentAdults > 2
-            ? Math.round(costs.adultSurcharge)
-            : 0,
-      show: showSurcharge,
     },
   ].filter((item) => item.show);
 

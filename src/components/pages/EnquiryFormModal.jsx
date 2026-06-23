@@ -84,7 +84,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
     if (open) {
       reset();
       if (user?.userId) {
-        getUserDetails(user.userId,null,0)
+        getUserDetails(user.userId, null, 0)
           .then((res) => {
             const userData = res?.data?.data;
             if (userData) {
@@ -93,7 +93,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
                 `${userData.firstName || ""} ${userData.lastName || ""}`.trim(),
               );
               setValue("mobileNumber", userData.whatsappNo || "");
-              setValue("email", userData.emailId || "");
+              setValue("email", (userData.emailId || "")?.toLowerCase());
               setValue("city", userData.city || "");
               setValue("state", userData.state || "");
             }
@@ -120,7 +120,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
   return (
     <Modal open={open} closeAfterTransition>
       <Box
-        sx={{ 
+        sx={{
           position: "absolute",
           top: "50%",
           left: "50%",
@@ -136,7 +136,6 @@ const EnquiryFormModal = ({ open, handleClose }) => {
             exit="hidden"
             className="w-[95vw] sm:w-[90vw] md:w-[85vw] lg:w-[850px] max-h-[90vh] flex flex-col overflow-hidden rounded shadow-2xl bg-white border border-green-100"
           >
-            {/* Header */}
             <div className="bg-gradient-to-r from-green-700 to-emerald-600 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between sticky top-0 z-10 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="bg-white/20 p-2.5 rounded-xl hidden sm:block backdrop-blur-md">
@@ -182,6 +181,7 @@ const EnquiryFormModal = ({ open, handleClose }) => {
                         label="Email Address *"
                         type="email"
                         error={errors.email}
+                        dontCapitalize="none"
                       />
                     </div>
                     <div className="col-span-2">

@@ -98,7 +98,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
-  const [therapySlots, setTherapySlots] = useState(() => generateTimeSlots(item?.duration));
+  const [therapySlots, setTherapySlots] = useState(() =>
+    generateTimeSlots(item?.duration),
+  );
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
@@ -106,8 +108,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
 
-  console.log("schedules",schedules);
-  
+  console.log("schedules", schedules);
 
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
@@ -141,7 +142,10 @@ export default function BookTherapySession({ open, onClose, item }) {
         }
         while (next.length < sessionsCount) {
           const lastValidDate = next[next.length - 1]?.date;
-          next.push({ date: lastValidDate ? addDays(lastValidDate, 1) : startOfToday(), time: null });
+          next.push({
+            date: lastValidDate ? addDays(lastValidDate, 1) : startOfToday(),
+            time: null,
+          });
         }
         if (next.length > sessionsCount) {
           next.length = sessionsCount;
@@ -181,36 +185,6 @@ export default function BookTherapySession({ open, onClose, item }) {
   useEffect(() => {
     handleGetPatientData();
   }, [user]);
-
-  useEffect(() => {
-    if (activePickerIndex === null || !user?.userId) {
-      setTherapySlots(generateTimeSlots(item?.duration));
-      return;
-    }
-
-    const activeSession = schedules[activePickerIndex];
-    if (activeSession?.date && user !== null) {
-      const formattedDate = format(activeSession.date, "yyyy-MM-dd");
-      setIsSlotsLoading(true);
-      GetDetoxTherapySlotsByUser(user.userId, formattedDate)
-        .then((res) => {
-          const data = res?.data;
-          if (Array.isArray(data?.data) && data.data.length > 0) {
-            setTherapySlots(data.data);
-          } else {
-            setTherapySlots(generateTimeSlots(item?.duration));
-          }
-        })
-        .catch(() => {
-          setTherapySlots(generateTimeSlots(item?.duration));
-        })
-        .finally(() => {
-          setIsSlotsLoading(false);
-        });
-    } else {
-      setTherapySlots(generateTimeSlots(item?.duration));
-    }
-  }, [activePickerIndex, schedules[activePickerIndex]?.date, user?.userId, item?.duration]);
 
   useEffect(() => {
     if (activePickerIndex !== null) {
@@ -315,7 +289,7 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
     if (isPaymentPending) return;
     const saveObj = {
-      role: selectedGuest?.userId === user?.userId ? "self" : "other",
+      // role: selectedGuest?.userId === user?.userId ? "self" : "other",
       userId: selectedGuest?.userId,
       createdBy: user?.userId,
       clinicFid: 5,
@@ -381,13 +355,12 @@ export default function BookTherapySession({ open, onClose, item }) {
       const bookingRes = await BookDetoxTherapy(finalSaveObj);
       const bookingData = bookingRes?.data;
 
-      
       if (bookingData?.message) {
         const bookingId = bookingData?.bookingId || bookingData?.data;
-        
+
         const tempObj = {
           amount: total,
-          userId:bookingId?.patientUserId,
+          userId: bookingId?.patientUserId,
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };
@@ -434,6 +407,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       setIsLoading(false);
       errorAlert(
         error?.response?.data?.message ||
+          error?.message ||
           "An unexpected error occurred during the booking process.",
       );
     }
@@ -677,7 +651,8 @@ export default function BookTherapySession({ open, onClose, item }) {
                                         bookedSlots || []
                                       ).find(
                                         (bs) =>
-                                          bs.slotStartTime === slot.slotStartTime &&
+                                          bs.slotStartTime ===
+                                            slot.slotStartTime &&
                                           bs.slotEndTime === slot.slotEndTime,
                                       );
                                       const isAvailable =
@@ -824,6 +799,62 @@ export default function BookTherapySession({ open, onClose, item }) {
                   </div>
                 </div>
                 <div className="mt-3">
+                  <h3 className="font-serif text-ayuTulsi text-sm font-bold mb-3 border-l-4 border-ayuMid pl-3">
+                    Wellness Info
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider block">
+                        First time taking this?
+                      </span>
+                      <div className="bg-white p-3 rounded-[5px] border border-[#e4ebdd] flex items-center gap-5 min-h-[44px]">
+                        {["Yes", "No"].map((opt) => (
+                          <label
+                            key={opt}
+                            className="flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <input
+                              type="radio"
+                              name="firstTime"
+                              checked={(opt === "Yes") === isFirstTime}
+                              onChange={() => setIsFirstTime(opt === "Yes")}
+                              className="w-3.5 h-3.5 accent-ayuMid"
+                            />
+                            <span className="text-gray-700 font-bold text-xs">
+                              {opt}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider block">
+                        Preferred therapist
+                      </span>
+                      <div className="bg-white p-3 rounded-[5px] border border-[#e4ebdd] flex items-center gap-3 min-h-[44px] overflow-x-auto custom-scrollbar-wellness-stay">
+                        {["No Preference", "Male", "Female"].map((opt) => (
+                          <label
+                            key={opt}
+                            className="flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                          >
+                            <input
+                              type="radio"
+                              name="genderPref"
+                              checked={genderPreference === opt}
+                              onChange={() => setGenderPreference(opt)}
+                              className="w-3.5 h-3.5 accent-ayuMid"
+                            />
+                            <span className="text-gray-700 font-bold text-[10px]">
+                              {opt}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-3">
                   <DropdownField
                     control={control}
                     name="selectGuest"
@@ -832,62 +863,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                     isClearable={true}
                     searchIcon={true}
                   />
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-serif text-ayuTulsi text-sm font-bold mb-3 border-l-4 border-ayuMid pl-3">
-                  Wellness Info
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider block">
-                      First time taking this?
-                    </span>
-                    <div className="bg-white p-3 rounded-[5px] border border-[#e4ebdd] flex items-center gap-5 min-h-[44px]">
-                      {["Yes", "No"].map((opt) => (
-                        <label
-                          key={opt}
-                          className="flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <input
-                            type="radio"
-                            name="firstTime"
-                            checked={(opt === "Yes") === isFirstTime}
-                            onChange={() => setIsFirstTime(opt === "Yes")}
-                            className="w-3.5 h-3.5 accent-ayuMid"
-                          />
-                          <span className="text-gray-700 font-bold text-xs">
-                            {opt}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <span className="text-gray-500 font-bold text-[10px] uppercase tracking-wider block">
-                      Preferred therapist
-                    </span>
-                    <div className="bg-white p-3 rounded-[5px] border border-[#e4ebdd] flex items-center gap-3 min-h-[44px] overflow-x-auto custom-scrollbar-wellness-stay">
-                      {["No Preference", "Male", "Female"].map((opt) => (
-                        <label
-                          key={opt}
-                          className="flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
-                        >
-                          <input
-                            type="radio"
-                            name="genderPref"
-                            checked={genderPreference === opt}
-                            onChange={() => setGenderPreference(opt)}
-                            className="w-3.5 h-3.5 accent-ayuMid"
-                          />
-                          <span className="text-gray-700 font-bold text-[10px]">
-                            {opt}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
                 </div>
               </div>
 

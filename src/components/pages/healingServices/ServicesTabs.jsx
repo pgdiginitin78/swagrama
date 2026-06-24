@@ -14,6 +14,7 @@ import DetoxHouse from "./detoxHouse/DetoxHouse";
 import IPDHospital from "./ipdHospital/IPDWellnessStay";
 import NatureTherapy from "./natureTherapy/NatureTherapy";
 import OPDClinic from "./opdClinic/OPDClinic";
+import YogaTherapy from "./yogaTherapy/YogaTherapy";
 
 const tabsData = [
   {
@@ -55,6 +56,14 @@ const tabsData = [
     color: "#7b4397",
     bgColor: "rgba(123, 67, 151, 0.08)",
     darkColor: "#532860",
+  },
+  {
+    label: "Yoga",
+    fullLabel: "योगतिककत्सा Yoga Therapy",
+    component: <YogaTherapy />,
+    color: "#537c3a",
+    bgColor: "rgba(83, 124, 58, 0.08)",
+    darkColor: "#3d5225",
   },
 ];
 

@@ -101,6 +101,15 @@ export const RedirectToSabPaisa = (
 ) => {
   const paymentWindow = window.open("", "_blank");
 
+  console.log("paymentWindow",paymentWindow)
+
+  if (!paymentWindow) {
+    onFailure?.({
+      message: "Payment window was blocked by the browser. Please allow popups.",
+    });
+    return () => {};
+  }
+
   const form = paymentWindow.document.createElement("form");
   form.method = "POST";
   form.action = data.sabPaisaUrl;

@@ -139,7 +139,7 @@ function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
   );
 }
 
-const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
+const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
   const [servicesOptions, setServicesOptions] = useState([]);
@@ -386,6 +386,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
         },
       ],
       FirstTimeTaking: null,
+      origin: origin || "Nature Therapy",
     };
 
     console.log("naturTherapySaveObj", saveObj);
@@ -474,7 +475,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy }) => {
                         sx={{ fontSize: 20, color: "var(--booking-primary)" }}
                       />
                     </span>
-                    Book Nature Therapy
+                    {origin === "Yoga Therapy" ? "Book Yoga Therapy" : "Book Nature Therapy"}
                   </h2>
                   <CancelButtonModal onClick={handleClose} />
                 </div>

@@ -523,7 +523,7 @@ const EShop = () => {
               ) : (
                 <motion.div
                   layout
-                  className="grid grid-cols-2  md:grid-cols-2 lg:grid-cols-3  2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
+                  className="grid  md:grid-cols-2 lg:grid-cols-3  2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
                 >
                   {filteredProducts.map((product, index) => (
                     <LazyProductCard

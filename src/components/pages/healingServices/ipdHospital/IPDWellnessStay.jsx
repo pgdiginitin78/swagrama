@@ -51,7 +51,7 @@ const IPDWellnessStay = () => {
     4: FirmnessRoom,
     5: InfiniteRoom,
     8: WellHouse,
-    9:OutdoorLeavingImg ,
+    9: OutdoorLeavingImg,
   };
 
   const getRoomImage = (room) => {
@@ -62,15 +62,14 @@ const IPDWellnessStay = () => {
     if (name.includes("firmness")) return FirmnessRoom;
     if (name.includes("infinite")) return InfiniteRoom;
     if (name.includes("well house") || name.includes("wellhouse"))
-      return OutdoorLeavingImg ;
-    if (name.includes("outdoor") || name.includes("out door"))
-      return WellHouse;
+      return OutdoorLeavingImg;
+    if (name.includes("outdoor") || name.includes("out door")) return WellHouse;
 
     return roomImageMap[room.roomTypeId] || EternityRoom;
   };
 
   const dynamicWellnessServices = roomList.map((room) => {
-    const image = getRoomImage(room); 
+    const image = getRoomImage(room);
 
     const occ = room.maxOccupancy ?? 0;
     let occupancyLabel = "Flexible";
@@ -194,99 +193,21 @@ const IPDWellnessStay = () => {
 
                   <div className="p-4 flex flex-col grow bg-white">
                     <h3 className="text-ayuDark font-display text-lg font-semibold tracking-tight leading-tight mb-2">
-                      {service.serviceName || "Premium Suite"}
+                      {service.serviceName || ""}
                     </h3>
-
-                    <div className="flex flex-wrap items-center gap-1.5 mb-2.5">
-                      {/* <span className="bg-lime text-ayuDark text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
-                      {service.occupancyLabel}
-                    </span> */}
-
-                      <div className=" bg-lime-100 backdrop-blur-md px-2 py-1 rounded-full text-[9px] font-bold text-ayuDark flex items-center gap-1 shadow-sm">
-                        <BedIcon
-                          sx={{ fontSize: 12 }}
-                          className="text-ayuMid"
-                        />
-                        {service.maxOcc} Guests
-                      </div>
-                      <span className="bg-orange-50 border border-orange-100 text-ayuBrown text-[8px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                        <FreeBreakfast sx={{ fontSize: 10 }} />
-                        Breakfast Included
-                      </span>
-                    </div>
-
-                    <p className="text-gray-500 text-[11px] leading-relaxed mb-1 font-light line-clamp-2">
-                      {service.description ||
-                        "A meticulously designed space featuring elegant aesthetics, deep comfort, and seamless integration with the surrounding natural beauty."}
+                    <p className="text-gray-500 text-[11px] mb-1 font-light">
+                      <span className="font-medium text-gray-700">
+                        Description :
+                      </span>{" "}
+                      {service?.description || ""}
                     </p>
-                    <p className="text-gray-500 text-[11px] leading-relaxed mb-1 font-light line-clamp-2">
-                      {service.meal || ""}
+
+                    <p className="text-gray-500 text-[11px] mb-1 font-light">
+                      <span className="font-medium text-gray-700">
+                        Benefits :
+                      </span>{" "}
+                      {service?.benefits || ""}
                     </p>
-                    <div className="grid grid-cols-2 gap-y-1.5 gap-x-1.5 text-[10px] text-ayuTulsi mb-2 pt-3 border-t border-gray-50">
-                      {isOutdoor ? (
-                        <>
-                          <div className="flex items-center gap-1.5">
-                            <DirectionsWalk
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Nature Trek
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <LocalFireDepartment
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Bonfire
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Explore
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Adventure
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircleOutline
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Guided Tour
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex items-center gap-1.5">
-                            <Landscape
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Garden View
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Bolt
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Natural Winds
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <Bathtub
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Ensuite
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            <CheckCircleOutline
-                              sx={{ fontSize: 13 }}
-                              className="text-ayuMid"
-                            />
-                            Free Wi-Fi
-                          </div>
-                        </>
-                      )}
-                    </div>
 
                     <div className="mt-auto flex items-end justify-between border-t border-gray-50">
                       <div>
@@ -328,9 +249,9 @@ const IPDWellnessStay = () => {
             })
           ) : (
             <>
-            <div className="text-center text-gray-500 text-sm flex justify-center  w-full my-32 col-span-4">
-              <p>No Rooms Available...</p>
-            </div>
+              <div className="text-center text-gray-500 text-sm flex justify-center  w-full my-32 col-span-4">
+                <p>No Rooms Available...</p>
+              </div>
             </>
           )}
         </div>

@@ -10,6 +10,7 @@ import CommonButton from "../../../common/button/CommonButton";
 import PaymentRefundDialog from "./PaymentRefundDialog";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import RescheduleAppointments from "../RescheduleAppointments";
+import RescheduleTherapy from "../RescheduleTherapy";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;
@@ -301,12 +302,23 @@ const ActivityDetailsDrawer = ({
       )}
 
       {rescheduleOpen && (
-        <RescheduleAppointments
-          open={rescheduleOpen}
-          onClose={() => setRescheduleOpen(false)}
-          bookingData={item}
-          onSuccess={onRescheduleSuccess}
-        />
+        d.isOPD ? (
+          <RescheduleAppointments
+            open={rescheduleOpen}
+            onClose={() => setRescheduleOpen(false)}
+            bookingData={item}
+            onSuccess={onRescheduleSuccess}
+            onRescheduleSuccess={onRescheduleSuccess}
+          />
+        ) : (
+          <RescheduleTherapy
+            open={rescheduleOpen}
+            onClose={() => setRescheduleOpen(false)}
+            bookingData={item}
+            onSuccess={onRescheduleSuccess}
+            onRescheduleSuccess={onRescheduleSuccess}
+          />
+        )
       )}
     </Drawer>
   );

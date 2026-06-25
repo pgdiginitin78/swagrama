@@ -1,10 +1,10 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import {
   AccessTime,
   ChevronLeft,
   ChevronRight,
   EventAvailable,
-  PersonOutline,
-  ReceiptLong,
+  PersonOutline
 } from "@mui/icons-material";
 import { Box, Modal } from "@mui/material";
 import {
@@ -20,29 +20,26 @@ import {
   startOfToday,
   subMonths,
 } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
+import SummaryIcon from "../../../../assets/SummaryIcon.svg";
 import { useAuth } from "../../../../context/AuthContext";
-import { getPatientDataByMobileNo } from "../../../../services/bookAppointment/BookAppointmentServices";
+import { getPatientDataByMobileNo, InitiatePayment } from "../../../../services/bookAppointment/BookAppointmentServices";
+import {
+  BookDetoxTherapy,
+  GetTherapySlots
+} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
+import { useLoader } from "../../../common/commonLoader/LoaderContext";
+import ConfirmationModal from "../../../common/ConfirmationModal";
 import DropdownField from "../../../common/formFields/DropdownField";
 import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
-import {
-  GetDetoxTherapySlotsByUser,
-  BookDetoxTherapy,
-  GetTherapySlots,
-} from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
-import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
-import { InitiatePayment } from "../../../../services/bookAppointment/BookAppointmentServices";
-import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
-import ConfirmationModal from "../../../common/ConfirmationModal";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
-import SummaryIcon from "../../../../assets/SummaryIcon.svg";
+import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr;

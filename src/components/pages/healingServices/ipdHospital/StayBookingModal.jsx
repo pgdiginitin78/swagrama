@@ -556,6 +556,80 @@ function StayBookingModal({
       errorAlert("Please select guest!");
       return;
     }
+
+    if (roomStatus && roomStatus !== "error") {
+      const avail = roomStatus?.availableOccupancy ?? null;
+      const roomGender = roomStatus?.gender ?? null;
+
+      const requestedAdults = Number(formValues?.noOfAdults) || 1;
+      const requestedChildren =
+        (Number(formValues?.noOfChildren0to5) || 0) +
+        (Number(formValues?.noOfChildren6to12) || 0);
+
+      if (avail !== null) {
+        if (avail <= 0) {
+          errorAlert("This room is fully occupied. No beds available.");
+          return;
+        }
+        if (avail === 1) {
+          if (requestedAdults > 1) {
+            errorAlert(
+              "Only 1 bed is available. Please select 1 adult only."
+            );
+            return;
+          }
+          if (requestedChildren > 0) {
+            errorAlert(
+              "Only 1 bed is available. Children cannot be accommodated."
+            );
+            return;
+          }
+        } else if (avail === 2) {
+          if (requestedAdults > 2) {
+            errorAlert(
+              "Only 2 beds are available. Maximum 2 adults allowed."
+            );
+            return;
+          }
+          if (requestedChildren > 0) {
+            errorAlert(
+              "Only 2 beds are available. Children cannot be accommodated."
+            );
+            return;
+          }
+        } else if (avail >= 3) {
+          if (requestedAdults > 3) {
+            errorAlert("Maximum 3 adults allowed for this room.");
+            return;
+          }
+          if (requestedAdults === 3 && requestedChildren > 0) {
+            errorAlert(
+              "With 3 adults, no additional children can be accommodated."
+            );
+            return;
+          }
+          if (requestedChildren > 2) {
+            errorAlert("Maximum 2 children allowed per booking.");
+            return;
+          }
+        }
+      }
+
+      if (roomGender !== null) {
+        const guestGender = formValues?.gender || "";
+        const roomGenderLower = roomGender.toLowerCase();
+        const guestGenderLower = guestGender.toLowerCase();
+        if (
+          guestGenderLower &&
+          guestGenderLower !== roomGenderLower
+        ) {
+          errorAlert(
+            `This room is reserved for ${roomGender} guests only. Your profile gender (${guestGender}) does not match.`
+          );
+          return;
+        }
+      }
+    }
     const saveObj = {
       userId: patientFid?.userId,
       resortId: 1,
@@ -578,7 +652,7 @@ function StayBookingModal({
       emailId: formValues?.email || "",
       mobile: String(formValues?.mobile || ""),
       city: formValues?.city || "",
-      sameGender: formValues?.sameGenderRules || false,
+      sameGender:null,
     };
     console.log("saveObj", formValues, saveObj);
 
@@ -729,8 +803,6 @@ function StayBookingModal({
     }
   }, [selectedService]);
 
-  const currentAdults = parseInt(formValues?.noOfAdults, 10) || 1;
-  const currentTwinSharing = Boolean(formValues?.twinSharing);
 
   const breakdownItems = [
     {
@@ -1470,15 +1542,36 @@ function StayBookingModal({
                           </span>
                           <button
                             type="button"
-                            disabled={
-                              label === "Room" ||
-                              (key === "adults" &&
-                                (guests.adults >= 3 ||
+                            disabled={(() => {
+                              if (label === "Room") return true;
+                              const avail =
+                                roomStatus?.availableOccupancy ?? null;
+                              if (key === "adults") {
+                                // Hard cap from availability
+                                const maxAdults =
+                                  avail !== null && avail < 3
+                                    ? avail
+                                    : 3;
+                                // Cannot add 3rd adult if children present
+                                if (
+                                  guests.adults >= maxAdults ||
                                   (guests.children > 0 &&
-                                    guests.adults >= 2))) ||
-                              (key === "children" &&
-                                (guests.children >= 2 || guests.adults >= 3))
-                            }
+                                    guests.adults >= 2)
+                                )
+                                  return true;
+                              }
+                              if (key === "children") {
+                                // Children not allowed if only 1 or 2 spots
+                                if (avail !== null && avail <= 2)
+                                  return true;
+                                if (
+                                  guests.children >= 2 ||
+                                  guests.adults >= 3
+                                )
+                                  return true;
+                              }
+                              return false;
+                            })()}
                             onClick={() => {
                               if (key === "children") {
                                 setGuests((g) => ({
@@ -1610,12 +1703,7 @@ function StayBookingModal({
                     subColor: "text-booking-primary",
                     field: "twinSharing",
                   },
-                  {
-                    label: "Same-gender rules?",
-                    sub: "*Only share with same gender",
-                    subColor: "text-red-500",
-                    field: "sameGenderRules",
-                  },
+             
                 ].map(({ label, sub, subColor, field }) => (
                   <div
                     key={field}

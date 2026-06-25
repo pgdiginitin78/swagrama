@@ -1,13 +1,73 @@
-import AddSharp from "@mui/icons-material/AddSharp";
-import RemoveSharp from "@mui/icons-material/RemoveSharp";
 import { Skeleton } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { Filter, Leaf, Menu, Search, ShoppingCart, X } from "lucide-react";
+import { Filter, Leaf, Menu, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, updateQuantity } from "../../redux/CartSlice";
+import AsafoetidaHerbsImage from "../../assets/eshop/Asafoetida 8 Herbs.png";
+import BabyHerbsImage from "../../assets/eshop/Baby Herb.png";
+import BarleriaOilImage from "../../assets/eshop/Barleria Oil.png";
+import BlackHennaImage from "../../assets/eshop/Black Henna.png";
+import BlackSaltImage from "../../assets/eshop/Black Salt.png";
+import CaneSyrupImage from "../../assets/eshop/Cane Syrup.png";
+import CowDungImage from "../../assets/eshop/Cow Dung.png";
+import CowHerbsGheeImage from "../../assets/eshop/Cow Herbs Ghee.png";
+import CrackCreamImage from "../../assets/eshop/Crack Cream.png";
+import DandruffOilImage from "../../assets/eshop/Dandruff Oil.png";
+import DandruffWashImage from "../../assets/eshop/Dandruff Wash.png";
+import DriedGrapeRaisinsImage from "../../assets/eshop/Dried Grape Raisins.png";
+import EarthwormFertilizerImage from "../../assets/eshop/Earthworm Fertilizer.png";
+import EasyDigestiveTonicImage from "../../assets/eshop/Easy Digestive Tonic.png";
+import FairFacePackImage from "../../assets/eshop/Fair Face Pack.png";
+import FemaleAnaemiaImage from "../../assets/eshop/Female Anaemia.png";
+import FemaleEnergyImage from "../../assets/eshop/Female Energy.png";
+import FeverGargleImage from "../../assets/eshop/Fever Gargle.png";
+import FractureOilTel from "../../assets/eshop/Fracture Oil Tel.png";
+import GoutOilImage from "../../assets/eshop/Gout Oil.png";
+import HairGrowOilImage from "../../assets/eshop/Hair Grow Oil.png";
+import HairShampooerImage from "../../assets/eshop/Hair Shampooer.png";
+import HoneyImage from "../../assets/eshop/Honey.png";
+import LemonGrassFreshImage from "../../assets/eshop/Lemon Grass Fresh.png";
+import LemonGrassPowderImage from "../../assets/eshop/Lemon Grass powder.png";
+import LimeWaterImage from "../../assets/eshop/Lime Water.png";
+import LiverTonicImage from "../../assets/eshop/Liver Tonic.png";
+import MouthPurityFragranceImage from "../../assets/eshop/Mouth Purity Fragrance Aroma Antidote.png";
+import NectorDropDrink from "../../assets/eshop/Nector Drop Drink.png";
+import NectorVaporInhailationImage from "../../assets/eshop/Nector Vapor Inhailation.png";
+import NerveMuscleNourishOilImage from "../../assets/eshop/Neuro Muscular Oil.png";
+import NeuroMuscularImage from "../../assets/eshop/NeuroMuscular.png";
+import NourishingDrinkImage from "../../assets/eshop/Nourishing Drink.png";
+import NourishingSweetmeatImage from "../../assets/eshop/Nourishing Sweetmeat.png";
+import PleasurePurginImage from "../../assets/eshop/Pleasure Purgin.png";
+import ReumaticOilImage from "../../assets/eshop/Reumatic Oil.png";
+import ReumatoidOilImage from "../../assets/eshop/Reumatoid Oil.png";
+import RockSugarPowderImage from "../../assets/eshop/Rock Sugar Powder.png";
+import RockSugarImage from "../../assets/eshop/Rock Sugar.png";
+import RosePetalJamImage from "../../assets/eshop/Rose Petal Jam.png";
+import SixHerbalInfusionImage from "../../assets/eshop/Six Herbal Infusion.png";
+import VaginalHealthOilImage from "../../assets/eshop/Vaginal Health Oil.png";
+import WholesomeSpicesImage from "../../assets/eshop/Wholesome Spices.png";
+import WoundCleanerOilImage from "../../assets/eshop/Wound Cleaner Oil.png";
+import WoundHealingOilImage from "../../assets/eshop/Wound Healing oil.png";
+import SafflowerCakeImage from "../../assets/eshop/करडई पेंड.png";
+import NigerSeedsCakeImage from "../../assets/eshop/कारळे पेंड.png";
+import FlaxseedPendImage from "../../assets/eshop/जवस पेंड.png";
+import SesameCakeImage from "../../assets/eshop/तीळ पेंड.png";
+import PeanutCakeImage from "../../assets/eshop/शेंगदाणा पेंड.png";
+import SunflowerSeedCakeImage from "../../assets/eshop/सूर्यफूल पेंड.png";
 import ProductDetailsModal from "./ProductDetailsModal";
 import BathPowder from "./productImages/Bath Powder.png";
+import HundredFoldPureGhee from "../../assets/eshop/Hundred Fold Pure Ghee.png";
+import NeemSeedOilImage from "../../assets/eshop/Neem Seed Oil.png";
+import PsoraleaSeedOilImage from "../../assets/eshop/Psoralea Seed oil.png";
+import PsoriaOilImage from "../../assets/eshop/Psoria Oil.png";
+import RedHeenaImage from "../../assets/eshop/Red Heena.png";
+import SkinOilImage from "../../assets/eshop/Skin Oil.png";
+import SkinTonicImage from "../../assets/eshop/Skin Tonic.png";
+import StrengtheningOilImage from "../../assets/eshop/Strengthening Oil.png";
+import SulphurEssenceImage from "../../assets/eshop/SulphurEssence.png";
+import UnguentBathImage from "../../assets/eshop/Unguent Bath.png";
+import UnguentOilImage from "../../assets/eshop/Unguent Oil.png";
+import CowNectorImage from "../../assets/eshop/Cow Nector.png"
 
 const getAllProducts = () => {
   const allProducts = [];
@@ -672,6 +732,7 @@ const medicineProducts = [
           "Shatavari (Asparagus racemosus), Saffron, Cardamom, Sugar",
         package: "250 gms Pouch",
         value: 220,
+        image: FemaleEnergyImage,
       },
       {
         id: 19,
@@ -752,22 +813,8 @@ const medicineProducts = [
         ingredients: "Apis cerana indica Honey",
         package: "100 ml Bottle",
         value: 180,
+        image: HoneyImage,
       },
-      {
-        id: 8,
-        name: "गुलकंद Rose Petal",
-        tagline: "Relax in summer with super cool",
-        benefits: [
-          "Cooling effect",
-          "Antacid",
-          "Boosts energy",
-          "Supports skin, stress relief",
-        ],
-        ingredients: "Fresh Rose Petals, Rock Sugar, Cardamom",
-        package: "500 gms Container",
-        value: 600,
-      },
-
       {
         id: 24,
         name: "तिलउपसेचन Sesame Chutney",
@@ -832,10 +879,11 @@ const medicineProducts = [
         ingredients: "Sugar Cane (Saccharum officinarum), Rock Sugar",
         package: "250 gms Pouch",
         value: 180,
+        image: RockSugarImage,
       },
       {
         id: 34,
-        name: "खडीसाखरचूर्ण -- स्वखण्डशर्कराचूर्ण Candied Sugar Powder",
+        name: "खडीसाखरचूर्ण -स्वखण्डशर्कराचूर्ण Candied Sugar Powder",
         tagline: "Uppermost medicinal sweetener",
         benefits: [
           "Energy booster",
@@ -845,10 +893,11 @@ const medicineProducts = [
         ingredients: "Sugar Cane (Saccharum officinarum), Rock Sugar",
         package: "250 gms Pouch",
         value: 180,
+        image: RockSugarPowderImage,
       },
       {
         id: 36,
-        name: "काकवी: स्वमत्स्यण्डिका Cane Syrup",
+        name: "काकवी : स्वमत्स्यण्डिका Cane Syrup",
         tagline: "Naturally nurturing liquid sweetener",
         benefits: [
           "Alternative for white sugar",
@@ -857,6 +906,7 @@ const medicineProducts = [
         ingredients: "Sugar Cane (Saccharum officinarum)",
         package: "500 gms Container",
         value: 250,
+        image: CaneSyrupImage,
       },
       {
         id: 37,
@@ -871,6 +921,7 @@ const medicineProducts = [
           "Blend of herbs & spices 30+ types, 6 types of Red Chillis, 2 Salts",
         package: "250 gms Pouch",
         value: 180,
+        image: WholesomeSpicesImage,
       },
       {
         id: 38,
@@ -886,6 +937,7 @@ const medicineProducts = [
         ingredients: "Cymbopogon citratus",
         package: "गड्डी",
         value: 150,
+        image: LemonGrassFreshImage,
       },
       {
         id: 39,
@@ -900,6 +952,7 @@ const medicineProducts = [
         ingredients: "Cymbopogon citratus",
         package: "250 gm Pouch",
         value: 180,
+        image: LemonGrassPowderImage,
       },
       {
         id: 40,
@@ -944,15 +997,17 @@ const medicineProducts = [
           "Arjuna, Manjistha, Anantmool, Lodhra, Dry Ginger, Cardamom",
         package: "250 gms Pouch",
         value: 170,
+        image: NourishingDrinkImage,
       },
       {
         id: 43,
-        name: "वनोषधि पाणी : षडङ्गपानीय Six Herbs Infusion",
+        name: "वनौषधि पाणी : षडङ्गपानीय Six Herbs Infusion",
         tagline: "Think Fever, Think Six Herbs Infusion",
         benefits: ["Fever relief", "Detoxifying", "Supports immunity"],
         ingredients: "Musta, Parpatak, Usheera, Chandana, Uddichya, Nagar",
         package: "100 gms Pouch",
         value: 140,
+        image: SixHerbalInfusionImage,
       },
       {
         id: 44,
@@ -965,6 +1020,7 @@ const medicineProducts = [
         ingredients: "Sodium Chloride, Iron sulfide, Sulfur compounds",
         package: "100 gms Pouch",
         value: 120,
+        image: BlackSaltImage,
       },
       {
         id: 45,
@@ -978,6 +1034,7 @@ const medicineProducts = [
           "Asafoetida, Black Salt, Cumin, Black Pepper, Long Pepper, Dry Ginger, Ajwain, Cow Ghee",
         package: "100 gms Pouch",
         value: 130,
+        image: AsafoetidaHerbsImage,
       },
       {
         id: 46,
@@ -990,6 +1047,7 @@ const medicineProducts = [
         ingredients: "Betel, Cloves, Cardamom, Fennel, Nutmeg",
         package: "100 gms Pouch",
         value: 150,
+        image: MouthPurityFragranceImage,
       },
 
       {
@@ -1023,6 +1081,7 @@ const medicineProducts = [
         ingredients: "Fresh Rose Petals, Rock Sugar, Cardamom",
         package: "500 gms Container",
         value: 600,
+        image: RosePetalJamImage,
       },
       {
         id: 50,
@@ -1041,6 +1100,7 @@ const medicineProducts = [
         ingredients: "Vitis vinifera Linn.",
         package: "250 gms Pouch",
         value: 140,
+        image: DriedGrapeRaisinsImage,
       },
       {
         id: 52,
@@ -1050,6 +1110,7 @@ const medicineProducts = [
         ingredients: "Flour, Ghee, Jaggery, Nuts",
         package: "250 gms Pouch",
         value: 160,
+        image: NourishingSweetmeatImage,
       },
       {
         id: 53,
@@ -1075,6 +1136,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 150,
+        image: HairShampooerImage,
       },
       {
         id: 55,
@@ -1084,15 +1146,17 @@ const medicineProducts = [
         ingredients: "Herbal oils & extracts",
         package: "100 ml Bottle",
         value: 220,
+        image: HairGrowOilImage,
       },
       {
         id: 56,
-        name: "लाल मेहंदी - रक्तगर्भमेन्धिका Red Henna",
+        name: "लाल मेहंदी - रक्तगर्भमेन्धिका Red Heena",
         tagline: "Hair & scalp care",
         benefits: ["Natural hair dye", "Strengthens hair", "Enhances shine"],
         ingredients: "Lawsonia inermis Linn. Leaves",
         package: "100 gms Pouch",
         value: 180,
+        image: RedHeenaImage,
       },
       {
         id: 57,
@@ -1102,6 +1166,7 @@ const medicineProducts = [
         ingredients: "Lawsonia inermis + Indigo",
         package: "100 gms Pouch",
         value: 180,
+        image: BlackHennaImage,
       },
       {
         id: 58,
@@ -1111,6 +1176,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 150,
+        image: DandruffWashImage,
       },
       {
         id: 59,
@@ -1120,6 +1186,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image: DandruffOilImage,
       },
       {
         id: 60,
@@ -1129,6 +1196,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image: UnguentOilImage,
       },
       {
         id: 61,
@@ -1138,6 +1206,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 150,
+        image: UnguentBathImage,
       },
       {
         id: 62,
@@ -1156,6 +1225,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image: StrengtheningOilImage,
       },
       {
         id: 64,
@@ -1175,6 +1245,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 160,
+        image: FairFacePackImage,
       },
       {
         id: 66,
@@ -1187,6 +1258,7 @@ const medicineProducts = [
         ingredients: "Cow Ghee, purified 100 times",
         package: "50 gm Container",
         value: 220,
+        image: HundredFoldPureGhee,
       },
       {
         id: 67,
@@ -1196,6 +1268,7 @@ const medicineProducts = [
         ingredients: "Herbal extracts & oils",
         package: "50 gm Container",
         value: 200,
+        image: CrackCreamImage,
       },
       {
         id: 68,
@@ -1205,6 +1278,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image: SkinOilImage,
       },
       {
         id: 69,
@@ -1223,6 +1297,7 @@ const medicineProducts = [
         ingredients: "Neem seeds",
         package: "100 ml Bottle",
         value: 220,
+        image: NeemSeedOilImage,
       },
       {
         id: 71,
@@ -1232,6 +1307,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: PsoriaOilImage,
       },
       {
         id: 72,
@@ -1241,6 +1317,7 @@ const medicineProducts = [
         ingredients: "Psoralea seeds",
         package: "100 ml Bottle",
         value: 220,
+        image: PsoraleaSeedOilImage,
       },
       {
         id: 73,
@@ -1250,6 +1327,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 350,
+        image: SkinTonicImage,
       },
       {
         id: 74,
@@ -1259,6 +1337,7 @@ const medicineProducts = [
         ingredients: "Sulphur essence",
         package: "50 ml Bottle",
         value: 250,
+        image: SulphurEssenceImage,
       },
     ],
   },
@@ -1361,6 +1440,7 @@ const medicineProducts = [
         ingredients: "Herbal decoction",
         package: "100 gms Pouch",
         value: 130,
+        image: FeverGargleImage,
       },
       {
         id: 85,
@@ -1370,6 +1450,7 @@ const medicineProducts = [
         ingredients: "Herbal decoction",
         package: "10 ml Drop Bottle",
         value: 160,
+        image: NectorVaporInhailationImage,
       },
       {
         id: 86,
@@ -1379,6 +1460,7 @@ const medicineProducts = [
         ingredients: "Herbal extracts & honey",
         package: "15 ml Drop Bottle",
         value: 180,
+        image: NectorDropDrink,
       },
       {
         id: 87,
@@ -1397,6 +1479,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: NerveMuscleNourishOilImage,
       },
       {
         id: 89,
@@ -1406,6 +1489,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: NerveMuscleNourishOilImage,
       },
       {
         id: 90,
@@ -1415,6 +1499,7 @@ const medicineProducts = [
         ingredients: "Barleria herb extract",
         package: "100 ml Bottle",
         value: 220,
+        image: BarleriaOilImage,
       },
       {
         id: 91,
@@ -1424,6 +1509,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: ReumaticOilImage,
       },
       {
         id: 92,
@@ -1433,6 +1519,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: WoundCleanerOilImage,
       },
       {
         id: 93,
@@ -1442,6 +1529,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: WoundHealingOilImage,
       },
       {
         id: 94,
@@ -1451,6 +1539,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: ReumatoidOilImage,
       },
       {
         id: 95,
@@ -1460,6 +1549,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: GoutOilImage,
       },
       {
         id: 96,
@@ -1469,6 +1559,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: FractureOilTel,
       },
     ],
   },
@@ -1484,15 +1575,17 @@ const medicineProducts = [
         ingredients: "Herbal extracts & oils",
         package: "As per weight",
         value: 200,
+        image: BabyHerbsImage,
       },
       {
         id: 98,
-        name: "महागव्योषधिघृत Cow Hebs Ghee",
+        name: "महागव्योषधिघृत Cow Herbs Ghee",
         tagline: "Nutritive ghee for health & vitality",
         benefits: ["Enhance digestion, immunity, and overall wellness"],
         ingredients: "Cow Ghee, Ayurvedic Herbs",
         package: "500 gms Container",
         value: 850,
+        image: CowHerbsGheeImage,
       },
       {
         id: 99,
@@ -1504,6 +1597,7 @@ const medicineProducts = [
         ingredients: "Shatavari, Herbal Extracts, Ghee",
         package: "500 gms Container",
         value: 800,
+        image: FemaleAnaemiaImage,
       },
       {
         id: 16,
@@ -1531,6 +1625,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
+        image: LiverTonicImage,
       },
       {
         id: 102,
@@ -1540,6 +1635,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 450,
+        image: NeuroMuscularImage,
       },
       {
         id: 103,
@@ -1621,6 +1717,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 250,
+        image: LimeWaterImage,
       },
       {
         id: 113,
@@ -1648,6 +1745,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
+        image: EasyDigestiveTonicImage,
       },
       {
         id: 116,
@@ -1693,6 +1791,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image: VaginalHealthOilImage,
       },
       {
         id: 121,
@@ -1702,6 +1801,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 130,
+        image: PleasurePurginImage,
       },
     ],
   },
@@ -1721,6 +1821,7 @@ const medicineProducts = [
         ingredients: "Sesamum indicum Seed",
         package: "5 kg Pack",
         value: 1200,
+        image: SesameCakeImage,
       },
       {
         id: 123,
@@ -1734,6 +1835,7 @@ const medicineProducts = [
         ingredients: "Arachis hypogaea Seed",
         package: "5 kg Pack",
         value: 1200,
+        image: PeanutCakeImage,
       },
       {
         id: 124,
@@ -1747,6 +1849,7 @@ const medicineProducts = [
         ingredients: "Guizotia abyssinica Seed",
         package: "5 kg Pack",
         value: 1200,
+        image: NigerSeedsCakeImage,
       },
       {
         id: 125,
@@ -1760,6 +1863,7 @@ const medicineProducts = [
         ingredients: "Linum usitatissimum Linn. Seeds",
         package: "5 kg Pack",
         value: 1200,
+        image: FlaxseedPendImage,
       },
       {
         id: 126,
@@ -1773,6 +1877,7 @@ const medicineProducts = [
         ingredients: "Carthamus tinctorius Linn. Seeds",
         package: "5 kg Pack",
         value: 1200,
+        image: SafflowerCakeImage,
       },
       {
         id: 127,
@@ -1786,6 +1891,7 @@ const medicineProducts = [
         ingredients: "Helianthus annuus Linn. Seed Oil",
         package: "5 kg Pack",
         value: 1200,
+        image: SunflowerSeedCakeImage,
       },
       {
         id: 128,
@@ -1798,6 +1904,7 @@ const medicineProducts = [
         ingredients: "Earthworm Castings",
         package: "1 kg Pouch",
         value: 300,
+        image: EarthwormFertilizerImage,
       },
       {
         id: 129,
@@ -1811,6 +1918,17 @@ const medicineProducts = [
         ingredients: "Bos indicus Urina (Gomutra)",
         package: "1 litre Bottle",
         value: 450,
+        image:CowNectorImage
+      },
+      {
+        id: 159,
+        name: "गोवरी  गोमयुपल Cow Dung Cake",
+        tagline: "Natural fertilizer & sacred offering",
+        benefits: ["Natural fertilizer & sacred offering for rituals"],
+        ingredients: "",
+        package: "5kg Pack",
+        value: 250,
+        image: CowDungImage,
       },
     ],
   },

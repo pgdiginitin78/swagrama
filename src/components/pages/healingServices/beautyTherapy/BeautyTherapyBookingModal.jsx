@@ -61,8 +61,16 @@ const schema = yup.object().shape({
   mobile: yup.string().required("Mobile number is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   city: yup.string().nullable(),
-  patientFid: dropdownObjectSchema.typeError("Patient is required"),
-  serviceFid: dropdownObjectSchema.typeError("Therapy is required"),
+  patientFid: yup
+    .mixed()
+    .nullable()
+    .required("Patient is required")
+    .test("is-selected", "Patient is required", (val) => val !== null && val !== undefined),
+  serviceFid: yup
+    .mixed()
+    .nullable()
+    .required("Therapy is required")
+    .test("is-selected", "Therapy is required", (val) => val !== null && val !== undefined),
   bookingDate: yup.date().required("Booking date is required").nullable(),
   termsAccepted: yup
     .boolean()
@@ -230,7 +238,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       .then((res) => {
         const data = res?.data?.data || [];
         const filterData = data.find(
-          (item) => String(item.patientId) === String(user?.userId),
+          (item) => String(item.mobileNo) === String(user?.mobileNo),
         );
         if (data?.length) {
           setPatientOptions(
@@ -335,9 +343,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
     }
     setSlotError("");
     const saveObj = {
-      role: patientFid?.userId === user?.userId ? "self" : "other",
+      role: String(patientFid?.mobileNo) === String(user?.mobileNo) ? "self" : "other",
       userId: user?.userId || null,
-      patientFid: patientFid?.userId,
+      patientFid: patientFid?.patientId,
       createdBy: user?.userId,
       clinicFid: 5,
       SpecificRequest: data.specialRequest,
@@ -784,7 +792,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                       <CommonButton
                         type="submit"
                         label="Book Now"
-                        onClick={handleSubmit(onSubmit)}
                         className="bg-booking-primary hover:bg-booking-primaryDark text-white  transition-transform w-full sm:w-auto"
                         disabled={!termsAccepted}
                       />

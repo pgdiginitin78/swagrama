@@ -3,17 +3,26 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Filter, Leaf, Menu, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import AllSeasonSpicesImage from "../../assets/eshop/All Season Spices.png";
+import AllSeasonTeaImage from "../../assets/eshop/All Season Tea.png";
 import AsafoetidaHerbsImage from "../../assets/eshop/Asafoetida 8 Herbs.png";
 import BabyHerbsImage from "../../assets/eshop/Baby Herb.png";
 import BarleriaOilImage from "../../assets/eshop/Barleria Oil.png";
+import BetelLeafPortionImage from "../../assets/eshop/Betel Leaf Portion.png";
 import BlackHennaImage from "../../assets/eshop/Black Henna.png";
 import BlackSaltImage from "../../assets/eshop/Black Salt.png";
 import CaneSyrupImage from "../../assets/eshop/Cane Syrup.png";
+import CoconutChutneyImage from "../../assets/eshop/Coconut Chutney.png";
+import CoconutOilImage from "../../assets/eshop/Coconut Oil_Bottle clear pharma grade bottle.png";
 import CowDungImage from "../../assets/eshop/Cow Dung.png";
 import CowHerbsGheeImage from "../../assets/eshop/Cow Herbs Ghee.png";
+import CowNectorImage from "../../assets/eshop/Cow Nector.png";
 import CrackCreamImage from "../../assets/eshop/Crack Cream.png";
+import CurryLeavesChutneyImage from "../../assets/eshop/Curry Leaves Chutney.png";
 import DandruffOilImage from "../../assets/eshop/Dandruff Oil.png";
 import DandruffWashImage from "../../assets/eshop/Dandruff Wash.png";
+import DesiRiceFlourLDEImage from "../../assets/eshop/Desi Rice Flour LDE.png";
+import DesiRiceImage from "../../assets/eshop/Desi Rice.png";
 import DriedGrapeRaisinsImage from "../../assets/eshop/Dried Grape Raisins.png";
 import EarthwormFertilizerImage from "../../assets/eshop/Earthworm Fertilizer.png";
 import EasyDigestiveTonicImage from "../../assets/eshop/Easy Digestive Tonic.png";
@@ -21,30 +30,69 @@ import FairFacePackImage from "../../assets/eshop/Fair Face Pack.png";
 import FemaleAnaemiaImage from "../../assets/eshop/Female Anaemia.png";
 import FemaleEnergyImage from "../../assets/eshop/Female Energy.png";
 import FeverGargleImage from "../../assets/eshop/Fever Gargle.png";
+import FlaxseedChutneyImage from "../../assets/eshop/Flaxseed Chutney.png";
+import FlaxseedsOilImage from "../../assets/eshop/Flaxseeds Oil.png";
 import FractureOilTel from "../../assets/eshop/Fracture Oil Tel.png";
+import GarlicGingerChutneyImage from "../../assets/eshop/Garlic Ginger Chutney.png";
 import GoutOilImage from "../../assets/eshop/Gout Oil.png";
+import GreenTeaImage from "../../assets/eshop/Green Tea.png";
 import HairGrowOilImage from "../../assets/eshop/Hair Grow Oil.png";
 import HairShampooerImage from "../../assets/eshop/Hair Shampooer.png";
 import HoneyImage from "../../assets/eshop/Honey.png";
+import HorseGramFlourImage from "../../assets/eshop/Horse Gram Flour.png";
+import HundredFoldPureGhee from "../../assets/eshop/Hundred Fold Pure Ghee.png";
+import JowarSorghumFlourPouchImage from "../../assets/eshop/Jowar Sorghum Flour Pouch.png";
+import KhapliEmmerWheatFlourImage from "../../assets/eshop/Khapli Emmer Wheat Flour.png";
+import KhapliGahuLapsiImage from "../../assets/eshop/Khapli Emmwr Wheat Porridge.png";
 import LemonGrassFreshImage from "../../assets/eshop/Lemon Grass Fresh.png";
 import LemonGrassPowderImage from "../../assets/eshop/Lemon Grass powder.png";
 import LimeWaterImage from "../../assets/eshop/Lime Water.png";
 import LiverTonicImage from "../../assets/eshop/Liver Tonic.png";
+import MaizeCornPorridgeImage from "../../assets/eshop/Maize-Corn Porridge.png";
 import MouthPurityFragranceImage from "../../assets/eshop/Mouth Purity Fragrance Aroma Antidote.png";
 import NectorDropDrink from "../../assets/eshop/Nector Drop Drink.png";
 import NectorVaporInhailationImage from "../../assets/eshop/Nector Vapor Inhailation.png";
+import NeemSeedOilImage from "../../assets/eshop/Neem Seed Oil.png";
 import NerveMuscleNourishOilImage from "../../assets/eshop/Neuro Muscular Oil.png";
 import NeuroMuscularImage from "../../assets/eshop/NeuroMuscular.png";
+import NigerSeedsChutney from "../../assets/eshop/Niger Seeds Chutney.png";
+import NigerSeedsOilBottleImage from "../../assets/eshop/Niger Seeds Oil  Bottle clear pharma grade bottle.png";
 import NourishingDrinkImage from "../../assets/eshop/Nourishing Drink.png";
 import NourishingSweetmeatImage from "../../assets/eshop/Nourishing Sweetmeat.png";
+import PainReliefOilImage from "../../assets/eshop/Pain Relief Oil.png";
+import PeanutChutneyImage from "../../assets/eshop/Peanut Chutney.png";
+import PeanutOilBottleImage from "../../assets/eshop/Peanut Oil Bottle.png";
+import PearlMilletFlourImage from "../../assets/eshop/PearlMilletFlour.png";
 import PleasurePurginImage from "../../assets/eshop/Pleasure Purgin.png";
+import PsoraleaSeedOilImage from "../../assets/eshop/Psoralea Seed oil.png";
+import PsoriaOilImage from "../../assets/eshop/Psoria Oil.png";
+import PureDesiJaggeryImage from "../../assets/eshop/Pure Desi Jaggery.png";
+import RawSeaSaltImage from "../../assets/eshop/Raw Sea Salt.png";
+import RedChilliPowderImage from "../../assets/eshop/Red Chilly.png";
+import RedHeenaImage from "../../assets/eshop/Red Heena.png";
 import ReumaticOilImage from "../../assets/eshop/Reumatic Oil.png";
 import ReumatoidOilImage from "../../assets/eshop/Reumatoid Oil.png";
+import RockSaltBottleImage from "../../assets/eshop/Rock Salt _Bottle.png";
 import RockSugarPowderImage from "../../assets/eshop/Rock Sugar Powder.png";
 import RockSugarImage from "../../assets/eshop/Rock Sugar.png";
 import RosePetalJamImage from "../../assets/eshop/Rose Petal Jam.png";
+import SafflowerOilImage from "../../assets/eshop/Safflower Oil.png";
+import SeaSaltImage from "../../assets/eshop/Sea Salt Powder.png";
+import SesameChutneyImage from "../../assets/eshop/Sesame Chutney.png";
+import SesameOilBottleImage from "../../assets/eshop/Sesame Oil _Bottle clear pharma grade bottle.png";
+import SharbatMasala from "../../assets/eshop/Sharbat Masala Ashtalavanapetva Nectar.png";
 import SixHerbalInfusionImage from "../../assets/eshop/Six Herbal Infusion.png";
+import SkinOilImage from "../../assets/eshop/Skin Oil.png";
+import SkinTonicImage from "../../assets/eshop/Skin Tonic.png";
+import SpiceDrinkIamge from "../../assets/eshop/Spice Drink.png";
+import StrengtheningOilImage from "../../assets/eshop/Strengthening Oil.png";
+import SulphurEssenceImage from "../../assets/eshop/SulphurEssence.png";
+import SunflowerOilBottleImage from "../../assets/eshop/Sunflower Oil_Bottle clear pharma grade.png";
+import TherapeuticOilImage from "../../assets/eshop/Therapeutic Oil.png";
+import UnguentBathImage from "../../assets/eshop/Unguent Bath.png";
+import UnguentOilImage from "../../assets/eshop/Unguent Oil.png";
 import VaginalHealthOilImage from "../../assets/eshop/Vaginal Health Oil.png";
+import VaraiMilletImage from "../../assets/eshop/Varai Millet.png";
 import WholesomeSpicesImage from "../../assets/eshop/Wholesome Spices.png";
 import WoundCleanerOilImage from "../../assets/eshop/Wound Cleaner Oil.png";
 import WoundHealingOilImage from "../../assets/eshop/Wound Healing oil.png";
@@ -52,51 +100,11 @@ import SafflowerCakeImage from "../../assets/eshop/करडई पेंड.png
 import NigerSeedsCakeImage from "../../assets/eshop/कारळे पेंड.png";
 import FlaxseedPendImage from "../../assets/eshop/जवस पेंड.png";
 import SesameCakeImage from "../../assets/eshop/तीळ पेंड.png";
+import राणप्राशावलेहVitalElectuaryimage from "../../assets/eshop/राणप्राशावलेह Vital Electuary.png";
 import PeanutCakeImage from "../../assets/eshop/शेंगदाणा पेंड.png";
 import SunflowerSeedCakeImage from "../../assets/eshop/सूर्यफूल पेंड.png";
 import ProductDetailsModal from "./ProductDetailsModal";
 import BathPowder from "./productImages/Bath Powder.png";
-import HundredFoldPureGhee from "../../assets/eshop/Hundred Fold Pure Ghee.png";
-import NeemSeedOilImage from "../../assets/eshop/Neem Seed Oil.png";
-import PsoraleaSeedOilImage from "../../assets/eshop/Psoralea Seed oil.png";
-import PsoriaOilImage from "../../assets/eshop/Psoria Oil.png";
-import RedHeenaImage from "../../assets/eshop/Red Heena.png";
-import SkinOilImage from "../../assets/eshop/Skin Oil.png";
-import SkinTonicImage from "../../assets/eshop/Skin Tonic.png";
-import StrengtheningOilImage from "../../assets/eshop/Strengthening Oil.png";
-import SulphurEssenceImage from "../../assets/eshop/SulphurEssence.png";
-import UnguentBathImage from "../../assets/eshop/Unguent Bath.png";
-import UnguentOilImage from "../../assets/eshop/Unguent Oil.png";
-import CowNectorImage from "../../assets/eshop/Cow Nector.png"
-import RockSaltBottleImage from "../../assets/eshop/Rock Salt _Bottle.png"
-import AllSeasonSpicesImage from "../../assets/eshop/All Season Spices.png"
-import CoconutOilImage from "../../assets/eshop/Coconut Oil_Bottle clear pharma grade bottle.png"
-import CurryLeavesChutneyImage from "../../assets/eshop/Curry Leaves Chutney.png"
-import VaraiMilletImage from "../../assets/eshop/Varai Millet.png"
-import TherapeuticOilImage from "../../assets/eshop/Therapeutic Oil.png"
-import SunflowerOilBottleImage from "../../assets/eshop/Sunflower Oil_Bottle clear pharma grade.png"
-import SesameOilBottleImage from "../../assets/eshop/Sesame Oil _Bottle clear pharma grade bottle.png"
-import SesameChutneyImage from "../../assets/eshop/Sesame Chutney.png"
-import SeaSaltImage from "../../assets/eshop/Sea Salt Powder.png"
-import SafflowerOilImage from "../../assets/eshop/Safflower Oil.png"
-import RedChilliPowderImage from "../../assets/eshop/Red Chilly.png"
-import RawSeaSaltImage from "../../assets/eshop/Raw Sea Salt.png"
-import PeanutOilBottleImage from "../../assets/eshop/Peanut Oil Bottle.png"
-import PeanutChutneyImage from "../../assets/eshop/Peanut Chutney.png"
-import PainReliefOilImage from "../../assets/eshop/Pain Relief Oil.png"
-import NigerSeedsOilBottleImage from "../../assets/eshop/Niger Seeds Oil  Bottle clear pharma grade bottle.png"
-import NigerSeedsChutney from "../../assets/eshop/Niger Seeds Chutney.png"
-import SharbatMasala from "../../assets/eshop/Sharbat Masala Ashtalavanapetva Nectar.png"
-import MaizeCornPorridgeImage from "../../assets/eshop/Maize-Corn Porridge.png"
-import KhapliGahuLapsiImage from "../../assets/eshop/Khapli Emmwr Wheat Porridge.png"
-import KhapliEmmerWheatFlourImage from "../../assets/eshop/Khapli Emmer Wheat Flour.png"
-import JowarSorghumFlourPouchImage from "../../assets/eshop/Jowar Sorghum Flour Pouch.png"
-import HorseGramFlourImage from "../../assets/eshop/Horse Gram Flour.png"
-import GarlicGingerChutneyImage from "../../assets/eshop/Garlic Ginger Chutney.png"
-import FlaxseedsOilImage from "../../assets/eshop/Flaxseeds Oil.png"
-import FlaxseedChutneyImage from "../../assets/eshop/Flaxseed Chutney.png"
-
-
 
 const getAllProducts = () => {
   const allProducts = [];
@@ -135,7 +143,7 @@ const ProductCardSkeleton = ({ index }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden shadow-md p-3"
+      className="bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden shadow-md p-3 h-full flex flex-col"
     >
       <div className="flex items-start justify-between mb-2">
         <Skeleton
@@ -253,7 +261,7 @@ const LazyProductCard = ({ product, index, onOpenModal }) => {
   }, []);
 
   return (
-    <div ref={cardRef}>
+    <div ref={cardRef} className="h-full">
       {isVisible && isLoaded ? (
         <ProductCard
           product={product}
@@ -279,7 +287,7 @@ const ProductCard = ({ product, index, onOpenModal }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="group relative bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden border border-green-100 shadow-md hover:shadow-xl transition-all duration-500 flex flex-col"
+      className="group relative bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden border border-green-100 shadow-md hover:shadow-xl transition-all duration-500 flex flex-col h-full"
     >
       <div className="w-full aspect-square overflow-hidden relative flex-shrink-0 bg-green-50">
         {product?.image && (
@@ -645,7 +653,7 @@ const medicineProducts = [
     products: [
       {
         id: 1,
-        name: "शुद्ध गूळ -- स्वविमलगुड Pure Jaggery",
+        name: "शुद्ध गूळ -- स्वविमलगुड Pure Desi Jaggery",
         tagline: "Nutritional sweetness from naturally grown sugarcane",
         benefits: [
           "Alternative for white sugar",
@@ -658,6 +666,7 @@ const medicineProducts = [
         ingredients: "Sugar Cane (Saccharum officinarum)",
         package: "1 kg Pouch",
         value: 280,
+        image: PureDesiJaggeryImage
       },
       {
         id: 2,
@@ -712,6 +721,7 @@ const medicineProducts = [
           "Betel Leaves, Lime, Catechu Betel Leaf, Lime, Catechu, Betel Nut, Cardamom, Cloves, Fennel, Coconut, Nutmeg, Jeshthmadh, Camphor, Kankol, Saffron, Poppy Seeds",
         package: "100 gms Pouch",
         value: 120,
+        image: BetelLeafPortionImage
       },
       {
         id: 4,
@@ -766,6 +776,21 @@ const medicineProducts = [
         package: "500 gms Pouch",
         value: 150,
         image: JowarSorghumFlourPouchImage,
+      },
+      {
+        id: 505,
+        name: "बाजरी पीठ Pearl Millet Flour",
+        tagline: "Stone Milled • Naturally Nutritious • Premium Quality",
+        benefits: [
+          "Rich in dietary fiber for healthy digestion",
+          "A good source of protein and essential minerals",
+          "Provides sustained energy throughout the day",
+          "Ideal for making nutritious bhakri, rotis, and traditional recipes"
+        ],
+        ingredients: "100% Stone Milled Pearl Millet (Bajra). No preservatives, additives, or artificial ingredients.",
+        package: "500 gms Pouch",
+        value: 160,
+        image: PearlMilletFlourImage,
       },
       {
         id: 511,
@@ -839,7 +864,7 @@ const medicineProducts = [
         ingredients: "Linum usitatissimum Linn. Seeds Oil",
         package: "500 ml Bottle",
         value: 400,
-        image:FlaxseedsOilImage
+        image: FlaxseedsOilImage
       },
       {
         id: 20,
@@ -941,10 +966,11 @@ const medicineProducts = [
         ingredients: "Coconut, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
+        image: CoconutChutneyImage
       },
       {
         id: 26,
-        name: " Coconut Oil",
+        name: "Coconut Oil",
         tagline: "Cold Pressed Coconut Oil",
         benefits: ["Supports digestion", "Rich in nutrients", "Good for hair & skin"],
         ingredients: "Coconut",
@@ -970,7 +996,7 @@ const medicineProducts = [
         ingredients: "Flaxseeds, Spices",
         package: "100 gms Pouch",
         value: 130,
-        image:FlaxseedChutneyImage
+        image: FlaxseedChutneyImage
       },
       {
         id: 45,
@@ -1021,6 +1047,36 @@ const medicineProducts = [
         package: "250 gms Pouch",
         value: 180,
         image: RockSugarPowderImage,
+      },
+      {
+        id: 530,
+        name: "देशी तांदूळ Desi Rice",
+        tagline: "Traditional • Naturally Grown • Wholesome",
+        benefits: [
+          "Naturally rich in nutrients and energy",
+          "Easy to digest and suitable for daily meals",
+          "Supports a balanced and healthy diet",
+          "Ideal for traditional Indian recipes"
+        ],
+        ingredients: "100% Naturally Grown Desi Rice. No preservatives, additives, or artificial polishing.",
+        package: "1 kg Pouch",
+        value: 180,
+        image: DesiRiceImage,
+      },
+      {
+        id: 54,
+        name: "देशी तांदूळ पीठ Desi Rice Flour",
+        tagline: "Stone Milled • Naturally Nutritious • Premium Quality",
+        benefits: [
+          "Made from naturally grown desi rice",
+          "Easy to digest and suitable for everyday cooking",
+          "Ideal for rotis, bhakri, dosa, idli, and traditional recipes",
+          "Free from preservatives and artificial additives"
+        ],
+        ingredients: "100% Stone Milled Desi Rice. No preservatives, additives, or artificial ingredients.",
+        package: "500 gms LDE Pack",
+        value: 150,
+        image: DesiRiceFlourLDEImage,
       },
       {
         id: 36,
@@ -1095,6 +1151,7 @@ const medicineProducts = [
           "Camellia sinensis, Ginger, Coriander, Fennel, Black Pepper, Cinnamon, Liquorice",
         package: "250 gms Pouch",
         value: 160,
+        image: AllSeasonTeaImage
       },
       {
         id: 41,
@@ -1111,6 +1168,7 @@ const medicineProducts = [
           "Camellia sinensis, Ginger, Coriander, Fennel, Black Pepper",
         package: "250 gm Pouch",
         value: 350,
+        image: GreenTeaImage
       },
       {
         id: 42,
@@ -1208,6 +1266,7 @@ const medicineProducts = [
           "Amalaki, Ashwagandha, Shatavari, Ghee, Honey, 40+ Herbs & Spices",
         package: "500 gms Container",
         value: 750,
+        image:राणप्राशावलेहVitalElectuaryimage
       },
       {
         id: 49,
@@ -1233,6 +1292,7 @@ const medicineProducts = [
         ingredients: "Combination of Ayurvedic herbs & Ghee",
         package: "500 gms Container",
         value: 700,
+        image:राणप्राशावलेहVitalElectuaryimage
       },
       {
         id: 51,
@@ -1263,6 +1323,7 @@ const medicineProducts = [
           "Ginger, Fennel, Black Pepper, Cinnamon, Liquorice, Cardamom, Clove, Nutmeg",
         package: "250 gm Pouch",
         value: 200,
+        image:SpiceDrinkIamge
       },
     ],
   },

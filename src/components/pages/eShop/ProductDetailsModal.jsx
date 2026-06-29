@@ -3,6 +3,7 @@ import { Modal, Box } from "@mui/material";
 import { Leaf, ShoppingBag, Plus, Minus, X } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/CartSlice";
+import CancelButtonModal from "../../common/button/CancelButtonModal";
 
 const ProductDetailsModal = ({ open, handleClose, product }) => {
   const dispatch = useDispatch();
@@ -38,14 +39,11 @@ const ProductDetailsModal = ({ open, handleClose, product }) => {
     >
       <Box
         sx={{ outline: "none" }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-sm relative flex flex-col"
+        className="bg-white rounded shadow-2xl w-full max-w-sm relative flex flex-col"
       >
-        <button
+        <CancelButtonModal
           onClick={handleClose}
-          className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
-        >
-          <X className="w-3.5 h-3.5 text-gray-600" />
-        </button>
+        />
 
         <div className="flex items-start gap-3 px-4 pt-4 pb-3 border-b border-gray-100">
           <div
@@ -88,7 +86,7 @@ const ProductDetailsModal = ({ open, handleClose, product }) => {
 
         <div className="px-4 py-3 space-y-3">
           <div className="flex gap-2">
-            <div className="flex-1 bg-gray-50 rounded-lg px-2 py-2 border border-gray-100">
+            <div className="flex-1 bg-gray-50 rounded-lg px-2 py-2 border border-green-200">
               <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
                 Category
               </p>
@@ -96,7 +94,7 @@ const ProductDetailsModal = ({ open, handleClose, product }) => {
                 {product.category}
               </p>
             </div>
-            <div className="flex-1 bg-gray-50 rounded-lg px-2 py-2 border border-gray-100">
+            <div className="flex-1 bg-gray-50 rounded-lg px-2 py-2 border border-green-200">
               <p className="text-[8px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">
                 Package
               </p>

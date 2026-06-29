@@ -1266,7 +1266,7 @@ const medicineProducts = [
           "Amalaki, Ashwagandha, Shatavari, Ghee, Honey, 40+ Herbs & Spices",
         package: "500 gms Container",
         value: 750,
-        image:राणप्राशावलेहVitalElectuaryimage
+        image: राणप्राशावलेहVitalElectuaryimage
       },
       {
         id: 49,
@@ -1292,7 +1292,7 @@ const medicineProducts = [
         ingredients: "Combination of Ayurvedic herbs & Ghee",
         package: "500 gms Container",
         value: 700,
-        image:राणप्राशावलेहVitalElectuaryimage
+        image: राणप्राशावलेहVitalElectuaryimage
       },
       {
         id: 51,
@@ -1323,7 +1323,7 @@ const medicineProducts = [
           "Ginger, Fennel, Black Pepper, Cinnamon, Liquorice, Cardamom, Clove, Nutmeg",
         package: "250 gm Pouch",
         value: 200,
-        image:SpiceDrinkIamge
+        image: SpiceDrinkIamge
       },
     ],
   },

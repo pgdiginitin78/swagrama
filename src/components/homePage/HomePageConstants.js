@@ -13,13 +13,13 @@ import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.webp";
 import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.webp";
 import NaturalHabitat from "../assets/landing-page/ayurvedaservices/Natural_habitat.webp";
 import Swagurukul from "../assets/landing-page/ayurvedaservices/Swagurukul.webp";
-import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.png";
-import PradipTaware from "../assets/landing-page/ourexperts/Pradip Taware.png";
-import SandipMehetre from "../assets/landing-page/ourexperts/Sandip Mehetre.png";
-import SantoshSuryavanshi from "../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
-import SmitaMehetre from "../assets/landing-page/ourexperts/Vd Smita mehetre.png";
-import VaishaliHolmukhe from "../assets/landing-page/ourexperts/Vaishali Holmukhe.png";
-import AvantiNitsure from "../assets/landing-page/ourexperts/Avanti Nitsure.png";
+import ManishaSuryawanshi from "../assets/landing-page/ourexperts/ManishaSuryavanshi.webp";
+import PradipTaware from "../assets/landing-page/ourexperts/Pradip Taware.webp";
+import SandipMehetre from "../assets/landing-page/ourexperts/Sandip Mehetre.webp";
+import SantoshSuryavanshi from "../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
+import SmitaMehetre from "../assets/landing-page/ourexperts/Vd Smita mehetre.webp";
+import VaishaliHolmukhe from "../assets/landing-page/ourexperts/Vaishali Holmukhe.webp";
+import AvantiNitsure from "../assets/landing-page/ourexperts/Avanti Nitsure.webp";
 
 export const healers = [
   {

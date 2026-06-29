@@ -27,10 +27,10 @@ const formatTime = (timeStr) => {
 const formatDate = (dateStr) =>
   dateStr?.includes("T")
     ? new Date(dateStr).toLocaleDateString("en-US", {
-        month: "short",
-        day: "2-digit",
-        year: "numeric",
-      })
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    })
     : dateStr;
 
 const formatAmount = (amount) =>
@@ -43,7 +43,7 @@ const getActivityDisplayData = (data) => {
   const isOPD = data.type === "OPD";
 
 
-  console.log("data`1234",data)
+  console.log("data`1234", data)
   return {
     id: data.bookingId || data.id || "N/A",
     name: data.title || data.name || data.doctorName,
@@ -116,7 +116,7 @@ const ActivityDetailsDrawer = ({
     icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
   };
 
-  console.log("1234567",d,item)
+  console.log("1234567", d, item)
 
   return (
     <Drawer
@@ -275,16 +275,26 @@ const ActivityDetailsDrawer = ({
 
         <div className="flex gap-2 2xl:gap-3 px-3 2xl:px-4 py-3 2xl:py-4 border-t border-green-100 bg-white shrink-0 shadow-[0_-4px_16px_rgba(21,128,61,0.02)]">
           <CommonButton
-            type="button"        
+            type="button"
             label="Cancel Booking"
+            disabled={
+              item?.isCancelBooking === false ||
+              item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
+              item?.bookingStatus === "Cancelled"
+            }
             onClick={() => setRefundDialogOpen(true)}
-            className={`text-[10px] 2xl:text-xs border bg-red-50 text-red-700 border-red-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
+            className={`disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs border bg-red-50 text-red-700 border-red-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
           />
           {!d.isStay && (
             <CommonButton
               type="button"
+                    disabled={
+              item?.isCancelBooking === false ||
+              item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
+              item?.bookingStatus === "Cancelled"
+            }
               label="Reschedule"
-              className="flex-1 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
+              className="flex-1  disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
               onClick={() => setRescheduleOpen(true)}
             />
           )}
@@ -296,7 +306,6 @@ const ActivityDetailsDrawer = ({
           open={refundDialogOpen}
           onClose={() => setRefundDialogOpen(false)}
           onConfirm={() => {
-            console.log("Refund requested for:", item);
             setRefundDialogOpen(false);
           }}
           bookingData={item}
@@ -304,7 +313,7 @@ const ActivityDetailsDrawer = ({
       )}
 
       {rescheduleOpen && (
-        d.isOPD === true? (
+        d.isOPD === true ? (
           <RescheduleAppointments
             open={rescheduleOpen}
             onClose={() => setRescheduleOpen(false)}

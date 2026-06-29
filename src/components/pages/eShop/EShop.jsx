@@ -538,7 +538,7 @@ const EShop = () => {
                   <label className="block text-xs font-semibold text-green-800 mb-2">
                     Category
                   </label>
-                  <div className="space-y-1.5 max-h-64 overflow-y-auto pr-2">
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto no-scrollbar pr-2">
                     {isInitialLoading
                       ? Array.from({ length: 6 }).map((_, i) => (
                         <Skeleton

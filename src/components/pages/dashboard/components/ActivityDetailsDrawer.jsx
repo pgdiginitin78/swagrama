@@ -278,26 +278,26 @@ const ActivityDetailsDrawer = ({
             type="button"
             label="Cancel Booking"
             disabled={
-              item?.isCancelBooking === false ||
+              item?.isCancelBooking === false || item?.isCancelBooking === null ||
               item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
               item?.bookingStatus === "Cancelled"
             }
             onClick={() => setRefundDialogOpen(true)}
             className={`disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs border bg-red-50 text-red-700 border-red-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
           />
-          {!d.isStay && (
-            <CommonButton
-              type="button"
-                    disabled={
-              item?.isCancelBooking === false ||
+
+          <CommonButton
+            type="button"
+            disabled={
+              item?.isCancelBooking === false || item?.isCancelBooking === null || !d.isStay ||
               item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
               item?.bookingStatus === "Cancelled"
             }
-              label="Reschedule"
-              className="flex-1  disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
-              onClick={() => setRescheduleOpen(true)}
-            />
-          )}
+            label="Reschedule Booking"
+            className="flex-1  disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
+            onClick={() => setRescheduleOpen(true)}
+          />
+
         </div>
       </div>
 

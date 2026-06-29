@@ -142,7 +142,9 @@ const TherapyDetailView = ({ selectedBooking, onClose, populateTable }) => {
           label="Reschedule"
           disabled={
             selectedBooking?.isCancelBooking === false ||
-            selectedBooking?.bookingsource === "Aayurmitra" || selectedBooking?.bookingsource === "App" ||
+            selectedBooking?.isCancelBooking === null ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingsource === "App" ||
             selectedBooking?.bookingStatus === "Cancelled"
           }
           onClick={() => {
@@ -155,7 +157,9 @@ const TherapyDetailView = ({ selectedBooking, onClose, populateTable }) => {
           label="Cancel"
           disabled={
             selectedBooking?.isRefund === false ||
-            selectedBooking?.bookingsource === "Aayurmitra" ||selectedBooking?.bookingsource === "App" ||
+            selectedBooking?.isCancelBooking === null ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingsource === "App" ||
             selectedBooking?.bookingStatus === "Cancelled"
           }
           onClick={() => {

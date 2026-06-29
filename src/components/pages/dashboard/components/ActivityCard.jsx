@@ -68,13 +68,14 @@ const getActivityDisplayData = (data) => {
     userName: data.userName,
     department: data.department,
     gender: data.gender || data.userGender || "male",
+
   };
 };
 
 const ActivityCard = ({ data, onClick }) => {
   const displayData = getActivityDisplayData(data);
 
-  console.log(displayData, data, "displayData12233");
+  console.log(data, "displayData12233");
 
   return (
     <motion.div

@@ -40,15 +40,14 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
     relative w-full px-2 py-1.5 rounded-lg text-[10px] font-medium
     flex items-center justify-between gap-2 border
     transition-all duration-150
-    ${
-      isSelected
-        ? "bg-emerald-500 border-emerald-500 text-white"
-        : slot?.count === 0
-          ? "bg-slate-100 border-slate-200 text-slate-400"
-          : slot?.count <= 3
-            ? "bg-amber-100 border-amber-300 text-amber-900"
-            : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
-    }
+    ${isSelected
+          ? "bg-emerald-500 border-emerald-500 text-white"
+          : slot?.count === 0
+            ? "bg-slate-100 border-slate-200 text-slate-400"
+            : slot?.count <= 3
+              ? "bg-amber-100 border-amber-300 text-amber-900"
+              : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
+        }
     disabled:opacity-60 disabled:cursor-not-allowed
   `}
     >
@@ -60,15 +59,14 @@ function TimeSlotChip({ slot, isSelected, onSelect }) {
         className={`
       flex-shrink-0 flex items-center justify-center min-w-[20px] h-5 px-1.5
       rounded-md text-[9px] font-bold
-      ${
-        isSelected
-          ? "bg-white/20 text-white"
-          : slot?.count === 0
-            ? "bg-red-100 text-red-600"
-            : slot?.count <= 3
-              ? "bg-amber-200 text-amber-900"
-              : "bg-emerald-100 text-emerald-700"
-      }
+      ${isSelected
+            ? "bg-white/20 text-white"
+            : slot?.count === 0
+              ? "bg-red-100 text-red-600"
+              : slot?.count <= 3
+                ? "bg-amber-200 text-amber-900"
+                : "bg-emerald-100 text-emerald-700"
+          }
     `}
       >
         {slot?.count}
@@ -183,7 +181,7 @@ export default function RescheduleAppointments({
       });
   }, [open, bookingData, setValue]);
 
-  console.log("appointmentDate",appointmentDate)
+  console.log("appointmentDate", appointmentDate)
 
   useEffect(() => {
     if (doctorValue && bookingData) {
@@ -193,7 +191,7 @@ export default function RescheduleAppointments({
 
       const formattedDate =
         appointmentDate &&
-        !isNaN(new Date(appointmentDate).getTime())
+          !isNaN(new Date(appointmentDate).getTime())
           ? format(new Date(appointmentDate), "yyyy-MM-dd")
           : "";
       const clinicId = bookingData?.clinicId || bookingData?.clinicFid || 5;
@@ -260,18 +258,19 @@ export default function RescheduleAppointments({
       setSlotError("Please select a time slot");
       return;
     }
-
     const payload = {
-      bookingId: bookingData?.bookingId,
+      // bookingId: bookingData?.bookingId,
       clinicFid: 5,
-      AppointmentFid: bookingData?.bookingId,
+      serviceFid: bookingData?.serviceId?.toString() ?? null,
+      AppointmentFid: bookingData?.bookingId || null,
       appoinmentDate:
         data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
           ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
           : "",
       SloteStartTime: selectedTimeSlot?.slotStartTime,
       SloteEndTime: selectedTimeSlot?.slotEndTime,
-      rescheduledBy: user?.userId,
+      rescheduledBy: bookingData?.userId
+
     };
 
     setIsLoading(true);

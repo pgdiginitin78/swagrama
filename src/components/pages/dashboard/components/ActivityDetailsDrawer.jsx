@@ -42,6 +42,8 @@ const getActivityDisplayData = (data) => {
   const isStay = data.type === "StayBooking";
   const isOPD = data.type === "OPD";
 
+
+  console.log("data`1234",data)
   return {
     id: data.bookingId || data.id || "N/A",
     name: data.title || data.name || data.doctorName,
@@ -139,7 +141,7 @@ const ActivityDetailsDrawer = ({
 
         <div className="flex-1 overflow-y-auto px-3 2xl:px-4 py-3 2xl:py-5 space-y-3 2xl:space-y-4 no-scrollbar">
           {d.image && (
-            <div className="w-full h-40 2xl:h-56 rounded-xl 2xl:rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(21,128,61,0.08)] border border-green-100">
+            <div className="w-full h-56 2xl:h-64 rounded-xl 2xl:rounded-2xl overflow-hidden shadow-[0_4px_16px_rgba(21,128,61,0.08)] border border-green-100">
               <img
                 src={d.image}
                 alt={d.name}
@@ -302,7 +304,7 @@ const ActivityDetailsDrawer = ({
       )}
 
       {rescheduleOpen && (
-        d.isOPD ? (
+        d.isOPD === true? (
           <RescheduleAppointments
             open={rescheduleOpen}
             onClose={() => setRescheduleOpen(false)}

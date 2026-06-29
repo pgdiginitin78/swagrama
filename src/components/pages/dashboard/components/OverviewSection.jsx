@@ -19,7 +19,7 @@ const OverviewSection = ({
   setSelectedItem,
 }) => {
   const activities = [...upcomingActivities];
-console.log("activities",activities)
+  console.log("upcomingTherapies", activities)
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -59,9 +59,9 @@ console.log("activities",activities)
           <div className="max-h-[500px] overflow-y-auto pr-1 group custom-scrollbar">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-4">
               {activities.map((activity, idx) => (
-                <ActivityCard 
-                  key={activity.id || idx} 
-                  data={activity} 
+                <ActivityCard
+                  key={activity.id || idx}
+                  data={activity}
                   onClick={setSelectedItem}
                 />
               ))}

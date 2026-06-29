@@ -7,7 +7,8 @@ import { RefundPayment } from "../../../../services/communityActivitiesServices/
 import { useAuth } from "../../../../context/AuthContext";
 import { useLoader } from "../../../common/commonLoader/LoaderContext";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
-import { successAlert ,errorAlert} from "../../../common/toast/CustomToast";
+import { successAlert, errorAlert } from "../../../common/toast/CustomToast";
+import { format } from "date-fns";
 
 const schema = yup.object().shape({
   RefundReason: yup
@@ -41,22 +42,35 @@ const PaymentRefundDialog = ({
     setIsLoading(true);
     const payload = {
       userId: bookingData?.userId,
-      BookingId: bookingData?.bookingId,
-      Amount: bookingData?.amount || bookingData?.totalAmount || 0,
       RefundBy: user?.userId,
+      Amount: bookingData?.amount || bookingData?.totalAmount || 0,
       RefundReason: data?.RefundReason,
       PaymentFor: bookingData?.type || bookingData?.paymentFor,
       role: user?.role,
       clinicFid: 5,
     };
 
+    if (bookingData?.type === "OPD") {
+      payload.AppointmentFid = bookingData?.bookingId || null;
+      payload.appointmentDate =
+        bookingData?.date &&
+          !isNaN(new Date(bookingData.date).getTime())
+          ? format(new Date(bookingData.date), "yyyy-MM-dd")
+          : "";
+
+      payload.SloteStartTime = bookingData?.startTime;
+      payload.SloteEndTime = bookingData?.endTime;
+    } else {
+      payload.BookingId = bookingData?.bookingId;
+    }
+
     RefundPayment(payload)
       .then((res) => {
         setIsLoading(false);
-        const refundResponse=JSON.parse(res?.data?.refundResponse)
+        const refundResponse = JSON.parse(res?.data?.refundResponse)
         if (refundResponse?.message) {
           successAlert(refundResponse?.message);
-          onConfirm?.(data);       
+          onConfirm?.(data);
           handleClose()
         }
       })
@@ -86,17 +100,17 @@ const PaymentRefundDialog = ({
     return isNaN(d)
       ? raw
       : d.toLocaleDateString("en-IN", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        });
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
   })();
 
-const formattedAmount =
-  bookingData?.amount != null || bookingData?.totalAmount != null
-    ? `₹ ${Number(bookingData?.amount ?? bookingData?.totalAmount).toLocaleString("en-IN")}`
-    : "—";
-console.log("formattedAmount",formattedAmount,bookingData);
+  const formattedAmount =
+    bookingData?.amount != null || bookingData?.totalAmount != null
+      ? `₹ ${Number(bookingData?.amount ?? bookingData?.totalAmount).toLocaleString("en-IN")}`
+      : "—";
+  console.log("formattedAmount", formattedAmount, bookingData);
 
   const activityName =
     bookingData?.title ||
@@ -143,7 +157,7 @@ console.log("formattedAmount",formattedAmount,bookingData);
             </div>
             <div>
               <p className="text-[0.95rem] sm:text-base font-bold text-slate-900 leading-tight">
-               Cancel Booking
+                Cancel Booking
               </p>
               <p className="text-[0.7rem] text-slate-400 font-medium mt-0.5">
                 Review &amp; submit cancel request

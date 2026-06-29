@@ -6,8 +6,6 @@ import { Drawer } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-
-// Components
 import TherapyIcon from "../../../assets/TherapyIcon.svg";
 import ActivityDetailsDrawer from "./components/ActivityDetailsDrawer";
 import DashboardHeader from "./components/DashboardHeader";
@@ -16,8 +14,6 @@ import GenericSection from "./components/GenericSection";
 import MembershipSection from "./components/MembershipSection";
 import MembershipUpgradeDrawer from "./components/MembershipUpgradeDrawer";
 import OverviewSection from "./components/OverviewSection";
-
-// Hooks & Constants
 import { MEMBERSHIP_TIERS, MENU_ITEMS } from "./constants/dashboardConstants";
 import useUserDashboard from "./hooks/useUserDashboard";
 

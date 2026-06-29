@@ -68,6 +68,35 @@ import SulphurEssenceImage from "../../assets/eshop/SulphurEssence.png";
 import UnguentBathImage from "../../assets/eshop/Unguent Bath.png";
 import UnguentOilImage from "../../assets/eshop/Unguent Oil.png";
 import CowNectorImage from "../../assets/eshop/Cow Nector.png"
+import RockSaltBottleImage from "../../assets/eshop/Rock Salt _Bottle.png"
+import AllSeasonSpicesImage from "../../assets/eshop/All Season Spices.png"
+import CoconutOilImage from "../../assets/eshop/Coconut Oil_Bottle clear pharma grade bottle.png"
+import CurryLeavesChutneyImage from "../../assets/eshop/Curry Leaves Chutney.png"
+import VaraiMilletImage from "../../assets/eshop/Varai Millet.png"
+import TherapeuticOilImage from "../../assets/eshop/Therapeutic Oil.png"
+import SunflowerOilBottleImage from "../../assets/eshop/Sunflower Oil_Bottle clear pharma grade.png"
+import SesameOilBottleImage from "../../assets/eshop/Sesame Oil _Bottle clear pharma grade bottle.png"
+import SesameChutneyImage from "../../assets/eshop/Sesame Chutney.png"
+import SeaSaltImage from "../../assets/eshop/Sea Salt Powder.png"
+import SafflowerOilImage from "../../assets/eshop/Safflower Oil.png"
+import RedChilliPowderImage from "../../assets/eshop/Red Chilly.png"
+import RawSeaSaltImage from "../../assets/eshop/Raw Sea Salt.png"
+import PeanutOilBottleImage from "../../assets/eshop/Peanut Oil Bottle.png"
+import PeanutChutneyImage from "../../assets/eshop/Peanut Chutney.png"
+import PainReliefOilImage from "../../assets/eshop/Pain Relief Oil.png"
+import NigerSeedsOilBottleImage from "../../assets/eshop/Niger Seeds Oil  Bottle clear pharma grade bottle.png"
+import NigerSeedsChutney from "../../assets/eshop/Niger Seeds Chutney.png"
+import SharbatMasala from "../../assets/eshop/Sharbat Masala Ashtalavanapetva Nectar.png"
+import MaizeCornPorridgeImage from "../../assets/eshop/Maize-Corn Porridge.png"
+import KhapliGahuLapsiImage from "../../assets/eshop/Khapli Emmwr Wheat Porridge.png"
+import KhapliEmmerWheatFlourImage from "../../assets/eshop/Khapli Emmer Wheat Flour.png"
+import JowarSorghumFlourPouchImage from "../../assets/eshop/Jowar Sorghum Flour Pouch.png"
+import HorseGramFlourImage from "../../assets/eshop/Horse Gram Flour.png"
+import GarlicGingerChutneyImage from "../../assets/eshop/Garlic Ginger Chutney.png"
+import FlaxseedsOilImage from "../../assets/eshop/Flaxseeds Oil.png"
+import FlaxseedChutneyImage from "../../assets/eshop/Flaxseed Chutney.png"
+
+
 
 const getAllProducts = () => {
   const allProducts = [];
@@ -324,7 +353,7 @@ const EShop = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    setTimeout(() => setSelectedProduct(null), 300); // clear after animation
+    setTimeout(() => setSelectedProduct(null), 300);
   };
 
   useEffect(() => {
@@ -438,11 +467,9 @@ const EShop = () => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={isDesktop ? false : { x: -300, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className={`${
-                  isDesktop ? "sticky top-4 w-72" : "fixed inset-0 w-full"
-                } bg-white rounded-none lg:rounded-xl shadow-xl p-4 ${
-                  isDesktop ? "h-fit" : "h-screen overflow-y-auto"
-                } z-50 lg:z-0`}
+                className={`${isDesktop ? "sticky top-4 w-72" : "fixed inset-0 w-full"
+                  } bg-white rounded-none lg:rounded-xl shadow-xl p-4 ${isDesktop ? "h-fit" : "h-screen overflow-y-auto"
+                  } z-50 lg:z-0`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-lg font-bold text-green-900 bg-lime-100 rounded-lg px-2 py-1 flex items-center gap-2">
@@ -506,32 +533,31 @@ const EShop = () => {
                   <div className="space-y-1.5 max-h-64 overflow-y-auto pr-2">
                     {isInitialLoading
                       ? Array.from({ length: 6 }).map((_, i) => (
-                          <Skeleton
-                            key={i}
-                            variant="rounded"
-                            height={36}
-                            sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-                          />
-                        ))
+                        <Skeleton
+                          key={i}
+                          variant="rounded"
+                          height={36}
+                          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
+                        />
+                      ))
                       : categories.map((cat) => (
-                          <motion.button
-                            key={cat}
-                            whileHover={{ x: 3 }}
-                            onClick={() => {
-                              setSelectedCategory(cat);
-                              if (!isDesktop) {
-                                setShowFilters(false);
-                              }
-                            }}
-                            className={`w-full text-left p-2 rounded-lg transition-all duration-300 text-xs ${
-                              selectedCategory === cat
-                                ? "bg-gradient-to-r from-green-600 to-lime-600 text-white shadow-md"
-                                : "bg-green-50 text-green-800 hover:bg-green-100"
+                        <motion.button
+                          key={cat}
+                          whileHover={{ x: 3 }}
+                          onClick={() => {
+                            setSelectedCategory(cat);
+                            if (!isDesktop) {
+                              setShowFilters(false);
+                            }
+                          }}
+                          className={`w-full text-left p-2 rounded-lg transition-all duration-300 text-xs ${selectedCategory === cat
+                            ? "bg-gradient-to-r from-green-600 to-lime-600 text-white shadow-md"
+                            : "bg-green-50 text-green-800 hover:bg-green-100"
                             }`}
-                          >
-                            {cat}
-                          </motion.button>
-                        ))}
+                        >
+                          {cat}
+                        </motion.button>
+                      ))}
                   </div>
                 </div>
 
@@ -644,6 +670,22 @@ const medicineProducts = [
         ingredients: "Halite / Sodium Chloride (NaCl)",
         package: "250 gms Pouch",
         value: 120,
+        image: RockSaltBottleImage
+      },
+      {
+        id: 46,
+        name: "नैसर्गिक समुद्री मीठ Raw Sea Salt",
+        tagline: "Unrefined • Mineral Rich • Naturally Harvested",
+        benefits: [
+          "Naturally rich in essential trace minerals",
+          "Enhances the natural flavor of food",
+          "Less processed than refined table salt",
+          "Ideal for everyday cooking and seasoning"
+        ],
+        ingredients: "100% Natural Raw Sea Salt. No additives, anti-caking agents, preservatives, or chemicals.",
+        package: "500 gms Pouch",
+        value: 120,
+        image: RawSeaSaltImage,
       },
       {
         id: 3,
@@ -659,6 +701,7 @@ const medicineProducts = [
           "6 types of Red Chillis, Coriander, Coconut, Sesame seeds, Salt, Spices",
         package: "1 kg Pouch",
         value: 450,
+        image: AllSeasonSpicesImage
       },
       {
         id: 32,
@@ -678,6 +721,22 @@ const medicineProducts = [
         ingredients: "Sesamum indicum Seed Oil",
         package: "1 litre Bottle",
         value: 550,
+        image: SesameOilBottleImage
+      },
+      {
+        id: 470,
+        name: "शेंगदाणा तेल Peanut Oil",
+        tagline: "Cold Pressed • Chemical Free • Premium Quality",
+        benefits: [
+          "Rich, in healthy fats and Vitamin E",
+          "Suitable for everyday cooking and frying",
+          "Supports heart health when used as part of a balanced diet",
+          "Naturally retains the aroma and nutrients of peanuts"
+        ],
+        ingredients: "100% Cold Pressed Peanut Oil. No preservatives, additives, or chemicals.",
+        package: "100 ml Bottle",
+        value: 200,
+        image: PeanutOilBottleImage,
       },
       {
         id: 5,
@@ -691,6 +750,37 @@ const medicineProducts = [
         ingredients: "Triticum dicoccum Schrank",
         package: "1 kg Pouch",
         value: 200,
+        image: KhapliEmmerWheatFlourImage
+      },
+      {
+        id: 52,
+        name: "ज्वारी पीठ Sorghum Flour",
+        tagline: "Stone Milled • Gluten Free • Naturally Nutritious",
+        benefits: [
+          "Naturally gluten free",
+          "Rich in dietary fiber for healthy digestion",
+          "A good source of essential nutrients and antioxidants",
+          "Ideal for making soft rotis and other traditional recipes"
+        ],
+        ingredients: "100% Stone Milled Jowar (Sorghum). No preservatives, additives, or artificial ingredients.",
+        package: "500 gms Pouch",
+        value: 150,
+        image: JowarSorghumFlourPouchImage,
+      },
+      {
+        id: 511,
+        name: "खापली गहू लापशी Godhuma Lapsika (Khapli Wheat Porridge)",
+        tagline: "Traditional • Wholesome • Stone Milled",
+        benefits: [
+          "Rich in dietary fiber for better digestion",
+          "Provides sustained energy throughout the day",
+          "Naturally nutritious and wholesome",
+          "Ideal for breakfast and healthy meals"
+        ],
+        ingredients: "100% Stone Milled Khapli (Emmer) Wheat. No preservatives, additives, or artificial ingredients.",
+        package: "500 gms Pouch",
+        value: 180,
+        image: KhapliGahuLapsiImage,
       },
       {
         id: 29,
@@ -700,6 +790,7 @@ const medicineProducts = [
         ingredients: "Curry Leaves, Spices",
         package: "100 gms Pouch",
         value: 120,
+        image: CurryLeavesChutneyImage
       },
       {
         id: 30,
@@ -709,6 +800,7 @@ const medicineProducts = [
         ingredients: "Garlic, Ginger, Spices",
         package: "100 gms Pouch",
         value: 130,
+        image: GarlicGingerChutneyImage
       },
       {
         id: 31,
@@ -718,6 +810,7 @@ const medicineProducts = [
         ingredients: "8 salts & spices",
         package: "100 gms Pouch",
         value: 140,
+        image: SharbatMasala
       },
       {
         id: 47,
@@ -736,7 +829,7 @@ const medicineProducts = [
       },
       {
         id: 19,
-        name: "जवस तैल -- अतसीतैल Flaxseeds Oil",
+        name: "जवस तैल - अतसीतैल Flaxseeds Oil",
         tagline: "Rich omega-3 oil",
         benefits: [
           "Improves heart health",
@@ -746,6 +839,7 @@ const medicineProducts = [
         ingredients: "Linum usitatissimum Linn. Seeds Oil",
         package: "500 ml Bottle",
         value: 400,
+        image:FlaxseedsOilImage
       },
       {
         id: 20,
@@ -758,6 +852,7 @@ const medicineProducts = [
         ingredients: "Carthamus tinctorius Linn. Seeds Oil",
         package: "500 ml Bottle",
         value: 350,
+        image: SafflowerOilImage
       },
       {
         id: 21,
@@ -767,6 +862,7 @@ const medicineProducts = [
         ingredients: "Zea mays Linn.",
         package: "500 gms Pouch",
         value: 200,
+        image: MaizeCornPorridgeImage
       },
       {
         id: 22,
@@ -780,6 +876,7 @@ const medicineProducts = [
         ingredients: "Panicum sumatrense Roth ex Roem. & Schult.",
         package: "500 gms Pouch",
         value: 220,
+        image: VaraiMilletImage
       },
       {
         id: 23,
@@ -793,6 +890,7 @@ const medicineProducts = [
         ingredients: "Macrotyloma uniflorum",
         package: "500 gms Pouch",
         value: 180,
+        image: HorseGramFlourImage
       },
     ],
   },
@@ -823,6 +921,7 @@ const medicineProducts = [
         ingredients: "Sesame seeds, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
+        image: SesameChutneyImage
       },
       {
         id: 25,
@@ -832,6 +931,7 @@ const medicineProducts = [
         ingredients: "Peanuts, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
+        image: PeanutChutneyImage
       },
       {
         id: 26,
@@ -843,6 +943,16 @@ const medicineProducts = [
         value: 120,
       },
       {
+        id: 26,
+        name: " Coconut Oil",
+        tagline: "Cold Pressed Coconut Oil",
+        benefits: ["Supports digestion", "Rich in nutrients", "Good for hair & skin"],
+        ingredients: "Coconut",
+        package: "100 ml Bottle",
+        value: 120,
+        image: CoconutOilImage
+      },
+      {
         id: 27,
         name: "कारळे चटणी -- खुरसणीउपसेचन Niger Seeds Chutney",
         tagline: "Bitter-nutritive chutney",
@@ -850,16 +960,33 @@ const medicineProducts = [
         ingredients: "Niger Seeds, Spices",
         package: "100 gms Pouch",
         value: 130,
+        image: NigerSeedsChutney
       },
       {
         id: 28,
-        name: "जवस चटणी -- अतसी Flaxseed",
+        name: "जवस चटणी -- अतसी Flaxseed Chutney",
         tagline: "Omega-3 rich chutney",
         benefits: ["Supports heart health & digestion"],
         ingredients: "Flaxseeds, Spices",
         package: "100 gms Pouch",
         value: 130,
+        image:FlaxseedChutneyImage
       },
+      {
+        id: 45,
+        name: "लाल तिखट Red Chilli Powder",
+        tagline: "Pure • Freshly Ground • No Artificial Colors",
+        benefits: [
+          "Adds rich color and authentic spicy flavor to dishes",
+          "Made from carefully selected premium red chillies",
+          "Free from artificial colors, preservatives, and additives",
+          "Ideal for daily cooking and traditional Indian recipes"
+        ],
+        ingredients: "100% Pure Red Chillies. No artificial colors, preservatives, or additives.",
+        package: "100 gms Pouch",
+        value: 120,
+        image: RedChilliPowderImage,
+      }
     ],
   },
   {
@@ -1021,6 +1148,21 @@ const medicineProducts = [
         package: "100 gms Pouch",
         value: 120,
         image: BlackSaltImage,
+      },
+      {
+        id: 44,
+        name: "समुद्री मीठ पावडर Sea Salt Powder",
+        tagline: "Natural • Mineral Rich • Chemical Free",
+        benefits: [
+          "Naturally contains essential trace minerals",
+          "Enhances the taste of food",
+          "Suitable for everyday cooking and seasoning",
+          "Less processed than refined table salt"
+        ],
+        ingredients: "100% Natural Sea Salt. No additives, anti-caking agents, or preservatives.",
+        package: "100 gms Pouch",
+        value: 120,
+        image: SeaSaltImage,
       },
       {
         id: 45,
@@ -1219,6 +1361,36 @@ const medicineProducts = [
       },
       {
         id: 63,
+        name: "रामतिळ तेल Niger Seeds Oil",
+        tagline: "Cold Pressed • Chemical Free • Premium Quality",
+        benefits: [
+          "Rich in natural antioxidants and healthy fats",
+          "Supports overall wellness and balanced nutrition",
+          "Suitable for everyday cooking and traditional use",
+          "Cold pressed to retain natural nutrients and aroma"
+        ],
+        ingredients: "100% Cold Pressed Niger Seeds Oil. No preservatives, additives, or chemicals.",
+        package: "100 ml Clear Pharma Grade Bottle",
+        value: 220,
+        image: NigerSeedsOilBottleImage,
+      },
+      {
+        id: 60,
+        name: "सूर्यफूल तेल  Sunflower Oil",
+        tagline: "Cold Pressed • Chemical Free • Premium Quality",
+        benefits: [
+          "Rich in Vitamin E and antioxidants",
+          "Supports heart health",
+          "Light and easy to digest",
+          "Suitable for everyday cooking"
+        ],
+        ingredients: "100% Cold Pressed Sunflower Seed Oil. No preservatives, additives, or chemicals.",
+        package: "100 ml Bottle",
+        value: 200,
+        image: SunflowerOilBottleImage
+      },
+      {
+        id: 63,
         name: "ताकद तेल : बल्यतैल Strengthening Oil",
         tagline: "Strength & vigor",
         benefits: ["Improves stamina, muscle strength & energy"],
@@ -1288,6 +1460,7 @@ const medicineProducts = [
         ingredients: "Pongamia seeds",
         package: "100 ml Bottle",
         value: 220,
+        image: TherapeuticOilImage
       },
       {
         id: 70,
@@ -1353,6 +1526,21 @@ const medicineProducts = [
         ingredients: "Herbal extracts",
         package: "10 ml Drop Bottle",
         value: 160,
+      },
+      {
+        id: 48,
+        name: "वेदनाशामक तेल Pain Relief Oil",
+        tagline: "Herbal • Fast Absorbing • Natural Care",
+        benefits: [
+          "Helps relieve joint and muscle pain",
+          "Provides soothing relief from stiffness and soreness",
+          "Supports relaxation after physical activity",
+          "Ideal for daily massage and body care"
+        ],
+        ingredients: "A blend of herbal oils including Sesame Oil and traditional Ayurvedic herbs. Free from mineral oil and harmful chemicals.",
+        package: "100 ml Bottle",
+        value: 250,
+        image: PainReliefOilImage,
       },
       {
         id: 76,
@@ -1918,7 +2106,7 @@ const medicineProducts = [
         ingredients: "Bos indicus Urina (Gomutra)",
         package: "1 litre Bottle",
         value: 450,
-        image:CowNectorImage
+        image: CowNectorImage
       },
       {
         id: 159,

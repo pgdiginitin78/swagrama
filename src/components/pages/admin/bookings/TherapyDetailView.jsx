@@ -26,7 +26,7 @@ const DetailRow = ({ icon, label, value }) => (
   </div>
 );
 
-const TherapyDetailView = ({ selectedBooking, onClose,populateTable }) => {
+const TherapyDetailView = ({ selectedBooking, onClose, populateTable }) => {
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [rescheduleOpen, setRescheduleOpen] = useState(false);
 
@@ -142,7 +142,7 @@ const TherapyDetailView = ({ selectedBooking, onClose,populateTable }) => {
           label="Reschedule"
           disabled={
             selectedBooking?.isCancelBooking === false ||
-            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingsource === "Aayurmitra" || selectedBooking?.bookingsource === "App" ||
             selectedBooking?.bookingStatus === "Cancelled"
           }
           onClick={() => {
@@ -155,7 +155,7 @@ const TherapyDetailView = ({ selectedBooking, onClose,populateTable }) => {
           label="Cancel"
           disabled={
             selectedBooking?.isRefund === false ||
-            selectedBooking?.bookingsource === "Aayurmitra" ||
+            selectedBooking?.bookingsource === "Aayurmitra" ||selectedBooking?.bookingsource === "App" ||
             selectedBooking?.bookingStatus === "Cancelled"
           }
           onClick={() => {

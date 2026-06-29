@@ -41,13 +41,12 @@ function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
     relative w-full px-2 py-1.5 rounded-lg text-[10px] font-medium
     flex items-center justify-between gap-2 border
     transition-all duration-150
-    ${
-      isSelected
-        ? "bg-emerald-500 border-emerald-500 text-white"
-        : isDisabled
-          ? "bg-slate-100 border-slate-200 text-slate-400"
-          : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
-    }
+    ${isSelected
+          ? "bg-emerald-500 border-emerald-500 text-white"
+          : isDisabled
+            ? "bg-slate-100 border-slate-200 text-slate-400"
+            : "bg-white border-slate-300 text-slate-800 hover:border-emerald-400"
+        }
     disabled:opacity-60 disabled:cursor-not-allowed
   `}
     >
@@ -157,25 +156,34 @@ export default function RescheduleTherapy({
       return;
     }
 
-    const payload = {
-      bookingId: bookingData?.bookingId,
-      clinicFid: 5,
-      AppointmentFid: bookingData?.bookingId,
-      appoinmentDate:
-        data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
-          ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
-          : "",
-      SloteStartTime: selectedTimeSlot?.slotStartTime,
-      SloteEndTime: selectedTimeSlot?.slotEndTime,
-      rescheduledBy: user?.userId,
+    const formattedDate =
+      data.appointmentDate && !isNaN(new Date(data.appointmentDate).getTime())
+        ? format(new Date(data.appointmentDate), "yyyy-MM-dd")
+        : "";
+
+    const newPayload = {
+      TherapyBookingId: bookingData?.bookingId,
+      ClinicFid: 5,
+      RescheduledBy: bookingData?.userId,
+      FromDate: formattedDate,
+      ToDate: formattedDate,
+      ServiceFid: bookingData?.serviceId,
+      UserId: user?.userId,
+      Slots: [
+        {
+          SlotDate: formattedDate,
+          SlotStart: selectedTimeSlot?.slotStartTime,
+          SlotEnd: selectedTimeSlot?.slotEndTime,
+        },
+      ],
     };
 
     setIsLoading(true);
-    BookDetoxTherapy(payload, user?.userId)
+    BookDetoxTherapy(newPayload)
       .then((res) => {
         setIsLoading(false);
-        if (res?.data?.status === 200) {
-          successAlert(res.data.message || "Therapy rescheduled successfully!");
+        if (res?.data?.statusCode === 200) {
+          successAlert(res.data.message);
           onSuccess?.();
           onClose();
           onRescheduleSuccess();
@@ -323,7 +331,7 @@ export default function RescheduleTherapy({
                       const isToday =
                         appointmentDate &&
                         new Date(appointmentDate).toDateString() ===
-                          new Date().toDateString();
+                        new Date().toDateString();
                       let isPast = false;
                       if (isToday && slot.slotStartTime) {
                         const [h, m, s] = slot.slotStartTime

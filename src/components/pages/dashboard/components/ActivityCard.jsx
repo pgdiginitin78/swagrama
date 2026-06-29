@@ -5,8 +5,8 @@ import {
   LocalShipping as ShippingIcon,
 } from "@mui/icons-material";
 import TherapyIcon from "../../../../assets/TherapyIcon.svg";
-import MaleIcon from "../../../../assets/3d_male_avatar.png";
-import FemaleIcon from "../../../../assets/3d_female_avatar.png";
+import MaleIcon from "../../../../assets/3d_male_avatar.webp";
+import FemaleIcon from "../../../../assets/3d_female_avatar.webp";
 import BedRoomIcon from "../../../assets/bedRoomIcon.svg";
 
 export const StatusBadge = ({ status }) => {

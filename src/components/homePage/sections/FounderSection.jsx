@@ -1,6 +1,6 @@
 import React, { memo, useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.png";
+import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
 
 const fly = (delay = 0) => ({
   hidden: { opacity: 0, y: 20 },

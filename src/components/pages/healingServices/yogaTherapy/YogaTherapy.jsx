@@ -1,8 +1,8 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import regularYogaImg from "../../../../assets/images/yoga/regular_yoga_mountain.png";
-import therapeuticYogaImg from "../../../../assets/images/yoga/therapeutic_yoga_mountain.png";
-import heroImg from "../../../../assets/images/yoga/yoga_ashram_banner.png";
+import regularYogaImg from "../../../../assets/images/yoga/regular_yoga_mountain.webp";
+import therapeuticYogaImg from "../../../../assets/images/yoga/therapeutic_yoga_mountain.webp";
+import heroImg from "../../../../assets/images/yoga/yoga_ashram_banner.webp";
 import {
     GetTherapyNameByServiceCategory
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";

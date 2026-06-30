@@ -1,15 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   CheckCircle as CheckCircleIcon,
   AutoAwesome as SparkleIcon,
 } from "@mui/icons-material";
+import MembershipUpgradeDrawer from "./MembershipUpgradeDrawer";
 
 const MembershipSection = ({
   membershipTiers,
-  selectedTier,
-  setSelectedTier,
+  user
 }) => {
+  const [selectedTier, setSelectedTier] = useState(null);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -116,6 +118,13 @@ const MembershipSection = ({
           </div>
         </div>
       </div>
+
+      <MembershipUpgradeDrawer
+        tier={selectedTier}
+        open={!!selectedTier}
+        onClose={() => setSelectedTier(null)}
+        currentRank={user?.membershipRank || "Silver Plus"}
+      />
     </motion.div>
   );
 };

@@ -82,7 +82,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
-  const { isLoading, setIsLoading } = useLoader();
+
+  const { setIsLoading } = useLoader();
+
+  const cancelPaymentRef = useRef(null);
 
   const {
     control,
@@ -108,6 +111,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
   });
 
   const patientFid = watch("patientFid");
+  const appointmentDate = watch("appointmentDate");
 
   const noOfPerson = watch("noOfPerson") || 1;
   const termsAccepted = watch("termsAccepted");
@@ -175,7 +179,6 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     }
   }, [patientFid, setValue]);
 
-  console.log("serviceDetails", serviceDetails);
 
   useEffect(() => {
     if (!user) return;
@@ -196,6 +199,37 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       }
     }
   }, [origin, serviceDetails, setValue]);
+
+  useEffect(() => {
+    if (appointmentDate && serviceDetails?.checkIn && origin !== "AnnualEvents") {
+      const today = new Date();
+      if (
+        appointmentDate.getDate() === today.getDate() &&
+        appointmentDate.getMonth() === today.getMonth() &&
+        appointmentDate.getFullYear() === today.getFullYear()
+      ) {
+        const timeParts = serviceDetails.checkIn.split(":");
+        if (timeParts.length >= 2) {
+          const checkInHours = parseInt(timeParts[0], 10);
+          const checkInMinutes = parseInt(timeParts[1], 10);
+          const currentHours = today.getHours();
+          const currentMinutes = today.getMinutes();
+
+          const checkInTimeInMinutes = checkInHours * 60 + checkInMinutes;
+          const currentTimeInMinutes = currentHours * 60 + currentMinutes;
+
+          if (currentTimeInMinutes > checkInTimeInMinutes) {
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            setValue("appointmentDate", tomorrow, { shouldValidate: true });
+            errorAlert(
+              "Check-in time for today has passed. Next available date has been selected."
+            );
+          }
+        }
+      }
+    }
+  }, [appointmentDate, serviceDetails, origin, setValue]);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -228,8 +262,6 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
-  console.log("serviceDetails", serviceDetails);
-  const cancelPaymentRef = useRef(null);
 
   const handleConfirmBooking = async () => {
     if (isPaymentPending) return;
@@ -297,6 +329,8 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       console.error("Booking error:", error);
     }
   };
+
+  console.log("serviceDetails", serviceDetails);
 
   if (!serviceDetails) return null;
 
@@ -563,11 +597,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             type="submit"
                             label="Book Now"
                             disabled={!termsAccepted}
-                            className={`font-black px-6 sm:px-8 transition-all shadow-lg active:scale-95 text-sm ${
-                              termsAccepted
-                                ? "bg-white text-green-800 hover:bg-green-50"
-                                : "bg-white/10 text-white/30 pointer-events-none"
-                            }`}
+                            className={`font-black px-6 sm:px-8 transition-all shadow-lg active:scale-95 text-sm ${termsAccepted
+                              ? "bg-white text-green-800 hover:bg-green-50"
+                              : "bg-white/10 text-white/30 pointer-events-none"
+                              }`}
                           />
                         </div>
                       </div>

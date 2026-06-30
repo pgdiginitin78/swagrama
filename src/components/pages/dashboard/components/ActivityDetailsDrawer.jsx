@@ -65,6 +65,7 @@ const getActivityDisplayData = (data) => {
     userName: data.userName || data.patientName || data.createdByName || null,
     isStay,
     isOPD,
+    checkoutdate: data.checkoutdate ? formatDate(data.checkoutdate) : null,
   };
 };
 
@@ -189,12 +190,19 @@ const ActivityDetailsDrawer = ({
           </div>
 
           <div className="grid grid-cols-2 gap-2 2xl:gap-3">
-            <Field label="Date">
+            <Field label={d.isStay ? "Check-in Date" : "Date"}>
               <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
                 {d.date}
               </p>
             </Field>
-            <Field label="Amount">
+            {d.checkoutdate && (
+              <Field label="Check-out Date">
+                <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
+                  {d.checkoutdate}
+                </p>
+              </Field>
+            )}
+            <Field label="Amount" className="col-span-2">
               <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
                 {d.amount ?? "—"}
               </p>
@@ -307,6 +315,8 @@ const ActivityDetailsDrawer = ({
           onClose={() => setRefundDialogOpen(false)}
           onConfirm={() => {
             setRefundDialogOpen(false);
+            onRescheduleSuccess?.();
+            onClose?.();
           }}
           bookingData={item}
         />
@@ -318,16 +328,32 @@ const ActivityDetailsDrawer = ({
             open={rescheduleOpen}
             onClose={() => setRescheduleOpen(false)}
             bookingData={item}
-            onSuccess={onRescheduleSuccess}
-            onRescheduleSuccess={onRescheduleSuccess}
+            onSuccess={() => {
+              setRescheduleOpen(false);
+              onRescheduleSuccess?.();
+              onClose?.();
+            }}
+            onRescheduleSuccess={() => {
+              setRescheduleOpen(false);
+              onRescheduleSuccess?.();
+              onClose?.();
+            }}
           />
         ) : (
           <RescheduleTherapy
             open={rescheduleOpen}
             onClose={() => setRescheduleOpen(false)}
             bookingData={item}
-            onSuccess={onRescheduleSuccess}
-            onRescheduleSuccess={onRescheduleSuccess}
+            onSuccess={() => {
+              setRescheduleOpen(false);
+              onRescheduleSuccess?.();
+              onClose?.();
+            }}
+            onRescheduleSuccess={() => {
+              setRescheduleOpen(false);
+              onRescheduleSuccess?.();
+              onClose?.();
+            }}
           />
         )
       )}

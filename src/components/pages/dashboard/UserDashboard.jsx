@@ -1,36 +1,20 @@
-import {
-  CalendarMonth as CalendarIcon,
-  Receipt as ReceiptIcon
-} from "@mui/icons-material";
 import { Drawer } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useAuth } from "../../../context/AuthContext";
-import TherapyIcon from "../../../assets/TherapyIcon.svg";
-import ActivityDetailsDrawer from "./components/ActivityDetailsDrawer";
 import DashboardHeader from "./components/DashboardHeader";
 import DashboardSidebar from "./components/DashboardSidebar";
-import GenericSection from "./components/GenericSection";
 import MembershipSection from "./components/MembershipSection";
-import MembershipUpgradeDrawer from "./components/MembershipUpgradeDrawer";
-import OverviewSection from "./components/OverviewSection";
+import OverviewTab from "./tabs/OverviewTab";
+import AppointmentsTab from "./tabs/AppointmentsTab";
+import TherapiesTab from "./tabs/TherapiesTab";
+import ShopTab from "./tabs/ShopTab";
 import { MEMBERSHIP_TIERS, MENU_ITEMS } from "./constants/dashboardConstants";
-import useUserDashboard from "./hooks/useUserDashboard";
 
 const UserDashboard = () => {
   const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [isMobileDrawerOpen, setMobileDrawerOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [selectedTier, setSelectedTier] = useState(null);
-
-  const {
-    userDashboardCount,
-    upcomingActivities,
-    upcomingOPD,
-    upcomingTherapies,
-    refresh,
-  } = useUserDashboard(user);
 
   const activeTabLabel = MENU_ITEMS.find((m) => m.id === activeTab)?.label;
 
@@ -65,45 +49,15 @@ const UserDashboard = () => {
           <AnimatePresence mode="wait">
             <div key={activeTab}>
               {activeTab === "overview" && (
-                <OverviewSection
-                  user={user}
-                  userDashboardCount={userDashboardCount}
-                  upcomingActivities={upcomingActivities}
-                  upcomingOPD={upcomingOPD}
-                  upcomingTherapies={upcomingTherapies}
-                  setActiveTab={setActiveTab}
-                  setSelectedItem={setSelectedItem}
-                />
+                <OverviewTab user={user} setActiveTab={setActiveTab} />
               )}
-              {activeTab === "appointments" && (
-                <GenericSection
-                  title="Consultations"
-                  icon={<CalendarIcon sx={{ fontSize: 20 }} />}
-                  data={upcomingOPD}
-                  setSelectedItem={setSelectedItem}
-                />
-              )}
-              {activeTab === "therapies" && (
-                <GenericSection
-                  title="Therapies"
-                  icon={<img src={TherapyIcon} alt="Therapies" className="h-5 w-5" />}
-                  data={upcomingTherapies}
-                  setSelectedItem={setSelectedItem}
-                />
-              )}
-              {activeTab === "shop" && (
-                <GenericSection
-                  title="Order History"
-                  icon={<ReceiptIcon sx={{ fontSize: 20 }} />}
-                  data={[]}
-                  setSelectedItem={setSelectedItem}
-                />
-              )}
+              {activeTab === "appointments" && <AppointmentsTab user={user} />}
+              {activeTab === "therapies" && <TherapiesTab user={user} />}
+              {activeTab === "shop" && <ShopTab user={user} />}
               {activeTab === "membership" && (
                 <MembershipSection
                   membershipTiers={MEMBERSHIP_TIERS}
-                  selectedTier={selectedTier}
-                  setSelectedTier={setSelectedTier}
+                  user={user}
                 />
               )}
             </div>
@@ -127,20 +81,6 @@ const UserDashboard = () => {
           membershipRank={user?.membershipRank || "Silver Plus"}
         />
       </Drawer>
-
-      <ActivityDetailsDrawer
-        item={selectedItem}
-        open={!!selectedItem}
-        onClose={() => setSelectedItem(null)}
-        onRescheduleSuccess={refresh}
-      />
-
-      <MembershipUpgradeDrawer
-        tier={selectedTier}
-        open={!!selectedTier}
-        onClose={() => setSelectedTier(null)}
-        currentRank={user?.membershipRank || "Silver Plus"}
-      />
 
       <style
         dangerouslySetInnerHTML={{

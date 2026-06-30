@@ -1,6 +1,6 @@
 import { Skeleton } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { Filter, Leaf, Menu, Search, X } from "lucide-react";
+import { Filter, Leaf, Menu, Package, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AllSeasonSpicesImage from "../../assets/eshop/All Season Spices.webp";
@@ -105,6 +105,33 @@ import PeanutCakeImage from "../../assets/eshop/शेंगदाणा पे�
 import SunflowerSeedCakeImage from "../../assets/eshop/सूर्यफूल पेंड.webp";
 import ProductDetailsModal from "./ProductDetailsModal";
 import BathPowder from "./productImages/Bath Powder.webp";
+import MicroNourishNasalDropImage from "../../assets/eshop/Micro Nourish Nasal Drop.webp";
+import DeepNourishNasalDropImage from "../../assets/eshop/Deep Nourish Nasal Drop.webp";
+import SensesNourishNasalDropImage from "../../assets/eshop/Senses Nourish Nasal Drop.webp";
+import ToothPowderImage from "../../assets/eshop/Tooth Powder.webp";
+import PainReliefMassageOilImage from "../../assets/eshop/Pain Relief Massage Oil.webp";
+import PilesTonicImage from "../../assets/eshop/Piles Tonic.webp";
+import IntellectTonicImage from "../../assets/eshop/Intellect Tonic.webp";
+import PenisHealthOilImage from "../../assets/eshop/Penis Health Oil.webp";
+import VaginalWashImage from "../../assets/eshop/Vaginal Wash.webp";
+import EyeCareImage from "../../assets/eshop/Eye Care.webp";
+import EarDischargeOilImage from "../../assets/eshop/Ear Discharge Oil.webp";
+import EarNourishOilImage from "../../assets/eshop/Ear Nourish Oil.webp";
+
+
+const CATEGORY_ACCENTS = [
+  { from: "#166534", to: "#4ade80", light: "#f0fdf4" }, 
+  { from: "#4d7c0f", to: "#a3e635", light: "#f7fee7" }, 
+  { from: "#78350f", to: "#d97706", light: "#fffbeb" }, 
+  { from: "#14532d", to: "#22c55e", light: "#f0fdf4" }, 
+  { from: "#3f6212", to: "#84cc16", light: "#f7fee7" }, 
+  { from: "#713f12", to: "#eab308", light: "#fefce8" },
+];
+
+const getCategoryAccent = (category, allCategories) => {
+  const idx = allCategories.indexOf(category);
+  return CATEGORY_ACCENTS[idx % CATEGORY_ACCENTS.length] || CATEGORY_ACCENTS[0];
+};
 
 const getAllProducts = () => {
   const allProducts = [];
@@ -137,95 +164,33 @@ const getAllProducts = () => {
   return allProducts;
 };
 
-const ProductCardSkeleton = ({ index }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden shadow-md p-3 h-full flex flex-col"
-    >
-      <div className="flex items-start justify-between mb-2">
-        <Skeleton
-          variant="rounded"
-          width={80}
-          height={24}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
-        <Skeleton
-          variant="circular"
-          width={16}
-          height={16}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
+const ProductCardSkeleton = ({ index }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.5, delay: index * 0.04 }}
+    style={{
+      background: "linear-gradient(135deg, #f8fffe 0%, #f0fdf4 100%)",
+      borderRadius: 20,
+      overflow: "hidden",
+      boxShadow: "0 4px 24px rgba(22,163,74,0.08)",
+      border: "1px solid rgba(134,239,172,0.3)",
+    }}
+    className="flex flex-col h-full"
+  >
+    <Skeleton variant="rectangular" height={180} sx={{ bgcolor: "rgba(22,163,74,0.07)" }} />
+    <div className="p-4 flex flex-col gap-2 flex-1">
+      <Skeleton variant="rounded" height={14} sx={{ bgcolor: "rgba(22,163,74,0.08)", borderRadius: 8 }} />
+      <Skeleton variant="rounded" width="75%" height={12} sx={{ bgcolor: "rgba(22,163,74,0.06)", borderRadius: 8 }} />
+      <div className="mt-auto pt-3 flex items-center justify-between">
+        <Skeleton variant="rounded" width={60} height={22} sx={{ bgcolor: "rgba(22,163,74,0.1)", borderRadius: 10 }} />
+        <Skeleton variant="rounded" width={90} height={32} sx={{ bgcolor: "rgba(22,163,74,0.12)", borderRadius: 12 }} />
       </div>
+    </div>
+  </motion.div>
+);
 
-      <Skeleton
-        variant="text"
-        height={20}
-        sx={{ bgcolor: "rgba(22, 163, 74, 0.1)", mb: 1 }}
-      />
-      <Skeleton
-        variant="text"
-        width="80%"
-        height={16}
-        sx={{ bgcolor: "rgba(22, 163, 74, 0.1)", mb: 2 }}
-      />
-
-      <div className="space-y-1 mb-2">
-        <Skeleton
-          variant="text"
-          height={14}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
-        <Skeleton
-          variant="text"
-          height={14}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
-      </div>
-
-      <div className="border-t border-green-200 py-1.5">
-        <div className="flex items-center justify-between">
-          <Skeleton
-            variant="text"
-            width={80}
-            height={32}
-            sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-          />
-          <Skeleton
-            variant="rounded"
-            width={70}
-            height={32}
-            sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-          />
-        </div>
-      </div>
-
-      <div className="border-t border-green-200 pt-2">
-        <Skeleton
-          variant="text"
-          width={100}
-          height={14}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)", mb: 1 }}
-        />
-        <Skeleton
-          variant="text"
-          height={12}
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
-        <Skeleton
-          variant="text"
-          height={12}
-          width="90%"
-          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-        />
-      </div>
-    </motion.div>
-  );
-};
-
-const LazyProductCard = ({ product, index, onOpenModal }) => {
+const LazyProductCard = ({ product, index, onOpenModal, allCategories }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const cardRef = useRef(null);
@@ -236,112 +201,131 @@ const LazyProductCard = ({ product, index, onOpenModal }) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setIsVisible(true);
-
-            setTimeout(() => {
-              setIsLoaded(true);
-            }, 300);
+            setTimeout(() => setIsLoaded(true), 200);
           }
         });
       },
-      {
-        rootMargin: "100px",
-        threshold: 0.01,
-      },
+      { rootMargin: "120px", threshold: 0.01 },
     );
-
-    if (cardRef.current) {
-      observer.observe(cardRef.current);
-    }
-
-    return () => {
-      if (cardRef.current) {
-        observer.unobserve(cardRef.current);
-      }
-    };
+    if (cardRef.current) observer.observe(cardRef.current);
+    return () => { if (cardRef.current) observer.unobserve(cardRef.current); };
   }, []);
 
   return (
     <div ref={cardRef} className="h-full">
-      {isVisible && isLoaded ? (
-        <ProductCard
-          product={product}
-          index={index}
-          onOpenModal={onOpenModal}
-        />
-      ) : (
-        <ProductCardSkeleton index={index} />
-      )}
+      {isVisible && isLoaded
+        ? <ProductCard product={product} index={index} onOpenModal={onOpenModal} allCategories={allCategories} />
+        : <ProductCardSkeleton index={index} />}
     </div>
   );
 };
 
-const ProductCard = ({ product, index, onOpenModal }) => {
-  const dispatch = useDispatch();
-  const cartItems = useSelector((state) => state.cart.items);
-  const cartItem = cartItems.find((item) => item.id === product.id);
+const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
+  const [imgErr, setImgErr] = useState(false);
+  const accent = getCategoryAccent(product.category, allCategories);
 
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration: 0.4, delay: index * 0.03 }}
-      className="group relative bg-gradient-to-br from-lime-50 to-green-50 rounded-xl overflow-hidden border border-green-100 shadow-md hover:shadow-xl transition-all duration-500 flex flex-col h-full"
+      exit={{ opacity: 0, scale: 0.92 }}
+      transition={{ duration: 0.45, delay: Math.min(index * 0.025, 0.5) }}
+      whileHover={{ y: -6, transition: { duration: 0.25 } }}
+      onClick={() => onOpenModal(product)}
+      className="group relative flex flex-col h-full cursor-pointer"
+      style={{
+        background: "#fff",
+        borderRadius: 20,
+        overflow: "hidden",
+        boxShadow: "0 2px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(134,239,172,0.25)",
+        transition: "box-shadow 0.3s",
+      }}
     >
-      <div className="w-full aspect-square overflow-hidden relative flex-shrink-0 bg-green-50">
-        {product?.image && (
+
+
+
+
+      <div
+        className="relative flex-shrink-0 overflow-hidden"
+        style={{ height: 180, background: accent.light }}
+      >
+        {product.image && !imgErr ? (
           <img
             src={product.image}
             alt={product.name}
-            className="w-full h-full object-cover block group-hover:scale-105 transition-transform duration-500"
-            onError={(e) => {
-              e.target.style.display = "none";
-              e.target.nextSibling.style.display = "flex";
-            }}
+            className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
+            style={{ transition: "transform 0.5s cubic-bezier(.25,.46,.45,.94)" }}
+            onError={() => setImgErr(true)}
           />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <Leaf className="w-12 h-12 opacity-30" style={{ color: accent.from }} />
+          </div>
         )}
 
-        <div
-          className="w-full h-full items-center justify-center"
-          style={{ display: product?.image ? "none" : "flex" }}
+        {/* Price badge */}
+        {/* <div
+          className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-white text-xs font-bold shadow-lg"
+          style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})` }}
         >
-          <Leaf className="w-10 h-10 text-green-300 opacity-50" />
-        </div>
+          ₹{product.value}
+        </div> */}
 
-        <div className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm rounded-full p-1.5 shadow-sm">
-          <Leaf className="w-3.5 h-3.5 text-green-600" />
-        </div>
+
+  
+
+
+
       </div>
 
-      <div className="px-3 pt-2 pb-0 flex flex-col flex-1">
-        <motion.h3
-          className="text-sm font-bold 2xl:text-[12px] text-green-900 mb-2 line-clamp-2 "
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
+
+      <div className="flex flex-col flex-1 p-3.5 gap-2">
+   
+        <h3
+          className="font-bold leading-snug line-clamp-2 py-1"
+          style={{ fontSize: 12.5, color: "#1a2e1a", letterSpacing: "-0.01em" }}
         >
           {product.name}
-        </motion.h3>
-      </div>
+        </h3>
 
-      <div className="border-t border-green-200 px-3 py-2 flex justify-end">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenModal(product);
-          }}
-          className="bg-gradient-to-r from-green-600 to-lime-600 text-white px-3 py-1.5 rounded font-semibold shadow-lg hover:shadow-xl transition-all duration-300 text-xs"
+
+        {product.tagline && (
+          <p className="text-[10.5px] line-clamp-1" style={{ color: accent.from, opacity: 0.8 }}>
+            {product.tagline}
+          </p>
+        )}
+
+        <div className="flex items-center gap-1 mt-auto">
+          <Package className="w-3 h-3 flex-shrink-0" style={{ color: accent.from, opacity: 0.6 }} />
+          <span className="text-[10px]" style={{ color: "#64748b" }}>{product.package}</span>
+        </div>
+
+        {/* Footer */}
+        <div
+          className="flex items-center justify-between pt-2.5"
+          style={{ borderTop: `1px solid ${accent.from}20` }}
         >
-          Read More
-        </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={(e) => { e.stopPropagation(); onOpenModal(product); }}
+            className="text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md"
+            style={{
+              background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`,
+              boxShadow: `0 4px 14px ${accent.from}40`,
+              letterSpacing: "0.02em",
+            }}
+          >
+            View Details
+          </motion.button>
+        </div>
       </div>
     </motion.div>
   );
 };
 
+// ─── Main EShop Component ──────────────────────────────────────────────────
 const EShop = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -350,7 +334,6 @@ const EShop = () => {
   const [sortBy, setSortBy] = useState("name");
   const [isDesktop, setIsDesktop] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -365,267 +348,391 @@ const EShop = () => {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 800);
-
+    const timer = setTimeout(() => setIsInitialLoading(false), 700);
     return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
   const allProducts = useMemo(() => getAllProducts(), []);
 
   const categories = useMemo(() => {
-    const categorySet = new Set();
-    allProducts.forEach((product) => {
-      if (product.category) {
-        categorySet.add(product.category);
-      }
-    });
-    const uniqueCategories = [...Array.from(categorySet).sort(), "All"];
-    console.log(
-      `Total categories found: ${uniqueCategories.length}`,
-      uniqueCategories,
-    );
-    return uniqueCategories;
+    const set = new Set();
+    allProducts.forEach((p) => { if (p.category) set.add(p.category); });
+    return ["All", ...Array.from(set).sort()];
   }, [allProducts]);
 
   const filteredProducts = useMemo(() => {
-    console.log("=== FILTERING PRODUCTS ===");
-    console.log("Search Query:", searchQuery);
-    console.log("Selected Category:", selectedCategory);
-    console.log("Price Range:", priceRange);
-
     let filtered = allProducts.filter((product) => {
-      const searchLower = searchQuery.toLowerCase().trim();
-      const matchesSearch =
-        searchLower === "" ||
-        (product.name ?? "").toLowerCase().includes(searchLower) ||
-        (product.tagline ?? "").toLowerCase().includes(searchLower) ||
-        (product.ingredients ?? "").toLowerCase().includes(searchLower) ||
-        (product.category ?? "").toLowerCase().includes(searchLower) ||
-        (Array.isArray(product.benefits) &&
-          product.benefits.some((b) =>
-            (b ?? "").toLowerCase().includes(searchLower),
-          ));
-
-      const matchesCategory =
-        selectedCategory === "All" || product.category === selectedCategory;
-
-      const matchesPrice =
-        product.value >= priceRange[0] && product.value <= priceRange[1];
-
+      const q = searchQuery.toLowerCase().trim();
+      const matchesSearch = q === "" ||
+        (product.name ?? "").toLowerCase().includes(q) ||
+        (product.tagline ?? "").toLowerCase().includes(q) ||
+        (product.ingredients ?? "").toLowerCase().includes(q) ||
+        (product.category ?? "").toLowerCase().includes(q) ||
+        (Array.isArray(product.benefits) && product.benefits.some((b) => (b ?? "").toLowerCase().includes(q)));
+      const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+      const matchesPrice = product.value >= priceRange[0] && product.value <= priceRange[1];
       return matchesSearch && matchesCategory && matchesPrice;
     });
-
     filtered.sort((a, b) => {
       if (sortBy === "name") return a.name.localeCompare(b.name);
       if (sortBy === "price-low") return a.value - b.value;
       if (sortBy === "price-high") return b.value - a.value;
       return 0;
     });
-
-    console.log(`Filtered results: ${filtered.length} products`);
     return filtered;
   }, [allProducts, searchQuery, selectedCategory, priceRange, sortBy]);
 
+  // Group filtered products by category for section display
+  const groupedProducts = useMemo(() => {
+    if (selectedCategory !== "All") {
+      return [{ category: selectedCategory, products: filteredProducts }];
+    }
+    const groups = {};
+    filteredProducts.forEach((p) => {
+      if (!groups[p.category]) groups[p.category] = [];
+      groups[p.category].push(p);
+    });
+    return Object.entries(groups).map(([category, products]) => ({ category, products }));
+  }, [filteredProducts, selectedCategory]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-lime-50 to-green-100 w-full ">
-      <h1
-        className="text-center pt-5 text-2xl font-semibold 
-                    text-transparent bg-clip-text 
-                    bg-gradient-to-r from-green-600 via-lime-500 to-green-600
-                    drop-shadow-[0_1px_6px_rgba(34,197,94,0.35)]"
+    <div
+      className="min-h-screen w-full"
+      style={{
+        background: "linear-gradient(135deg, #f8fffe 0%, #f0fdf4 30%, #fafff5 60%, #f0fdf4 100%)",
+        fontFamily: "'Inter', 'Segoe UI', sans-serif",
+      }}
+    >
+      {/* ── Hero Header ── */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #052e16 0%, #14532d 40%, #166534 70%, #15803d 100%)",
+          paddingBottom: 32,
+        }}
       >
-        स्वविपणि Shop
-      </h1>
-      <div className=" mx-auto px-2 sm:px-4 xl:px-12 py-4 sm:py-6 w-full">
-        <div className="lg:hidden mb-3">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="w-full bg-white rounded-lg shadow-md p-3 flex items-center justify-between text-green-900 font-semibold text-sm"
+        {/* Decorative circles */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-5" style={{ background: "radial-gradient(circle, #86efac, transparent)", transform: "translate(30%, -30%)" }} />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-5" style={{ background: "radial-gradient(circle, #4ade80, transparent)", transform: "translate(-20%, 30%)" }} />
+
+        <div className="relative max-w-7xl mx-auto px-4 pt-8 pb-2 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
           >
-            <span className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              Filters & Search
-            </span>
-            {showFilters ? (
-              <X className="w-4 h-4" />
-            ) : (
-              <Menu className="w-4 h-4" />
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-lime-300" />
+              <span className="text-lime-200 text-xs font-semibold tracking-widest uppercase">Ayurvedic Wellness Store</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em" }}>
+              स्वविपणि <span style={{ color: "#86efac" }}>Shop</span>
+            </h1>
+            <p className="text-green-200 text-sm font-medium">
+              {allProducts.length}+ Premium Natural & Ayurvedic Products
+            </p>
+          </motion.div>
+
+          {/* Inline Search */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="relative max-w-md mx-auto mt-5"
+          >
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#4ade80" }} />
+            <input
+              type="text"
+              placeholder="Search products, herbs, benefits..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-11 pr-4 py-3 text-sm font-medium rounded-2xl outline-none"
+              style={{
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(12px)",
+                border: "1.5px solid rgba(255,255,255,0.25)",
+                color: "#fff",
+              }}
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 flex items-center justify-center rounded-full"
+                style={{ background: "rgba(255,255,255,0.2)" }}
+              >
+                <X className="w-3 h-3 text-white" />
+              </button>
             )}
-          </button>
+          </motion.div>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-4">
+        {/* Stats bar */}
+        <div className="relative max-w-7xl mx-auto px-4 mt-5">
+          <div className="flex items-center justify-center gap-4 sm:gap-8 text-center">
+            {[
+              { label: "Products", value: allProducts.length },
+              { label: "Categories", value: categories.length - 1 },
+              { label: "Shown", value: filteredProducts.length },
+            ].map((s) => (
+              <div key={s.label}>
+                <div className="text-xl font-black text-white">{s.value}</div>
+                <div className="text-xs text-green-300 font-medium">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 xl:px-6 py-6">
+
+        <div className="lg:hidden mb-4">
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            onClick={() => setShowFilters(!showFilters)}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl font-semibold text-sm shadow-lg"
+            style={{
+              background: "linear-gradient(135deg, #052e16, #166534)",
+              color: "#fff",
+              boxShadow: "0 4px 20px rgba(22,101,52,0.3)",
+            }}
+          >
+            <span className="flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4" />
+              Filters & Categories
+            </span>
+            {showFilters ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+          </motion.button>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-5">
           <AnimatePresence>
             {(showFilters || isDesktop) && (
               <motion.aside
-                initial={isDesktop ? false : { x: -300, opacity: 0 }}
+                initial={isDesktop ? false : { x: -320, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                exit={isDesktop ? false : { x: -300, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-                className={`${isDesktop ? "sticky top-4 w-72" : "fixed inset-0 w-full"
-                  } bg-white rounded-none lg:rounded-xl shadow-xl p-4 ${isDesktop ? "h-fit" : "h-screen overflow-y-auto"
-                  } z-50 lg:z-0`}
+                exit={isDesktop ? false : { x: -320, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className={`${
+                  isDesktop
+                    ? "sticky top-4 w-72 flex-shrink-0 h-fit"
+                    : "fixed inset-0 w-full z-50 overflow-y-auto"
+                }`}
+                style={{
+                  background: isDesktop ? "#fff" : "#fff",
+                  borderRadius: isDesktop ? 20 : 0,
+                  boxShadow: isDesktop
+                    ? "0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(134,239,172,0.2)"
+                    : "none",
+                  padding: isDesktop ? 20 : 20,
+                }}
               >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-bold text-green-900 bg-lime-100 rounded-lg px-2 py-1 flex items-center gap-2">
-                    <Filter className="w-5 h-5" />
-                    Filters
-                  </h2>
+                {/* Sidebar header */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-8 h-8 rounded-xl flex items-center justify-center"
+                      style={{ background: "linear-gradient(135deg, #052e16, #15803d)" }}
+                    >
+                      <Filter className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="font-black text-base" style={{ color: "#052e16" }}>Filters</span>
+                  </div>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="lg:hidden text-green-600 p-1.5 hover:bg-green-50 rounded-full"
+                    className="lg:hidden w-8 h-8 flex items-center justify-center rounded-full"
+                    style={{ background: "#f0fdf4" }}
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-4 h-4" style={{ color: "#166534" }} />
                   </button>
                 </div>
 
-                <div className="mb-3 text-center">
-                  {isInitialLoading ? (
-                    <Skeleton
-                      variant="rounded"
-                      width={120}
-                      height={24}
-                      sx={{
-                        bgcolor: "rgba(22, 163, 74, 0.1)",
-                        margin: "0 auto",
-                      }}
-                    />
-                  ) : (
-                    <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                      {filteredProducts.length} of {allProducts.length} products
-                    </span>
-                  )}
+                {/* Product count */}
+                <div
+                  className="flex items-center justify-between mb-4 px-3 py-2 rounded-xl"
+                  style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)", border: "1px solid #bbf7d0" }}
+                >
+                  <span className="text-xs font-semibold" style={{ color: "#166534" }}>Showing</span>
+                  <span
+                    className="text-xs font-black px-2 py-0.5 rounded-full text-green-600"
+                
+                  >
+                    {filteredProducts.length} / {allProducts.length}
+                  </span>
                 </div>
 
-                <div className="relative mb-4">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-green-600 w-4 h-4" />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-3 py-2 rounded-lg text-sm text-green-900 placeholder-green-500 outline-none ring-2 ring-lime-400 focus:ring-green-600 shadow transition-all"
-                  />
-                </div>
                 <div className="mb-4">
-                  <label className="block text-xs font-semibold text-green-800 mb-2">
+                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "#166534" }}>
                     Sort By
                   </label>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    className="w-full p-2 text-sm border-2 border-green-200 rounded-lg outline-none text-green-900 bg-green-50 focus:border-green-600 transition-all cursor-pointer"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl outline-none cursor-pointer font-semibold"
+                    style={{
+                      background: "#f0fdf4",
+                      border: "1.5px solid #bbf7d0",
+                      color: "#052e16",
+                    }}
                   >
-                    <option value="name">Name (A-Z)</option>
+                    <option value="name">Name (A–Z)</option>
                     <option value="price-low">Price: Low to High</option>
                     <option value="price-high">Price: High to Low</option>
                   </select>
                 </div>
+
+
                 <div className="mb-4">
-                  <label className="block text-xs font-semibold text-green-800 mb-2">
+                  <label className="block text-xs font-bold mb-3 uppercase tracking-wider" style={{ color: "#166534" }}>
                     Category
                   </label>
-                  <div className="space-y-1.5 max-h-64 overflow-y-auto no-scrollbar pr-2">
+                  <div
+                    className="space-y-1 overflow-y-auto no-scrollbar pr-1"
+                    style={{ maxHeight: isDesktop ? 420 : 300 }}
+                  >
                     {isInitialLoading
-                      ? Array.from({ length: 6 }).map((_, i) => (
-                        <Skeleton
-                          key={i}
-                          variant="rounded"
-                          height={36}
-                          sx={{ bgcolor: "rgba(22, 163, 74, 0.1)" }}
-                        />
-                      ))
-                      : categories.map((cat) => (
-                        <motion.button
-                          key={cat}
-                          whileHover={{ x: 3 }}
-                          onClick={() => {
-                            setSelectedCategory(cat);
-                            if (!isDesktop) {
-                              setShowFilters(false);
-                            }
-                          }}
-                          className={`w-full text-left p-2 rounded-lg transition-all duration-300 text-xs ${selectedCategory === cat
-                            ? "bg-gradient-to-r from-green-600 to-lime-600 text-white shadow-md"
-                            : "bg-green-50 text-green-800 hover:bg-green-100"
-                            }`}
-                        >
-                          {cat}
-                        </motion.button>
-                      ))}
+                      ? Array.from({ length: 7 }).map((_, i) => (
+                          <Skeleton key={i} variant="rounded" height={38} sx={{ bgcolor: "rgba(22,163,74,0.07)", borderRadius: 12 }} />
+                        ))
+                      : categories.map((cat, i) => {
+                          const isActive = selectedCategory === cat;
+                          const accent = cat === "All"
+                            ? { from: "#052e16", to: "#15803d" }
+                            : getCategoryAccent(cat, categories.filter((c) => c !== "All"));
+                          return (
+                            <motion.button
+                              key={cat}
+                              whileHover={{ x: 4 }}
+                              whileTap={{ scale: 0.97 }}
+                              onClick={() => {
+                                setSelectedCategory(cat);
+                                if (!isDesktop) setShowFilters(false);
+                              }}
+                              className="w-full text-left px-3 py-2.5 rounded-xl transition-all duration-200 text-xs font-semibold flex items-center justify-between"
+                              style={{
+                                background: isActive
+                                  ? `linear-gradient(135deg, ${accent.from}, ${accent.to})`
+                                  : "#f8fffe",
+                                color: isActive ? "#fff" : "#374151",
+                                boxShadow: isActive ? `0 4px 16px ${accent.from}35` : "none",
+                                border: isActive ? "none" : "1px solid #e5e7eb",
+                              }}
+                            >
+                              <span className="leading-tight line-clamp-2 py-1">{cat}</span>
+                            </motion.button>
+                          );
+                        })}
                   </div>
                 </div>
 
+                {/* Reset */}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => {
                     setSelectedCategory("All");
                     setPriceRange([0, 2000]);
                     setSearchQuery("");
                     setSortBy("name");
                   }}
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 text-white py-2 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 text-sm"
+                  className="w-full py-2.5 rounded-xl font-bold text-sm text-white shadow-md"
+                  style={{ background: "linear-gradient(135deg, #dc2626, #f97316)" }}
                 >
-                  Reset Filters
+                  Reset All Filters
                 </motion.button>
               </motion.aside>
             )}
           </AnimatePresence>
 
-          <div className="flex-1">
+          {/* ── Products Area ── */}
+          <div className="flex-1 min-w-0">
             <AnimatePresence mode="wait">
               {isInitialLoading ? (
                 <motion.div
+                  key="skeleton"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  className="grid md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3"
+                  className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3"
                 >
-                  {Array.from({ length: 9 }).map((_, index) => (
-                    <ProductCardSkeleton key={index} index={index} />
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <ProductCardSkeleton key={i} index={i} />
                   ))}
                 </motion.div>
               ) : filteredProducts.length === 0 ? (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  key="empty"
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  className="bg-white rounded-xl shadow-xl p-8 text-center"
+                  exit={{ opacity: 0 }}
+                  className="flex flex-col items-center justify-center py-20 text-center"
                 >
-                  <Leaf className="w-20 h-20 text-green-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-green-900 mb-2">
-                    No Products Found
-                  </h3>
-                  <p className="text-sm text-green-600">
-                    Try adjusting your filters or search query
-                  </p>
+                  <div
+                    className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 shadow-xl"
+                    style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)" }}
+                  >
+                    <Leaf className="w-10 h-10" style={{ color: "#86efac" }} />
+                  </div>
+                  <h3 className="text-xl font-black mb-2" style={{ color: "#052e16" }}>No Products Found</h3>
+                  <p className="text-sm" style={{ color: "#6b7280" }}>Try adjusting your filters or search query</p>
                 </motion.div>
               ) : (
-                <motion.div
-                  layout
-                  className="grid  md:grid-cols-2 lg:grid-cols-3  2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4"
-                >
-                  {filteredProducts.map((product, index) => (
-                    <LazyProductCard
-                      key={product.id}
-                      product={product}
-                      index={index}
-                      onOpenModal={handleOpenModal}
-                    />
+                <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  {groupedProducts.map(({ category, products }, groupIndex) => (
+                    <div key={category} className={groupIndex > 0 ? "mt-8" : ""}>
+                 
+                      {selectedCategory === "All" && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -16 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: groupIndex * 0.05 }}
+                          className="flex items-center gap-3 mb-4"
+                        >
+                          <div
+                            className="h-8 flex items-center px-4 rounded-full text-white text-xs font-black shadow-md flex-shrink-0"
+                            style={{
+                              background: `linear-gradient(135deg, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).from}, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).to})`,
+                            }}
+                          >
+                            {products.length} items
+                          </div>
+                          <div className="flex-1">
+                            <h2
+                              className="font-black text-sm leading-tight line-clamp-2 py-1"
+                              style={{ color: "#052e16", letterSpacing: "-0.01em" }}
+                            >
+                              {category}
+                            </h2>
+                          </div>
+                          <div
+                            className="flex-1 h-px"
+                            style={{
+                              background: `linear-gradient(to right, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).from}40, transparent)`,
+                            }}
+                          />
+                        </motion.div>
+                      )}
+
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+                        {products.map((product, idx) => (
+                          <LazyProductCard
+                            key={`${product.id}-${category}-${idx}`}
+                            product={product}
+                            index={idx}
+                            onOpenModal={handleOpenModal}
+                            allCategories={categories.filter((c) => c !== "All")}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </motion.div>
               )}
@@ -638,6 +745,7 @@ const EShop = () => {
         open={isModalOpen}
         handleClose={handleCloseModal}
         product={selectedProduct}
+        allCategories={categories.filter((c) => c !== "All")}
       />
     </div>
   );
@@ -1419,6 +1527,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
+        image:PenisHealthOilImage
       },
       {
         id: 63,
@@ -1587,6 +1696,7 @@ const medicineProducts = [
         ingredients: "Herbal extracts",
         package: "10 ml Drop Bottle",
         value: 160,
+        image:EyeCareImage
       },
       {
         id: 48,
@@ -1611,6 +1721,7 @@ const medicineProducts = [
         ingredients: "Herbal oils & extracts",
         package: "15 ml Drop Bottle",
         value: 180,
+        image:EyeCareImage
       },
       {
         id: 77,
@@ -1620,6 +1731,8 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image:EyeCareImage
+
       },
       {
         id: 78,
@@ -1629,6 +1742,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image:EarDischargeOilImage
       },
       {
         id: 79,
@@ -1638,6 +1752,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image:EarNourishOilImage
       },
       {
         id: 80,
@@ -1647,6 +1762,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image: MicroNourishNasalDropImage
       },
       {
         id: 81,
@@ -1656,6 +1772,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image: DeepNourishNasalDropImage
       },
       {
         id: 82,
@@ -1665,6 +1782,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
+        image: SensesNourishNasalDropImage
       },
       {
         id: 83,
@@ -1674,6 +1792,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 140,
+        image: ToothPowderImage
       },
     ],
   },
@@ -1719,6 +1838,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image: PainReliefMassageOilImage
       },
       {
         id: 88,
@@ -1856,6 +1976,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: PilesTonicImage
       },
       {
         id: 17,
@@ -1865,6 +1986,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
+        image: IntellectTonicImage
       },
       {
         id: 101,
@@ -1894,6 +2016,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 104,
@@ -1903,6 +2026,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 105,
@@ -1912,6 +2036,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
+        image: IntellectTonicImage
       },
       {
         id: 106,
@@ -1921,6 +2046,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 450,
+        image: IntellectTonicImage
       },
       {
         id: 108,
@@ -1930,6 +2056,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
+        image: IntellectTonicImage
       },
       {
         id: 109,
@@ -1939,6 +2066,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 450,
+        image: IntellectTonicImage
       },
       {
         id: 110,
@@ -1948,6 +2076,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 111,
@@ -1957,6 +2086,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
+        image: IntellectTonicImage
       },
       {
         id: 112,
@@ -1976,6 +2106,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 114,
@@ -1985,6 +2116,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
+        image: IntellectTonicImage
       },
       {
         id: 115,
@@ -2004,6 +2136,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 117,
@@ -2013,6 +2146,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
+        image: IntellectTonicImage
       },
       {
         id: 118,
@@ -2022,6 +2156,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
+        image:PenisHealthOilImage
       },
       {
         id: 119,
@@ -2031,6 +2166,7 @@ const medicineProducts = [
         ingredients: "Herbal decoction",
         package: "100 gms Pouch",
         value: 150,
+        image:VaginalWashImage
       },
       {
         id: 120,

@@ -73,11 +73,13 @@ const bookingStatusColor = (s) => {
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
+    const val = payload[0].value;
+    const formattedVal = val >= 1000 ? `₹${(val / 1000).toFixed(1)}k` : `₹${val}`;
     return (
       <div className="bg-white border border-[#e8f5e0] rounded-xl px-3.5 py-2 shadow-lg">
         <p className="text-[10px] font-bold text-[#9e9e9e] mb-0.5">{label}</p>
         <p className="text-[13px] font-extrabold text-[#3d6b1f] m-0">
-          ₹{(payload[0].value / 1000).toFixed(0)}k
+          {formattedVal}
         </p>
       </div>
     );
@@ -105,7 +107,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
       value: `₹${dashboardStats?.totalRevenue ?? 0}`,
       trend: "+0%",
       sub: "incl. Shop & Services",
-      icon: <img src={TotalMoney} alt="Total Money" style={{height:"24px",width:"24px"}} />,
+      icon: <img src={TotalMoney} alt="Total Money" style={{ height: "24px", width: "24px" }} />,
       bg: "#e8f5e0",
       fg: "#3d6b1f",
     },
@@ -125,7 +127,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
       value: `₹${dashboardStats?.storeOrders ?? 0}`,
       trend: "0",
       sub: "pending fulfillment",
-      icon: <img src={ShopOrderIcon} alt="Shop Order" style={{height:"20px",width:"20px"}} />,
+      icon: <img src={ShopOrderIcon} alt="Shop Order" style={{ height: "20px", width: "20px" }} />,
       bg: "#fce4ec",
       fg: "#c62828",
     },
@@ -263,11 +265,10 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                 <button
                   key={p}
                   onClick={() => setSelectedPeriod(p)}
-                  className={`px-2.5 py-1 text-[14px] font-semibold rounded-[7px] border-none cursor-pointer transition-all ${
-                    selectedPeriod === p
-                      ? "bg-green-200 text-green-600 shadow-sm"
-                      : "bg-transparent text-gray-600"
-                  }`}
+                  className={`px-2.5 py-1 text-[14px] font-semibold rounded-[7px] border-none cursor-pointer transition-all ${selectedPeriod === p
+                    ? "bg-green-200 text-green-600 shadow-sm"
+                    : "bg-transparent text-gray-600"
+                    }`}
                 >
                   {p}
                 </button>
@@ -310,11 +311,10 @@ const SuperAdminDashboard = ({ onNavigate }) => {
               </div>
               <div className="mt-1.5 flex items-center gap-1.5">
                 <span
-                  className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-[5px] ${
-                    kpi.trend.startsWith("+")
-                      ? "bg-[#e8f5e0] text-[#3d6b1f]"
-                      : "bg-[#f5f5f5] text-[#9e9e9e]"
-                  }`}
+                  className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-[5px] ${kpi.trend.startsWith("+")
+                    ? "bg-[#e8f5e0] text-[#3d6b1f]"
+                    : "bg-[#f5f5f5] text-[#9e9e9e]"
+                    }`}
                 >
                   {kpi.trend}
                 </span>
@@ -367,8 +367,8 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                       axisLine={false}
                       tickLine={false}
                       tick={{ fontSize: 10, fontWeight: 600, fill: "#9aa090" }}
-                      tickFormatter={(v) => `₹${v / 1000}k`}
-                      width={40}
+                      tickFormatter={(v) => v >= 1000 ? `₹${(v / 1000).toFixed(0)}k` : `₹${v}`}
+                      width={45}
                       domain={[30000, "auto"]}
                     />
                     <RechartsTooltip content={<CustomTooltip />} />
@@ -445,18 +445,18 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                   <p className="m-0 mb-2 text-[10px] font-bold text-[#9aa090] uppercase tracking-[0.5px]">
                     Clinic Revenue
                   </p>
-                  <div className="h-[200px] md:h-[290px]">
+                  <div className="h-[260px] md:h-[340px]">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart
                         data={
                           (revenueData || []).length > 0
                             ? revenueData.map((r) => ({
-                                name: r.category,
-                                revenue: r.amount,
-                              }))
+                              name: r.category,
+                              revenue: r.amount,
+                            }))
                             : categoryRevenue
                         }
-                        margin={{ top: 0, right: 4, left: 0, bottom: 0 }}
+                        margin={{ top: 5, right: 8, left: 0, bottom: 10 }}
                       >
                         <CartesianGrid
                           strokeDasharray="3 3"
@@ -472,7 +472,10 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                             fontWeight: 600,
                             fill: "#9aa090",
                           }}
-                          dy={4}
+                          interval={0}
+                          angle={-40}
+                          textAnchor="end"
+                          height={70}
                         />
                         <YAxis
                           axisLine={false}
@@ -482,8 +485,16 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                             fontWeight: 600,
                             fill: "#9aa090",
                           }}
-                          tickFormatter={(v) => `${v / 1000}k`}
-                          width={28}
+                          tickFormatter={(v) => {
+                            if (v >= 1000) {
+                              const k = v / 1000;
+                              return `₹${Number.isInteger(k) ? k : k.toFixed(1)}k`;
+                            }
+                            return `₹${v}`;
+                          }}
+                          width={38}
+                          domain={[0, "auto"]}
+                          allowDecimals={false}
                         />
                         <RechartsTooltip content={<CustomTooltip />} />
                         <Bar
@@ -491,7 +502,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                           radius={[5, 5, 0, 0]}
                           maxBarSize={22}
                         >
-                          {categoryRevenue.map((_, i) => (
+                          {(revenueData.length > 0 ? revenueData : categoryRevenue).map((_, i) => (
                             <Cell
                               key={i}
                               fill={i % 2 === 0 ? G : G2}
@@ -507,7 +518,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             </div>
           </div>
         </section>
-{console.log("filteredDoctors", filteredDoctors)}
+        {console.log("filteredDoctors", filteredDoctors)}
         <section
           id="staff-assignments"
           className="bg-white rounded-[18px] border border-[#eef0ea] overflow-hidden mb-5"
@@ -615,11 +626,10 @@ const SuperAdminDashboard = ({ onNavigate }) => {
                     </td>
                     <td className="px-3.5 py-[11px]">
                       <span
-                        className={`text-[12px] font-extrabold ${
-                          (doc.upcomingCount || 0) > 3
-                            ? "text-[#e65100]"
-                            : "text-[#3d6b1f]"
-                        }`}
+                        className={`text-[12px] font-extrabold ${(doc.upcomingCount || 0) > 3
+                          ? "text-[#e65100]"
+                          : "text-[#3d6b1f]"
+                          }`}
                       >
                         {doc.upcomingCount || 0}
                       </span>
@@ -735,7 +745,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
         </section>
       </motion.main>
 
-      <div
+      {/* <div
         className={`fixed inset-0 bg-black/30 z-40 transition-opacity duration-300 ${
           isDrawerOpen
             ? "opacity-100 pointer-events-auto"
@@ -868,7 +878,7 @@ const SuperAdminDashboard = ({ onNavigate }) => {
             </div>
           </div>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };

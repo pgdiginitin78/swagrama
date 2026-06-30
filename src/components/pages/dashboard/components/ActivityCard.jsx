@@ -124,8 +124,8 @@ const ActivityCard = ({ data, onClick }) => {
         <p className="text-sm font-bold text-gray-900 leading-tight">
           {displayData.userName}
         </p>
-        <p className="text-[11px] text-gray-400 font-medium mt-0.5">
-          {displayData.department}
+        <p className="text-[11px] text-gray-400 font-medium capitalize mt-0.5">
+          {displayData.type}
         </p>
       </div>
 

@@ -307,7 +307,7 @@ const OPDBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                     customRowBgColor={"#cde8b8"}
                     renderInput={renderInput}
                     editableColumns={["status", "customer", "origin"]}
-                    removeHeaders={["paymentStatus", "amount","paymentFor"]}
+                    removeHeaders={["paymentStatus", "amount","paymentFor","userId","appointmnetId","serviceId","clinicId","doctorId","createdAt","updatedAt","departmentId","isRefund","isCancelBooking"]}
                   />
                 </div>
               ) : (

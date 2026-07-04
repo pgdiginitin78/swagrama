@@ -48,6 +48,7 @@ const PaymentRefundDialog = ({
       PaymentFor: bookingData?.type || bookingData?.paymentFor,
       role: user?.role,
       clinicFid: 5,
+      bookingId: bookingData?.bookingId || null,
     };
 
     if (bookingData?.type === "OPD") {

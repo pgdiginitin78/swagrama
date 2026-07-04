@@ -222,7 +222,7 @@ export default function WellnessStayBookings({
   };
 
   useEffect(() => {
-    GetNext24HoursArrivals()
+    GetNext24HoursArrivals(5)
       .then((res) => {
         setNext24HoursArrivals(res.data.data);
       })

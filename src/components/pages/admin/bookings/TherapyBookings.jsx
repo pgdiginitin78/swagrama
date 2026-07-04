@@ -276,7 +276,7 @@ const TherapyBookings = ({ onSelect, selectedId, refreshTrigger }) => {
                   "image",
                   "patientId",
                   "paymentFor",
-                  "slots","slotDetails"
+                  "slots","slotDetails","serviceFid","isCancelBooking","isRefund"
                 ]}
               />
             </div>

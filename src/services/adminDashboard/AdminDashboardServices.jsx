@@ -21,8 +21,8 @@ export const GetEnquiryList = (searchData) => {
   return AxiosInstance.post(`GetEnquiryList`, searchData);
 };
 
-export const GetNext24HoursArrivals = () => {
-  return AxiosInstance.get(`GetNext24HoursArrivals`);
+export const GetNext24HoursArrivals = (clinicId) => {
+  return AxiosInstance.get(`GetNext24HoursArrivals?ClinicFid=${clinicId}`);
 };
 
 export const GetOtherBookingsList = (data) => {

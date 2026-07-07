@@ -2,7 +2,7 @@ import ArrowForward from "@mui/icons-material/ArrowForward";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { motion } from "framer-motion";
 import { Filter, Leaf } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdEco } from "react-icons/md";
 import {
   GetDetoxTherapyByServiceCategory,
@@ -54,7 +54,7 @@ function ServiceCard({ item }) {
                 onClick={() => setModalOpen(true)}
                 className="group/btn flex-shrink-0 flex items-center gap-1 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium text-white bg-[#4f8f73] rounded-lg transition-all duration-300 hover:bg-[#2a5f46] hover:shadow-md active:scale-95"
               >
-               Book Now
+                Book Now
                 <ArrowForward
                   className="transition-transform duration-300 group-hover/btn:translate-x-0.5"
                   style={{ fontSize: 13 }}
@@ -125,20 +125,22 @@ export default function DetoxHouse() {
       .finally(() => setIsLoading(false));
   };
 
+  const latestRequestId = useRef(0);
+
   useEffect(() => {
     setIsLoading(true);
+    const requestId = ++latestRequestId.current;
+
     GetDetoxTherapyByServiceCategory(5)
       .then((res) => {
-        const data = res?.data?.data.filter(
-          (item) => item.therapyType === "Detox Therapy ",
+        if (requestId !== latestRequestId.current) return;
+        const data = res?.data?.data?.filter(
+          (item) => item.therapyType?.trim() === "Detox Therapy",
         );
         setIsLoading(false);
         if (data?.length) {
           setServiceCategories([
-            {
-              serviceGroupId: 0,
-              serviceGroupName: "All",
-            },
+            { serviceGroupId: 0, serviceGroupName: "All" },
             ...data.map((d) => ({
               serviceGroupId: d?.serviceGroupId,
               serviceGroupName: d?.serviceGroupName,
@@ -146,7 +148,10 @@ export default function DetoxHouse() {
           ]);
         }
       })
-      .catch((err) => err);
+      .catch((err) => err)
+      .finally(() => {
+        if (requestId === latestRequestId.current) setIsLoading(false);
+      });
   }, []);
 
   useEffect(() => {

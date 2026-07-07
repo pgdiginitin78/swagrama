@@ -13,11 +13,7 @@ import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
 import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
 import WaterDropIcon from "@mui/icons-material/WaterDrop";
 import YardIcon from "@mui/icons-material/Yard";
-import {
-  Box,
-  Divider,
-  Modal
-} from "@mui/material";
+import { Box, Divider, Modal } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -82,7 +78,8 @@ import { ModalStyle } from "../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
-import AppointmentRescheduleIcon from "../../assets/AppointmentScheduleIcon.svg"
+import AppointmentRescheduleIcon from "../../assets/AppointmentScheduleIcon.svg";
+import { RefundPayment } from "../../../services/communityActivitiesServices/CommunityActivitiesServices";
 
 const ayurvedaCarouselImages = [
   { id: 1, src: herbsImg, alt: "Ayurveda Herbal Preparations" },
@@ -212,8 +209,6 @@ const validationSchema = yup.object().shape({
     .nullable()
     .required("Appointment date is required")
     .typeError("Appointment date is required"),
-
-
 });
 
 const ayurvedaSideContent = [
@@ -692,7 +687,7 @@ function AyurvedaForm({
 
   useEffect(() => {
     if (patientFid !== null) {
-      getServicesByClinicId(5, patientFid?.userId,selectedDoctorId?.userId)
+      getServicesByClinicId(5, patientFid?.userId, selectedDoctorId?.userId)
         .then((res) => {
           const data = res?.data?.data;
           if (data?.length) {
@@ -704,55 +699,55 @@ function AyurvedaForm({
                 label: `${item.serviceName}`,
               })),
             );
-          }else{
-            setServicesOptions([])
+          } else {
+            setServicesOptions([]);
           }
         })
         .catch((error) => setServicesOptions([]));
     }
-  }, [patientFid,selectedDoctorId]);
+  }, [patientFid, selectedDoctorId]);
 
-useEffect(() => {
-  if (selectedDoctorId !== null) {
-    setSelectedTimeSlot(null);
-    setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
+  useEffect(() => {
+    if (selectedDoctorId !== null) {
+      setSelectedTimeSlot(null);
+      setSlotData((prev) => ({ ...prev, loading: true, error: "" }));
 
-    getDoctorAvailableSlots(
-      selectedDoctorId?.userId,
-      appointmentDate && !isNaN(new Date(appointmentDate).getTime())
-        ? format(new Date(appointmentDate), "yyyy-MM-dd")
-        : "",
-      5,
-    )
-      .then((res) => {
-        const data = res?.data;
+      getDoctorAvailableSlots(
+        selectedDoctorId?.userId,
+        appointmentDate && !isNaN(new Date(appointmentDate).getTime())
+          ? format(new Date(appointmentDate), "yyyy-MM-dd")
+          : "",
+        5,
+      )
+        .then((res) => {
+          const data = res?.data;
 
-        if (data?.status === 200) {
-          const fetchedSlots = data?.data || [];
-          setSlotData({
-            slots: fetchedSlots,
-            loading: false,
-            error: fetchedSlots.length === 0 ? "No slots available" : "",
-          });
-        } else {
+          if (data?.status === 200) {
+            const fetchedSlots = data?.data || [];
+            setSlotData({
+              slots: fetchedSlots,
+              loading: false,
+              error: fetchedSlots.length === 0 ? "No slots available" : "",
+            });
+          } else {
+            setSlotData({
+              slots: [],
+              loading: false,
+              error: data?.message || "Something went wrong",
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching slots:", err);
           setSlotData({
             slots: [],
             loading: false,
-            error: data?.message || "Something went wrong",
+            error: err?.response?.data?.message || "Failed to fetch slots",
           });
-        }
-      })
-      .catch((err) => {
-        console.error("Error fetching slots:", err);
-        setSlotData({
-          slots: [],
-          loading: false,
-          error: err?.response?.data?.message || "Failed to fetch slots",
         });
-      });
-  }
-}, [selectedDoctorId, appointmentDate]);
-console.log("selectedPatient",patientFid)
+    }
+  }, [selectedDoctorId, appointmentDate]);
+  console.log("selectedPatient", patientFid);
 
   const handleConfirmBooking = handleSubmit(
     (data) => {
@@ -790,7 +785,7 @@ console.log("selectedPatient",patientFid)
         EncounterStatus: data?.EncounterStatus,
         reason: data.reasonForVisit,
         bookingSource: "web",
-        createdBy:user?.userId
+        createdBy: user?.userId,
       };
       setFinalObj(saveObj);
       setPreviewData({ ...data, selectedTimeSlot });
@@ -806,6 +801,55 @@ console.log("selectedPatient",patientFid)
       }
     },
   );
+
+  const handleAutoRefund = async (clientTxnId, reasonForFailure) => {
+    try {
+      const payload = {
+        userId: patientFid !== null ? patientFid?.id : user?.userId,
+        RefundBy: user?.userId,
+        Amount: previewData?.serviceFid?.charges || 0,
+        RefundReason:
+          reasonForFailure ||
+          "Auto-refund: booking failed after successful payment",
+        PaymentFor: "OPD",
+        role: user?.role,
+        clinicFid: 5,
+        bookingId: null,
+        AppointmentFid: null,
+        appointmentDate:
+          previewData?.appointmentDate &&
+          !isNaN(new Date(previewData.appointmentDate).getTime())
+            ? format(new Date(previewData.appointmentDate), "yyyy-MM-dd")
+            : "",
+        SloteStartTime: selectedTimeSlot?.slotStartTime,
+        SloteEndTime: selectedTimeSlot?.slotEndTime,
+        clientTxnId: clientTxnId,
+      };
+
+      const res = await RefundPayment(payload);
+      const refundResponse = JSON.parse(res?.data?.refundResponse);
+
+      if (refundResponse?.message) {
+        errorAlert(
+          "Booking failed, so your payment has been refunded. " +
+            refundResponse.message,
+        );
+      } else {
+        errorAlert(
+          "Booking failed and refund could not be confirmed. Please contact support with Transaction ID: " +
+            clientTxnId,
+        );
+      }
+    } catch (refundError) {
+      console.error("Auto-refund failed:", refundError);
+      errorAlert(
+        "Booking failed and refund could not be processed automatically. Please contact support with Transaction ID: " +
+          clientTxnId,
+      );
+    } finally {
+      setIsPaymentPending(false);
+    }
+  };
 
   const initiatePayment = async () => {
     if (isPaymentPending) return;
@@ -1068,7 +1112,7 @@ console.log("selectedPatient",patientFid)
                       fontSize="small"
                       className="text-emerald-600"
                     />
-                   Community Healers (By Appointment only) 
+                    Community Healers (By Appointment only)
                   </h3>
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 </div>
@@ -1188,10 +1232,7 @@ console.log("selectedPatient",patientFid)
                                     : "bg-gray-100 text-gray-600"
                                 }`}
                               >
-                                <Clock
-                                  size={8}
-                                  className="w-[12px] h-[12px]"
-                                />
+                                <Clock size={8} className="w-[12px] h-[12px]" />
                                 {doctor?.sessions?.[0]?.timeSlot || ""} Min
                               </span>
                             </div>
@@ -1257,7 +1298,11 @@ console.log("selectedPatient",patientFid)
                                     const isValid = (t) => {
                                       if (!t) return false;
                                       const str = t.trim();
-                                      return !(str.includes("00:00 - 00:00") || str.includes("00:00:00") || str === "00:00");
+                                      return !(
+                                        str.includes("00:00 - 00:00") ||
+                                        str.includes("00:00:00") ||
+                                        str === "00:00"
+                                      );
                                     };
                                     const hasMorning = isValid(session.morning);
                                     const hasEvening = isValid(session.evening);
@@ -1487,8 +1532,6 @@ console.log("selectedPatient",patientFid)
                     ))}
                   </div>
                 )}
-
-            
               </div>
             </div>
           </div>
@@ -1657,7 +1700,6 @@ console.log("selectedPatient",patientFid)
                   minRows={3}
                   maxRows={5}
                 />
-          
               </div>
 
               <div className="col-span-1 xs:col-span-2 lg:col-span-4 flex flex-col gap-2.5 pt-2 sm:flex-row sm:justify-end sm:gap-3">
@@ -1675,7 +1717,11 @@ console.log("selectedPatient",patientFid)
                 >
                   {/* <EventAvailableIcon sx={{ fontSize: 16 }} /> */}
                   Confirm Booking
-                  <img src={AppointmentRescheduleIcon} alt="" className="h-5 w-5" />
+                  <img
+                    src={AppointmentRescheduleIcon}
+                    alt=""
+                    className="h-5 w-5"
+                  />
                 </button>
               </div>
             </div>

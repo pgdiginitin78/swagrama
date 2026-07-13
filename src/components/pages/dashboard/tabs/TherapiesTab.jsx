@@ -6,7 +6,6 @@ import TherapyIcon from "../../../../assets/TherapyIcon.svg";
 
 const TherapiesTab = ({ user }) => {
   const [upcomingTherapies, setUpcomingTherapies] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [selectedItem, setSelectedItem] = useState(null);
 
   const fetchData = async () => {
@@ -18,14 +17,13 @@ const TherapiesTab = ({ user }) => {
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    setLoading(true);
-    fetchData();
+    if (user) {
+      fetchData();
+    }
   }, [user?.userId]);
 
   return (

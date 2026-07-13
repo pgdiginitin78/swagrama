@@ -1,17 +1,13 @@
 import {
-  CalendarMonth as CalendarIcon,
-  Dashboard as DashboardIcon,
   Diamond as DiamondIcon,
-  Spa as SpaIcon,
   Star as StarIcon,
   EmojiEvents as TrophyIcon
 } from "@mui/icons-material";
-import MembershipOutlineIcon from "../../../../assets/membershipOutlineIcon.svg";
+import ConsultationIcon from "../../../../assets/ConsultationBooking.svg";
+import MembershipIcon from "../../../../assets/MembrshipIcon.svg";
 import OrdersIcon from "../../../../assets/Orders.svg";
 import TherapyIcon from "../../../../assets/Therapy.svg";
 import WellnessIcon from "../../../../assets/WellnessIcon.svg";
-import MembershipIcon from "../../../../assets/MembrshipIcon.svg";
-import ConsultationIcon from "../../../../assets/ConsultationBooking.svg";
 
 
 

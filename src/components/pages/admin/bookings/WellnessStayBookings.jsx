@@ -454,7 +454,7 @@ export default function WellnessStayBookings({
                   count={count}
                   setCount={setCount}
                   setRowsPerPage={setRowsPerPage}
-                  tableClass={"h-[460px] border cursor-pointer"}
+                  tableClass={"h-[420px] lg:h-[760px] border cursor-pointer"}
                   setDataResult={setUpcomingStays}
                   populateTable={populateTable}
                   renderInput={renderInput}
@@ -475,7 +475,8 @@ export default function WellnessStayBookings({
                     "images",
                     "amount",
                     "isRefund",
-                    "paymentFor"
+                    "paymentFor",
+                    "familyMembers"
                   ]}
                 />
               </main>

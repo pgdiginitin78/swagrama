@@ -16,9 +16,10 @@ export const checkRoomAvailability = (
   checkInTime,
   checkOutDate,
   checkOutTime,
+  twinSharing
 ) => {
   return AxiosInstance.get(
-    `/Getroomtype?roomTypeId=${roomTypeId}&checkInDate=${checkInDate}&checkInTime=${checkInTime}&checkOutDate=${checkOutDate}&checkOutTime=${checkOutTime}`,
+    `/Getroomtype?roomTypeId=${roomTypeId}&checkInDate=${checkInDate}&checkInTime=${checkInTime}&checkOutDate=${checkOutDate}&checkOutTime=${checkOutTime}&twinSharing=${twinSharing}`,
   );
 };
 

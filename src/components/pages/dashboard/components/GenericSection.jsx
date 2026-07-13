@@ -24,10 +24,7 @@ const GenericSection = ({ title, icon, data, setSelectedItem }) => {
             </p>
           </div>
         </div>
-        <button className="hidden sm:flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-xs font-bold text-gray-500 hover:bg-gray-50 shrink-0">
-          <HistoryIcon sx={{ fontSize: 14 }} />
-          <span>Export</span>
-        </button>
+    
       </div>
       <div className="max-h-[650px] overflow-y-auto pr-1 group custom-scrollbar">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-6">

@@ -13,13 +13,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { getRoomList } from "../../../../services/healingServices/wellnessStay/WellnessStayServices";
 import StayBookingModal from "./StayBookingModal";
-import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.webp";
-import InfiniteRoom from "../../../assets/rooms/InfiniteRoom.webp";
-import WellHouse from "../../../assets/rooms/WellHouse.webp";
-import EternityRoom from "../../../assets/rooms/EternityRoom.webp";
-import EternalRoom from "../../../assets/rooms/EternalRoom.webp";
-import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.webp";
-import OutdoorLeavingImg from "../../../assets/rooms/OutdoorLeaving.webp";
+import PerpetualRoom from "../../../assets/rooms/PerpetualRoom.png";
+import InfiniteRoom from "../../../assets/rooms/InfiniteRoom.png";
+import WellHouse from "../../../assets/rooms/WellHouse.png";
+import EternityRoom from "../../../assets/rooms/EternityRoom.png";
+import EternalRoom from "../../../assets/rooms/EternalRoom1.png";
+import FirmnessRoom from "../../../assets/rooms/FirmnessRoom.png";
+import OutdoorLeavingImg from "../../../assets/rooms/OutdoorLeaving.png";
 import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 
 const staggerContainer = {
@@ -62,8 +62,8 @@ const IPDWellnessStay = () => {
     if (name.includes("firmness")) return FirmnessRoom;
     if (name.includes("infinite")) return InfiniteRoom;
     if (name.includes("well house") || name.includes("wellhouse"))
-      return OutdoorLeavingImg;
-    if (name.includes("outdoor") || name.includes("out door")) return WellHouse;
+      return WellHouse;
+    if (name.includes("outdoor") || name.includes("out door")) return OutdoorLeavingImg;
 
     return roomImageMap[room.roomTypeId] || EternityRoom;
   };
@@ -152,7 +152,7 @@ const IPDWellnessStay = () => {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-20px" }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-5"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 2xl:gap-5"
         >
           {dynamicWellnessServices?.length > 0 ? (
             dynamicWellnessServices.map((service, idx) => {
@@ -168,7 +168,7 @@ const IPDWellnessStay = () => {
                     !service.isActive ? "opacity-75 grayscale-[0.3]" : ""
                   }`}
                 >
-                  <div className="relative h-[220px] 2xl:h-[360px] overflow-hidden">
+                  <div className="relative h-[390px] xl:h-[330px] 2xl:h-[360px] overflow-hidden">
                     <motion.div
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -209,10 +209,10 @@ const IPDWellnessStay = () => {
                       {service?.benefits || ""}
                     </p>
 
-                    <div className="mt-auto flex items-end justify-between border-t border-gray-50">
+                    <div className="mt-auto flex items-end whitespace-nowrap justify-between border-t border-gray-50">
                       <div>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-xl font-display font-semibold text-ayuDark">
+                          <span className="text-lg font-display font-semibold text-ayuDark">
                             ₹{(service.price || 0).toLocaleString("en-IN")} / PP
                           </span>
                         </div>
@@ -223,7 +223,7 @@ const IPDWellnessStay = () => {
                           type="button"
                           disabled={!service.isActive}
                           onClick={() => handleBook(service)}
-                          className={`px-4 py-1.5 rounded-[5px] flex items-center justify-center transition-all duration-200 ${
+                          className={`px-2 py-1.5 rounded-[5px] text-lg whitespace-nowrap flex items-center justify-center transition-all duration-200 ${
                             service.isActive
                               ? "bg-ayuMid text-white  hover:scale-105 shadow-sm shadow-ayuDark/20 "
                               : "bg-gray-100 text-gray-400 cursor-not-allowed"

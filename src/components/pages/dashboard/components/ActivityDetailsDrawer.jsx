@@ -1,5 +1,6 @@
 import {
   EventNote as BookingIcon,
+  Person,
   LocalShipping as ShippingIcon,
   Spa as SpaIcon,
   Hotel as StayIcon,
@@ -27,10 +28,10 @@ const formatTime = (timeStr) => {
 const formatDate = (dateStr) =>
   dateStr?.includes("T")
     ? new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "2-digit",
-      year: "numeric",
-    })
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+      })
     : dateStr;
 
 const formatAmount = (amount) =>
@@ -42,8 +43,7 @@ const getActivityDisplayData = (data) => {
   const isStay = data.type === "StayBooking";
   const isOPD = data.type === "OPD";
 
-
-  console.log("data`1234", data)
+  console.log("data`1234", data);
   return {
     id: data.bookingId || data.id || "N/A",
     name: data.title || data.name || data.doctorName,
@@ -117,7 +117,7 @@ const ActivityDetailsDrawer = ({
     icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
   };
 
-  console.log("1234567", d, item)
+  console.log("1234567", d, item);
 
   return (
     <Drawer
@@ -179,8 +179,11 @@ const ActivityDetailsDrawer = ({
                 <span className="text-[8px] 2xl:text-[9px] font-bold text-green-800/60 uppercase tracking-widest mb-1 2xl:mb-1.5">
                   Status
                 </span>
-                <div className="bg-lime-50 border border-lime-200 px-2 2xl:px-2.5 py-1 2xl:py-1.5 rounded-full flex items-center gap-1 2xl:gap-1.5 shadow-sm">
-                  <span className="w-1 h-1 2xl:w-1.5 2xl:h-1.5 rounded-full bg-lime-500"></span>
+                <div className="bg-lime-50 border border-lime-200 px-2 2xl:px-2.5 py-1 2xl:py-1.5 rounded-lg flex items-center gap-1 2xl:gap-1.5 shadow-sm">
+                  <div className="relative flex items-center justify-center">
+                    <span className="absolute inline-flex h-3 w-3 rounded-full bg-lime-400 opacity-75 animate-ping"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-lime-500"></span>
+                  </div>{" "}
                   <span className="text-[9px] 2xl:text-[10px] font-bold text-lime-600 uppercase tracking-wider">
                     {d.status}
                   </span>
@@ -281,13 +284,53 @@ const ActivityDetailsDrawer = ({
           )}
         </div>
 
+        {item?.familyMembers && item?.familyMembers.length > 0 && (
+          <div className="mx-3 mt-2">
+            <p className="text-[9px] font-bold text-[#6a9060] uppercase tracking-wide mb-1">
+              Family Members
+            </p>
+            <div className="bg-white rounded-lg border border-gray-100 divide-y divide-gray-50">
+              {item?.familyMembers.map((member) => (
+                <div
+                  key={member.familyMemberId}
+                  className="flex items-center justify-between gap-2 px-3 py-1.5"
+                >
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <div className="w-6 h-6 rounded-full bg-[#f0f7ee] flex items-center justify-center shrink-0">
+                      <Person style={{ fontSize: 12, color: "#4c7c70" }} />
+                    </div>
+                    <span className="text-[11px] font-semibold text-[#002a24] truncate">
+                      {`${member.firstName || ""} ${member.lastName || ""}`.trim() ||
+                        "—"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    {member.age != null && (
+                      <span className="text-[9px] text-gray-400 font-medium">
+                        {member.age} yrs
+                      </span>
+                    )}
+                    {member.gender && (
+                      <span className="text-[9px] text-gray-400 font-medium">
+                        {member.gender}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="flex gap-2 2xl:gap-3 px-3 2xl:px-4 py-3 2xl:py-4 border-t border-green-100 bg-white shrink-0 shadow-[0_-4px_16px_rgba(21,128,61,0.02)]">
           <CommonButton
             type="button"
             label="Cancel Booking"
             disabled={
-              item?.isCancelBooking === false || item?.isCancelBooking === null ||
-              item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
+              item?.isCancelBooking === false ||
+              item?.isCancelBooking === null ||
+              item?.bookingsource === "Aayurmitra" ||
+              item?.bookingsource === "App" ||
               item?.bookingStatus === "Cancelled"
             }
             onClick={() => setRefundDialogOpen(true)}
@@ -297,15 +340,17 @@ const ActivityDetailsDrawer = ({
           <CommonButton
             type="button"
             disabled={
-              item?.isCancelBooking === false || item?.isCancelBooking === null || !d.isStay ||
-              item?.bookingsource === "Aayurmitra" || item?.bookingsource === "App" ||
+              item?.isCancelBooking === false ||
+              item?.isCancelBooking === null ||
+              !d.isStay ||
+              item?.bookingsource === "Aayurmitra" ||
+              item?.bookingsource === "App" ||
               item?.bookingStatus === "Cancelled"
             }
             label="Reschedule Booking"
             className="flex-1  disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"
             onClick={() => setRescheduleOpen(true)}
           />
-
         </div>
       </div>
 
@@ -322,8 +367,8 @@ const ActivityDetailsDrawer = ({
         />
       )}
 
-      {rescheduleOpen && (
-        d.isOPD === true ? (
+      {rescheduleOpen &&
+        (d.isOPD === true ? (
           <RescheduleAppointments
             open={rescheduleOpen}
             onClose={() => setRescheduleOpen(false)}
@@ -355,8 +400,7 @@ const ActivityDetailsDrawer = ({
               onClose?.();
             }}
           />
-        )
-      )}
+        ))}
     </Drawer>
   );
 };

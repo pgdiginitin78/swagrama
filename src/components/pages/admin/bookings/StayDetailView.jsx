@@ -79,7 +79,9 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
     <div className="flex items-center justify-between gap-2 py-1.5 border-b border-gray-50 last:border-0">
       <div className="flex items-center gap-1.5 min-w-0">
         {Icon && <Icon style={{ fontSize: 12, color: iconColor }} />}
-        <span className="text-[10px] text-gray-400 font-medium shrink-0">{label}</span>
+        <span className="text-[10px] text-gray-400 font-medium shrink-0">
+          {label}
+        </span>
       </div>
       <span className="text-[11px] font-semibold text-[#002a24] text-right truncate max-w-[55%]">
         {value || "—"}
@@ -87,43 +89,65 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
     </div>
   );
 
-  const OptionChip = ({ active, activeColor, inactiveColor, Icon, label, activeText, inactiveText }) => (
-    <div className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border ${active ? `bg-[#f0f7ee] border-[${activeColor}]` : "bg-gray-50 border-gray-100"
-      }`}>
-      <div className={`p-1 rounded-md ${active ? "bg-white shadow-sm" : "bg-gray-100"}`}>
+  const OptionChip = ({
+    active,
+    activeColor,
+    inactiveColor,
+    Icon,
+    label,
+    activeText,
+    inactiveText,
+  }) => (
+    <div
+      className={`flex items-center gap-2 px-2.5 py-2 rounded-lg border ${
+        active
+          ? `bg-[#f0f7ee] border-[${activeColor}]`
+          : "bg-gray-50 border-gray-100"
+      }`}
+    >
+      <div
+        className={`p-1 rounded-md ${active ? "bg-white shadow-sm" : "bg-gray-100"}`}
+      >
         <Icon style={{ fontSize: 13, color: active ? activeColor : "#bbb" }} />
       </div>
       <div>
-        <p className={`text-[10px] font-bold ${active ? `text-[${activeColor}]` : "text-gray-400"}`}>
+        <p
+          className={`text-[10px] font-bold ${active ? `text-[${activeColor}]` : "text-gray-400"}`}
+        >
           {label}
         </p>
         <div className="flex items-center gap-0.5 mt-0.5">
-          {active
-            ? <CheckCircleIcon style={{ fontSize: 9, color: "#3e9d6d" }} />
-            : <CancelCircleIcon style={{ fontSize: 9, color: "#ccc" }} />
-          }
-          <p className="text-[8px] text-gray-400">{active ? activeText : inactiveText}</p>
+          {active ? (
+            <CheckCircleIcon style={{ fontSize: 9, color: "#3e9d6d" }} />
+          ) : (
+            <CancelCircleIcon style={{ fontSize: 9, color: "#ccc" }} />
+          )}
+          <p className="text-[8px] text-gray-400">
+            {active ? activeText : inactiveText}
+          </p>
         </div>
       </div>
     </div>
   );
-
+  console.log("selectedBooking", selectedBooking);
   return (
     <div className="flex flex-col h-full bg-white w-full border rounded-lg overflow-hidden shadow-sm">
-
       <div className="flex items-center justify-between px-3 py-2 border-b border-gray-100 shrink-0 bg-white">
         <div>
-          <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">Active Selection</p>
-          <h2 className="text-[13px] font-bold text-[#002a24] leading-tight">Stay Booking Details</h2>
+          <p className="text-[7px] font-bold text-gray-400 uppercase tracking-widest">
+            Active Selection
+          </p>
+          <h2 className="text-[13px] font-bold text-[#002a24] leading-tight">
+            Stay Booking Details
+          </h2>
         </div>
         <IconButton onClick={onClose} size="small">
           <CloseIcon style={{ fontSize: 18, color: "#ef4444" }} />
         </IconButton>
       </div>
       <div className="flex-1 overflow-y-auto pb-1">
-
         <div className="mx-3 mt-3 rounded-xl overflow-hidden border border-gray-100 shadow-sm">
-          <div className="relative h-[155px] bg-gradient-to-br from-[#1a2e22] to-[#2e4a38]">
+          <div className="relative h-[255px] bg-gradient-to-br from-[#1a2e22] to-[#2e4a38]">
             {selectedBooking?.images ? (
               <img
                 src={selectedBooking.images}
@@ -132,11 +156,15 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               />
             ) : (
               <div className="flex items-center justify-center h-full">
-                <RoomIcon style={{ fontSize: 38, color: "rgba(255,255,255,0.18)" }} />
+                <RoomIcon
+                  style={{ fontSize: 38, color: "rgba(255,255,255,0.18)" }}
+                />
               </div>
             )}
             <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/50 backdrop-blur-sm px-2 py-0.5 rounded border border-white/20 max-w-[70%]">
-              <RoomIcon style={{ fontSize: 9, color: "rgba(255,255,255,0.8)" }} />
+              <RoomIcon
+                style={{ fontSize: 9, color: "rgba(255,255,255,0.8)" }}
+              />
               <span className="text-white text-[8px] font-bold uppercase tracking-wide truncate">
                 {selectedBooking.room || "—"}
               </span>
@@ -158,10 +186,14 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               </div>
             </div>
             <div className="flex flex-col items-end gap-1 shrink-0">
-              <span className={`px-2 py-0.5 rounded-full text-[7px] font-bold ${statusStyles[bookingStatus] || "bg-gray-100 text-gray-600"}`}>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[7px] font-bold ${statusStyles[bookingStatus] || "bg-gray-100 text-gray-600"}`}
+              >
                 {bookingStatus.toUpperCase()}
               </span>
-              <span className={`px-2 py-0.5 rounded-full text-[7px] font-bold ${financialStatusStyles[financialStatus] || "bg-gray-100 text-gray-600"}`}>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[7px] font-bold ${financialStatusStyles[financialStatus] || "bg-gray-100 text-gray-600"}`}
+              >
                 {financialStatus.toUpperCase()}
               </span>
             </div>
@@ -172,12 +204,16 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
           <div className="flex items-center justify-between mb-1.5">
             <div className="flex items-center gap-1">
               <DateRangeIcon style={{ fontSize: 13, color: "#4c7c70" }} />
-              <p className="text-[9px] font-bold text-[#6a9060] uppercase tracking-wide">Stay Period</p>
+              <p className="text-[9px] font-bold text-[#6a9060] uppercase tracking-wide">
+                Stay Period
+              </p>
             </div>
             {selectedBooking.daysRemaining && (
               <div className="flex items-center gap-1 bg-[#003d33] text-white px-2 py-0.5 rounded-full">
                 <DaysRemainingIcon style={{ fontSize: 9, color: "#a3d9b4" }} />
-                <span className="text-[8px] font-bold">{selectedBooking.daysRemaining}</span>
+                <span className="text-[8px] font-bold">
+                  {selectedBooking.daysRemaining}
+                </span>
               </div>
             )}
           </div>
@@ -186,7 +222,9 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
             <div className="bg-white rounded-lg px-2 py-1.5 border border-[#d4e9ce]">
               <div className="flex items-center gap-1 mb-0.5">
                 <CheckInIcon style={{ fontSize: 11, color: "#4c7c70" }} />
-                <p className="text-[8px] text-gray-500 font-semibold">Check-In</p>
+                <p className="text-[8px] text-gray-500 font-semibold">
+                  Check-In
+                </p>
               </div>
               <p className="text-[10px] font-bold text-[#002a24] leading-snug">
                 {formatDateOnly(selectedBooking.checkInDate)}
@@ -203,7 +241,9 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
             <div className="bg-white rounded-lg px-2 py-1.5 border border-[#d4e9ce]">
               <div className="flex items-center gap-1 mb-0.5">
                 <CheckOutIcon style={{ fontSize: 11, color: "#e07070" }} />
-                <p className="text-[8px] text-gray-500 font-semibold">Check-Out</p>
+                <p className="text-[8px] text-gray-500 font-semibold">
+                  Check-Out
+                </p>
               </div>
               <p className="text-[10px] font-bold text-[#002a24] leading-snug">
                 {formatDateOnly(selectedBooking.checkOutDate)}
@@ -280,7 +320,46 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
             />
           </div>
         </div>
-
+        {selectedBooking?.familyMembers &&
+          selectedBooking?.familyMembers?.length > 0 && (
+            <div className="mx-3 mt-2">
+              <p className="text-[9px] font-bold text-[#6a9060] uppercase tracking-wide mb-1">
+                Family Members
+              </p>
+              <div className="bg-white rounded-lg border border-gray-100 divide-y divide-gray-50">
+                {selectedBooking?.familyMembers.map((member) => (
+                  <div
+                    key={member.familyMemberId}
+                    className="flex items-center justify-between gap-2 px-3 py-1.5"
+                  >
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <div className="w-6 h-6 rounded-full bg-[#f0f7ee] flex items-center justify-center shrink-0">
+                        <PersonIcon
+                          style={{ fontSize: 12, color: "#4c7c70" }}
+                        />
+                      </div>
+                      <span className="text-[11px] font-semibold text-[#002a24] truncate">
+                        {`${member.firstName || ""} ${member.lastName || ""}`.trim() ||
+                          "—"}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {member.age != null && (
+                        <span className="text-[9px] text-gray-400 font-medium">
+                          {member.age} yrs
+                        </span>
+                      )}
+                      {member.gender && (
+                        <span className="text-[9px] text-gray-400 font-medium">
+                          {member.gender}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         <div className="mx-3 mt-2 mb-2">
           <p className="text-[9px] font-bold text-[#6a9060] uppercase tracking-wide mb-1">
             Financial Overview
@@ -290,23 +369,31 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <div className="flex justify-between items-center py-1.5 border-b border-gray-50">
                 <div className="flex items-center gap-1">
                   <RoomIcon style={{ fontSize: 10, color: "#9ca3af" }} />
-                  <span className="text-[9px] text-gray-400 font-medium">Base Room Rate</span>
+                  <span className="text-[9px] text-gray-400 font-medium">
+                    Base Room Rate
+                  </span>
                 </div>
                 <span className="text-[9px] font-bold text-[#002a24]">
-                  {selectedBooking?.charges ? `₹${selectedBooking.charges}` : "—"}
+                  {selectedBooking?.charges
+                    ? `₹${selectedBooking.charges}`
+                    : "—"}
                 </span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-gray-50">
                 <div className="flex items-center gap-1">
                   <WellnessIcon style={{ fontSize: 10, color: "#9ca3af" }} />
-                  <span className="text-[9px] text-gray-400 font-medium">Wellness Add-ons</span>
+                  <span className="text-[9px] text-gray-400 font-medium">
+                    Wellness Add-ons
+                  </span>
                 </div>
                 <span className="text-[9px] font-bold text-[#002a24]">—</span>
               </div>
               <div className="flex justify-between items-center py-1.5 border-b border-gray-50">
                 <div className="flex items-center gap-1">
                   <TaxIcon style={{ fontSize: 10, color: "#9ca3af" }} />
-                  <span className="text-[9px] text-gray-400 font-medium">Taxes (GST)</span>
+                  <span className="text-[9px] text-gray-400 font-medium">
+                    Taxes (GST)
+                  </span>
                 </div>
                 <span className="text-[9px] font-bold text-[#002a24]">—</span>
               </div>
@@ -314,11 +401,15 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               <div className="flex justify-between items-center py-2">
                 <div className="flex items-center gap-1">
                   <TotalIcon style={{ fontSize: 12, color: "#3e9d6d" }} />
-                  <span className="text-[11px] font-black text-[#002a24]">Grand Total</span>
+                  <span className="text-[11px] font-black text-[#002a24]">
+                    Grand Total
+                  </span>
                 </div>
                 <div className="flex items-center gap-0.5">
                   <RupeeIcon style={{ fontSize: 12, color: "#16a34a" }} />
-                  <span className={`text-[14px] font-black ${selectedBooking.amount ? "text-green-600" : "text-[#003d33]"}`}>
+                  <span
+                    className={`text-[14px] font-black ${selectedBooking.amount ? "text-green-600" : "text-[#003d33]"}`}
+                  >
                     {selectedBooking.amount
                       ? selectedBooking.amount.toLocaleString("en-IN")
                       : "—"}
@@ -327,12 +418,15 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
               </div>
             </div>
 
-            <div className={`flex items-center justify-center gap-1 px-3 py-1 ${selectedBooking.isRefund
-                ? "bg-blue-50 text-blue-600"
-                : financialStatus === "Pending"
-                  ? "bg-amber-50 text-amber-600"
-                  : "bg-emerald-50 text-emerald-600"
-              }`}>
+            <div
+              className={`flex items-center justify-center gap-1 px-3 py-1 ${
+                selectedBooking.isRefund
+                  ? "bg-blue-50 text-blue-600"
+                  : financialStatus === "Pending"
+                    ? "bg-amber-50 text-amber-600"
+                    : "bg-emerald-50 text-emerald-600"
+              }`}
+            >
               {selectedBooking.isRefund ? (
                 <RefundIcon style={{ fontSize: 10 }} />
               ) : financialStatus === "Pending" ? (
@@ -356,7 +450,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
         <button
           type="button"
           onClick={() => handleCheckInOut(selectedBooking.bookingId)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-[#003d33] text-white text-[11px] font-semibold shadow-sm hover:bg-[#004d40] transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-[#003d33] text-white text-[11px] font-semibold shadow-sm hover:bg-[#004d40] transition-colors"
         >
           {selectedBooking?.financials === "Pending" ? (
             <>
@@ -373,7 +467,7 @@ const StayDetailView = ({ selectedBooking, onClose, onSuccess }) => {
         <button
           type="button"
           onClick={() => setOpenCancelModal(true)}
-          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-red-50 text-red-600 text-[11px] font-semibold border border-red-300 hover:bg-red-100 transition-colors"
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded bg-red-50 text-red-600 text-[11px] font-semibold border border-red-300 hover:bg-red-100 transition-colors"
         >
           <CancelCircleIcon style={{ fontSize: 13 }} />
           Cancel

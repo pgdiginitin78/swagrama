@@ -33,6 +33,40 @@ import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
+const NATURE_THERAPY_PRICE_MAP = {
+  114: { single: 400, group: 200, bulk: 100 },
+  168: { single: 400, group: 300, bulk: 200 },
+  111: { single: 750, group: 500, bulk: 250 },
+  110: { single: 750, group: 500, bulk: 250 },
+  115: { single: 400, group: 200, bulk: 100 },
+  112: { single: 400, group: 200, bulk: 100 },
+  113: { single: 750, group: 500, bulk: 250 },
+};
+
+const DEFAULT_THERAPY_PRICING = { single: 1000, group: 750, bulk: 500 };
+
+const resolveTherapyPricing = (therapy) => {
+  if (
+    therapy?.pricing &&
+    therapy.pricing.single != null &&
+    therapy.pricing.group != null &&
+    therapy.pricing.bulk != null
+  ) {
+    return therapy.pricing;
+  }
+
+  const mapped = NATURE_THERAPY_PRICE_MAP[therapy?.serviceId];
+  if (mapped) return mapped;
+
+  return DEFAULT_THERAPY_PRICING;
+};
+
+const getPricePerPerson = (pricing, totalPeople) => {
+  if (totalPeople >= 5) return pricing.bulk;
+  if (totalPeople >= 2) return pricing.group;
+  return pricing.single;
+};
+
 const schema = yup.object().shape({
   serviceFid: yup.object().nullable().required("Therapy is required"),
   fromDate: yup
@@ -189,16 +223,8 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
 
   useEffect(() => {
     const totalPeople = parseInt(noOfPerson) || 1;
-
-    // Fixed tiered pricing
-    let pricePerPerson;
-    if (totalPeople >= 5) {
-      pricePerPerson = 500; // 5 or more persons
-    } else if (totalPeople >= 2) {
-      pricePerPerson = 750; // 2 to 4 persons
-    } else {
-      pricePerPerson = 1000; // 1 person
-    }
+    const pricing = resolveTherapyPricing(therapy);
+    const pricePerPerson = getPricePerPerson(pricing, totalPeople);
 
     const sessionAmount = pricePerPerson * totalPeople;
     setValue("perDayAmount", pricePerPerson);
@@ -210,8 +236,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       label: therapy?.serviceName,
     });
   }, [noOfPerson, therapy, setValue]);
-
-  console.log("therapy", therapy);
 
   useEffect(() => {
     setSelectedTimeSlot(null);
@@ -253,10 +277,14 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
-              { shouldValidate: true }
+              { shouldValidate: true },
             );
-            setValue("email", filterData.emailId || "", { shouldValidate: true });
-            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true });
+            setValue("email", filterData.emailId || "", {
+              shouldValidate: true,
+            });
+            setValue("mobile", String(filterData.mobileNo || ""), {
+              shouldValidate: true,
+            });
             setValue("city", filterData.city || "", { shouldValidate: true });
           }
         }
@@ -267,7 +295,9 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
       setValue("fullName", patientFid.label, { shouldValidate: true });
-      setValue("mobile", String(patientFid.mobileNo || ""), { shouldValidate: true });
+      setValue("mobile", String(patientFid.mobileNo || ""), {
+        shouldValidate: true,
+      });
       setValue("email", patientFid.emailId || "", { shouldValidate: true });
       setValue("city", patientFid.city || "", { shouldValidate: true });
     } else {
@@ -308,7 +338,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       const formattedDate = format(new Date(fromDate), "yyyy-MM-dd");
       GetTherapySlots(formattedDate, therapy?.serviceId, formattedDate, 5)
         .then((res) => {
-          console.log("slotsData", res?.data.data);
           setBookedSlots(res.data.data);
         })
         .catch((err) => setBookedSlots([]));
@@ -344,8 +373,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       setSelectedTimeSlot(null);
     }
   }, [user?.userId, fromDate]);
-
-  console.log("selectedTimeSlot", therapy);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -389,7 +416,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       origin: origin || "Nature Therapy",
     };
 
-    console.log("naturTherapySaveObj", saveObj);
     setFormData(saveObj);
     setOpenConfirmation(true);
   };
@@ -475,7 +501,9 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                         sx={{ fontSize: 20, color: "var(--booking-primary)" }}
                       />
                     </span>
-                    {origin === "Yoga Therapy" ? "Book Yoga Therapy" : "Book Nature Therapy"}
+                    {origin === "Yoga Therapy"
+                      ? "Book Yoga Therapy"
+                      : "Book Nature Therapy"}
                   </h2>
                   <CancelButtonModal onClick={handleClose} />
                 </div>
@@ -512,7 +540,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                 searchIcon={true}
                                 error={errors.patientFid}
                               />
-                              {errors.patientFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.patientFid.message}</p>}
+                              {errors.patientFid && (
+                                <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                  {errors.patientFid.message}
+                                </p>
+                              )}
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -525,7 +557,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                     error={errors.fullName}
                                     shrink={true}
                                   />
-                                  {errors.fullName && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fullName.message}</p>}
+                                  {errors.fullName && (
+                                    <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                      {errors.fullName.message}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               <div className="flex flex-col">
@@ -536,7 +572,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   error={errors.mobile}
                                   shrink={true}
                                 />
-                                {errors.mobile && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.mobile.message}</p>}
+                                {errors.mobile && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.mobile.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex flex-col">
                                 <InputField
@@ -547,7 +587,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   shrink={true}
                                   dontCapitalize="none"
                                 />
-                                {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email.message}</p>}
+                                {errors.email && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.email.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="col-span-1 sm:col-span-2">
                                 <InputField
@@ -582,7 +626,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                     error={errors.serviceFid}
                                     isDisabled={true}
                                   />
-                                  {errors.serviceFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.serviceFid.message}</p>}
+                                  {errors.serviceFid && (
+                                    <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                      {errors.serviceFid.message}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               <div className="flex flex-col">
@@ -594,7 +642,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   disablePast={true}
                                   error={errors.fromDate}
                                 />
-                                {errors.fromDate && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fromDate.message}</p>}
+                                {errors.fromDate && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.fromDate.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex flex-col">
                                 <InputField
@@ -603,9 +655,15 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   label="Number of Persons *"
                                   type="number"
                                   error={errors.noOfPerson}
-                                  InputProps={{ inputProps: { min: 1, max: 20 } }}
+                                  InputProps={{
+                                    inputProps: { min: 1, max: 20 },
+                                  }}
                                 />
-                                {errors.noOfPerson && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.noOfPerson.message}</p>}
+                                {errors.noOfPerson && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.noOfPerson.message}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -626,7 +684,11 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                               label="I agree to the clinical guidelines and terms."
                               error={errors.termsAccepted}
                             />
-                            {errors.termsAccepted && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.termsAccepted.message}</p>}
+                            {errors.termsAccepted && (
+                              <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                {errors.termsAccepted.message}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </motion.div>

@@ -102,7 +102,7 @@ const walkInServices = [
 const visitorServices = [
   {
     nameHindi: "स्वप्रातःदर्शन",
-    serviceName: "Morning Swagrama",
+    serviceName: "Morning Vision",
     checkIn: "08:45",
     checkOut: "11:15",
     description:
@@ -116,7 +116,7 @@ const visitorServices = [
   },
   {
     nameHindi: "स्वसायम्दर्शन",
-    serviceName: "Evening Swagrama",
+    serviceName: "Evening Vision",
     checkIn: "14:45",
     checkOut: "17:15",
     description:

@@ -653,7 +653,7 @@ export default function CommuneTabs() {
 
       <section
         ref={nextSectionRef}
-        className="relative py-16 md:py-24 px-4 md:px-12 max-w-6xl mx-auto"
+        className="relative py-8 md:py-12 px-4 md:px-12 max-w-6xl mx-auto"
       >
         <div
           className="absolute -top-4 right-0 text-[120px] md:text-[200px] font-black leading-none select-none pointer-events-none opacity-[0.04] text-stone-900"
@@ -799,7 +799,7 @@ export default function CommuneTabs() {
         </motion.div>
       </AnimSection>
 
-      <section className="py-16 md:py-24 ">
+      <section className="py-8 md:py-12 ">
         <AnimSection className="w-full mx-auto">
           <motion.div variants={fadeUp} className="text-center mb-10 md:mb-14">
             <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-amber-600 mb-3">
@@ -860,34 +860,7 @@ export default function CommuneTabs() {
           </motion.div>
         </AnimSection>
       </section>
-
-      <div className="relative py-12 overflow-hidden ">
-        <div className="absolute inset-0">
-          <img
-            src={indoorInterior}
-            alt="Nature"
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <AnimSection className="relative z-10 max-w-2xl mx-auto text-center px-6 py-20">
-          <motion.blockquote variants={fadeUp} className="text-white">
-            <p
-              className="text-2xl md:text-3xl font-light mb-4 leading-relaxed"
-              style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontStyle: "italic",
-              }}
-            >
-              "To build a self-reliant nation, we must first build self-reliant
-              villages."
-            </p>
-            <footer className="text-white/60 text-xs uppercase tracking-widest">
-              — Swagram Academy Vision
-            </footer>
-          </motion.blockquote>
-        </AnimSection>
-      </div>
-      <section className="py-16  px-4 md:px-12">
+     <section className="py-8  px-4 md:px-12">
         <AnimSection className="max-w-5xl mx-auto">
           <motion.div variants={fadeUp} className="text-center mb-10 md:mb-14">
             <span className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] font-semibold text-amber-600 mb-3">
@@ -924,6 +897,33 @@ export default function CommuneTabs() {
           </motion.div>
         </AnimSection>
       </section>
+      <div className="relative py-12 overflow-hidden ">
+        <div className="absolute inset-0">
+          <img
+            src={indoorInterior}
+            alt="Nature"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <AnimSection className="relative z-10 max-w-2xl mx-auto text-center px-6 py-20">
+          <motion.blockquote variants={fadeUp} className="text-white">
+            <p
+              className="text-2xl md:text-3xl font-light mb-4 leading-relaxed"
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: "italic",
+              }}
+            >
+              "To build a self-reliant nation, we must first build self-reliant
+              villages."
+            </p>
+            <footer className="text-white/60 text-xs uppercase tracking-widest">
+              — Swagram Academy Vision
+            </footer>
+          </motion.blockquote>
+        </AnimSection>
+      </div>
+ 
       {openEnquiryModal && (
         <MembershipRegistrationModal
           open={openEnquiryModal}

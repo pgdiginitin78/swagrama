@@ -192,6 +192,11 @@ function StayBookingModal({
   const outTimeRef = useRef(null);
   const guestInputRef = useRef(null);
 
+  const isAdmin =
+    String(user?.role || "")
+      .trim()
+      .toLowerCase() === "admin";
+
   const schema = yup.object().shape({
     fullName: yup.string().required("Full name is required"),
     email: yup
@@ -1424,12 +1429,22 @@ function StayBookingModal({
                         </div>
                         <div
                           ref={inTimeRef}
-                          onClick={() => setInTimeAnchorEl(inTimeRef.current)}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            setInTimeAnchorEl(inTimeRef.current);
+                          onClick={() => {
+                            if (isAdmin) {
+                              setInTimeAnchorEl(inTimeRef.current);
+                            }
                           }}
-                          className="w-20 sm:w-24 shrink-0 flex flex-col px-2 py-2 cursor-pointer hover:bg-booking-primaryLight/20 transition-all"
+                          onTouchEnd={(e) => {
+                            if (isAdmin) {
+                              e.preventDefault();
+                              setInTimeAnchorEl(inTimeRef.current);
+                            }
+                          }}
+                          className={`w-20 sm:w-24 shrink-0 flex flex-col px-2 py-2 transition-all ${
+                            isAdmin
+                              ? "cursor-pointer hover:bg-booking-primaryLight/20"
+                              : "cursor-default pointer-events-none select-none"
+                          }`}
                         >
                           <p className="text-[7px] font-bold text-booking-primary uppercase tracking-[0.18em] mb-0.5">
                             Time
@@ -1481,12 +1496,22 @@ function StayBookingModal({
                         </div>
                         <div
                           ref={outTimeRef}
-                          onClick={() => setOutTimeAnchorEl(outTimeRef.current)}
-                          onTouchEnd={(e) => {
-                            e.preventDefault();
-                            setOutTimeAnchorEl(outTimeRef.current);
+                          onClick={() => {
+                            if (isAdmin) {
+                              setOutTimeAnchorEl(outTimeRef.current);
+                            }
                           }}
-                          className="w-20 sm:w-24 shrink-0 flex flex-col px-2 py-2 cursor-pointer hover:bg-booking-primaryLight/20 transition-all"
+                          onTouchEnd={(e) => {
+                            if (isAdmin) {
+                              e.preventDefault();
+                              setOutTimeAnchorEl(outTimeRef.current);
+                            }
+                          }}
+                          className={`w-20 sm:w-24 shrink-0 flex flex-col px-2 py-2 transition-all ${
+                            isAdmin
+                              ? "cursor-pointer hover:bg-booking-primaryLight/20"
+                              : "cursor-default pointer-events-none select-none"
+                          }`}
                         >
                           <p className="text-[7px] font-bold text-booking-primary uppercase tracking-[0.18em] mb-0.5">
                             Time
@@ -1658,7 +1683,7 @@ function StayBookingModal({
                 )}
 
                 <Popover
-                  open={Boolean(inTimeAnchorEl)}
+                  open={Boolean(inTimeAnchorEl) && isAdmin}
                   anchorEl={inTimeAnchorEl}
                   onClose={() => setInTimeAnchorEl(null)}
                   anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -1707,7 +1732,7 @@ function StayBookingModal({
                     <div className="w-full flex justify-end p-3 border-t border-gray-100 bg-gray-50/50">
                       <button
                         onClick={() => setInTimeAnchorEl(null)}
-                        className="px-6 py-2 bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white text-[10px] font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
+                        className="px-6 py-2 bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white text-[10px] font-bold rounded hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
                       >
                         Done
                       </button>
@@ -1716,7 +1741,7 @@ function StayBookingModal({
                 </Popover>
 
                 <Popover
-                  open={Boolean(outTimeAnchorEl)}
+                  open={Boolean(outTimeAnchorEl) && isAdmin}
                   anchorEl={outTimeAnchorEl}
                   onClose={() => setOutTimeAnchorEl(null)}
                   anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
@@ -1772,7 +1797,7 @@ function StayBookingModal({
                             }
                           }, 300);
                         }}
-                        className="px-6 py-2 bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white text-[10px] font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
+                        className="px-6 py-2 bg-gradient-to-r from-booking-primary to-booking-primaryDark text-white text-[10px] font-bold rounded hover:shadow-lg transition-all active:scale-95 uppercase tracking-widest"
                       >
                         Done
                       </button>
@@ -2717,7 +2742,10 @@ function StayBookingModal({
             >
               <div className="flex items-center gap-2 border-b border-booking-primary/10 pb-2.5">
                 <div className="w-7 h-7 rounded-full bg-booking-primaryLight/60 flex items-center justify-center shrink-0">
-                  <img src={ReservationIcon} className="w-7 h-7 text-booking-primaryDark" />
+                  <img
+                    src={ReservationIcon}
+                    className="w-7 h-7 text-booking-primaryDark"
+                  />
                 </div>
                 <h2 className="text-base sm:text-lg font-serif text-booking-primary font-bold">
                   Reservation Summary

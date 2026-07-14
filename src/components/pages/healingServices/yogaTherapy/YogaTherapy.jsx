@@ -42,6 +42,7 @@ function TherapyCard({ therapy, index, onBookSession }) {
           : "0 4px 24px rgba(0,0,0,0.10)",
         transition: "box-shadow 0.35s ease",
         border: `1px solid ${therapy.accent}25`,
+                  background: therapy.light,
       }}
       whileHover={{ y: -6, scale: 1.01 }}
       transition={{ duration: 0.35 }}
@@ -90,7 +91,7 @@ function TherapyCard({ therapy, index, onBookSession }) {
       <div
         className="p-4 space-y-3"
         style={{
-          background: therapy.light,
+
           backgroundImage:
             "repeating-linear-gradient(0deg, transparent, transparent 24px, rgba(0,0,0,0.03) 25px)",
         }}

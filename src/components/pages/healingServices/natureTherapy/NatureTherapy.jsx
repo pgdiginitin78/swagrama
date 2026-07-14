@@ -7,6 +7,28 @@ import {
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import NatureTherapyBookingModal from "./NatureTherapyBookingModal";
 
+const NATURE_THERAPY_PRICE_MAP = {
+  114: { single: 400, group: 200, bulk: 100 },
+  168: { single: 400, group: 300, bulk: 200 },
+  111: { single: 750, group: 500, bulk: 250 },
+  110: { single: 750, group: 500, bulk: 250 },
+  115: { single: 400, group: 200, bulk: 100 },
+  112: { single: 400, group: 200, bulk: 100 },
+  113: { single: 750, group: 500, bulk: 250 },
+};
+
+const getTherapyPricing = (therapy) => {
+  const mapped = NATURE_THERAPY_PRICE_MAP[therapy?.serviceId];
+  if (mapped) return mapped;
+
+  const base = therapy?.charges || 0;
+  return {
+    single: base,
+    group: Math.round(base * 0.5),
+    bulk: Math.round(base * 0.25),
+  };
+};
+
 export default function NatureTherapy() {
   const [selectedCategory, setSelectedCategory] = useState({
     serviceGroupId: 0,
@@ -29,7 +51,6 @@ export default function NatureTherapy() {
     setPage(1);
     setServices([]);
   };
-  console.log("selectedCategory", selectedCategory, serviceCategories);
 
   const headerRef = useRef(null);
 
@@ -69,7 +90,6 @@ export default function NatureTherapy() {
         const data = res?.data?.data.filter(
           (item) => item.therapyType === "Nature Therapy",
         );
-        console.log("data123456", data);
         if (data?.length) {
           setServiceCategories([
             {
@@ -223,110 +243,112 @@ export default function NatureTherapy() {
               transition={{ duration: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
             >
-              {services.map((therapy, index) => (
-                <motion.div
-                  key={therapy.id}
-                  initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{
-                    delay: index * 0.1,
-                    duration: 0.4,
-                    ease: "easeOut",
-                  }}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-100 hover:shadow-2xl transition-all duration-300 group"
-                >
-                  <div className="relative h-56 2xl:h-64 overflow-hidden">
-                    <motion.img
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.4 }}
-                      src={therapy.serviceImage}
-                      alt={therapy.serviceName}
-                      className="w-full h-full object-cover"
-                    />
+              {services.map((therapy, index) => {
+                const pricing = getTherapyPricing(therapy);
 
-                    {/* <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" /> */}
+                return (
+                  <motion.div
+                    key={therapy.id}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{
+                      delay: index * 0.1,
+                      duration: 0.4,
+                      ease: "easeOut",
+                    }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden border border-green-100 hover:shadow-2xl transition-all duration-300 group"
+                  >
+                    <div className="relative h-56 2xl:h-64 overflow-hidden">
+                      <motion.img
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.4 }}
+                        src={therapy.serviceImage}
+                        alt={therapy.serviceName}
+                        className="w-full h-full object-cover"
+                      />
 
-                    <div
-                      className="
+                      <div
+                        className="
                           absolute bottom-0 left-0 right-0
                           p-3 text-center
                           bg-white/25
                           backdrop-blur-md backdrop-saturate-150
                           border-t border-white/30
                         "
-                    >
-                      <h3 className="text-white font-bold text-sm leading-tight drop-shadow-lg">
-                        {therapy.serviceName}
-                      </h3>
+                      >
+                        <h3 className="text-white font-bold text-sm leading-tight drop-shadow-lg">
+                          {therapy.serviceName}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-4 space-y-2.5">
-                    <div className="bg-green-50 rounded-lg p-2">
-                      <p className="text-xs text-green-900">
-                        <span className="font-bold">Room :</span>
-                        <span className="text-green-700 ml-1">
-                          {therapy.roomNames}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="bg-lime-50 rounded-lg p-2">
-                      <p className="text-xs text-green-900 line-clamp-2">
-                        <span className="font-bold">Description :</span>
-                        <span className="text-green-700 ml-1">
-                          {therapy.description}
-                        </span>
-                      </p>
-                    </div>
-                    <div className="bg-emerald-50 rounded-lg p-2">
-                      <p className="text-xs text-green-900 line-clamp-2">
-                        <span className="font-bold">Benefits :</span>
-                        <span className="text-green-700 ml-1">
-                          {therapy.uses}
-                        </span>
-                      </p>
-                    </div>
+                    <div className="p-4 space-y-2.5">
+                      <div className="bg-green-50 rounded-lg p-2">
+                        <p className="text-xs text-green-900">
+                          <span className="font-bold">Room :</span>
+                          <span className="text-green-700 ml-1">
+                            {therapy.roomNames}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="bg-lime-50 rounded-lg p-2">
+                        <p className="text-xs text-green-900 line-clamp-2">
+                          <span className="font-bold">Description :</span>
+                          <span className="text-green-700 ml-1">
+                            {therapy.description}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="bg-emerald-50 rounded-lg p-2">
+                        <p className="text-xs text-green-900 line-clamp-2">
+                          <span className="font-bold">Benefits :</span>
+                          <span className="text-green-700 ml-1">
+                            {therapy.uses}
+                          </span>
+                        </p>
+                      </div>
 
-                    <div className="bg-gradient-to-br from-green-50 to-lime-50 rounded-lg p-2.5 space-y-1.5 border border-green-100">
-                      <div className="flex justify-between items-center text-xs">
-                        <span className="text-green-900 font-semibold">
-                          Single
-                        </span>
-                        <span className="text-green-900 font-bold">
-                          {/* ₹{therapy.charges} */}₹ 1000/1
-                        </span>
+                      <div className="bg-gradient-to-br from-green-50 to-lime-50 rounded-lg p-2.5 space-y-1.5 border border-green-100">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-green-900 font-semibold">
+                            Single
+                          </span>
+                          <span className="text-green-900 font-bold">
+                            ₹ {pricing.single}/1
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs border-t border-green-200 pt-1.5">
+                          <span className="text-green-900 font-semibold">
+                            2-5 People
+                          </span>
+                          <span className="text-green-900 font-bold">
+                            ₹ {pricing.group}/2-5
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center text-xs border-t border-green-200 pt-1.5">
+                          <span className="text-green-900 font-semibold">
+                            5+ People
+                          </span>
+                          <span className="text-green-900 font-bold">
+                            ₹ {pricing.bulk}/5 or More
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex justify-between items-center text-xs border-t border-green-200 pt-1.5">
-                        <span className="text-green-900 font-semibold">
-                          2-5 People
-                        </span>
-                        <span className="text-green-900 font-bold">
-                          ₹ 750/2-5
-                          {/* {therapy.priceRange} */}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center text-xs border-t border-green-200 pt-1.5">
-                        <span className="text-green-900 font-semibold">
-                          5+ People
-                        </span>
-                        <span className="text-green-900 font-bold">
-                          {/* ₹{therapy.bulkPrice} */}₹ 500/5 or More
-                        </span>
-                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() =>
+                          handleBooking({ ...therapy, pricing })
+                        }
+                        className="w-full bg-gradient-to-r from-green-600 to-lime-600 text-white font-semibold text-sm py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 group-hover:from-green-700 group-hover:to-lime-700"
+                      >
+                        Book Now
+                      </motion.button>
                     </div>
-                    <motion.button
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.97 }}
-                      onClick={() => handleBooking(therapy)}
-                      className="w-full bg-gradient-to-r from-green-600 to-lime-600 text-white font-semibold text-sm py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all duration-300 group-hover:from-green-700 group-hover:to-lime-700"
-                    >
-                  
-                      Book Now
-                    </motion.button>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </motion.div>
           </AnimatePresence>
 

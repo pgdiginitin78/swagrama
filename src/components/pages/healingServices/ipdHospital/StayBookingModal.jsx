@@ -547,6 +547,16 @@ function StayBookingModal({
     }
   };
 
+  const closeCalendarPopover = () => {
+    if (checkIn && !checkOut) {
+      const autoCheckOut = addDays(checkIn, 1);
+      if (!isDateBooked(autoCheckOut)) {
+        setCheckOut(autoCheckOut);
+      }
+    }
+    setCalendarAnchorEl(null);
+  };
+
   const calculateTotal = () => {
     if (!selectedService)
       return {
@@ -1808,7 +1818,7 @@ function StayBookingModal({
                 <Popover
                   open={Boolean(calendarAnchorEl)}
                   anchorEl={calendarAnchorEl}
-                  onClose={() => setCalendarAnchorEl(null)}
+                  onClose={closeCalendarPopover}
                   anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
                   transformOrigin={{ vertical: "top", horizontal: "center" }}
                   PaperProps={{
@@ -2045,7 +2055,7 @@ function StayBookingModal({
                       </button>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => setCalendarAnchorEl(null)}
+                          onClick={closeCalendarPopover}
                           className="px-4 py-2 bg-white border border-[#EEE9DC] text-booking-primary font-semibold rounded-lg hover:bg-booking-primaryLight/20 transition-all text-xs"
                         >
                           Cancel
@@ -2069,7 +2079,7 @@ function StayBookingModal({
                               setCheckOut(end);
                               setSelectingFor("checkIn");
                             }
-                            setCalendarAnchorEl(null);
+                            closeCalendarPopover();
                           }}
                           className="bg-booking-primary text-white min-w-[80px]"
                         />

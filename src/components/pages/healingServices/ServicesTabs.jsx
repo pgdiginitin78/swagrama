@@ -59,7 +59,7 @@ const tabsData = [
   },
   {
     label: "Yoga",
-    fullLabel: "योगतिककत्सा Yoga Therapy",
+    fullLabel: "योगचिकित्सा Yoga Therapy",
     component: <YogaTherapy />,
     color: "#537c3a",
     bgColor: "rgba(83, 124, 58, 0.08)",

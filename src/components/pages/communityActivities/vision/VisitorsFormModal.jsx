@@ -47,6 +47,10 @@ const schema = yup.object().shape({
     .required("Mobile number is required")
     .matches(/^[0-9]{10}$/, "Must be 10 digits"),
   city: yup.string().required("City is required"),
+  patientFid: yup
+    .object()
+    .nullable()
+    .required("Guest is required"),
   appointmentDate: yup
     .date()
     .typeError("Invalid date")
@@ -107,7 +111,6 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       specialRequests: "",
       termsAccepted: false,
     },
-    mode: "onChange",
   });
 
   const patientFid = watch("patientFid");
@@ -172,10 +175,10 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
       setValue("email", patientFid.emailId || "", { shouldValidate: true });
       setValue("city", patientFid.city || "", { shouldValidate: true });
     } else {
-      setValue("fullName", "", { shouldValidate: true });
-      setValue("mobileNumber", "", { shouldValidate: true });
-      setValue("email", "", { shouldValidate: true });
-      setValue("city", "", { shouldValidate: true });
+      setValue("fullName", "");
+      setValue("mobileNumber", "");
+      setValue("email", "");
+      setValue("city", "");
     }
   }, [patientFid, setValue]);
 
@@ -427,7 +430,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             error={errors.appointmentDate}
                           />
                           {errors.appointmentDate && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText>
                               {errors.appointmentDate.message}
                             </FormHelperText>
                           )}
@@ -443,7 +446,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             error={errors.noOfPerson}
                           />
                           {errors.noOfPerson && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText error >
                               {errors.noOfPerson.message}
                             </FormHelperText>
                           )}
@@ -474,7 +477,13 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                           dataArray={patientOptions}
                           isClearable={true}
                           searchIcon={true}
+                          error={errors.patientFid}
                         />
+                        {errors.patientFid && (
+                          <FormHelperText error sx={{ mt: 0 }}>
+                            {errors.patientFid.message}
+                          </FormHelperText>
+                        )}
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="col-span-1 sm:col-span-2">
@@ -485,7 +494,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             error={errors.fullName}
                           />
                           {errors.fullName && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText error >
                               {errors.fullName.message}
                             </FormHelperText>
                           )}
@@ -499,7 +508,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             error={errors.mobileNumber}
                           />
                           {errors.mobileNumber && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText error >
                               {errors.mobileNumber.message}
                             </FormHelperText>
                           )}
@@ -513,7 +522,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             dontCapitalize="none"
                           />
                           {errors.email && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText error >
                               {errors.email.message}
                             </FormHelperText>
                           )}
@@ -526,7 +535,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                             error={errors.city}
                           />
                           {errors.city && (
-                            <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                            <FormHelperText error >
                               {errors.city.message}
                             </FormHelperText>
                           )}
@@ -551,7 +560,7 @@ const VisitorsFormModal = ({ open, handleClose, serviceDetails, origin }) => {
                           error={errors.termsAccepted}
                         />
                         {errors.termsAccepted && (
-                          <FormHelperText error sx={{ ml: 2, mt: 0 }}>
+                          <FormHelperText>
                             {errors.termsAccepted.message}
                           </FormHelperText>
                         )}

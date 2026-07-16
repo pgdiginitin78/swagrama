@@ -88,10 +88,11 @@ export default function BookTherapySession({ open, onClose, item }) {
   const selectedDateRef = useRef(null);
   const [sessionsCount, setSessionsCount] = useState(1);
   const [schedules, setSchedules] = useState([
-    { date: startOfToday(), time: null },
+    { date: null, time: null },
   ]);
   const [activePickerIndex, setActivePickerIndex] = useState(0);
   const [calendarBaseDate, setCalendarBaseDate] = useState(startOfToday());
+  const [suggestedDate, setSuggestedDate] = useState(null);
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
@@ -135,14 +136,11 @@ export default function BookTherapySession({ open, onClose, item }) {
       setSchedules((prev) => {
         const next = [...prev];
         if (next.length === 0) {
-          next.push({ date: startOfToday(), time: null });
+          next.push({ date: null, time: null });
         }
         while (next.length < sessionsCount) {
-          const lastValidDate = next[next.length - 1]?.date;
-          next.push({
-            date: lastValidDate ? addDays(lastValidDate, 1) : startOfToday(),
-            time: null,
-          });
+          // Don't auto-fill dates — let the user pick each one explicitly
+          next.push({ date: null, time: null });
         }
         if (next.length > sessionsCount) {
           next.length = sessionsCount;
@@ -185,6 +183,26 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   useEffect(() => {
     if (activePickerIndex !== null) {
+      // When switching to a session that has no date yet,
+      // auto-navigate the calendar to the month of (previous session date + 1 day)
+      const activeSession = schedules[activePickerIndex];
+      if (!activeSession?.date && activePickerIndex > 0) {
+        const prevDate = schedules[activePickerIndex - 1]?.date;
+        if (prevDate) {
+          const suggested = addDays(prevDate, 1);
+          setSuggestedDate(suggested);
+          setCalendarBaseDate(startOfMonth(suggested));
+        } else {
+          setSuggestedDate(null);
+        }
+      } else {
+        setSuggestedDate(null);
+        // If the session already has a date, navigate to its month
+        if (activeSession?.date) {
+          setCalendarBaseDate(startOfMonth(activeSession.date));
+        }
+      }
+
       const timer = setTimeout(() => {
         if (selectedDateRef.current) {
           selectedDateRef.current.scrollIntoView({
@@ -196,7 +214,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [activePickerIndex, calendarBaseDate]);
+  }, [activePickerIndex]);
 
   useEffect(() => {
     if (item !== null && activePickerIndex !== null) {
@@ -240,9 +258,17 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
 
   const handleDateSelect = (date, idx) => {
+    setSuggestedDate(null); // clear suggestion once user picks explicitly
     setSchedules((prev) => {
       const next = [...prev];
       next[idx] = { ...next[idx], date, time: null };
+      // Reset all subsequent sessions that haven't been fully scheduled yet
+      // so they don't carry stale auto-filled dates
+      for (let i = idx + 1; i < next.length; i++) {
+        if (!next[i].time) {
+          next[i] = { date: null, time: null };
+        }
+      }
       return next;
     });
   };
@@ -378,7 +404,7 @@ export default function BookTherapySession({ open, onClose, item }) {
               successAlert(bookingData.message);
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
-              setSchedules([{ date: startOfToday(), time: null }]);
+              setSchedules([{ date: null, time: null }]);
               setSessionsCount(1);
               reset();
               onClose();
@@ -412,7 +438,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const handleReset = () => {
     reset();
     setSessionsCount(1);
-    setSchedules([{ date: startOfToday(), time: null }]);
+    setSchedules([{ date: null, time: null }]);
     setActivePickerIndex(0);
     setCalendarBaseDate(startOfToday());
     setIsFirstTime(false);
@@ -593,8 +619,18 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     const isSelected =
                                       schedule.date &&
                                       isSameDay(date, schedule.date);
+
+                                    // Use suggestedDate for scroll focus when no date chosen yet
+                                    const isSuggested =
+                                      !schedule.date &&
+                                      suggestedDate &&
+                                      isSameDay(date, suggestedDate) &&
+                                      activePickerIndex === idx;
+
                                     const isTargetDate =
-                                      isSelected || (!schedule.date && isToday);
+                                      isSelected ||
+                                      isSuggested ||
+                                      (!schedule.date && !suggestedDate && isToday);
                                     return (
                                       <button
                                         key={i}
@@ -612,9 +648,11 @@ export default function BookTherapySession({ open, onClose, item }) {
                                             ? "text-gray-200 cursor-not-allowed"
                                             : isSelected
                                               ? "bg-ayuMid text-white shadow-md"
-                                              : isToday
-                                                ? "bg-ayuMid/10 text-ayuMid border-2 border-ayuMid shadow-sm"
-                                                : "bg-white text-gray-500 border border-gray-100 hover:border-ayuMid active:scale-95"
+                                              : isSuggested
+                                                ? "bg-ayuMid/10 text-ayuMid border-2 border-dashed border-ayuMid shadow-sm"
+                                                : isToday
+                                                  ? "bg-ayuMid/10 text-ayuMid border-2 border-ayuMid shadow-sm"
+                                                  : "bg-white text-gray-500 border border-gray-100 hover:border-ayuMid active:scale-95"
                                         }`}
                                       >
                                         <span

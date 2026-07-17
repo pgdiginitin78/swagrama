@@ -212,13 +212,13 @@ export default function YogaTherapy() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <section className=" px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.3 }}
           variants={fadeUp}
-          className="mb-10 text-center sm:mb-14"
+          className="mb-10 mx-auto text-center sm:mb-14"
         >
           <p className="mb-2 font-serif text-[10px] font-semibold uppercase tracking-[0.35em] text-lime-700 sm:text-xs">
             ॥ प्राचीन परम्परा ॥

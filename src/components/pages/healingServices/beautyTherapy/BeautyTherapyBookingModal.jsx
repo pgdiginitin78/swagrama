@@ -14,10 +14,9 @@ import {
   getServicesByClinicId,
   InitiatePayment,
 } from "../../../../services/bookAppointment/BookAppointmentServices";
-import { GetBeautyTherapySlots } from "../../../../services/healingServices/beautyTherapyServices/BeautyTherapyServices";
 import {
   BookDetoxTherapy,
-  GetTherapySlots,
+  TherapySlots,
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 
@@ -65,12 +64,20 @@ const schema = yup.object().shape({
     .mixed()
     .nullable()
     .required("Patient is required")
-    .test("is-selected", "Patient is required", (val) => val !== null && val !== undefined),
+    .test(
+      "is-selected",
+      "Patient is required",
+      (val) => val !== null && val !== undefined,
+    ),
   serviceFid: yup
     .mixed()
     .nullable()
     .required("Therapy is required")
-    .test("is-selected", "Therapy is required", (val) => val !== null && val !== undefined),
+    .test(
+      "is-selected",
+      "Therapy is required",
+      (val) => val !== null && val !== undefined,
+    ),
   bookingDate: yup.date().required("Booking date is required").nullable(),
   termsAccepted: yup
     .boolean()
@@ -104,23 +111,13 @@ const sectionVariants = {
   },
 };
 
-const staticTimeSlots = [
-  { slotStartTime: "09:00:00", slotEndTime: "10:00:00", isAvailable: true },
-  { slotStartTime: "10:00:00", slotEndTime: "11:00:00", isAvailable: true },
-  { slotStartTime: "11:00:00", slotEndTime: "12:00:00", isAvailable: true },
-  { slotStartTime: "12:00:00", slotEndTime: "13:00:00", isAvailable: true },
-  { slotStartTime: "13:00:00", slotEndTime: "14:00:00", isAvailable: true },
-  { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
-  { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
-  { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
-];
-
 function TimeSlotChip({ slot, isSelected, onSelect }) {
   return (
     <button
       type="button"
       onClick={onSelect}
       disabled={!slot.isAvailable}
+      title={slot.genderMessage}
       className={`
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
@@ -148,14 +145,13 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
 
   // API specific states
   const [servicesOptions, setServicesOptions] = useState([]);
-  const [doctorSlots, setDoctorSlots] = useState([]);
+  const [therapySlots, setTherapySlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
   const [loading, setLoading] = useState(false);
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
-  const [bookedSlots, setBookedSlots] = useState([]);
 
   const { setIsLoading } = useLoader();
   const cancelPaymentRef = useRef(null);
@@ -192,6 +188,39 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   const selectedServiceValue = watch("serviceFid");
   const termsAccepted = watch("termsAccepted");
 
+  const isGenderAllowed = (slot, patient) => {
+    if (!patient || !patient.gender) return true;
+    const g = String(patient.gender).toLowerCase().trim();
+    const patientGender = g.startsWith("f")
+      ? "female"
+      : g.startsWith("m")
+        ? "male"
+        : g;
+    const msg = String(slot.genderMessage || "").toLowerCase();
+    if (!msg || msg.includes("both")) return true;
+    return msg.split(/[^a-z]+/).includes(patientGender);
+  };
+
+  const doctorSlots = therapySlots.map((s) => ({
+    ...s,
+    slotStartTime: s.startTime,
+    slotEndTime: s.endTime,
+    isAvailable:
+      String(s.status || "").toLowerCase() === "available" &&
+      (s.maxBookings == null || (s.bookingCount || 0) < s.maxBookings) &&
+      isGenderAllowed(s, patientFid),
+  }));
+
+  useEffect(() => {
+    if (
+      selectedTimeSlot &&
+      patientFid &&
+      !isGenderAllowed(selectedTimeSlot, patientFid)
+    ) {
+      setSelectedTimeSlot(null);
+    }
+  }, [patientFid]);
+
   console.log("selectedServiceValue", selectedServiceValue);
 
   useEffect(() => {
@@ -200,9 +229,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   }, [setValue]);
 
   useEffect(() => {
-    setDoctorSlots([]);
-    setSelectedTimeSlot(null);
-    setSlotError("");
+    setTherapySlots([]);
 
     getServicesByClinicId(5)
       .then((res) => {
@@ -220,18 +247,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       })
       .catch((error) => console.error(error));
   }, [setValue]);
-
-  useEffect(() => {
-    if (eventDetails?.serviceId && bookingDate) {
-      const formattedDate = format(new Date(bookingDate), "yyyy-MM-dd");
-      GetTherapySlots(formattedDate, eventDetails?.serviceId, formattedDate, 5)
-        .then((res) => {
-          console.log("slotsData", res?.data.data);
-          setBookedSlots(res.data.data);
-        })
-        .catch((err) => setBookedSlots([]));
-    }
-  }, [eventDetails, bookingDate]);
 
   const handleGetPatientData = () => {
     getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
@@ -253,10 +268,14 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
             setValue(
               "fullName",
               `${filterData.firstName || ""} ${filterData.lastName || ""}`.trim(),
-              { shouldValidate: true }
+              { shouldValidate: true },
             );
-            setValue("email", filterData.emailId || "", { shouldValidate: true });
-            setValue("mobile", String(filterData.mobileNo || ""), { shouldValidate: true });
+            setValue("email", filterData.emailId || "", {
+              shouldValidate: true,
+            });
+            setValue("mobile", String(filterData.mobileNo || ""), {
+              shouldValidate: true,
+            });
             setValue("city", filterData.city || "", { shouldValidate: true });
           }
         }
@@ -267,7 +286,9 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   useEffect(() => {
     if (patientFid !== null && patientFid !== undefined) {
       setValue("fullName", patientFid.label, { shouldValidate: true });
-      setValue("mobile", String(patientFid.mobileNo || ""), { shouldValidate: true });
+      setValue("mobile", String(patientFid.mobileNo || ""), {
+        shouldValidate: true,
+      });
       setValue("email", patientFid.emailId || "", { shouldValidate: true });
       setValue("city", patientFid.city || "", { shouldValidate: true });
     } else {
@@ -304,32 +325,29 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
   }, [eventDetails, setValue]);
 
   useEffect(() => {
-    if (user?.userId && bookingDate) {
+    if (
+      eventDetails?.serviceId &&
+      bookingDate &&
+      !isNaN(new Date(bookingDate).getTime())
+    ) {
       setSelectedTimeSlot(null);
       setSlotError("");
       setLoading(true);
 
-      const bookingDateStr =
-        bookingDate && !isNaN(new Date(bookingDate).getTime())
-          ? format(new Date(bookingDate), "yyyy-MM-dd")
-          : "";
+      const bookingDateStr = format(new Date(bookingDate), "yyyy-MM-dd");
 
-      GetBeautyTherapySlots(user.userId, bookingDateStr)
+      TherapySlots(eventDetails.serviceId, bookingDateStr)
         .then((res) => {
-          const data = res?.data?.data || [];
-          const slots = data?.length > 0 ? data : staticTimeSlots;
-          setDoctorSlots(slots);
-          setLoading(false);
+          const data = Array.isArray(res?.data?.data) ? res.data.data : [];
+          setTherapySlots(data);
         })
-        .catch(() => {
-          setDoctorSlots(staticTimeSlots);
-          setLoading(false);
-        });
+        .catch(() => setTherapySlots([]))
+        .finally(() => setLoading(false));
     } else {
-      setDoctorSlots([]);
+      setTherapySlots([]);
       setSelectedTimeSlot(null);
     }
-  }, [user?.userId, bookingDate]);
+  }, [eventDetails?.serviceId, bookingDate]);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -341,9 +359,25 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       errorAlert("Please select a time slot");
       return;
     }
+    if (!selectedTimeSlot.serviceRoomID) {
+      setSlotError("Selected slot has no room assigned. Please re-select.");
+      errorAlert("Selected slot has no room assigned. Please re-select.");
+      return;
+    }
+    if (!isGenderAllowed(selectedTimeSlot, patientFid)) {
+      const msg =
+        selectedTimeSlot.genderMessage ||
+        "Slot not allowed for this patient's gender";
+      setSlotError(msg);
+      errorAlert(msg);
+      return;
+    }
     setSlotError("");
     const saveObj = {
-      role: String(patientFid?.mobileNo) === String(user?.mobileNo) ? "self" : "other",
+      role:
+        String(patientFid?.mobileNo) === String(user?.mobileNo)
+          ? "self"
+          : "other",
       userId: user?.userId || null,
       patientFid: patientFid?.patientId,
       createdBy: user?.userId,
@@ -366,6 +400,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               : "",
           slotStart: selectedTimeSlot?.slotStartTime,
           slotEnd: selectedTimeSlot?.slotEndTime,
+          serviceRoomID: selectedTimeSlot?.serviceRoomID,
         },
       ],
       FirstTimeTaking: null,
@@ -502,7 +537,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                 searchIcon={true}
                                 error={errors.patientFid}
                               />
-                              {errors.patientFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.patientFid.message}</p>}
+                              {errors.patientFid && (
+                                <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                  {errors.patientFid.message}
+                                </p>
+                              )}
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                               <div className="md:col-span-2 flex flex-col">
@@ -513,7 +552,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   error={errors.fullName}
                                   shrink={true}
                                 />
-                                {errors.fullName && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.fullName.message}</p>}
+                                {errors.fullName && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.fullName.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex flex-col">
                                 <InputField
@@ -523,7 +566,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   error={errors.mobile}
                                   shrink={true}
                                 />
-                                {errors.mobile && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.mobile.message}</p>}
+                                {errors.mobile && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.mobile.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="flex flex-col">
                                 <InputField
@@ -534,7 +581,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   shrink={true}
                                   dontCapitalize="none"
                                 />
-                                {errors.email && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.email.message}</p>}
+                                {errors.email && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.email.message}
+                                  </p>
+                                )}
                               </div>
                               <div className="md:col-span-2">
                                 <InputField
@@ -581,7 +632,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                       eventDetails?.serviceName ? true : false
                                     }
                                   />
-                                  {errors.serviceFid && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.serviceFid.message}</p>}
+                                  {errors.serviceFid && (
+                                    <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                      {errors.serviceFid.message}
+                                    </p>
+                                  )}
                                 </div>
                               </div>
                               <div className="md:col-span-2 sm:col-span-1 flex flex-col">
@@ -593,7 +648,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                                   disablePast={true}
                                   error={errors.bookingDate}
                                 />
-                                {errors.bookingDate && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.bookingDate.message}</p>}
+                                {errors.bookingDate && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                    {errors.bookingDate.message}
+                                  </p>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -615,7 +674,11 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               label="I agree to the terms and conditions and clinical guidelines."
                               error={errors.termsAccepted}
                             />
-                            {errors.termsAccepted && <p className="text-red-500 text-[10px] mt-1 ml-1">{errors.termsAccepted.message}</p>}
+                            {errors.termsAccepted && (
+                              <p className="text-red-500 text-[10px] mt-1 ml-1">
+                                {errors.termsAccepted.message}
+                              </p>
+                            )}
                           </div>
                         </div>
                       </motion.div>
@@ -624,7 +687,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                         variants={sectionVariants}
                         className="lg:col-span-1"
                       >
-                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border lg:sticky lg:top-0 h-full flex flex-col">
+                        <div className="bg-booking-surface rounded-[9px] shadow-sm border border-booking-border h-full flex flex-col">
                           <div className="bg-booking-secondaryLight px-4 py-2 flex items-center gap-2 rounded-t-[9px] text-booking-secondary font-bold">
                             <div className="p-1.5 bg-booking-secondary/10 rounded-[9px]">
                               <Clock className="w-5 h-5" />
@@ -634,7 +697,7 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                             </h2>
                           </div>
 
-                          <div className="p-4 sm:p-5 flex-1 relative min-h-[200px]">
+                          <div className="p-4 sm:p-5 flex-1 relative min-h-[240px]">
                             {loading ? (
                               <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80">
                                 <div className="w-10 h-10 border-4 border-amber-200 border-t-amber-500 rounded-full animate-spin"></div>
@@ -646,20 +709,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
                               <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
-                                className="grid grid-cols-2 gap-2 content-start h-full"
+                                className="slots-scroll grid grid-cols-2 gap-2 content-start max-h-[320px] overflow-y-auto pr-1 lg:max-h-none lg:absolute lg:inset-4 xl:inset-5"
                               >
                                 {doctorSlots.map((slot, index) => {
-                                  const matchingBookedSlot = (
-                                    bookedSlots || []
-                                  ).find(
-                                    (bs) =>
-                                      bs.slotStartTime === slot.slotStartTime &&
-                                      bs.slotEndTime === slot.slotEndTime,
-                                  );
-
-                                  let isAvailable = matchingBookedSlot
-                                    ? matchingBookedSlot.isAvailable
-                                    : slot.isAvailable;
+                                  let isAvailable = slot.isAvailable;
 
                                   // Disable past slots if booking for today
                                   const bookingDateStr =

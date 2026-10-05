@@ -16,9 +16,8 @@ import {
 } from "../../../../services/bookAppointment/BookAppointmentServices";
 import {
   BookDetoxTherapy,
-  GetTherapySlots,
+  TherapySlots,
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
-import { GetNatureTherapySlotsByUser } from "../../../../services/healingServices/natureTherapyServices/NatureTherapyServices";
 import ConfirmationModal from "../../../common/ConfirmationModal";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -131,17 +130,6 @@ const formatTime = (timeStr) => {
   }
 };
 
-const staticTimeSlots = [
-  { slotStartTime: "09:00:00", slotEndTime: "10:00:00", isAvailable: true },
-  { slotStartTime: "10:00:00", slotEndTime: "11:00:00", isAvailable: true },
-  { slotStartTime: "11:00:00", slotEndTime: "12:00:00", isAvailable: true },
-  { slotStartTime: "12:00:00", slotEndTime: "13:00:00", isAvailable: true },
-  { slotStartTime: "13:00:00", slotEndTime: "14:00:00", isAvailable: true },
-  { slotStartTime: "14:00:00", slotEndTime: "15:00:00", isAvailable: true },
-  { slotStartTime: "15:00:00", slotEndTime: "16:00:00", isAvailable: true },
-  { slotStartTime: "16:00:00", slotEndTime: "17:00:00", isAvailable: true },
-];
-
 function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
   const isDisabled = !slot.isAvailable || slot.isBookedByUser || isPast;
   return (
@@ -149,7 +137,13 @@ function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
       type="button"
       onClick={onSelect}
       disabled={isDisabled}
-      title={isPast ? "This time slot has already passed" : undefined}
+      title={
+        isPast
+          ? slot.genderOk === false
+            ? slot.genderMessage
+            : "This time slot is not available"
+          : slot.genderMessage
+      }
       className={`
         relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
         ${
@@ -177,14 +171,13 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [formData, setFormData] = useState(null);
   const [servicesOptions, setServicesOptions] = useState([]);
-  const [doctorSlots, setDoctorSlots] = useState([]);
   const [selectedTimeSlot, setSelectedTimeSlot] = useState(null);
   const [slotError, setSlotError] = useState("");
-  const [loading, setLoading] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [openAddPatient, setOpenAddPatient] = useState(false);
   const [patientOptions, setPatientOptions] = useState([]);
-  const [bookedSlots, setBookedSlots] = useState([]);
+  const [therapySlots, setTherapySlots] = useState([]);
+  const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
@@ -222,6 +215,48 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   const termsAccepted = watch("termsAccepted");
 
   useEffect(() => {
+    if (noOfPerson === "" || noOfPerson === null || noOfPerson === undefined)
+      return;
+    const n = parseInt(noOfPerson, 10);
+    if (isNaN(n) || n < 1) setValue("noOfPerson", 1);
+    else if (n > 20) setValue("noOfPerson", 20);
+    else if (n !== Number(noOfPerson)) setValue("noOfPerson", n);
+  }, [noOfPerson, setValue]);
+
+  const isGenderAllowed = (slot, patient) => {
+    if (!patient || !patient.gender) return true;
+    const g = String(patient.gender).toLowerCase().trim();
+    const patientGender = g.startsWith("f") ? "female" : g.startsWith("m") ? "male" : g;
+    const msg = String(slot.genderMessage || "").toLowerCase();
+    if (!msg || msg.includes("both")) return true;
+    return msg.split(/[^a-z]+/).includes(patientGender);
+  };
+
+  const doctorSlots = therapySlots.map((s) => {
+    const genderOk = isGenderAllowed(s, patientFid);
+    return {
+      ...s,
+      slotStartTime: s.startTime,
+      slotEndTime: s.endTime,
+      genderOk,
+      isAvailable:
+        String(s.status || "").toLowerCase() === "available" &&
+        (s.maxBookings == null || (s.bookingCount || 0) < s.maxBookings) &&
+        genderOk,
+    };
+  });
+
+  useEffect(() => {
+    if (
+      selectedTimeSlot &&
+      patientFid &&
+      !isGenderAllowed(selectedTimeSlot, patientFid)
+    ) {
+      setSelectedTimeSlot(null);
+    }
+  }, [patientFid]);
+
+  useEffect(() => {
     const totalPeople = parseInt(noOfPerson) || 1;
     const pricing = resolveTherapyPricing(therapy);
     const pricePerPerson = getPricePerPerson(pricing, totalPeople);
@@ -240,22 +275,24 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   useEffect(() => {
     setSelectedTimeSlot(null);
     setSlotError("");
-    getServicesByClinicId(5)
-      .then((res) => {
-        const data = res?.data?.data;
-        if (data?.length) {
-          const formatted = data.map((item) => ({
-            ...item,
-            id: item.serviceFid,
-            value: item.serviceFid,
-            label: `${item.serviceName}`,
-            charges: item.charges || 0,
-          }));
-          setServicesOptions(formatted);
-        }
-      })
-      .catch((error) => console.error(error));
-  }, [setValue]);
+    if(patientFid?.userId){
+      getServicesByClinicId(5,patientFid?.userId)
+        .then((res) => {
+          const data = res?.data?.data;
+          if (data?.length) {
+            const formatted = data.map((item) => ({
+              ...item,
+              id: item.serviceFid,
+              value: item.serviceFid,
+              label: `${item.serviceName}`,
+              charges: item.charges || 0,
+            }));
+            setServicesOptions(formatted);
+          }
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [setValue,patientFid?.userId]);
 
   const handleGetPatientData = () => {
     getPatientDataByMobileNo(user?.mobileNo, user.userId, "IPD", 5)
@@ -333,46 +370,35 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
     }
   }, [servicesOptions, therapy, setValue]);
 
-  useEffect(() => {
-    if (therapy?.serviceId && fromDate) {
-      const formattedDate = format(new Date(fromDate), "yyyy-MM-dd");
-      GetTherapySlots(formattedDate, therapy?.serviceId, formattedDate, 5)
-        .then((res) => {
-          setBookedSlots(res.data.data);
-        })
-        .catch((err) => setBookedSlots([]));
-    }
-  }, [therapy, fromDate]);
 
   useEffect(() => {
-    if (user?.userId && fromDate) {
-      setSelectedTimeSlot(null);
-      setSlotError("");
-      setLoading(true);
-      GetNatureTherapySlotsByUser(
-        user.userId,
-        fromDate && !isNaN(new Date(fromDate).getTime())
-          ? format(new Date(fromDate), "yyyy-MM-dd")
-          : "",
-      )
-        .then((res) => {
-          const data = res?.data?.data;
-          if (data?.length) {
-            setDoctorSlots(data);
-          } else {
-            setDoctorSlots(staticTimeSlots);
-          }
-          setLoading(false);
-        })
-        .catch(() => {
-          setDoctorSlots(staticTimeSlots);
-          setLoading(false);
-        });
-    } else {
-      setDoctorSlots([]);
-      setSelectedTimeSlot(null);
+    if (
+      !open ||
+      !therapy?.serviceId ||
+      !fromDate ||
+      isNaN(new Date(fromDate).getTime())
+    ) {
+      setTherapySlots([]);
+      return;
     }
-  }, [user?.userId, fromDate]);
+
+    const activeDate = format(new Date(fromDate), "yyyy-MM-dd");
+    setSelectedTimeSlot(null);
+    setSlotError("");
+    setIsSlotsLoading(true);
+
+    TherapySlots(therapy.serviceId, activeDate)
+      .then((res) => {
+        console.log("therapy slots", res?.data?.data);
+        const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
+        setTherapySlots(data);
+      })
+      .catch((error) => {
+        console.error("therapy slots error", error);
+        setTherapySlots([]);
+      })
+      .finally(() => setIsSlotsLoading(false));
+  }, [open, therapy?.serviceId, fromDate]);
 
   const onSubmit = (data) => {
     if (!user) {
@@ -384,7 +410,18 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       errorAlert("Please select a time slot");
       return;
     }
+    if (!selectedTimeSlot?.serviceRoomID) {
+      setSlotError("Selected slot has no room assigned. Please re-select.");
+      errorAlert("Selected slot has no room assigned. Please re-select.");
+      return;
+    }
     setSlotError("");
+    if (!isGenderAllowed(selectedTimeSlot, patientFid)) {
+      const msg = selectedTimeSlot?.genderMessage || "Slot not allowed for this patient's gender";
+      setSlotError(msg);
+      errorAlert(msg);
+      return;
+    }
     const saveObj = {
       role: patientFid?.userId === user?.userId ? "self" : "other",
       userId: patientFid?.userId,
@@ -410,6 +447,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
               : "",
           slotStart: selectedTimeSlot?.slotStartTime,
           slotEnd: selectedTimeSlot?.slotEndTime,
+          serviceRoomID: selectedTimeSlot?.serviceRoomID,
         },
       ],
       FirstTimeTaking: null,
@@ -656,7 +694,15 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   type="number"
                                   error={errors.noOfPerson}
                                   InputProps={{
-                                    inputProps: { min: 1, max: 20 },
+                                    inputProps: {
+                                      min: 1,
+                                      max: 20,
+                                      step: 1,
+                                      onKeyDown: (e) => {
+                                        if (["-", "+", "e", "E", "."].includes(e.key))
+                                          e.preventDefault();
+                                      },
+                                    },
                                   }}
                                 />
                                 {errors.noOfPerson && (
@@ -706,7 +752,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                           </div>
 
                           <div className="p-4 min-h-[180px] flex flex-col">
-                            {loading ? (
+                            {isSlotsLoading ? (
                               <div className="flex flex-1 items-center justify-center h-40">
                                 <div className="w-8 h-8 border-4 border-emerald-100 border-t-emerald-500 rounded-full animate-spin" />
                               </div>
@@ -727,18 +773,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                     isPast = slotDateTime < new Date();
                                   }
 
-                                  const matchedBookedSlot = (
-                                    bookedSlots || []
-                                  ).find(
-                                    (bs) =>
-                                      bs.slotStartTime === slot.slotStartTime &&
-                                      bs.slotEndTime === slot.slotEndTime,
-                                  );
-                                  const isAvailable =
-                                    (matchedBookedSlot
-                                      ? matchedBookedSlot.isAvailable
-                                      : slot.isAvailable) &&
-                                    !slot?.isBookedByUser;
+                                  const isAvailable = slot.isAvailable;
 
                                   const isDisabled = isPast || !isAvailable;
                                   return (

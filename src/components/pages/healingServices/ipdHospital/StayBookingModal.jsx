@@ -111,20 +111,6 @@ const SectionLabel = ({ children, tone = "sage" }) => {
   );
 };
 
-const LeafIcon = ({ className }) => (
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    className={className}
-    stroke="currentColor"
-    strokeWidth={1.6}
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M4 20c8.5 0 15-6 15-15C10 5 4 11.5 4 20Z" />
-    <path d="M6 18C11 13 14 10 18 6" />
-  </svg>
-);
 
 function StayBookingModal({
   open,
@@ -315,6 +301,7 @@ function StayBookingModal({
   })();
 
   const adultSlotsRemaining = maxAdults - totalAdults;
+  
   const childSlotsRemaining = (() => {
     if (
       !isOutdoorLeaving &&

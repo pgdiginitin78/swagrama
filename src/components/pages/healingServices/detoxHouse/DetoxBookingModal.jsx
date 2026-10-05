@@ -388,7 +388,7 @@ const DetoxBookingModal = ({ open, handleClose, eventDetails }) => {
                     <span className="bg-booking-primary/10 p-1.5 rounded-lg flex items-center justify-center">
                       <Event sx={{ fontSize: 20 }} />
                     </span>
-                    Book Detox Therapy
+                    Book Detox Therapy 
                   </h2>
                   <button
                     type="button"

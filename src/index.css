@@ -43,3 +43,26 @@
   -ms-overflow-style: none !important; /* IE and Edge */
   scrollbar-width: none !important; /* Firefox */
 }
+
+/* Slim themed scrollbar for slot lists */
+.slots-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--booking-primary, #10b981) transparent;
+}
+
+.slots-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.slots-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.slots-scroll::-webkit-scrollbar-thumb {
+  background: var(--booking-primary, #10b981);
+  border-radius: 9999px;
+}
+
+.slots-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--booking-primaryDark, #059669);
+}

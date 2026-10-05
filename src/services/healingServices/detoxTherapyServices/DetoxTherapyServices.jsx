@@ -32,10 +32,15 @@ export const GetTherapyNameByServiceCategory = (
   });
 };
 
-// https://ayurmitra.in/WellnessAPILive/TherapyName?ClinicFid=5&ServiceGroupId=1&TherapyType=Detox
 
 export const GetTherapySlots = (fromDate, serviceFid, toDate, clinicFId) => {
   return AxiosInstance.get(
     `/GetTherapySlots?fromDate=${fromDate}&serviceFid=${serviceFid}&toDate=${toDate}&clinicFId=${clinicFId}`,
   );
 };
+
+
+export const TherapySlots = (serviceId, date) => {
+  return AxiosInstance.get(`/TherapySlots?serviceId=${serviceId}&date=${date}`);
+};
+// https://ayurmitra.in/wellnessapilive/TherapySlots?serviceId=164&date=2026-09-30

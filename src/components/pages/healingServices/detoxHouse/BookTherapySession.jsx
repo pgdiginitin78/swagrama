@@ -4,7 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   EventAvailable,
-  PersonOutline
+  PersonOutline,
 } from "@mui/icons-material";
 import { Box, Modal } from "@mui/material";
 import {
@@ -26,10 +26,13 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import SummaryIcon from "../../../../assets/SummaryIcon.svg";
 import { useAuth } from "../../../../context/AuthContext";
-import { getPatientDataByMobileNo, InitiatePayment } from "../../../../services/bookAppointment/BookAppointmentServices";
+import {
+  getPatientDataByMobileNo,
+  InitiatePayment,
+} from "../../../../services/bookAppointment/BookAppointmentServices";
 import {
   BookDetoxTherapy,
-  GetTherapySlots
+  TherapySlots,
 } from "../../../../services/healingServices/detoxTherapyServices/DetoxTherapyServices";
 import CancelButtonModal from "../../../common/button/CancelButtonModal";
 import CommonButton from "../../../common/button/CommonButton";
@@ -55,40 +58,17 @@ const formatTime = (timeStr) => {
   }
 };
 
-const generateTimeSlots = (durationInMinutes) => {
-  const duration = parseInt(durationInMinutes) || 30;
-  const slots = [];
-  let currentMinutes = 9 * 60; // 9:00 AM
-  const endMinutes = 19 * 60; // 7:00 PM
-
-  while (currentMinutes + duration <= endMinutes) {
-    const startH = Math.floor(currentMinutes / 60);
-    const startM = currentMinutes % 60;
-    const endMins = currentMinutes + duration;
-    const endH = Math.floor(endMins / 60);
-    const endM = endMins % 60;
-
-    const formatTimeStr = (h, m) =>
-      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`;
-
-    slots.push({
-      slotStartTime: formatTimeStr(startH, startM),
-      slotEndTime: formatTimeStr(endH, endM),
-      isAvailable: true,
-    });
-
-    currentMinutes += duration;
-  }
-  return slots;
-};
-
 export default function BookTherapySession({ open, onClose, item }) {
   const backdropRef = useRef(null);
   const scrollContainerRef = useRef(null);
   const selectedDateRef = useRef(null);
+  const prevFreqRef = useRef(null);
   const [sessionsCount, setSessionsCount] = useState(1);
-  const [schedules, setSchedules] = useState([
-    { date: null, time: null },
+  const [daysCount, setDaysCount] = useState(1);
+  const [frequency, setFrequency] = useState(null);
+  const [isCustomFrequency, setIsCustomFrequency] = useState(false);
+  const [days, setDays] = useState([
+    { date: startOfToday(), requiredSessions: 1, selectedSlots: [] },
   ]);
   const [activePickerIndex, setActivePickerIndex] = useState(0);
   const [calendarBaseDate, setCalendarBaseDate] = useState(startOfToday());
@@ -96,17 +76,14 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
-  const [therapySlots, setTherapySlots] = useState(() =>
-    generateTimeSlots(item?.duration),
-  );
+  const [therapySlots, setTherapySlots] = useState([]);
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openAddPatient, setOpenAddPatient] = useState(false);
-  const [bookedSlots, setBookedSlots] = useState([]);
 
-  console.log("schedules", schedules);
+  console.log("days", days);
 
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
@@ -132,30 +109,115 @@ export default function BookTherapySession({ open, onClose, item }) {
   const selectedGuest = watch("selectGuest");
 
   useEffect(() => {
-    if (sessionsCount > 0) {
-      setSchedules((prev) => {
+    if (!selectedGuest) return;
+    setDays((prevDays) => {
+      let hasChanges = false;
+      const nextDays = prevDays.map((day) => {
+        const validSlots = day.selectedSlots.filter((slot) =>
+          isTherapySlotSelectable(slot, selectedGuest),
+        );
+        if (validSlots.length !== day.selectedSlots.length) {
+          hasChanges = true;
+          return { ...day, selectedSlots: validSlots };
+        }
+        return day;
+      });
+      return hasChanges ? nextDays : prevDays;
+    });
+  }, [selectedGuest]);
+
+  const isTherapySlotSelectable = (slot, guest) => {
+    if (!guest || !guest.gender) return true;
+
+    if (slot.status && slot.status.toLowerCase() !== "available") return false;
+
+    const maxBookings =
+      typeof slot.maxBookings === "number" ? slot.maxBookings : 1;
+    const currentBookingCount =
+      typeof slot.bookingCount === "number" ? slot.bookingCount : 0;
+    if (currentBookingCount >= maxBookings) return false;
+
+    const guestGender = String(guest.gender).toLowerCase().trim();
+    const genderMsg = String(slot.genderMessage || "").toLowerCase();
+
+    if (genderMsg.includes("both")) return true;
+
+    const words = genderMsg.split(/[^a-z]+/);
+    if (words.includes(guestGender)) return true;
+
+    return false;
+  };
+
+  useEffect(() => {
+    const freqChanged = prevFreqRef.current !== frequency;
+    prevFreqRef.current = frequency;
+
+    if (sessionsCount > 0 && daysCount > 0) {
+      setDays((prev) => {
         const next = [...prev];
+        const baseDate = next[0]?.date || startOfToday();
+
         if (next.length === 0) {
-          next.push({ date: null, time: null });
+          next.push({ date: baseDate, requiredSessions: 0, selectedSlots: [] });
         }
-        while (next.length < sessionsCount) {
-          // Don't auto-fill dates — let the user pick each one explicitly
-          next.push({ date: null, time: null });
+
+        if (daysCount > 1 && frequency === null) {
+          next.length = 1;
+        } else {
+          while (next.length < daysCount) {
+            const prevIdx = next.length - 1;
+            const prevDate = next[prevIdx]?.date || baseDate;
+            next.push({
+              date: addDays(prevDate, frequency || 0),
+              requiredSessions: 0,
+              selectedSlots: [],
+            });
+          }
+          if (next.length > daysCount) {
+            next.length = daysCount;
+          }
+          if (freqChanged && frequency !== null) {
+            let rollingDate = baseDate;
+            for (let i = 1; i < next.length; i++) {
+              rollingDate = addDays(rollingDate, frequency);
+              next[i] = { ...next[i], date: rollingDate };
+            }
+          } else if (frequency !== null) {
+            for (let i = 1; i < next.length; i++) {
+              if (!next[i]?.date && next[i - 1]?.date) {
+                next[i] = {
+                  ...next[i],
+                  date: addDays(next[i - 1].date, frequency),
+                };
+              }
+            }
+          }
         }
-        if (next.length > sessionsCount) {
-          next.length = sessionsCount;
+
+        const baseSessions = Math.floor(sessionsCount / daysCount);
+        let remainder = sessionsCount % daysCount;
+        for (let i = 0; i < next.length; i++) {
+          next[i].requiredSessions = baseSessions + (remainder > 0 ? 1 : 0);
+          remainder--;
+          if (next[i].selectedSlots.length > next[i].requiredSessions) {
+            next[i].selectedSlots = next[i].selectedSlots.slice(
+              0,
+              next[i].requiredSessions,
+            );
+          }
         }
+
         return next;
       });
 
-      if (activePickerIndex !== null && activePickerIndex >= sessionsCount) {
-        setActivePickerIndex(sessionsCount - 1);
+      if (activePickerIndex !== null && activePickerIndex >= daysCount) {
+        setActivePickerIndex(daysCount - 1);
       }
     } else {
-      setSchedules([]);
+      setDays([]);
       setActivePickerIndex(null);
     }
-  }, [sessionsCount]);
+  }, [sessionsCount, daysCount, frequency]);
 
   const handleGetPatientData = () => {
     if (user !== null) {
@@ -183,13 +245,11 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   useEffect(() => {
     if (activePickerIndex !== null) {
-      // When switching to a session that has no date yet,
-      // auto-navigate the calendar to the month of (previous session date + 1 day)
-      const activeSession = schedules[activePickerIndex];
+      const activeSession = days[activePickerIndex];
       if (!activeSession?.date && activePickerIndex > 0) {
-        const prevDate = schedules[activePickerIndex - 1]?.date;
+        const prevDate = days[activePickerIndex - 1]?.date;
         if (prevDate) {
-          const suggested = addDays(prevDate, 1);
+          const suggested = addDays(prevDate, frequency);
           setSuggestedDate(suggested);
           setCalendarBaseDate(startOfMonth(suggested));
         } else {
@@ -197,7 +257,6 @@ export default function BookTherapySession({ open, onClose, item }) {
         }
       } else {
         setSuggestedDate(null);
-        // If the session already has a date, navigate to its month
         if (activeSession?.date) {
           setCalendarBaseDate(startOfMonth(activeSession.date));
         }
@@ -216,20 +275,31 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
   }, [activePickerIndex]);
 
+  const activeDate =
+    activePickerIndex !== null && days?.[activePickerIndex]?.date
+      ? format(days[activePickerIndex].date, "yyyy-MM-dd")
+      : null;
+
   useEffect(() => {
-    if (item !== null && activePickerIndex !== null) {
-      const activeSession = schedules[activePickerIndex];
-      if (activeSession?.date) {
-        const formattedDate = format(activeSession.date, "yyyy-MM-dd");
-        GetTherapySlots(formattedDate, item?.serviceId, formattedDate, 5)
-          .then((res) => {
-            console.log("slotsData", res?.data.data);
-            setBookedSlots(res.data.data);
-          })
-          .catch((err) => setBookedSlots([]));
-      }
+    if (!open || !item?.serviceId || !activeDate) {
+      setTherapySlots([]);
+      return;
     }
-  }, [item, activePickerIndex, schedules]);
+
+    setIsSlotsLoading(true);
+
+    TherapySlots(item.serviceId, activeDate)
+      .then((res) => {
+        console.log("therapy slots", res?.data?.data);
+        const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
+        setTherapySlots(data);
+      })
+      .catch((error) => {
+        console.error("therapy slots error", error);
+        setTherapySlots([]);
+      })
+      .finally(() => setIsSlotsLoading(false));
+  }, [open, item?.serviceId, activeDate]);
 
   if (!open || !item) return null;
 
@@ -247,60 +317,99 @@ export default function BookTherapySession({ open, onClose, item }) {
   });
 
   const handleSessionChange = (val) => {
-    const n = Math.max(0, Math.min(20, parseInt(val) || 0));
+    const n = Math.max(1, Math.min(20, parseInt(val) || 0));
     setSessionsCount(n);
+    if (daysCount > n) {
+      setDaysCount(n);
+    }
+  };
+
+  const handleDaysChange = (val) => {
+    const n = Math.max(1, Math.min(20, parseInt(val) || 0));
+    setDaysCount(n);
+    if (sessionsCount < n) {
+      setSessionsCount(n);
+    }
+    if (n > 1) {
+      setFrequency(null);
+      setIsCustomFrequency(false);
+    } else {
+      setFrequency(null);
+      setIsCustomFrequency(false);
+    }
   };
 
   const nextMonth = () => setCalendarBaseDate(addMonths(calendarBaseDate, 1));
   const prevMonth = () => {
+    const minMonth =
+      activePickerIndex !== null &&
+      activePickerIndex > 0 &&
+      days[activePickerIndex - 1]?.date
+        ? days[activePickerIndex - 1].date
+        : startOfToday();
     const prev = subMonths(calendarBaseDate, 1);
-    if (!isBefore(endOfMonth(prev), startOfToday())) setCalendarBaseDate(prev);
+    if (!isBefore(endOfMonth(prev), minMonth)) setCalendarBaseDate(prev);
   };
 
   const handleDateSelect = (date, idx) => {
-    setSuggestedDate(null); // clear suggestion once user picks explicitly
-    setSchedules((prev) => {
+    setSuggestedDate(null);
+    setDays((prev) => {
       const next = [...prev];
-      next[idx] = { ...next[idx], date, time: null };
-      // Reset all subsequent sessions that haven't been fully scheduled yet
-      // so they don't carry stale auto-filled dates
+      next[idx] = { ...next[idx], date };
+      let rollingDate = date;
       for (let i = idx + 1; i < next.length; i++) {
-        if (!next[i].time) {
-          next[i] = { date: null, time: null };
-        }
+        rollingDate = addDays(rollingDate, frequency || 0);
+        next[i] = { ...next[i], date: rollingDate };
       }
       return next;
     });
   };
 
   const handleTimeSelect = (slot, idx) => {
-    setSchedules((prev) => {
+    setDays((prev) => {
       const next = [...prev];
-      next[idx] = {
-        ...next[idx],
-        time: slot.slotStartTime,
-        slotStartTime: slot.slotStartTime,
-        slotEndTime: slot.slotEndTime,
-      };
-      setTimeout(() => {
-        const firstEmptyIdx = next.findIndex((s) => !s.date || !s.time);
-        if (firstEmptyIdx !== -1) {
-          setActivePickerIndex(firstEmptyIdx);
-        } else {
-          setActivePickerIndex(null);
+      const day = { ...next[idx] };
+      const selectedSlots = [...day.selectedSlots];
+
+      const existingIdx = selectedSlots.findIndex(
+        (s) => s.startTime === slot.startTime,
+      );
+      if (existingIdx >= 0) {
+        selectedSlots.splice(existingIdx, 1);
+      } else {
+        if (selectedSlots.length < day.requiredSessions) {
+          selectedSlots.push(slot);
+        } else if (day.requiredSessions > 0) {
+          selectedSlots.shift();
+          selectedSlots.push(slot);
         }
-      }, 50);
+      }
+      day.selectedSlots = selectedSlots;
+      next[idx] = day;
+
+      setTimeout(() => {
+        if (day.selectedSlots.length === day.requiredSessions) {
+          const nextIdx = idx + 1;
+          if (
+            nextIdx < next.length &&
+            next[nextIdx].selectedSlots.length < next[nextIdx].requiredSessions
+          ) {
+            setActivePickerIndex(nextIdx);
+          }
+        }
+      }, 80);
 
       return next;
     });
   };
 
-  const canPickSession = (idx) =>
-    idx === 0 || (schedules[idx - 1]?.date && schedules[idx - 1]?.time);
+  const canPickSession = (idx) => idx === 0 || Boolean(days[idx - 1]?.date);
 
   const allScheduled =
     sessionsCount > 0 &&
-    schedules.every((s) => s.date && s.time) &&
+    days.every(
+      (d) => d.date && d.selectedSlots.length === d.requiredSessions,
+    ) &&
     selectedGuest;
 
   console.log("selectedGuest", item);
@@ -311,19 +420,32 @@ export default function BookTherapySession({ open, onClose, item }) {
       return;
     }
     if (isPaymentPending) return;
+
+    const allValid = days.every(
+      (day) =>
+        day.selectedSlots.length === day.requiredSessions &&
+        day.selectedSlots.every(
+          (slot) =>
+            isTherapySlotSelectable(slot, selectedGuest) && slot.serviceRoomID,
+        ),
+    );
+
+    if (!allValid) {
+      errorAlert(
+        "One or more selected time slots are no longer available for the selected guest or are missing data. Please re-select.",
+      );
+      return;
+    }
     const saveObj = {
-      // role: selectedGuest?.userId === user?.userId ? "self" : "other",
       userId: selectedGuest?.userId,
       createdBy: user?.userId,
       clinicFid: 5,
       serviceGroupID: item?.serviceGroupId,
       serviceFid: item?.serviceId,
       doctorFid: item?.doctorId,
-      fromDate: schedules[0]?.date
-        ? format(schedules[0].date, "yyyy-MM-dd")
-        : "",
-      toDate: schedules[schedules.length - 1]?.date
-        ? format(schedules[schedules.length - 1].date, "yyyy-MM-dd")
+      fromDate: days[0]?.date ? format(days[0].date, "yyyy-MM-dd") : "",
+      toDate: days[days.length - 1]?.date
+        ? format(days[days.length - 1].date, "yyyy-MM-dd")
         : "",
       totalAmount: total,
       no_Of_Person: 1,
@@ -333,38 +455,36 @@ export default function BookTherapySession({ open, onClose, item }) {
       No_Of_Sessions: sessionsCount,
       Preferred_therapist: genderPreference,
       Amount: total,
-      // UserId:
-      //   selectedGuest?.value === user?.userId
-      //     ? selectedGuest?.value
-      //     : user?.userId,
-      // GuestUserId: selectedGuest?.value || selectedGuest?.id,
-      slots: schedules.map((s) => {
-        const parseToDisplay = (timeStr) => {
-          if (!timeStr) return "N/A";
-          try {
-            let finalDate;
-            if (timeStr.includes("AM") || timeStr.includes("PM")) {
-              finalDate = parse(timeStr, "hh:mm a", new Date());
-            } else {
-              const parsedDate = parse(timeStr, "HH:mm:ss", new Date());
-              finalDate = isNaN(parsedDate.getTime())
-                ? parse(timeStr, "HH:mm", new Date())
-                : parsedDate;
+      slots: days.flatMap((d) =>
+        d.selectedSlots.map((slot) => {
+          const parseToDisplay = (timeStr) => {
+            if (!timeStr) return "N/A";
+            try {
+              let finalDate;
+              if (timeStr.includes("AM") || timeStr.includes("PM")) {
+                finalDate = parse(timeStr, "hh:mm a", new Date());
+              } else {
+                const parsedDate = parse(timeStr, "HH:mm:ss", new Date());
+                finalDate = isNaN(parsedDate.getTime())
+                  ? parse(timeStr, "HH:mm", new Date())
+                  : parsedDate;
+              }
+              return !isNaN(finalDate.getTime())
+                ? format(finalDate, "HH:mm:ss")
+                : timeStr;
+            } catch (e) {
+              return timeStr || "N/A";
             }
-            return !isNaN(finalDate.getTime())
-              ? format(finalDate, "HH:mm:ss")
-              : timeStr;
-          } catch (e) {
-            return timeStr || "N/A";
-          }
-        };
+          };
 
-        return {
-          SlotDate: s.date ? format(s.date, "yyyy-MM-dd") : "N/A",
-          slotStart: parseToDisplay(s.slotStartTime || s.time),
-          slotEnd: parseToDisplay(s.slotEndTime || s.time),
-        };
-      }),
+          return {
+            SlotDate: d.date ? format(d.date, "yyyy-MM-dd") : "N/A",
+            slotStart: parseToDisplay(slot.startTime),
+            slotEnd: parseToDisplay(slot.endTime),
+            serviceRoomID: slot.serviceRoomID,
+          };
+        }),
+      ),
     };
     console.log("saveObj", saveObj);
     setFinalSaveObj(saveObj);
@@ -404,7 +524,14 @@ export default function BookTherapySession({ open, onClose, item }) {
               successAlert(bookingData.message);
               setOpenConfirmationModal(false);
               setIsPaymentPending(false);
-              setSchedules([{ date: null, time: null }]);
+              setDays([
+                {
+                  date: startOfToday(),
+                  requiredSessions: 1,
+                  selectedSlots: [],
+                },
+              ]);
+              setDaysCount(1);
               setSessionsCount(1);
               reset();
               onClose();
@@ -438,7 +565,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const handleReset = () => {
     reset();
     setSessionsCount(1);
-    setSchedules([{ date: null, time: null }]);
+    setFrequency(1);
+    setDays([{ date: startOfToday(), requiredSessions: 1, selectedSlots: [] }]);
+    setDaysCount(1);
     setActivePickerIndex(0);
     setCalendarBaseDate(startOfToday());
     setIsFirstTime(false);
@@ -499,40 +628,161 @@ export default function BookTherapySession({ open, onClose, item }) {
                   </div>
                 </div>
               </motion.div>
-
-              <div>
-                <span className="text-gray-500 text-[10px] font-bold mb-2 block uppercase tracking-widest">
-                  Number of Sessions
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => handleSessionChange(sessionsCount - 1)}
-                    className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
-                  >
-                    −
-                  </button>
-                  <input
-                    type="number"
-                    min="0"
-                    max="20"
-                    placeholder="0"
-                    value={sessionsCount === 0 ? "" : sessionsCount}
-                    onChange={(e) => handleSessionChange(e.target.value)}
-                    className="flex-1 bg-[#f4f7f2] rounded-[5px] p-1.5 text-ayuTulsi font-bold text-base text-center outline-none border-2 border-transparent focus:border-ayuMid focus:bg-white transition-all shadow-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => handleSessionChange(sessionsCount + 1)}
-                    className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
-                  >
-                    +
-                  </button>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div>
+                  <span className="text-gray-500 text-[10px] font-bold  block uppercase tracking-widest">
+                    Number of Sessions
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleSessionChange(sessionsCount - 1)}
+                      className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      placeholder="1"
+                      value={sessionsCount === 0 ? "" : sessionsCount}
+                      onChange={(e) => handleSessionChange(e.target.value)}
+                      className="flex-1 bg-[#f4f7f2] rounded-[5px] p-1.5 text-ayuTulsi font-bold text-base text-center outline-none border-2 border-transparent focus:border-ayuMid focus:bg-white transition-all shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleSessionChange(sessionsCount + 1)}
+                      className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-gray-500 text-[10px] font-bold  block uppercase tracking-widest">
+                    Number of Days
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleDaysChange(daysCount - 1)}
+                      className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
+                    >
+                      −
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      max="20"
+                      placeholder="1"
+                      value={daysCount === 0 ? "" : daysCount}
+                      onChange={(e) => handleDaysChange(e.target.value)}
+                      className="flex-1 bg-[#f4f7f2] rounded-[5px] p-1.5 text-ayuTulsi font-bold text-base text-center outline-none border-2 border-transparent focus:border-ayuMid focus:bg-white transition-all shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDaysChange(daysCount + 1)}
+                      className="w-10 h-10 flex-shrink-0 rounded-[5px] bg-[#f0f4ef] border border-[#e4ebdd] text-ayuMid font-bold text-xl flex items-center justify-center hover:bg-ayuMid hover:text-white active:scale-95 transition-all"
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               </div>
 
               <AnimatePresence>
-                {sessionsCount > 0 && (
+                {daysCount > 1 && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="pt-4">
+                      <span className="text-gray-500 text-[10px] font-bold mb-2 block uppercase tracking-widest">
+                        Session Frequency
+                      </span>
+                      <div className="flex flex-col gap-3">
+                        <div className="bg-[#f0f4ef] p-1.5 rounded-[5px] border border-[#e4ebdd] flex flex-wrap items-center gap-1.5">
+                          {[
+                            { label: "Alternate Day", value: 2 },
+                            { label: "Weekly", value: 7 },
+                            { label: "Custom", value: "custom" },
+                          ].map((opt) => {
+                            const isActive =
+                              opt.value === "custom"
+                                ? isCustomFrequency
+                                : !isCustomFrequency && frequency === opt.value;
+                            return (
+                              <button
+                                key={opt.label}
+                                type="button"
+                                onClick={() => {
+                                  if (opt.value === "custom") {
+                                    setIsCustomFrequency(true);
+                                  } else {
+                                    setIsCustomFrequency(false);
+                                    setFrequency(opt.value);
+                                  }
+                                }}
+                                className={`flex-1 min-w-[70px] py-2 px-2 rounded text-[11px] font-bold transition-all shadow-sm ${
+                                  isActive
+                                    ? "bg-ayuMid text-white"
+                                    : "bg-white text-gray-600 hover:bg-[#e4ebdd]"
+                                }`}
+                              >
+                                {opt.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        <AnimatePresence>
+                          {isCustomFrequency && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: "auto" }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="flex items-center gap-3 bg-white p-3 rounded-[5px] border border-[#e4ebdd]">
+                                <span className="text-xs font-bold text-gray-600">
+                                  Gap between sessions:
+                                </span>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    type="number"
+                                    min="0"
+                                    placeholder="0"
+                                    className="w-16 bg-[#f4f7f2] border border-[#e4ebdd] rounded p-1.5 text-xs font-bold outline-none text-ayuTulsi text-center focus:border-ayuMid"
+                                    value={frequency === null ? "" : frequency}
+                                    onChange={(e) => {
+                                      if (e.target.value === "") {
+                                        setFrequency(null);
+                                      } else {
+                                        const val = parseInt(e.target.value);
+                                        if (!isNaN(val))
+                                          setFrequency(Math.max(0, val));
+                                      }
+                                    }}
+                                  />
+                                  <span className="text-xs font-bold text-gray-600">
+                                    days
+                                  </span>
+                                </div>
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>
+                {(daysCount === 1 || (daysCount > 1 && frequency !== null)) && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -543,7 +793,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                       Choose Date & Time
                     </h3>
                     <div className="flex flex-col gap-3">
-                      {schedules.map((schedule, idx) => {
+                      {days.map((schedule, idx) => {
                         const isLocked = !canPickSession(idx);
                         const isPicking = activePickerIndex === idx;
                         return (
@@ -555,11 +805,15 @@ export default function BookTherapySession({ open, onClose, item }) {
                           >
                             <div className="flex items-center gap-1.5 mb-1.5 text-ayuMid font-black text-[10px] uppercase tracking-widest">
                               <EventAvailable style={{ fontSize: 12 }} />
-                              <span>Session {idx + 1}</span>
+                              <span>Day {idx + 1}</span>
+                              <span className="ml-auto text-gray-500 lowercase tracking-normal font-medium">
+                                Required slots: {schedule.requiredSessions} |
+                                Selected: {schedule.selectedSlots.length}/
+                                {schedule.requiredSessions}
+                              </span>
                             </div>
 
-                            {!isPicking &&
-                            (!schedule.date || !schedule.time) ? (
+                            {!isPicking && !schedule.date ? (
                               <div
                                 onClick={() =>
                                   !isLocked && setActivePickerIndex(idx)
@@ -607,14 +861,24 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   className="flex gap-2 overflow-x-auto pb-3 mb-3 no-scrollbar scroll-smooth"
                                 >
                                   {visibleDates.map((date, i) => {
+                                    const minDateForSession =
+                                      idx > 0 && days[idx - 1]?.date
+                                        ? days[idx - 1].date
+                                        : startOfToday();
                                     const isToday = isSameDay(
                                       date,
                                       startOfToday(),
                                     );
-                                    const isDisabled = isBefore(
-                                      date,
-                                      startOfToday(),
-                                    );
+                                    const requiredDate =
+                                      idx > 0 &&
+                                      days[idx - 1]?.date &&
+                                      frequency !== null
+                                        ? addDays(days[idx - 1].date, frequency)
+                                        : null;
+                                    const isDisabled =
+                                      isBefore(date, minDateForSession) ||
+                                      (requiredDate !== null &&
+                                        !isSameDay(date, requiredDate));
 
                                     const isSelected =
                                       schedule.date &&
@@ -630,7 +894,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     const isTargetDate =
                                       isSelected ||
                                       isSuggested ||
-                                      (!schedule.date && !suggestedDate && isToday);
+                                      (!schedule.date &&
+                                        !suggestedDate &&
+                                        isToday);
                                     return (
                                       <button
                                         key={i}
@@ -668,10 +934,12 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   })}
                                 </div>
 
-                                <span className="text-[#6d8a7c] text-[10px] font-bold mb-2 block uppercase tracking-widest">
-                                  Available Slots
-                                </span>
-                                <div className="flex flex-wrap gap-2 min-h-[40px] items-center">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-[#6d8a7c] text-[10px] font-bold uppercase tracking-widest">
+                                    Available Slots
+                                  </span>
+                                </div>
+                                <div className="slots-scroll flex flex-wrap gap-2 min-h-[40px] max-h-[220px] overflow-y-auto pr-1 items-center content-start">
                                   {isSlotsLoading ? (
                                     <div className="w-full flex flex-col items-center justify-center py-4">
                                       <div className="w-6 h-6 border-2 border-ayuMid/20 border-t-ayuMid rounded-full animate-spin" />
@@ -681,84 +949,109 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     </div>
                                   ) : therapySlots.length > 0 ? (
                                     therapySlots.map((slot, i) => {
-                                      const t = slot.slotStartTime;
-                                      const matchedBookedSlot = (
-                                        bookedSlots || []
-                                      ).find(
-                                        (bs) =>
-                                          bs.slotStartTime ===
-                                            slot.slotStartTime &&
-                                          bs.slotEndTime === slot.slotEndTime,
-                                      );
-                                      const isAvailable =
-                                        (matchedBookedSlot
-                                          ? matchedBookedSlot.isAvailable
-                                          : slot.isAvailable) &&
-                                        !slot?.isBookedByUser;
-                                      const isTaken = schedules.some(
-                                        (s, sIdx) => {
-                                          if (
-                                            sIdx === idx ||
-                                            !s.date ||
-                                            !schedule.date ||
-                                            !s.time
-                                          )
-                                            return false;
-                                          return (
-                                            isSameDay(s.date, schedule.date) &&
-                                            s.time === t
+                                      const t = slot.startTime;
+                                      const isSelected =
+                                        schedule.selectedSlots.some(
+                                          (s) => s.startTime === t,
+                                        );
+
+                                      const currentSessionDateStr =
+                                        schedule.date
+                                          ? format(schedule.date, "yyyy-MM-dd")
+                                          : activeDate;
+
+                                      // Only disable if booked by ANOTHER day on the exact same date (rare, but possible)
+                                      const isAlreadySelectedByOtherSession =
+                                        days.some((d, dIdx) => {
+                                          if (dIdx === idx) return false;
+                                          if (!d.date) return false;
+                                          const dDateStr = format(
+                                            d.date,
+                                            "yyyy-MM-dd",
                                           );
-                                        },
-                                      );
-                                      const isSelectedDateToday =
+                                          return (
+                                            dDateStr ===
+                                              currentSessionDateStr &&
+                                            d.selectedSlots.some(
+                                              (s) => s.startTime === t,
+                                            )
+                                          );
+                                        });
+
+                                      let isPastTime = false;
+                                      if (
                                         schedule.date &&
                                         isSameDay(
                                           schedule.date,
                                           startOfToday(),
+                                        ) &&
+                                        slot.startTime
+                                      ) {
+                                        try {
+                                          const [h, m] =
+                                            slot.startTime.split(":");
+                                          const slotDate = new Date();
+                                          slotDate.setHours(
+                                            parseInt(h, 10) || 0,
+                                            parseInt(m, 10) || 0,
+                                            0,
+                                            0,
+                                          );
+                                          if (slotDate < new Date()) {
+                                            isPastTime = true;
+                                          }
+                                        } catch (e) {
+                                          isPastTime = false;
+                                        }
+                                      }
+
+                                      const isValidForGuest =
+                                        isTherapySlotSelectable(
+                                          slot,
+                                          selectedGuest,
                                         );
-                                      const isPastSlot = isSelectedDateToday
-                                        ? (() => {
-                                            try {
-                                              const [h, m, s] = t
-                                                .split(":")
-                                                .map(Number);
-                                              const slotDate = new Date();
-                                              slotDate.setHours(
-                                                h,
-                                                m,
-                                                s || 0,
-                                                0,
-                                              );
-                                              return slotDate <= new Date();
-                                            } catch {
-                                              return false;
-                                            }
-                                          })()
-                                        : false;
+
                                       const isDisabledSlot =
-                                        !isAvailable || isTaken || isPastSlot;
+                                        !isSelected &&
+                                        (!isValidForGuest ||
+                                          isPastTime ||
+                                          isAlreadySelectedByOtherSession);
+
                                       return (
                                         <button
                                           key={i}
                                           type="button"
                                           disabled={isDisabledSlot}
                                           onClick={() => {
-                                            if (!isDisabledSlot)
+                                            if (!isDisabledSlot) {
                                               handleTimeSelect(slot, idx);
+                                            }
                                           }}
-                                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border active:scale-95
-                                        ${
-                                          schedule.time === t
-                                            ? "bg-ayuMid text-white border-ayuMid"
-                                            : isDisabledSlot
-                                              ? "bg-gray-100/50 text-gray-300 border-gray-100 cursor-not-allowed"
-                                              : "bg-white text-gray-500 border-[#e4ebdd] hover:border-ayuMid"
-                                        }`}
+                                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 active:scale-95 ${
+                                            isSelected
+                                              ? "bg-ayuMid text-white border-ayuMid shadow-sm"
+                                              : isDisabledSlot
+                                                ? "bg-gray-100/50 text-gray-300 border-gray-200 cursor-not-allowed"
+                                                : "bg-white text-gray-600 border-[#e4ebdd] hover:border-ayuMid hover:bg-[#f0f4ef]"
+                                          }`}
                                         >
-                                          {formatTime(slot.slotStartTime)}
-                                          {slot.slotEndTime
-                                            ? ` - ${formatTime(slot.slotEndTime)}`
-                                            : ""}
+                                          <span>
+                                            {formatTime(slot.startTime)}
+                                            {slot.endTime
+                                              ? ` - ${formatTime(slot.endTime)}`
+                                              : ""}
+                                          </span>
+                                          {isDisabledSlot && (
+                                            <span className="text-[9px] text-gray-400 font-normal truncate max-w-[100px]">
+                                              {isAlreadySelectedByOtherSession
+                                                ? "(Booked)"
+                                                : isPastTime
+                                                  ? "(Past Time)"
+                                                  : !isValidForGuest
+                                                    ? "(Not Allowed)"
+                                                    : "(Full)"}
+                                            </span>
+                                          )}
                                         </button>
                                       );
                                     })
@@ -782,17 +1075,30 @@ export default function BookTherapySession({ open, onClose, item }) {
                               </motion.div>
                             ) : (
                               <div
-                                onClick={() => setActivePickerIndex(idx)}
+                                onClick={() =>
+                                  !isLocked && setActivePickerIndex(idx)
+                                }
                                 className="bg-white border border-[#e4ebdd] rounded-2xl p-3 flex justify-between items-center cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
                               >
                                 <div className="flex flex-col">
                                   <span className="text-gray-800 font-bold text-sm">
-                                    {format(schedule.date, "MMM d, yyyy")}
+                                    {schedule.date
+                                      ? format(
+                                          schedule.date,
+                                          "EEE, MMM d, yyyy",
+                                        )
+                                      : "Select Date"}
                                   </span>
-                                  <span className="text-ayuMid font-bold text-[11px] uppercase mt-0.5">
+                                  <span
+                                    className={`text-[11px] font-bold uppercase mt-0.5 ${
+                                      schedule.time
+                                        ? "text-ayuMid"
+                                        : "text-amber-600"
+                                    }`}
+                                  >
                                     {schedule.time
                                       ? formatTime(schedule.time)
-                                      : "No time selected"}
+                                      : "Select slot"}
                                   </span>
                                 </div>
                                 <div className="bg-[#f0f4ef] p-1.5 rounded-lg text-ayuMid">
@@ -922,24 +1228,21 @@ export default function BookTherapySession({ open, onClose, item }) {
                   <div className="flex justify-between items-start gap-4">
                     <span className="flex-shrink-0">Schedule</span>
                     <div className="flex flex-col items-end gap-1">
-                      {schedules.length > 0 ? (
-                        schedules.map((s, i) =>
-                          s.date && s.time ? (
+                      {days.some((d) => d.selectedSlots.length > 0) ? (
+                        days.flatMap((d, dIdx) =>
+                          d.selectedSlots.map((slot, sIdx) => (
                             <span
-                              key={i}
+                              key={`${dIdx}-${sIdx}`}
                               className="text-ayuMid text-[10px] bg-white px-2 py-0.5 rounded border border-ayuMid/20"
                             >
-                              {format(s.date, "MMM d")} • {formatTime(s.time)}
+                              {format(d.date, "MMM d")} •{" "}
+                              {formatTime(slot.startTime)}
                             </span>
-                          ) : s.date ? (
-                            <span key={i} className="text-gray-400 text-[10px]">
-                              {format(s.date, "MMM d")} • No time
-                            </span>
-                          ) : null,
+                          )),
                         )
                       ) : (
                         <span className="text-gray-400 italic text-[10px]">
-                          No sessions
+                          Not scheduled yet
                         </span>
                       )}
                     </div>

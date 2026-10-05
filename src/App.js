@@ -10,6 +10,7 @@ import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
 import Feeds from "./components/pages/feeds/Feeds";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import Registration from "./components/pages/registration/Registration";
 
 const SwagramaRefundPolicy = lazy(
   () => import("./components/pages/refund-policy/RefundPolicy"),
@@ -113,6 +114,7 @@ export default function App() {
               <Route path="feeds" element={<Feeds />} />
               <Route path="/dashboard" element={<UserDashboard />} />
               <Route path="/admin/dashboard" element={<AdminLayout />} />
+              <Route path="/registration" element={<Registration />} />
             </Routes>
           </Suspense>
         </ErrorBoundary>

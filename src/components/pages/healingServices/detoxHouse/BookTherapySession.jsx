@@ -148,6 +148,9 @@ export default function BookTherapySession({ open, onClose, item }) {
     return false;
   };
 
+  const durationNum = parseInt(item?.duration) || 30;
+  const slotsNeeded = Math.max(1, Math.ceil(durationNum / 30));
+
   useEffect(() => {
     const freqChanged = prevFreqRef.current !== frequency;
     prevFreqRef.current = frequency;
@@ -199,10 +202,11 @@ export default function BookTherapySession({ open, onClose, item }) {
         for (let i = 0; i < next.length; i++) {
           next[i].requiredSessions = baseSessions + (remainder > 0 ? 1 : 0);
           remainder--;
-          if (next[i].selectedSlots.length > next[i].requiredSessions) {
+          const maxSlotsForDay = next[i].requiredSessions * slotsNeeded;
+          if (next[i].selectedSlots.length > maxSlotsForDay) {
             next[i].selectedSlots = next[i].selectedSlots.slice(
               0,
-              next[i].requiredSessions,
+              maxSlotsForDay,
             );
           }
         }
@@ -217,7 +221,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       setDays([]);
       setActivePickerIndex(null);
     }
-  }, [sessionsCount, daysCount, frequency]);
+  }, [sessionsCount, daysCount, frequency, slotsNeeded]);
 
   const handleGetPatientData = () => {
     if (user !== null) {
@@ -249,7 +253,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       if (!activeSession?.date && activePickerIndex > 0) {
         const prevDate = days[activePickerIndex - 1]?.date;
         if (prevDate) {
-          const suggested = addDays(prevDate, frequency);
+          const suggested = addDays(prevDate, frequency || 1);
           setSuggestedDate(suggested);
           setCalendarBaseDate(startOfMonth(suggested));
         } else {
@@ -292,7 +296,18 @@ export default function BookTherapySession({ open, onClose, item }) {
       .then((res) => {
         console.log("therapy slots", res?.data?.data);
         const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
-        setTherapySlots(data);
+        const uniqueData = [];
+        const seenStartTimes = new Set();
+        data.forEach((s) => {
+          if (s?.startTime && !seenStartTimes.has(s.startTime)) {
+            seenStartTimes.add(s.startTime);
+            uniqueData.push(s);
+          }
+        });
+        uniqueData.sort((a, b) =>
+          (a.startTime || "").localeCompare(b.startTime || ""),
+        );
+        setTherapySlots(uniqueData);
       })
       .catch((error) => {
         console.error("therapy slots error", error);
@@ -331,7 +346,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       setSessionsCount(n);
     }
     if (n > 1) {
-      setFrequency(null);
+      setFrequency(1);
       setIsCustomFrequency(false);
     } else {
       setFrequency(null);
@@ -358,41 +373,89 @@ export default function BookTherapySession({ open, onClose, item }) {
       next[idx] = { ...next[idx], date };
       let rollingDate = date;
       for (let i = idx + 1; i < next.length; i++) {
-        rollingDate = addDays(rollingDate, frequency || 0);
+        rollingDate = addDays(rollingDate, frequency || 1);
         next[i] = { ...next[i], date: rollingDate };
       }
       return next;
     });
   };
 
-  const handleTimeSelect = (slot, idx) => {
+  const isSingleSlotSelectable = (slot, dayIdx) => {
+    if (!slot) return false;
+    const currentSessionDateStr = days[dayIdx]?.date
+      ? format(days[dayIdx].date, "yyyy-MM-dd")
+      : activeDate;
+
+    const isAlreadySelectedByOtherSession = days.some((d, dIdx) => {
+      if (dIdx === dayIdx) return false;
+      if (!d.date) return false;
+      return (
+        format(d.date, "yyyy-MM-dd") === currentSessionDateStr &&
+        d.selectedSlots.some((s) => s.startTime === slot.startTime)
+      );
+    });
+
+    let isPastTime = false;
+    if (
+      days[dayIdx]?.date &&
+      isSameDay(days[dayIdx].date, startOfToday()) &&
+      slot.startTime
+    ) {
+      try {
+        const [h, m] = slot.startTime.split(":");
+        const slotDate = new Date();
+        slotDate.setHours(
+          parseInt(h, 10) || 0,
+          parseInt(m, 10) || 0,
+          0,
+          0,
+        );
+        if (slotDate < new Date()) {
+          isPastTime = true;
+        }
+      } catch (e) {
+        isPastTime = false;
+      }
+    }
+
+    const isValidForGuest = isTherapySlotSelectable(slot, selectedGuest);
+
+    return isValidForGuest && !isPastTime && !isAlreadySelectedByOtherSession;
+  };
+
+  const handleTimeSelect = (slot, dayIdx) => {
     setDays((prev) => {
       const next = [...prev];
-      const day = { ...next[idx] };
-      const selectedSlots = [...day.selectedSlots];
+      const day = { ...next[dayIdx] };
+      let selectedSlots = [...day.selectedSlots];
 
       const existingIdx = selectedSlots.findIndex(
         (s) => s.startTime === slot.startTime,
       );
+
       if (existingIdx >= 0) {
         selectedSlots.splice(existingIdx, 1);
       } else {
-        if (selectedSlots.length < day.requiredSessions) {
+        const maxTotalSlots = day.requiredSessions * slotsNeeded;
+        if (selectedSlots.length < maxTotalSlots) {
           selectedSlots.push(slot);
         } else if (day.requiredSessions > 0) {
           selectedSlots.shift();
           selectedSlots.push(slot);
         }
       }
+
       day.selectedSlots = selectedSlots;
-      next[idx] = day;
+      next[dayIdx] = day;
 
       setTimeout(() => {
-        if (day.selectedSlots.length === day.requiredSessions) {
-          const nextIdx = idx + 1;
+        const maxTotalSlots = day.requiredSessions * slotsNeeded;
+        if (day.selectedSlots.length === maxTotalSlots) {
+          const nextIdx = dayIdx + 1;
           if (
             nextIdx < next.length &&
-            next[nextIdx].selectedSlots.length < next[nextIdx].requiredSessions
+            next[nextIdx].selectedSlots.length <
+              next[nextIdx].requiredSessions * slotsNeeded
           ) {
             setActivePickerIndex(nextIdx);
           }
@@ -408,7 +471,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const allScheduled =
     sessionsCount > 0 &&
     days.every(
-      (d) => d.date && d.selectedSlots.length === d.requiredSessions,
+      (d) =>
+        d.date &&
+        d.selectedSlots.length === d.requiredSessions * slotsNeeded,
     ) &&
     selectedGuest;
 
@@ -423,7 +488,7 @@ export default function BookTherapySession({ open, onClose, item }) {
 
     const allValid = days.every(
       (day) =>
-        day.selectedSlots.length === day.requiredSessions &&
+        day.selectedSlots.length === day.requiredSessions * slotsNeeded &&
         day.selectedSlots.every(
           (slot) =>
             isTherapySlotSelectable(slot, selectedGuest) && slot.serviceRoomID,
@@ -706,6 +771,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                       <div className="flex flex-col gap-3">
                         <div className="bg-[#f0f4ef] p-1.5 rounded-[5px] border border-[#e4ebdd] flex flex-wrap items-center gap-1.5">
                           {[
+                            { label: "Daily", value: 1 },
                             { label: "Alternate Day", value: 2 },
                             { label: "Weekly", value: 7 },
                             { label: "Custom", value: "custom" },
@@ -796,6 +862,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                       {days.map((schedule, idx) => {
                         const isLocked = !canPickSession(idx);
                         const isPicking = activePickerIndex === idx;
+                        const totalReqSlots = schedule.requiredSessions * slotsNeeded;
                         return (
                           <div
                             key={idx}
@@ -807,9 +874,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                               <EventAvailable style={{ fontSize: 12 }} />
                               <span>Day {idx + 1}</span>
                               <span className="ml-auto text-gray-500 lowercase tracking-normal font-medium">
-                                Required slots: {schedule.requiredSessions} |
+                                Required slots: {totalReqSlots} |
                                 Selected: {schedule.selectedSlots.length}/
-                                {schedule.requiredSessions}
+                                {totalReqSlots}
                               </span>
                             </div>
 
@@ -955,67 +1022,11 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           (s) => s.startTime === t,
                                         );
 
-                                      const currentSessionDateStr =
-                                        schedule.date
-                                          ? format(schedule.date, "yyyy-MM-dd")
-                                          : activeDate;
-
-                                      // Only disable if booked by ANOTHER day on the exact same date (rare, but possible)
-                                      const isAlreadySelectedByOtherSession =
-                                        days.some((d, dIdx) => {
-                                          if (dIdx === idx) return false;
-                                          if (!d.date) return false;
-                                          const dDateStr = format(
-                                            d.date,
-                                            "yyyy-MM-dd",
-                                          );
-                                          return (
-                                            dDateStr ===
-                                              currentSessionDateStr &&
-                                            d.selectedSlots.some(
-                                              (s) => s.startTime === t,
-                                            )
-                                          );
-                                        });
-
-                                      let isPastTime = false;
-                                      if (
-                                        schedule.date &&
-                                        isSameDay(
-                                          schedule.date,
-                                          startOfToday(),
-                                        ) &&
-                                        slot.startTime
-                                      ) {
-                                        try {
-                                          const [h, m] =
-                                            slot.startTime.split(":");
-                                          const slotDate = new Date();
-                                          slotDate.setHours(
-                                            parseInt(h, 10) || 0,
-                                            parseInt(m, 10) || 0,
-                                            0,
-                                            0,
-                                          );
-                                          if (slotDate < new Date()) {
-                                            isPastTime = true;
-                                          }
-                                        } catch (e) {
-                                          isPastTime = false;
-                                        }
-                                      }
-
-                                      const isValidForGuest =
-                                        isTherapySlotSelectable(
-                                          slot,
-                                          selectedGuest,
-                                        );
+                                      const isSingleValid =
+                                        isSingleSlotSelectable(slot, idx);
 
                                       const isDisabledSlot =
-                                        !isSelected &&
-                                        (!isValidForGuest ||
-                                          isPastTime ||
-                                          isAlreadySelectedByOtherSession);
+                                        !isSelected && !isSingleValid;
 
                                       return (
                                         <button
@@ -1043,13 +1054,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           </span>
                                           {isDisabledSlot && (
                                             <span className="text-[9px] text-gray-400 font-normal truncate max-w-[100px]">
-                                              {isAlreadySelectedByOtherSession
-                                                ? "(Booked)"
-                                                : isPastTime
-                                                  ? "(Past Time)"
-                                                  : !isValidForGuest
-                                                    ? "(Not Allowed)"
-                                                    : "(Full)"}
+                                              (Booked)
                                             </span>
                                           )}
                                         </button>

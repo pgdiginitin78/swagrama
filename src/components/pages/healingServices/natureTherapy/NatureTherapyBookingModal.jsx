@@ -391,7 +391,18 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       .then((res) => {
         console.log("therapy slots", res?.data?.data);
         const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
-        setTherapySlots(data);
+        const uniqueData = [];
+        const seenStartTimes = new Set();
+        data.forEach((s) => {
+          if (s?.startTime && !seenStartTimes.has(s.startTime)) {
+            seenStartTimes.add(s.startTime);
+            uniqueData.push(s);
+          }
+        });
+        uniqueData.sort((a, b) =>
+          (a.startTime || "").localeCompare(b.startTime || ""),
+        );
+        setTherapySlots(uniqueData);
       })
       .catch((error) => {
         console.error("therapy slots error", error);

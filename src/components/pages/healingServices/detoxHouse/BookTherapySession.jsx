@@ -161,7 +161,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         const baseDate = next[0]?.date || startOfToday();
 
         if (next.length === 0) {
-          next.push({ date: baseDate, requiredSessions: 0, selectedSlots: [] });
+          next.push({ date: baseDate, selectedSlots: [] });
         }
 
         if (daysCount > 1 && frequency === null) {
@@ -171,8 +171,7 @@ export default function BookTherapySession({ open, onClose, item }) {
             const prevIdx = next.length - 1;
             const prevDate = next[prevIdx]?.date || baseDate;
             next.push({
-              date: addDays(prevDate, frequency || 0),
-              requiredSessions: 0,
+              date: addDays(prevDate, frequency || 1),
               selectedSlots: [],
             });
           }
@@ -197,17 +196,23 @@ export default function BookTherapySession({ open, onClose, item }) {
           }
         }
 
-        const baseSessions = Math.floor(sessionsCount / daysCount);
-        let remainder = sessionsCount % daysCount;
-        for (let i = 0; i < next.length; i++) {
-          next[i].requiredSessions = baseSessions + (remainder > 0 ? 1 : 0);
-          remainder--;
-          const maxSlotsForDay = next[i].requiredSessions * slotsNeeded;
-          if (next[i].selectedSlots.length > maxSlotsForDay) {
-            next[i].selectedSlots = next[i].selectedSlots.slice(
-              0,
-              maxSlotsForDay,
-            );
+        const totalReq = sessionsCount * slotsNeeded;
+        let currentTotal = next.reduce(
+          (sum, d) => sum + d.selectedSlots.length,
+          0,
+        );
+        if (currentTotal > totalReq) {
+          for (let i = next.length - 1; i >= 0 && currentTotal > totalReq; i--) {
+            const excess = currentTotal - totalReq;
+            const count = next[i].selectedSlots.length;
+            if (count > 0) {
+              const toRemove = Math.min(count, excess);
+              next[i] = {
+                ...next[i],
+                selectedSlots: next[i].selectedSlots.slice(0, count - toRemove),
+              };
+              currentTotal -= toRemove;
+            }
           }
         }
 
@@ -436,45 +441,39 @@ export default function BookTherapySession({ open, onClose, item }) {
       if (existingIdx >= 0) {
         selectedSlots.splice(existingIdx, 1);
       } else {
-        const maxTotalSlots = day.requiredSessions * slotsNeeded;
-        if (selectedSlots.length < maxTotalSlots) {
-          selectedSlots.push(slot);
-        } else if (day.requiredSessions > 0) {
-          selectedSlots.shift();
-          selectedSlots.push(slot);
+        const totalSelected = prev.reduce(
+          (sum, d) => sum + d.selectedSlots.length,
+          0,
+        );
+        const totalRequired = sessionsCount * slotsNeeded;
+
+        if (totalSelected >= totalRequired) {
+          errorAlert(
+            `You have already selected all ${totalRequired} slot(s) for your ${sessionsCount} session(s). Deselect a slot to pick a different one.`,
+          );
+          return prev;
         }
+        selectedSlots.push(slot);
       }
 
       day.selectedSlots = selectedSlots;
       next[dayIdx] = day;
-
-      setTimeout(() => {
-        const maxTotalSlots = day.requiredSessions * slotsNeeded;
-        if (day.selectedSlots.length === maxTotalSlots) {
-          const nextIdx = dayIdx + 1;
-          if (
-            nextIdx < next.length &&
-            next[nextIdx].selectedSlots.length <
-              next[nextIdx].requiredSessions * slotsNeeded
-          ) {
-            setActivePickerIndex(nextIdx);
-          }
-        }
-      }, 80);
-
       return next;
     });
   };
 
   const canPickSession = (idx) => idx === 0 || Boolean(days[idx - 1]?.date);
 
+  const totalSelectedSlots = days.reduce(
+    (sum, d) => sum + d.selectedSlots.length,
+    0,
+  );
+  const totalRequiredSlots = sessionsCount * slotsNeeded;
+
   const allScheduled =
     sessionsCount > 0 &&
-    days.every(
-      (d) =>
-        d.date &&
-        d.selectedSlots.length === d.requiredSessions * slotsNeeded,
-    ) &&
+    totalSelectedSlots === totalRequiredSlots &&
+    days.every((d) => Boolean(d.date)) &&
     selectedGuest;
 
   console.log("selectedGuest", item);
@@ -486,18 +485,19 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
     if (isPaymentPending) return;
 
-    const allValid = days.every(
-      (day) =>
-        day.selectedSlots.length === day.requiredSessions * slotsNeeded &&
+    const allValid =
+      totalSelectedSlots === totalRequiredSlots &&
+      days.every((d) => Boolean(d.date)) &&
+      days.every((day) =>
         day.selectedSlots.every(
           (slot) =>
             isTherapySlotSelectable(slot, selectedGuest) && slot.serviceRoomID,
         ),
-    );
+      );
 
     if (!allValid) {
       errorAlert(
-        "One or more selected time slots are no longer available for the selected guest or are missing data. Please re-select.",
+        "Please select all required time slots for your sessions and ensure they are available.",
       );
       return;
     }
@@ -855,14 +855,18 @@ export default function BookTherapySession({ open, onClose, item }) {
                     exit={{ opacity: 0, height: 0 }}
                     className="overflow-hidden"
                   >
-                    <h3 className="font-serif text-ayuTulsi text-sm font-bold mb-3 border-l-4 border-ayuMid pl-3">
-                      Choose Date & Time
-                    </h3>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-serif text-ayuTulsi text-sm font-bold border-l-4 border-ayuMid pl-3">
+                        Choose Date & Time
+                      </h3>
+                      <span className="text-[11px] font-bold text-ayuMid bg-[#eef6e8] px-2.5 py-1 rounded-full uppercase tracking-tight">
+                        Total Selected: {totalSelectedSlots} / {totalRequiredSlots} slots
+                      </span>
+                    </div>
                     <div className="flex flex-col gap-3">
                       {days.map((schedule, idx) => {
                         const isLocked = !canPickSession(idx);
                         const isPicking = activePickerIndex === idx;
-                        const totalReqSlots = schedule.requiredSessions * slotsNeeded;
                         return (
                           <div
                             key={idx}
@@ -874,9 +878,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                               <EventAvailable style={{ fontSize: 12 }} />
                               <span>Day {idx + 1}</span>
                               <span className="ml-auto text-gray-500 lowercase tracking-normal font-medium">
-                                Required slots: {totalReqSlots} |
-                                Selected: {schedule.selectedSlots.length}/
-                                {totalReqSlots}
+                                Selected: {schedule.selectedSlots.length} slot(s)
                               </span>
                             </div>
 

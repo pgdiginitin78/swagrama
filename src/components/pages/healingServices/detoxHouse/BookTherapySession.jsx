@@ -65,7 +65,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   const prevFreqRef = useRef(null);
   const [sessionsCount, setSessionsCount] = useState(1);
   const [daysCount, setDaysCount] = useState(1);
-  const [frequency, setFrequency] = useState(null);
+  const [frequency, setFrequency] = useState(1);
   const [isCustomFrequency, setIsCustomFrequency] = useState(false);
   const [days, setDays] = useState([
     { date: startOfToday(), requiredSessions: 1, selectedSlots: [] },
@@ -82,7 +82,6 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isPaymentPending, setIsPaymentPending] = useState(false);
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openAddPatient, setOpenAddPatient] = useState(false);
-
 
   const cancelPaymentRef = useRef(null);
   const { user } = useAuth();
@@ -150,10 +149,14 @@ export default function BookTherapySession({ open, onClose, item }) {
   const durationNum = parseInt(item?.duration) || 30;
   const slotsNeeded = Math.max(1, Math.ceil(durationNum / 30));
 
-  useEffect(() => {
-    const freqChanged = prevFreqRef.current !== frequency;
-    prevFreqRef.current = frequency;
+  const getTargetSessionsForDay = (dayIdx, totalSessions, totalDays) => {
+    if (totalDays <= 1) return Math.max(1, totalSessions);
+    const base = Math.floor(totalSessions / totalDays);
+    const remainder = totalSessions % totalDays;
+    return Math.max(1, base + (dayIdx < remainder ? 1 : 0));
+  };
 
+  useEffect(() => {
     if (sessionsCount > 0 && daysCount > 0) {
       setDays((prev) => {
         const next = [...prev];
@@ -179,15 +182,27 @@ export default function BookTherapySession({ open, onClose, item }) {
           next.length = daysCount;
         }
 
-        let rollingDate = baseDate;
+        const isSequential = !isCustomFrequency && typeof frequency === "number";
+        const step = typeof frequency === "number" ? frequency : 1;
+
         for (let i = 0; i < next.length; i++) {
           if (i === 0) {
             if (!next[0].date) next[0].date = baseDate;
-            rollingDate = next[0].date;
           } else {
-            rollingDate = addDays(rollingDate, frequency || 1);
-            if (!next[i].date) {
-              next[i] = { ...next[i], date: rollingDate };
+            if (isSequential) {
+              const seqDate = addDays(next[0].date, i * step);
+              const dateChanged = !next[i].date || !isSameDay(next[i].date, seqDate);
+              next[i] = {
+                ...next[i],
+                date: seqDate,
+                selectedSlots: dateChanged ? [] : next[i].selectedSlots,
+              };
+            } else {
+              // In Custom frequency: if date not set or before previous day, set reasonable default
+              const minD = next[i - 1]?.date || baseDate;
+              if (!next[i].date || isBefore(next[i].date, minD)) {
+                next[i] = { ...next[i], date: addDays(minD, 1), selectedSlots: [] };
+              }
             }
           }
         }
@@ -202,7 +217,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       setDays([]);
       setActivePickerIndex(null);
     }
-  }, [sessionsCount, daysCount, frequency]);
+  }, [sessionsCount, daysCount, frequency, isCustomFrequency]);
 
   const handleGetPatientData = () => {
     if (user !== null) {
@@ -233,13 +248,27 @@ export default function BookTherapySession({ open, onClose, item }) {
   useEffect(() => {
     if (activePickerIndex !== null) {
       const activeSession = days[activePickerIndex];
-      const initialDate = activeSession?.date || null;
+      let initialDate = activeSession?.date || null;
+
+      if (
+        !isCustomFrequency &&
+        typeof frequency === "number" &&
+        activePickerIndex > 0
+      ) {
+        const baseDate = days[0]?.date || startOfToday();
+        initialDate = addDays(baseDate, activePickerIndex * frequency);
+      }
+
       setExploringDate(initialDate);
 
       if (!initialDate && activePickerIndex > 0) {
         const prevDate = days[activePickerIndex - 1]?.date;
         if (prevDate) {
-          const suggested = addDays(prevDate, frequency || 1);
+          const step =
+            !isCustomFrequency && typeof frequency === "number"
+              ? frequency
+              : 1;
+          const suggested = addDays(prevDate, step);
           setSuggestedDate(suggested);
           setCalendarBaseDate(startOfMonth(suggested));
         } else {
@@ -266,7 +295,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       setExploringDate(null);
       setSuggestedDate(null);
     }
-  }, [activePickerIndex]);
+  }, [activePickerIndex, frequency, isCustomFrequency]);
 
   const activeExplorerDate =
     exploringDate ||
@@ -326,7 +355,11 @@ export default function BookTherapySession({ open, onClose, item }) {
   });
 
   const handleSessionChange = (val) => {
-    const n = Math.max(1, Math.min(20, parseInt(val) || 0));
+    if (val === "" || val === null) {
+      setSessionsCount(0);
+      return;
+    }
+    const n = Math.max(1, Math.min(20, parseInt(val) || 1));
     setSessionsCount(n);
     if (daysCount > n) {
       setDaysCount(n);
@@ -334,16 +367,21 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
 
   const handleDaysChange = (val) => {
-    const n = Math.max(1, Math.min(20, parseInt(val) || 0));
+    if (val === "" || val === null) {
+      setDaysCount(0);
+      return;
+    }
+    const n = Math.max(1, Math.min(20, parseInt(val) || 1));
     setDaysCount(n);
     if (sessionsCount < n) {
       setSessionsCount(n);
     }
     if (n > 1) {
-      setFrequency(1);
-      setIsCustomFrequency(false);
+      if (!isCustomFrequency && (frequency === null || frequency === undefined)) {
+        setFrequency(1);
+      }
     } else {
-      setFrequency(null);
+      setFrequency(1);
       setIsCustomFrequency(false);
     }
   };
@@ -363,6 +401,37 @@ export default function BookTherapySession({ open, onClose, item }) {
   const handleDateSelect = (date, idx) => {
     setSuggestedDate(null);
     setExploringDate(date);
+
+    setDays((prev) => {
+      const next = [...prev];
+      if (!next[idx]) return prev;
+
+      const dateChanged = !next[idx].date || !isSameDay(next[idx].date, date);
+      next[idx] = {
+        ...next[idx],
+        date: date,
+        selectedSlots: dateChanged ? [] : next[idx].selectedSlots,
+      };
+
+      const isSequential = !isCustomFrequency && typeof frequency === "number";
+      const step = typeof frequency === "number" ? frequency : 1;
+
+      // In sequential mode (Daily/Alternate/Weekly), changing Day 0 date cascades to all following days
+      if (idx === 0 && isSequential) {
+        for (let j = 1; j < next.length; j++) {
+          const cascadedDate = addDays(date, j * step);
+          const cascadedChanged =
+            !next[j].date || !isSameDay(next[j].date, cascadedDate);
+          next[j] = {
+            ...next[j],
+            date: cascadedDate,
+            selectedSlots: cascadedChanged ? [] : next[j].selectedSlots,
+          };
+        }
+      }
+
+      return next;
+    });
   };
 
   const isSingleSlotSelectable = (slot, dayIdx, targetDateOverride) => {
@@ -397,12 +466,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       try {
         const [h, m] = slot.startTime.split(":");
         const slotDate = new Date();
-        slotDate.setHours(
-          parseInt(h, 10) || 0,
-          parseInt(m, 10) || 0,
-          0,
-          0,
-        );
+        slotDate.setHours(parseInt(h, 10) || 0, parseInt(m, 10) || 0, 0, 0);
         if (slotDate < new Date()) {
           isPastTime = true;
         }
@@ -483,22 +547,31 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
 
   const handleTimeSelect = (slot, dayIdx) => {
-    const targetDate =
-      (activePickerIndex === dayIdx && exploringDate) ||
-      days[dayIdx]?.date ||
-      startOfToday();
+    const isSequential = !isCustomFrequency && typeof frequency === "number";
+    const step = typeof frequency === "number" ? frequency : 1;
+
+    let targetDate = days[dayIdx]?.date;
+    if (dayIdx === 0) {
+      targetDate = exploringDate || days[0]?.date || startOfToday();
+    } else if (isSequential) {
+      const baseDate = days[0]?.date || startOfToday();
+      targetDate = addDays(baseDate, dayIdx * step);
+    } else {
+      targetDate = exploringDate || days[dayIdx]?.date || startOfToday();
+    }
 
     setDays((prev) => {
       const next = [...prev];
       const day = { ...next[dayIdx] };
       const isDateChanging = !day.date || !isSameDay(day.date, targetDate);
 
-      let selectedSlots = isDateChanging ? [] : [...day.selectedSlots];
+      let selectedSlots = isDateChanging ? [] : [...(day.selectedSlots || [])];
 
       const existingIdx = selectedSlots.findIndex(
         (s) => s.startTime === slot.startTime,
       );
 
+      // If clicking already selected slot -> Deselect it
       if (existingIdx >= 0 && !isDateChanging) {
         if (slotsNeeded > 1) {
           const blockStartIdx =
@@ -508,21 +581,7 @@ export default function BookTherapySession({ open, onClose, item }) {
           selectedSlots.splice(existingIdx, 1);
         }
       } else {
-        const totalSelectedSlots = prev.reduce(
-          (sum, d, i) =>
-            sum +
-            (i === dayIdx ? selectedSlots.length : d.selectedSlots.length),
-          0,
-        );
-        const totalRequiredSlots = sessionsCount * slotsNeeded;
-
-        if (totalSelectedSlots + slotsNeeded > totalRequiredSlots) {
-          errorAlert(
-            `You have already selected all ${sessionsCount} required session(s). Deselect a session to pick a different time slot.`,
-          );
-          return prev;
-        }
-
+        // Clicking new slot
         const checkResult = getConsecutiveSlotGroup(
           slot,
           slotsNeeded,
@@ -536,28 +595,104 @@ export default function BookTherapySession({ open, onClose, item }) {
           return prev;
         }
 
-        selectedSlots.push(...checkResult.slots);
+        const maxDaySessions = getTargetSessionsForDay(
+          dayIdx,
+          sessionsCount,
+          daysCount,
+        );
+        const currentDaySessions = Math.floor(
+          selectedSlots.length / slotsNeeded,
+        );
+
+        // If this day already reached its session quota, CHANGE / REPLACE slot
+        if (currentDaySessions >= maxDaySessions) {
+          if (maxDaySessions <= 1) {
+            selectedSlots = [...checkResult.slots];
+          } else {
+            selectedSlots.splice(
+              (currentDaySessions - 1) * slotsNeeded,
+              slotsNeeded,
+              ...checkResult.slots,
+            );
+          }
+        } else {
+          // This day still has capacity
+          const totalSelectedSlotsExcludingThisDay = prev.reduce(
+            (sum, d, i) => (i === dayIdx ? sum : sum + d.selectedSlots.length),
+            0,
+          );
+          const totalRequiredSlots = sessionsCount * slotsNeeded;
+
+          if (
+            totalSelectedSlotsExcludingThisDay +
+              selectedSlots.length +
+              slotsNeeded >
+            totalRequiredSlots
+          ) {
+            if (selectedSlots.length >= slotsNeeded) {
+              selectedSlots.splice(
+                selectedSlots.length - slotsNeeded,
+                slotsNeeded,
+                ...checkResult.slots,
+              );
+            } else {
+              errorAlert(
+                `All ${sessionsCount} session(s) have already been selected across your scheduled days. Deselect a session from another day first.`,
+              );
+              return prev;
+            }
+          } else {
+            selectedSlots.push(...checkResult.slots);
+          }
+        }
       }
 
       day.date = targetDate;
       day.selectedSlots = selectedSlots;
       next[dayIdx] = day;
 
-      const targetSessionsForDay = Math.max(
-        1,
-        Math.ceil(sessionsCount / daysCount),
-      );
-      const targetSlotsForDay = targetSessionsForDay * slotsNeeded;
+      // In sequential mode, changing Day 0 cascades dates to subsequent days
+      if (dayIdx === 0 && isSequential) {
+        for (let j = 1; j < next.length; j++) {
+          const cascadedDate = addDays(targetDate, j * step);
+          const dateChanged =
+            !next[j].date || !isSameDay(next[j].date, cascadedDate);
+          next[j] = {
+            ...next[j],
+            date: cascadedDate,
+            selectedSlots: dateChanged ? [] : next[j].selectedSlots,
+          };
+        }
+      }
 
-      if (selectedSlots.length >= targetSlotsForDay && dayIdx < daysCount - 1) {
+      const maxDaySessions = getTargetSessionsForDay(
+        dayIdx,
+        sessionsCount,
+        daysCount,
+      );
+      const targetSlotsForDay = maxDaySessions * slotsNeeded;
+
+      // Auto-advance only if next day does not have slots selected yet
+      if (
+        selectedSlots.length >= targetSlotsForDay &&
+        dayIdx < daysCount - 1
+      ) {
         const nextIdx = dayIdx + 1;
-        const nextDate =
-          next[nextIdx]?.date || addDays(targetDate, frequency || 1);
-        next[nextIdx] = { ...next[nextIdx], date: nextDate };
-        setTimeout(() => {
-          setActivePickerIndex(nextIdx);
-          setExploringDate(nextDate);
-        }, 150);
+        if (
+          !next[nextIdx]?.selectedSlots ||
+          next[nextIdx].selectedSlots.length === 0
+        ) {
+          const nextDate =
+            next[nextIdx]?.date ||
+            (isSequential
+              ? addDays(targetDate, step)
+              : addDays(targetDate, 1));
+          next[nextIdx] = { ...next[nextIdx], date: nextDate };
+          setTimeout(() => {
+            setActivePickerIndex(nextIdx);
+            setExploringDate(nextDate);
+          }, 150);
+        }
       }
 
       return next;
@@ -819,6 +954,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                       placeholder="1"
                       value={sessionsCount === 0 ? "" : sessionsCount}
                       onChange={(e) => handleSessionChange(e.target.value)}
+                      onBlur={() => {
+                        if (sessionsCount === 0) setSessionsCount(1);
+                      }}
                       className="flex-1 bg-[#f4f7f2] rounded-[5px] p-1.5 text-ayuTulsi font-bold text-base text-center outline-none border-2 border-transparent focus:border-ayuMid focus:bg-white transition-all shadow-sm"
                     />
                     <button
@@ -849,6 +987,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                       placeholder="1"
                       value={daysCount === 0 ? "" : daysCount}
                       onChange={(e) => handleDaysChange(e.target.value)}
+                      onBlur={() => {
+                        if (daysCount === 0) setDaysCount(1);
+                      }}
                       className="flex-1 bg-[#f4f7f2] rounded-[5px] p-1.5 text-ayuTulsi font-bold text-base text-center outline-none border-2 border-transparent focus:border-ayuMid focus:bg-white transition-all shadow-sm"
                     />
                     <button
@@ -893,6 +1034,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                 onClick={() => {
                                   if (opt.value === "custom") {
                                     setIsCustomFrequency(true);
+                                    setFrequency("custom");
                                   } else {
                                     setIsCustomFrequency(false);
                                     setFrequency(opt.value);
@@ -918,31 +1060,8 @@ export default function BookTherapySession({ open, onClose, item }) {
                               exit={{ opacity: 0, height: 0 }}
                               className="overflow-hidden"
                             >
-                              <div className="flex items-center gap-3 bg-white p-3 rounded-[5px] border border-[#e4ebdd]">
-                                <span className="text-xs font-bold text-gray-600">
-                                  Gap between sessions:
-                                </span>
-                                <div className="flex items-center gap-2">
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    placeholder="0"
-                                    className="w-16 bg-[#f4f7f2] border border-[#e4ebdd] rounded p-1.5 text-xs font-bold outline-none text-ayuTulsi text-center focus:border-ayuMid"
-                                    value={frequency === null ? "" : frequency}
-                                    onChange={(e) => {
-                                      if (e.target.value === "") {
-                                        setFrequency(null);
-                                      } else {
-                                        const val = parseInt(e.target.value);
-                                        if (!isNaN(val))
-                                          setFrequency(Math.max(0, val));
-                                      }
-                                    }}
-                                  />
-                                  <span className="text-xs font-bold text-gray-600">
-                                    days
-                                  </span>
-                                </div>
+                              <div className="flex items-center gap-2 bg-[#f4f7f2] p-2.5 rounded-[5px] border border-[#e4ebdd] text-ayuMid text-xs font-semibold">
+                                <span>✨ Custom frequency enabled: You can select any preferred date for each session independently below.</span>
                               </div>
                             </motion.div>
                           )}
@@ -954,7 +1073,9 @@ export default function BookTherapySession({ open, onClose, item }) {
               </AnimatePresence>
 
               <AnimatePresence>
-                {(daysCount === 1 || (daysCount > 1 && frequency !== null)) && (
+                {(daysCount === 1 ||
+                  (daysCount > 1 &&
+                    (frequency !== null || isCustomFrequency))) && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
@@ -965,7 +1086,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                       <h3 className="font-serif text-ayuTulsi text-sm font-bold border-l-4 border-ayuMid pl-3">
                         Choose Date & Time
                       </h3>
-                     
                     </div>
                     <div className="flex flex-col gap-3">
                       {days.map((schedule, idx) => {
@@ -981,7 +1101,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                             <div className="flex items-center gap-1.5 mb-1.5 text-ayuMid font-black text-[10px] uppercase tracking-widest">
                               <EventAvailable style={{ fontSize: 12 }} />
                               <span>Day {idx + 1}</span>
-                        
                             </div>
 
                             {!isPicking && !schedule.date ? (
@@ -1043,8 +1162,19 @@ export default function BookTherapySession({ open, onClose, item }) {
                                       date,
                                       startOfToday(),
                                     );
-                                    const isDisabled =
-                                      isBefore(date, minDateForSession);
+                                    const seqMode =
+                                      !isCustomFrequency &&
+                                      typeof frequency === "number" &&
+                                      idx > 0;
+                                    const seqDate = seqMode
+                                      ? addDays(
+                                          days[0]?.date || startOfToday(),
+                                          idx * frequency,
+                                        )
+                                      : null;
+                                    const isDisabled = seqMode
+                                      ? !isSameDay(date, seqDate)
+                                      : isBefore(date, minDateForSession);
 
                                     const activeTargetDate =
                                       activePickerIndex === idx && exploringDate
@@ -1164,7 +1294,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           </span>
                                           {isDisabledSlot && (
                                             <span className="text-[9px] text-gray-400 font-normal truncate max-w-[100px]">
-                                              (Booked)
+                                              (Selected)
                                             </span>
                                           )}
                                         </button>
@@ -1187,10 +1317,17 @@ export default function BookTherapySession({ open, onClose, item }) {
                                         const nextDate =
                                           days[nextIdx]?.date ||
                                           (schedule.date
-                                            ? addDays(schedule.date, frequency || 1)
+                                            ? addDays(
+                                                schedule.date,
+                                                !isCustomFrequency &&
+                                                  typeof frequency === "number"
+                                                  ? frequency
+                                                  : 1,
+                                              )
                                             : null);
                                         setActivePickerIndex(nextIdx);
-                                        if (nextDate) setExploringDate(nextDate);
+                                        if (nextDate)
+                                          setExploringDate(nextDate);
                                       } else {
                                         setActivePickerIndex(null);
                                       }
@@ -1234,7 +1371,8 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           ].endTime
                                             ? ` - ${formatTime(
                                                 schedule.selectedSlots[
-                                                  schedule.selectedSlots.length - 1
+                                                  schedule.selectedSlots
+                                                    .length - 1
                                                 ].endTime,
                                               )}`
                                             : ""

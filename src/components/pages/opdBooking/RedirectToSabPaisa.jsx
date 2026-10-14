@@ -11,32 +11,31 @@ const startPaymentStatusPolling = (
   let timeoutId = null;
   let isStopped = false;
   let pollCount = 0;
-  // Track if the window has ever navigated away from the initial blank page.
-  // When the form submits, window goes cross-origin to SabPaisa.
-  // After payment, it goes cross-origin to the backend callback.
-  // We detect the backend callback by: window is cross-origin AND paymentStatus is Success.
+
   let hasBeenCrossOrigin = false;
 
   const poll = async () => {
     if (isStopped) return;
     pollCount++;
 
-    // Detect if window is currently cross-origin (inaccessible location)
     let isCrossOrigin = false;
     try {
       const _ = paymentWindow?.location?.href;
-      // If we can read the URL and it's not about:blank, treat as same-origin accessible
-      hasBeenCrossOrigin = false; // still accessible means still on same origin
+
+      hasBeenCrossOrigin = false;
     } catch (e) {
       isCrossOrigin = true;
-      hasBeenCrossOrigin = true; // once cross-origin, track it
+      hasBeenCrossOrigin = true;
     }
 
     try {
       const response = await CheckPaymentStatus(clinicId, clientTxnId);
       const status = response?.data;
 
-      console.log(`[Poll #${pollCount}] paymentStatus: "${status?.paymentStatus}"`, status);
+      console.log(
+        `[Poll #${pollCount}] paymentStatus: "${status?.paymentStatus}"`,
+        status,
+      );
 
       if (isStopped) return;
 
@@ -70,7 +69,6 @@ const startPaymentStatusPolling = (
         return;
       }
 
-      // Schedule next poll only if not stopped
       if (!isStopped) {
         timeoutId = setTimeout(poll, POLL_INTERVAL);
       }
@@ -101,11 +99,12 @@ export const RedirectToSabPaisa = (
 ) => {
   const paymentWindow = window.open("", "_blank");
 
-  console.log("paymentWindow",paymentWindow)
+  console.log("paymentWindow", paymentWindow);
 
   if (!paymentWindow) {
     onFailure?.({
-      message: "Payment window was blocked by the browser. Please allow popups.",
+      message:
+        "Payment window was blocked by the browser. Please allow popups.",
     });
     return () => {};
   }

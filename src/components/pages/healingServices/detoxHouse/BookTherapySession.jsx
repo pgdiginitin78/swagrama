@@ -182,7 +182,8 @@ export default function BookTherapySession({ open, onClose, item }) {
           next.length = daysCount;
         }
 
-        const isSequential = !isCustomFrequency && typeof frequency === "number";
+        const isSequential =
+          !isCustomFrequency && typeof frequency === "number";
         const step = typeof frequency === "number" ? frequency : 1;
 
         for (let i = 0; i < next.length; i++) {
@@ -191,17 +192,21 @@ export default function BookTherapySession({ open, onClose, item }) {
           } else {
             if (isSequential) {
               const seqDate = addDays(next[0].date, i * step);
-              const dateChanged = !next[i].date || !isSameDay(next[i].date, seqDate);
+              const dateChanged =
+                !next[i].date || !isSameDay(next[i].date, seqDate);
               next[i] = {
                 ...next[i],
                 date: seqDate,
                 selectedSlots: dateChanged ? [] : next[i].selectedSlots,
               };
             } else {
-              // In Custom frequency: if date not set or before previous day, set reasonable default
               const minD = next[i - 1]?.date || baseDate;
               if (!next[i].date || isBefore(next[i].date, minD)) {
-                next[i] = { ...next[i], date: addDays(minD, 1), selectedSlots: [] };
+                next[i] = {
+                  ...next[i],
+                  date: addDays(minD, 1),
+                  selectedSlots: [],
+                };
               }
             }
           }
@@ -265,9 +270,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         const prevDate = days[activePickerIndex - 1]?.date;
         if (prevDate) {
           const step =
-            !isCustomFrequency && typeof frequency === "number"
-              ? frequency
-              : 1;
+            !isCustomFrequency && typeof frequency === "number" ? frequency : 1;
           const suggested = addDays(prevDate, step);
           setSuggestedDate(suggested);
           setCalendarBaseDate(startOfMonth(suggested));
@@ -377,7 +380,10 @@ export default function BookTherapySession({ open, onClose, item }) {
       setSessionsCount(n);
     }
     if (n > 1) {
-      if (!isCustomFrequency && (frequency === null || frequency === undefined)) {
+      if (
+        !isCustomFrequency &&
+        (frequency === null || frequency === undefined)
+      ) {
         setFrequency(1);
       }
     } else {
@@ -416,7 +422,6 @@ export default function BookTherapySession({ open, onClose, item }) {
       const isSequential = !isCustomFrequency && typeof frequency === "number";
       const step = typeof frequency === "number" ? frequency : 1;
 
-      // In sequential mode (Daily/Alternate/Weekly), changing Day 0 date cascades to all following days
       if (idx === 0 && isSequential) {
         for (let j = 1; j < next.length; j++) {
           const cascadedDate = addDays(date, j * step);
@@ -673,10 +678,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       const targetSlotsForDay = maxDaySessions * slotsNeeded;
 
       // Auto-advance only if next day does not have slots selected yet
-      if (
-        selectedSlots.length >= targetSlotsForDay &&
-        dayIdx < daysCount - 1
-      ) {
+      if (selectedSlots.length >= targetSlotsForDay && dayIdx < daysCount - 1) {
         const nextIdx = dayIdx + 1;
         if (
           !next[nextIdx]?.selectedSlots ||
@@ -684,9 +686,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         ) {
           const nextDate =
             next[nextIdx]?.date ||
-            (isSequential
-              ? addDays(targetDate, step)
-              : addDays(targetDate, 1));
+            (isSequential ? addDays(targetDate, step) : addDays(targetDate, 1));
           next[nextIdx] = { ...next[nextIdx], date: nextDate };
           setTimeout(() => {
             setActivePickerIndex(nextIdx);
@@ -743,24 +743,24 @@ export default function BookTherapySession({ open, onClose, item }) {
       return;
     }
     const saveObj = {
-      userId: selectedGuest?.userId,
+      userId:
+        selectedGuest?.userId ||
+        selectedGuest?.patientUserId ||
+        selectedGuest?.id ||
+        selectedGuest?.value,
       createdBy: user?.userId,
-      clinicFid: 5,
-      serviceGroupID: item?.serviceGroupId,
-      serviceFid: item?.serviceId,
-      doctorFid: item?.doctorId,
+      serviceGroupID: item?.serviceGroupId || item?.serviceGroupID,
+      serviceFid: item?.serviceId || item?.serviceFid,
       fromDate: days[0]?.date ? format(days[0].date, "yyyy-MM-dd") : "",
       toDate: days[days.length - 1]?.date
         ? format(days[days.length - 1].date, "yyyy-MM-dd")
         : "",
+      serviceRoomID:
+        days.flatMap((d) => d.selectedSlots).find((s) => s?.serviceRoomID)
+          ?.serviceRoomID ||
+        item?.serviceRoomId ||
+        item?.serviceRoomID,
       totalAmount: total,
-      no_Of_Person: 1,
-      duration: item.duration,
-      TherapyName: item?.serviceName || "",
-      FirstTimeTaking: isFirstTime,
-      No_Of_Sessions: sessionsCount,
-      Preferred_therapist: genderPreference,
-      Amount: total,
       slots: days.flatMap((d) =>
         d.selectedSlots.map((slot) => {
           const parseToDisplay = (timeStr) => {
@@ -787,7 +787,6 @@ export default function BookTherapySession({ open, onClose, item }) {
             SlotDate: d.date ? format(d.date, "yyyy-MM-dd") : "N/A",
             slotStart: parseToDisplay(slot.startTime),
             slotEnd: parseToDisplay(slot.endTime),
-            serviceRoomID: slot.serviceRoomID,
           };
         }),
       ),
@@ -1061,7 +1060,11 @@ export default function BookTherapySession({ open, onClose, item }) {
                               className="overflow-hidden"
                             >
                               <div className="flex items-center gap-2 bg-[#f4f7f2] p-2.5 rounded-[5px] border border-[#e4ebdd] text-ayuMid text-xs font-semibold">
-                                <span>✨ Custom frequency enabled: You can select any preferred date for each session independently below.</span>
+                                <span>
+                                  ✨ Custom frequency enabled: You can select
+                                  any preferred date for each session
+                                  independently below.
+                                </span>
                               </div>
                             </motion.div>
                           )}

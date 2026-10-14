@@ -450,6 +450,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       totalAmount: watch("totalAmount"),
       serviceGroupID: therapy?.serviceGroupId,
       serviceFid: therapy?.serviceId,
+      serviceRoomID:
+        selectedTimeSlot?.serviceRoomID ||
+        therapy?.serviceRoomId ||
+        therapy?.serviceRoomID,
       slots: [
         {
           SlotDate:
@@ -458,7 +462,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
               : "",
           slotStart: selectedTimeSlot?.slotStartTime,
           slotEnd: selectedTimeSlot?.slotEndTime,
-          serviceRoomID: selectedTimeSlot?.serviceRoomID,
         },
       ],
       FirstTimeTaking: null,

@@ -93,7 +93,9 @@ export const CheckPaymentStatus = (clinicId, clientTxnId) => {
     params.append("clientTxnId", clientTxnId);
   }
 
-  return AxiosInstance.get(`CheckPaymentStatus?${params.toString()}`);
+  return AxiosInstance.get(`CheckPaymentStatus?${params.toString()}`, {
+    validateStatus: (status) => status >= 200 && status < 500,
+  });
 };
 
 //https://ayurmitra.in/WellnessAPILive/AgeDetails

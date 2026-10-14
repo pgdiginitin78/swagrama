@@ -403,6 +403,10 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
       doctorFid: null,
       serviceGroupID: eventDetails?.serviceGroupId,
       serviceFid: eventDetails?.serviceId,
+      serviceRoomID:
+        selectedTimeSlot?.serviceRoomID ||
+        eventDetails?.serviceRoomId ||
+        eventDetails?.serviceRoomID,
       slots: [
         {
           SlotDate:
@@ -411,7 +415,6 @@ const BeautyTherapyBookingModal = ({ open, handleClose, eventDetails }) => {
               : "",
           slotStart: selectedTimeSlot?.slotStartTime,
           slotEnd: selectedTimeSlot?.slotEndTime,
-          serviceRoomID: selectedTimeSlot?.serviceRoomID,
         },
       ],
       FirstTimeTaking: null,

@@ -37,7 +37,6 @@ const HeroSection = () => {
 
   return (
     <section className="relative min-h-screen overflow-hidden">
-      {/* High-priority immediate responsive LCP image for mobile and desktop */}
       <picture className="absolute inset-0 w-full h-full pointer-events-none">
         <source
           media="(max-width: 767px)"
@@ -55,7 +54,6 @@ const HeroSection = () => {
         />
       </picture>
 
-      {/* Video stream on desktop once idle */}
       {canStreamVideo && (
         <video
           autoPlay

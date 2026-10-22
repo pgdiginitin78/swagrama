@@ -2,14 +2,18 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { getNextTwoEvents } from "./HomePageConstants";
 
-// Sections
-import CommunityHealers from "./sections/CommunityHealers";
-import FounderSection from "./sections/FounderSection";
+// Above-the-fold sections
 import HeroSection from "./sections/HeroSection";
-import PillarsSection from "./sections/PillarsSection";
 import ServicesSection from "./sections/ServicesSection";
-import TopStoriesSection from "./sections/TopStoriesSection";
-import UpcomingEventsSection from "./sections/UpcomingEventsSection";
+
+// Below-the-fold sections (code-split for fast initial paint)
+const TopStoriesSection = lazy(() => import("./sections/TopStoriesSection"));
+const UpcomingEventsSection = lazy(
+  () => import("./sections/UpcomingEventsSection"),
+);
+const FounderSection = lazy(() => import("./sections/FounderSection"));
+const PillarsSection = lazy(() => import("./sections/PillarsSection"));
+const CommunityHealers = lazy(() => import("./sections/CommunityHealers"));
 
 // Lazy-loaded modals (never in the critical render path)
 const TopStoriesModals = lazy(() => import("./sections/TopStoriesModals"));
@@ -58,19 +62,21 @@ export default function AyurvedaLanding({ userData }) {
 
       <ServicesSection />
 
-      <TopStoriesSection setModal1={setModal1} setModal2={setModal2} />
+      <Suspense fallback={null}>
+        <TopStoriesSection setModal1={setModal1} setModal2={setModal2} />
 
-      <UpcomingEventsSection
-        eventsDataUpdated={upcommingEvent}
-        setOpenRegisterModal={setOpenRegisterModal}
-        setSelectedEvents={setSelectedEvents}
-      />
+        <UpcomingEventsSection
+          eventsDataUpdated={upcommingEvent}
+          setOpenRegisterModal={setOpenRegisterModal}
+          setSelectedEvents={setSelectedEvents}
+        />
 
-      <FounderSection />
+        <FounderSection />
 
-      <PillarsSection />
+        <PillarsSection />
 
-      <CommunityHealers />
+        <CommunityHealers />
+      </Suspense>
 
       <Suspense fallback={null}>
         {(modal1 || modal2) && (

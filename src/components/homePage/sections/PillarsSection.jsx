@@ -58,6 +58,8 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
               <img
                 src={healer.image}
                 alt={healer.name}
+                width="380"
+                height="450"
                 loading="lazy"
                 decoding="async"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"

@@ -222,6 +222,8 @@ const Navbar = () => {
             <Link to="/" className="flex-shrink-0 z-10 focus:outline-none">
               <img
                 src={SwagramaLogo}
+                width="80"
+                height="80"
                 className="h-12 lg:h-16 xl:h-20 2xl:h-28 2xl:w-32 w-auto object-contain cursor-pointer"
                 alt="Swagrama Logo"
               />

@@ -3,7 +3,7 @@ import { memo, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 import landigPageS1 from "../../assets/landing-page/landigPageS1.webm";
-import heroPoster from "../../assets/landing-page/swagramaMain.webp";
+const heroPoster = "/heroPoster.webp";
 
 const HeroSection = () => {
   const navigate = useNavigate();
@@ -37,6 +37,9 @@ const HeroSection = () => {
         playsInline
         poster={heroPoster}
         preload="none"
+        width="1920"
+        height="1080"
+        aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover"
       >
         {canStreamVideo && <source src={landigPageS1} type="video/webm" />}

@@ -53,6 +53,8 @@ const FounderSection = ({ foundersRef, isFoundersInView }) => {
             <img
               src={SantoshSuryavanshi}
               alt="Vaidya Santosh Suryawanshi"
+              width="400"
+              height="580"
               loading="lazy"
               decoding="async"
               className="absolute inset-0 w-full h-full object-cover object-top"

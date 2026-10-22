@@ -41,6 +41,8 @@ const ServicesSection = () => {
                   src={item.img}
                   loading="lazy"
                   decoding="async"
+                  width="112"
+                  height="112"
                   className="h-24 sm:h-28 object-contain transition-transform duration-500"
                   alt={item.title}
                   whileHover={{ scale: 1.1, rotate: 5 }}

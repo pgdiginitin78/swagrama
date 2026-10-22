@@ -23,7 +23,15 @@ const CommunityHealers = () => {
             transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
             className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-teal-500 to-emerald-500 rounded-full mb-4 shadow-md"
           >
-            <img src={DoctorIcon} alt="Doctor Icon" className="h-10 w-10" />
+            <img
+              src={DoctorIcon}
+              alt="Doctor Icon"
+              width="40"
+              height="40"
+              loading="lazy"
+              decoding="async"
+              className="h-10 w-10"
+            />
           </motion.div>
 
           <h2 className="font-bold text-gray-900 text-3xl sm:text-4xl tracking-tight mb-4">
@@ -62,6 +70,8 @@ const CommunityHealers = () => {
                 <motion.img
                   src={healer.image}
                   alt={healer.name}
+                  width="280"
+                  height="350"
                   loading="lazy"
                   decoding="async"
                   className="absolute inset-0 w-full h-full object-cover"

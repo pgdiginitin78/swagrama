@@ -27,6 +27,10 @@ const Footer = () => {
                 <img
                   src={SwagramaLogo}
                   alt="Swagrama Logo"
+                  width="144"
+                  height="144"
+                  loading="lazy"
+                  decoding="async"
                   className="h-28 md:h-36 w-auto mx-auto drop-shadow-lg"
                 />
               </div>
@@ -104,7 +108,15 @@ const Footer = () => {
                 </div>
 
                 <div className="flex gap-2 items-start text-white/90">
-                  <img src={CommunityVillage} alt="Community Village" className="h-6 w-6" />
+                  <img
+                    src={CommunityVillage}
+                    alt="Community Village"
+                    width="24"
+                    height="24"
+                    loading="lazy"
+                    decoding="async"
+                    className="h-6 w-6"
+                  />
                   <div>
                     <p className="font-medium text-xs mb-1">
                       Community Village

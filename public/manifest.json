@@ -1,0 +1,23 @@
+{
+  "name": "Swagrama",
+  "short_name": "Swagrama",
+  "description": "Swagrama - Ayurveda • Yoga • Nisarga • Agro • Tourism",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#263d21",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/swagramaLogo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "/swagramaLogo.svg",
+      "type": "image/svg+xml",
+      "sizes": "192x192 512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

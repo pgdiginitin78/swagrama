@@ -64,6 +64,8 @@ const TopStoriesSection = ({ setModal1, setModal2 }) => {
                 <img
                   src={story.img}
                   alt={story.title}
+                  width="540"
+                  height="260"
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover object-center"

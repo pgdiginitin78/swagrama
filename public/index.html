@@ -18,14 +18,21 @@
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     >
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      >
+    </noscript>
     <title>Swagrama</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script>
-      // Load lordicon.js only when needed or after main thread is free
       window.addEventListener('load', function() {
         if ('requestIdleCallback' in window) {
           requestIdleCallback(function() {

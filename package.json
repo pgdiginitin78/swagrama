@@ -41,6 +41,8 @@
   "scripts": {
     "start": "react-scripts start",
     "dev": "react-scripts start",
+    "backend": "dotnet run --project Wellness --launch-profile http",
+    "start:all": "node scripts/start-all.js",
     "build": "react-scripts build",
     "postbuild": "node -e \"const fs = require('fs-extra'); const p = require('path'); fs.copySync('public', 'build', { dereference: true, filter: f => p.basename(f).toLowerCase() !== 'index.html' });\"",
     "test": "react-scripts test",

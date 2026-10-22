@@ -20,7 +20,8 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
         <motion.div
           variants={staggerContainer}
           initial="hidden"
-          animate={isHealersInView ? "visible" : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
           className="text-center mb-16 pt-10"
         >
           <motion.span
@@ -32,7 +33,7 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
 
           <motion.h2
             variants={fadeInUp}
-            className="font-serif text-3xl md:text-4xl  text-[#111827] mt-4"
+            className="font-serif text-3xl md:text-4xl text-[#111827] mt-4"
           >
             Pillars of SwaGrama
           </motion.h2>
@@ -41,7 +42,8 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-60px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full mx-auto px-3 md:px-5"
         >
           {partnersData.map((healer, index) => (
@@ -56,8 +58,9 @@ const PillarsSection = ({ healersRef, isHealersInView }) => {
               <img
                 src={healer.image}
                 alt={healer.name}
-                className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110                  
-              `}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
               />
 
               {/* Multi-layered Gradient Overlay for better text readability */}

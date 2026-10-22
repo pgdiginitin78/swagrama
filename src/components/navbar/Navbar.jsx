@@ -6,16 +6,17 @@ import MenuIcon from "@mui/icons-material/Menu";
 import PersonIcon from "@mui/icons-material/Person";
 import DashboardIcon from "@mui/icons-material/SpaceDashboard";
 import { Drawer } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, lazy, Suspense } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
-import LoginModal from "../loginModal/LoginModal";
-import ShopCart from "../pages/eShop/ShopCart";
-import ManageMembers from "../profile/ManageMembers";
-import ManageProfileModal from "../profile/ManageProfileModal";
-import ConfirmationModal from "../common/ConfirmationModal";
+
+const LoginModal = lazy(() => import("../loginModal/LoginModal"));
+const ShopCart = lazy(() => import("../pages/eShop/ShopCart"));
+const ManageMembers = lazy(() => import("../profile/ManageMembers"));
+const ManageProfileModal = lazy(() => import("../profile/ManageProfileModal"));
+const ConfirmationModal = lazy(() => import("../common/ConfirmationModal"));
 
 const ProfileDropdown = ({
   user,
@@ -24,7 +25,6 @@ const ProfileDropdown = ({
   setOpenManageMembers,
   setOpenConfirmationDialog,
 }) => (
-  console.log("user", user),
   (
     <div className="absolute right-0 top-full mt-2 w-52 bg-white rounded-2xl shadow-2xl border border-green-100 overflow-hidden z-[999] animate-[fadeInDown_0.15s_ease_forwards]">
       <div className="px-4 py-3 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
@@ -471,42 +471,47 @@ const Navbar = () => {
         </div>
       </Drawer>
 
-      {openStore && <ShopCart isOpen={openStore} setIsOpen={setOpenStore} />}
+      <Suspense fallback={null}>
+        {openStore && <ShopCart isOpen={openStore} setIsOpen={setOpenStore} />}
 
-      {openLoginModal && (
-        <LoginModal
-          open={openLoginModal}
-          handleClose={() => setOpenLoginModal(false)}
-          onLoginSuccess={handleLoginSuccess}
-        />
-      )}
+        {openLoginModal && (
+          <LoginModal
+            open={openLoginModal}
+            handleClose={() => setOpenLoginModal(false)}
+            onLoginSuccess={handleLoginSuccess}
+          />
+        )}
 
-      {openProfile && (
-        <ManageProfileModal
-          open={openProfile}
-          onClose={() => setOpenProfile(false)}
-          user={user}
-          onSave={handleProfileSave}
-          setOpen={setOpen}
-        />
-      )}
+        {openProfile && (
+          <ManageProfileModal
+            open={openProfile}
+            onClose={() => setOpenProfile(false)}
+            user={user}
+            onSave={handleProfileSave}
+            setOpen={setOpen}
+          />
+        )}
 
-      {openManageMembers && (
-        <ManageMembers
-          open={openManageMembers}
-          onClose={() => setOpenManageMembers(false)}
-          user={user}
-          setOpen={setOpen}
-        />
-      )}
-            <ConfirmationModal
-              confirmationOpen={openConfirmationDialog}
-              confirmationHandleClose={() => setOpenConfirmationDialog(false)}
-              confirmationSubmitFunc={handleLogout}
-              confirmationLabel="Confirmation"
-              confirmationMsg="Are you sure you want to log out?"
-              confirmationButtonMsg="Confirm"
-            />
+        {openManageMembers && (
+          <ManageMembers
+            open={openManageMembers}
+            onClose={() => setOpenManageMembers(false)}
+            user={user}
+            setOpen={setOpen}
+          />
+        )}
+
+        {openConfirmationDialog && (
+          <ConfirmationModal
+            confirmationOpen={openConfirmationDialog}
+            confirmationHandleClose={() => setOpenConfirmationDialog(false)}
+            confirmationSubmitFunc={handleLogout}
+            confirmationLabel="Confirmation"
+            confirmationMsg="Are you sure you want to log out?"
+            confirmationButtonMsg="Confirm"
+          />
+        )}
+      </Suspense>
     </>
   );
 };

@@ -7,7 +7,6 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useRef } from "react";
 import { Link } from "react-router-dom";
 import SwagramaLogo from "../assets/landing-page/swagramaLogo.svg";
-import VillaIcon from "@mui/icons-material/Villa";
 import BusinessIcon from "@mui/icons-material/Business";
 import CommunityVillage from "../../assets/CommunityVillage.svg";
 
@@ -16,56 +15,6 @@ const Footer = () => {
 
   return (
     <>
-      <style>{`
-        @keyframes pulse {
-          0%, 100% {
-            transform: scale(1);
-          }
-          50% {
-            transform: scale(1.03);
-          }
-        }
-
-        .pulse-animate {
-          animation: pulse 2s ease-in-out infinite;
-        }
-
-        .footer-heading::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 40px;
-          height: 2px;
-          background: white;
-          border-radius: 2px;
-        }
-
-        .footer-link {
-          position: relative;
-          padding-left: 0;
-          transition: padding-left 0.3s ease;
-        }
-
-        .footer-link::before {
-          content: '→';
-          position: absolute;
-          left: -20px;
-          opacity: 0;
-          color: white;
-          transition: all 0.3s ease;
-        }
-
-        .footer-link:hover {
-          padding-left: 20px;
-        }
-
-        .footer-link:hover::before {
-          opacity: 1;
-          left: 0;
-        }
-      `}</style>
-
       <footer
         ref={footerRef}
         className="relative overflow-hidden bg-gradient-to-r from-green-900 via-green-800 to-lime-900"
@@ -103,7 +52,7 @@ const Footer = () => {
               </div> */}
             </div>
             <div>
-              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 footer-heading">
+              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-white after:rounded-full">
                 Explore
               </h4>
               <div className="flex flex-col gap-2 text-sm">
@@ -121,7 +70,7 @@ const Footer = () => {
                   <Link
                     to={link.href}
                     key={index}
-                    className="text-white/90 hover:text-white transition-all duration-300 footer-link"
+                    className="text-white/90 hover:text-white transition-all duration-300 hover:translate-x-1 inline-block"
                   >
                     {link.label}
                   </Link>
@@ -130,7 +79,7 @@ const Footer = () => {
             </div>
 
             <div>
-              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 footer-heading">
+              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-white after:rounded-full">
                 Contact
               </h4>
               <div className="flex flex-col gap-2.5 text-sm">
@@ -155,7 +104,7 @@ const Footer = () => {
                 </div>
 
                 <div className="flex gap-2 items-start text-white/90">
-                  <img src={CommunityVillage} className="h-6 w-6" />
+                  <img src={CommunityVillage} alt="Community Village" className="h-6 w-6" />
                   <div>
                     <p className="font-medium text-xs mb-1">
                       Community Village
@@ -201,7 +150,7 @@ const Footer = () => {
               </div>
             </div>
             <div>
-              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 footer-heading">
+              <h4 className="font-['Cinzel'] text-white text-base font-bold mb-3 relative pb-2 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-10 after:h-0.5 after:bg-white after:rounded-full">
                 Connect With Us
               </h4>
               <div className="flex gap-2.5 mb-4">
@@ -235,10 +184,11 @@ const Footer = () => {
               </div>
               <div className="w-full h-[140px] rounded-lg overflow-hidden border border-white/20">
                 <iframe
+                  title="Swagrama Location Map"
                   src="https://www.google.com/maps?q=Swagram%20Car%20Parking%20Lavale%20Maharashtra&output=embed"
                   width="100%"
                   height="300"
-                  style={{ border: 0 }}
+                  className="border-0"
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"

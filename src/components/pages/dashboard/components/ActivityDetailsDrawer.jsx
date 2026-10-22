@@ -14,52 +14,105 @@ import RescheduleAppointments from "../RescheduleAppointments";
 import RescheduleTherapy from "../RescheduleTherapy";
 
 const formatTime = (timeStr) => {
-  if (!timeStr || typeof timeStr !== "string") return timeStr;
-  if (timeStr.includes(":") && timeStr.split(":").length >= 2) {
-    const [hours, minutes] = timeStr.split(":");
-    let h = parseInt(hours);
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12 || 12;
-    return `${h}:${minutes} ${ampm}`;
+  if (!timeStr || typeof timeStr !== "string") return timeStr || null;
+  const cleanTimeStr = timeStr.replace(/\s*(AM|PM|am|pm)\s*/gi, "").trim();
+  if (cleanTimeStr.includes(":") && cleanTimeStr.split(":").length >= 2) {
+    const [hours, minutes] = cleanTimeStr.split(":");
+    let h = parseInt(hours, 10);
+    if (!isNaN(h)) {
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      const m = (minutes || "00").substring(0, 2);
+      return `${h}:${m} ${ampm}`;
+    }
   }
   return timeStr;
 };
 
-const formatDate = (dateStr) =>
-  dateStr?.includes("T")
-    ? new Date(dateStr).toLocaleDateString("en-US", {
+const formatDate = (dateStr) => {
+  if (!dateStr) return null;
+  try {
+    const d = new Date(dateStr);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString("en-US", {
         month: "short",
         day: "2-digit",
         year: "numeric",
-      })
-    : dateStr;
+      });
+    }
+  } catch (e) {
+    // fallback
+  }
+  return typeof dateStr === "string" ? dateStr : null;
+};
 
-const formatAmount = (amount) =>
-  amount != null ? `₹${Number(amount).toLocaleString("en-IN")}` : null;
+const formatAmount = (amount) => {
+  if (amount == null || amount === "") return null;
+  const num = Number(amount);
+  return !isNaN(num) ? `₹${num.toLocaleString("en-IN")}` : `₹${amount}`;
+};
 
 const getActivityDisplayData = (data) => {
   if (!data) return null;
-  const type = data.type?.toLowerCase();
-  const isStay = data.type === "StayBooking";
-  const isOPD = data.type === "OPD";
+  const rawType = data.type || "";
+  const type = typeof rawType === "string" ? rawType.toLowerCase() : "";
+  const isStay =
+    rawType === "StayBooking" || type === "stay" || type === "staybooking";
+  const isOPD = rawType === "OPD" || type === "opd";
 
-  console.log("data`1234", data);
+  const isTherapy =
+    rawType === "TherapyBooking" ||
+    type === "therapy" ||
+    type === "therapybooking" ||
+    type.includes("therapy") ||
+    Boolean(data.therapyName || data.TherapyName);
+
+  // Safely extract therapy name with multiple fallbacks
+  const therapyName =
+    (typeof data.therapyName === "string" && data.therapyName.trim()) ||
+    (typeof data.TherapyName === "string" && data.TherapyName.trim()) ||
+    (typeof data.serviceName === "string" && data.serviceName.trim()) ||
+    (isTherapy && typeof data.title === "string" && data.title.trim()) ||
+    (isTherapy && typeof data.name === "string" && data.name.trim()) ||
+    null;
+
+  const rawImage = data.images || data.image || null;
+  const image = Array.isArray(rawImage)
+    ? rawImage[0]
+    : typeof rawImage === "string"
+      ? rawImage
+      : null;
+
   return {
     id: data.bookingId || data.id || "N/A",
-    name: data.title || data.name || data.doctorName,
+    name:
+      therapyName ||
+      (typeof data.title === "string" && data.title.trim()) ||
+      (typeof data.name === "string" && data.name.trim()) ||
+      data.doctorName ||
+      "Activity",
+    therapyName,
+    isTherapy,
     expert: isStay
       ? "Wellness Stay"
-      : data.expert || (data.doctorName ? data.department : data.type),
+      : isTherapy
+        ? therapyName || "Therapy Session"
+        : data.expert || (data.doctorName ? data.department : rawType),
     date: formatDate(data.date),
     time: formatTime(data.startTime || data.time),
     endTime: formatTime(data.endTime),
     amount: formatAmount(data.amount),
-    type,
-    rawType: data.type,
+    type: type || "activity",
+    rawType,
     status: data.status,
-    prep: data.note || "",
-    step: data.step,
-    image: data.images || null,
+    prep:
+      typeof data.note === "string"
+        ? data.note
+        : typeof data.prep === "string"
+          ? data.prep
+          : "",
+    step: typeof data.step === "number" ? data.step : 0,
+    image,
     doctorName: data.doctorName || null,
     department: data.department || null,
     userName: data.userName || data.patientName || data.createdByName || null,
@@ -71,6 +124,10 @@ const getActivityDisplayData = (data) => {
 
 const TYPE_STYLES = {
   therapy: {
+    bg: "bg-green-50",
+    icon: <SpaIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+  },
+  therapybooking: {
     bg: "bg-green-50",
     icon: <SpaIcon sx={{ fontSize: 20 }} className="text-green-800" />,
   },
@@ -112,12 +169,13 @@ const ActivityDetailsDrawer = ({
 
   if (!item) return null;
   const d = getActivityDisplayData(item);
-  const typeStyle = TYPE_STYLES[d.type] || {
-    bg: "bg-green-50",
-    icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
-  };
+  if (!d) return null;
 
-  console.log("1234567", d, item);
+  const typeStyle = TYPE_STYLES[d.type] ||
+    (d.isTherapy ? TYPE_STYLES.therapy : null) || {
+      bg: "bg-green-50",
+      icon: <BookingIcon sx={{ fontSize: 20 }} className="text-green-800" />,
+    };
 
   return (
     <Drawer
@@ -164,13 +222,17 @@ const ActivityDetailsDrawer = ({
                     ? "Consultation For"
                     : d.isStay
                       ? "Stay Booking"
-                      : "Activity"}
+                      : d.isTherapy
+                        ? "Therapy Booking"
+                        : "Activity"}
                 </p>
                 <p className="text-[12px] 2xl:text-[14px] font-bold text-green-800 tracking-wide leading-snug break-words">
                   {d.userName || d.name}
                 </p>
                 <p className="text-[9px] 2xl:text-[11px] font-medium text-green-800/60 tracking-widest uppercase mt-0.5 2xl:mt-1">
-                  {d.department || d.expert}
+                  {d.isTherapy
+                    ? d.therapyName || d.expert || "Therapy"
+                    : d.department || d.expert}
                 </p>
               </div>
             </div>
@@ -192,10 +254,18 @@ const ActivityDetailsDrawer = ({
             )}
           </div>
 
+          {(d.therapyName || d.isTherapy) && (
+            <Field label="Therapy Name">
+              <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800 tracking-wide leading-relaxed">
+                {d.therapyName || "—"}
+              </p>
+            </Field>
+          )}
+
           <div className="grid grid-cols-2 gap-2 2xl:gap-3">
             <Field label={d.isStay ? "Check-in Date" : "Date"}>
               <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
-                {d.date}
+                {d.date || "—"}
               </p>
             </Field>
             {d.checkoutdate && (
@@ -205,7 +275,10 @@ const ActivityDetailsDrawer = ({
                 </p>
               </Field>
             )}
-            <Field label="Amount" className="col-span-2">
+            <Field
+              label="Amount"
+              className={d.checkoutdate ? "" : "col-span-2"}
+            >
               <p className="text-[11px] 2xl:text-[13px] font-semibold text-green-800/80 tracking-wide">
                 {d.amount ?? "—"}
               </p>
@@ -290,9 +363,9 @@ const ActivityDetailsDrawer = ({
               Family Members
             </p>
             <div className="bg-white rounded-lg border border-gray-100 divide-y divide-gray-50">
-              {item?.familyMembers.map((member) => (
+              {item?.familyMembers.map((member, idx) => (
                 <div
-                  key={member.familyMemberId}
+                  key={member?.familyMemberId || member?.id || idx}
                   className="flex items-center justify-between gap-2 px-3 py-1.5"
                 >
                   <div className="flex items-center gap-1.5 min-w-0">
@@ -300,17 +373,17 @@ const ActivityDetailsDrawer = ({
                       <Person style={{ fontSize: 12, color: "#4c7c70" }} />
                     </div>
                     <span className="text-[11px] font-semibold text-[#002a24] truncate">
-                      {`${member.firstName || ""} ${member.lastName || ""}`.trim() ||
+                      {`${member?.firstName || ""} ${member?.lastName || ""}`.trim() ||
                         "—"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    {member.age != null && (
+                    {member?.age != null && (
                       <span className="text-[9px] text-gray-400 font-medium">
                         {member.age} yrs
                       </span>
                     )}
-                    {member.gender && (
+                    {member?.gender && (
                       <span className="text-[9px] text-gray-400 font-medium">
                         {member.gender}
                       </span>
@@ -329,9 +402,10 @@ const ActivityDetailsDrawer = ({
             disabled={
               item?.isCancelBooking === false ||
               item?.isCancelBooking === null ||
-              item?.bookingsource === "Aayurmitra" ||
-              item?.bookingsource === "App" ||
-              item?.bookingStatus === "Cancelled"
+              (item?.bookingSource || item?.bookingsource) === "Aayurmitra" ||
+              (item?.bookingSource || item?.bookingsource) === "App" ||
+              item?.bookingStatus === "Cancelled" ||
+              item?.status === "Cancelled"
             }
             onClick={() => setRefundDialogOpen(true)}
             className={`disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs border bg-red-50 text-red-700 border-red-700 hover:bg-green-50 transition-all shadow-sm font-semibold tracking-wide py-2 2xl:py-2.5 ${d.isStay ? "w-full" : "flex-1"}`}
@@ -343,9 +417,10 @@ const ActivityDetailsDrawer = ({
               item?.isCancelBooking === false ||
               item?.isCancelBooking === null ||
               !d.isStay ||
-              item?.bookingsource === "Aayurmitra" ||
-              item?.bookingsource === "App" ||
-              item?.bookingStatus === "Cancelled"
+              (item?.bookingSource || item?.bookingsource) === "Aayurmitra" ||
+              (item?.bookingSource || item?.bookingsource) === "App" ||
+              item?.bookingStatus === "Cancelled" ||
+              item?.status === "Cancelled"
             }
             label="Reschedule Booking"
             className="flex-1  disabled:bg-gray-300 disabled:border-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-50 text-[10px] 2xl:text-xs bg-green-600 text-white hover:opacity-90 transition-all shadow-[0_4px_12px_rgba(21,128,61,0.25)] font-semibold tracking-wide py-2 2xl:py-2.5"

@@ -39,6 +39,8 @@ const ServicesSection = () => {
               <div className="relative h-32 sm:h-40 bg-gradient-to-br from-green-100 to-lime-100 flex items-center justify-center overflow-hidden">
                 <motion.img
                   src={item.img}
+                  loading="lazy"
+                  decoding="async"
                   className="h-24 sm:h-28 object-contain transition-transform duration-500"
                   alt={item.title}
                   whileHover={{ scale: 1.1, rotate: 5 }}

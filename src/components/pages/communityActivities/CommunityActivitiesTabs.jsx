@@ -9,11 +9,12 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
-import CommunityActivity from "./communityActivity/CommunityActivity";
-import CommunityCeremony from "./communityCeremony/CommunityCeremony";
-import JoinActivities from "./joinActivities/JoinActivities";
-import Vision from "./vision/Vision";
+import { lazy, Suspense, useState } from "react";
+
+const CommunityActivity = lazy(() => import("./communityActivity/CommunityActivity"));
+const CommunityCeremony = lazy(() => import("./communityCeremony/CommunityCeremony"));
+const JoinActivities = lazy(() => import("./joinActivities/JoinActivities"));
+const Vision = lazy(() => import("./vision/Vision"));
 
 const communityTabs = [
   {
@@ -303,46 +304,48 @@ const CommunityActivitiesTabs = () => {
               },
             }}
           >
-            {hasChildren ? (
-              current.children[selectedChild].component
-            ) : current.component ? (
-              current.component
-            ) : (
-              <Box sx={{ textAlign: "center", py: { xs: 4, md: 8 } }}>
-                <Typography
-                  variant="h5"
-                  sx={{
-                    color: current.color,
-                    fontWeight: 700,
-                    mb: 1,
-                    fontSize: { xs: "1.2rem", md: "1.5rem" },
-                  }}
-                >
-                  {current.fullLabel}
-                </Typography>
+            <Suspense fallback={<div className="h-64 rounded-2xl bg-stone-100 animate-pulse my-8 w-full" />}>
+              {hasChildren ? (
+                current.children[selectedChild].component
+              ) : current.component ? (
+                current.component
+              ) : (
+                <Box sx={{ textAlign: "center", py: { xs: 4, md: 8 } }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      color: current.color,
+                      fontWeight: 700,
+                      mb: 1,
+                      fontSize: { xs: "1.2rem", md: "1.5rem" },
+                    }}
+                  >
+                    {current.fullLabel}
+                  </Typography>
 
-                <Typography
-                  sx={{
-                    fontSize: { xs: "0.95rem", md: "1.05rem" },
-                    color: "#999",
-                    mb: 2,
-                  }}
-                >
-                  Coming Soon...
-                </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "0.95rem", md: "1.05rem" },
+                      color: "#999",
+                      mb: 2,
+                    }}
+                  >
+                    Coming Soon...
+                  </Typography>
 
-                <Chip
-                  label="Stay tuned for updates"
-                  variant="outlined"
-                  sx={{
-                    borderColor: current.color,
-                    color: current.color,
-                    fontSize: "0.8rem",
-                    height: "32px",
-                  }}
-                />
-              </Box>
-            )}
+                  <Chip
+                    label="Stay tuned for updates"
+                    variant="outlined"
+                    sx={{
+                      borderColor: current.color,
+                      color: current.color,
+                      fontSize: "0.8rem",
+                      height: "32px",
+                    }}
+                  />
+                </Box>
+              )}
+            </Suspense>
           </Box>
         </Card>
       </Container>

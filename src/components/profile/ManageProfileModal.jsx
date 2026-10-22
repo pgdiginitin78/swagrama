@@ -5,11 +5,10 @@ import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Calendar,
-  Camera,
   CheckCircle,
   MapPin,
   Phone,
-  User as UserIcon,
+  User as UserIcon
 } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -22,15 +21,15 @@ import {
 } from "../../services/login/LoginServices";
 import CancelButtonModal from "../common/button/CancelButtonModal";
 import CommonButton from "../common/button/CommonButton";
+import { useLoader } from "../common/commonLoader/LoaderContext";
+import ConfirmationModal from "../common/ConfirmationModal";
 import DatePickerField from "../common/formFields/DatePickerField";
+import DropdownField from "../common/formFields/DropdownField";
 import InputArea from "../common/formFields/InputArea";
 import InputField from "../common/formFields/InputField";
 import RadioField from "../common/formFields/RadioField";
-import { errorAlert, successAlert } from "../common/toast/CustomToast";
-import { useLoader } from "../common/commonLoader/LoaderContext";
-import ConfirmationModal from "../common/ConfirmationModal";
 import { ModalStyle } from "../common/modalStyle/ModalStyle";
-import DropdownField from "../common/formFields/DropdownField";
+import { errorAlert, successAlert } from "../common/toast/CustomToast";
 
 const dropdownObjectSchema = yup
   .object()
@@ -154,13 +153,6 @@ const ManageProfileModal = ({ open, onClose, user: authUser, onSave }) => {
   const isAgeUpdate = useRef(false);
   const isDobUpdate = useRef(false);
 
-  const handleAvatarChange = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => setAvatarPreview(ev.target.result);
-    reader.readAsDataURL(file);
-  };
 
   const onSubmit = (data) => {
     const formattedData = {

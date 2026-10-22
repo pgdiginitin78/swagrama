@@ -8,13 +8,14 @@ import {
   Tabs,
   Typography
 } from "@mui/material";
-import { useState } from "react";
-import BeautyTherapy from "./beautyTherapy/BeautyTherapy";
-import DetoxHouse from "./detoxHouse/DetoxHouse";
-import IPDHospital from "./ipdHospital/IPDWellnessStay";
-import NatureTherapy from "./natureTherapy/NatureTherapy";
-import OPDClinic from "./opdClinic/OPDClinic";
-import YogaTherapy from "./yogaTherapy/YogaTherapy";
+import { lazy, Suspense, useState } from "react";
+
+const BeautyTherapy = lazy(() => import("./beautyTherapy/BeautyTherapy"));
+const DetoxHouse = lazy(() => import("./detoxHouse/DetoxHouse"));
+const IPDHospital = lazy(() => import("./ipdHospital/IPDWellnessStay"));
+const NatureTherapy = lazy(() => import("./natureTherapy/NatureTherapy"));
+const OPDClinic = lazy(() => import("./opdClinic/OPDClinic"));
+const YogaTherapy = lazy(() => import("./yogaTherapy/YogaTherapy"));
 
 const tabsData = [
   {
@@ -313,12 +314,13 @@ const ServicesTabs = () => {
               },
             }}
           >
-            {hasChildren ? (
-              current.children[selectedChild].component
-            ) : current.component ? (
-              current.component
-            ) : (
-              <Box sx={{ textAlign: "center", py: { xs: 0, md: 0 } }}>
+            <Suspense fallback={<div className="h-64 rounded-2xl bg-stone-100 animate-pulse my-8 w-full" />}>
+              {hasChildren ? (
+                current.children[selectedChild].component
+              ) : current.component ? (
+                current.component
+              ) : (
+                <Box sx={{ textAlign: "center", py: { xs: 0, md: 0 } }}>
                 <Box
                   sx={{
                     width: { xs: 70, md: 90 },
@@ -377,6 +379,7 @@ const ServicesTabs = () => {
                 />
               </Box>
             )}
+            </Suspense>
           </Box>
         </Card>
       </div>

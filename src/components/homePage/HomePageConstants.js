@@ -1,13 +1,3 @@
-import {
-  Healing,
-  LocalFlorist,
-  LocalHospital,
-  MedicalServices,
-  Nature,
-  Person,
-  Spa,
-  WbSunny,
-} from "@mui/icons-material";
 import AgroWellness from "../assets/landing-page/ayurvedaservices/Agro_wellness.webp";
 import Ayurveda from "../assets/landing-page/ayurvedaservices/Ayurveda.webp";
 import NaturalFarming from "../assets/landing-page/ayurvedaservices/Natural_farming.webp";
@@ -125,31 +115,26 @@ export const services = [
     img: AgroWellness,
     title: "Agro & Wellness Tourism",
     text: "Rejuvenate in nature, embrace sustainable living.",
-    icon: <Nature />,
   },
   {
     img: Ayurveda,
     title: "Ayurveda Services",
     text: "Ancient healing therapies for vitality.",
-    icon: <Spa />,
   },
   {
     img: NaturalFarming,
     title: "Natural Farming",
     text: "Grow chemical-free sustainable crops.",
-    icon: <LocalFlorist />,
   },
   {
     img: NaturalHabitat,
     title: "Natural Habitat",
     text: "Eco-friendly lifestyle for mind & soul.",
-    icon: <WbSunny />,
   },
   {
     img: Swagurukul,
     title: "Swagurukul",
     text: "Learn timeless wisdom for conscious living.",
-    icon: <Person />,
   },
 ];
 
@@ -206,19 +191,6 @@ export const cardVariants = {
       ease: "easeOut",
     },
   },
-};
-
-export const getIcon = (specialty) => {
-  switch (specialty) {
-    case "Ayurveda":
-      return <Spa />;
-    case "Yoga Therapist":
-      return <Healing />;
-    case "Homoeopathy":
-      return <LocalHospital />;
-    default:
-      return <MedicalServices />;
-  }
 };
 
 export const parseDDMMYYYY = (dateStr) => {

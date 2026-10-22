@@ -1,9 +1,13 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import {
   AccessTime,
+  CheckCircleOutline,
   ChevronLeft,
   ChevronRight,
+  ErrorOutline,
   EventAvailable,
+  InfoOutlined,
+  MeetingRoom,
   PersonOutline,
 } from "@mui/icons-material";
 import { Box, Modal } from "@mui/material";
@@ -21,7 +25,7 @@ import {
   subMonths,
 } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import SummaryIcon from "../../../../assets/SummaryIcon.svg";
@@ -76,7 +80,9 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [genderPreference, setGenderPreference] = useState("No Preference");
   const [patientOptions, setPatientOptions] = useState([]);
+  const [rawTherapySlots, setRawTherapySlots] = useState([]);
   const [therapySlots, setTherapySlots] = useState([]);
+  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
   const [openConfirmationModal, setOpenConfirmationModal] = useState(false);
   const [isPaymentPending, setIsPaymentPending] = useState(false);
@@ -120,14 +126,21 @@ export default function BookTherapySession({ open, onClose, item }) {
         }
         return day;
       });
+      if (hasChanges) {
+        errorAlert(
+          "Some selected slots were removed because their assigned room does not allow the chosen guest's gender.",
+        );
+      }
       return hasChanges ? nextDays : prevDays;
     });
   }, [selectedGuest]);
 
   const isTherapySlotSelectable = (slot, guest) => {
+    if (!slot) return false;
     if (!guest || !guest.gender) return true;
 
-    if (slot.status && slot.status.toLowerCase() !== "available") return false;
+    if (slot.status && String(slot.status).toLowerCase() !== "available")
+      return false;
 
     const maxBookings =
       typeof slot.maxBookings === "number" ? slot.maxBookings : 1;
@@ -135,7 +148,12 @@ export default function BookTherapySession({ open, onClose, item }) {
       typeof slot.bookingCount === "number" ? slot.bookingCount : 0;
     if (currentBookingCount >= maxBookings) return false;
 
-    const guestGender = String(guest.gender).toLowerCase().trim();
+    const g = String(guest.gender).toLowerCase().trim();
+    const guestGender = g.startsWith("f")
+      ? "female"
+      : g.startsWith("m")
+        ? "male"
+        : g;
     const genderMsg = String(slot.genderMessage || "").toLowerCase();
 
     if (!genderMsg || genderMsg.includes("both")) return true;
@@ -144,6 +162,68 @@ export default function BookTherapySession({ open, onClose, item }) {
     if (words.includes(guestGender)) return true;
 
     return false;
+  };
+
+  const getSlotGenderValidation = (slot, guest, therapyName) => {
+    if (!slot) return null;
+    const roomId =
+      slot.serviceRoomID ||
+      item?.serviceRoomId ||
+      item?.serviceRoomID ||
+      "N/A";
+    const genderMsg = slot.genderMessage || "Available for both Gender";
+    const serviceTitle = therapyName || item?.serviceName || "this therapy";
+
+    if (!guest || !guest.gender) {
+      return {
+        status: "info",
+        isValid: true,
+        roomId,
+        genderMsg,
+        title: `Room ${roomId} • Allowed: ${genderMsg}`,
+        message: `Room ${roomId} allows "${genderMsg}" for ${serviceTitle}. Select a guest to validate room eligibility.`,
+        boxClass: "bg-[#f0f7f4] border-[#c2ddcf] text-ayuTulsi",
+        badgeClass: "bg-[#d4e8c2] text-ayuTulsi border-ayuMid/30",
+        iconType: "info",
+      };
+    }
+
+    const g = String(guest.gender).toLowerCase().trim();
+    const guestGender = g.startsWith("f")
+      ? "Female"
+      : g.startsWith("m")
+        ? "Male"
+        : String(guest.gender).charAt(0).toUpperCase() +
+          String(guest.gender).slice(1);
+    const isAllowed = isTherapySlotSelectable(slot, guest);
+
+    if (isAllowed) {
+      return {
+        status: "success",
+        isValid: true,
+        roomId,
+        genderMsg,
+        guestGender,
+        title: `Room ${roomId} Approved`,
+        message: `Room ${roomId} allows "${genderMsg}" for ${serviceTitle}. Guest ${guest.label || "Selected Guest"} (${guestGender}) is eligible for this room.`,
+        boxClass: "bg-emerald-50 border-emerald-200 text-emerald-800",
+        badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
+        iconType: "success",
+      };
+    } else {
+      return {
+        status: "error",
+        isValid: false,
+        roomId,
+        genderMsg,
+        guestGender,
+        title: `Room ${roomId} Restriction`,
+        message: `Room ${roomId} allows "${genderMsg}" for ${serviceTitle}. Guest ${guest.label || "Selected Guest"} (${guestGender}) is not permitted in this room.`,
+        boxClass: "bg-rose-50 border-rose-200 text-rose-800",
+        badgeClass: "bg-rose-100 text-rose-800 border-rose-300",
+        iconType: "error",
+      };
+    }
   };
 
   const durationNum = parseInt(item?.duration) || 30;
@@ -312,6 +392,7 @@ export default function BookTherapySession({ open, onClose, item }) {
 
   useEffect(() => {
     if (!open || !item?.serviceId || !activeDate) {
+      setRawTherapySlots([]);
       setTherapySlots([]);
       return;
     }
@@ -322,25 +403,84 @@ export default function BookTherapySession({ open, onClose, item }) {
       .then((res) => {
         console.log("therapy slots", res?.data?.data);
         const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
-        const uniqueData = [];
-        const seenStartTimes = new Set();
-        data.forEach((s) => {
-          if (s?.startTime && !seenStartTimes.has(s.startTime)) {
-            seenStartTimes.add(s.startTime);
-            uniqueData.push(s);
-          }
-        });
-        uniqueData.sort((a, b) =>
-          (a.startTime || "").localeCompare(b.startTime || ""),
-        );
-        setTherapySlots(uniqueData);
+        setRawTherapySlots(data);
       })
       .catch((error) => {
         console.error("therapy slots error", error);
+        setRawTherapySlots([]);
         setTherapySlots([]);
       })
       .finally(() => setIsSlotsLoading(false));
   }, [open, item?.serviceId, activeDate]);
+
+  const availableRooms = useMemo(() => {
+    const map = new Map();
+    rawTherapySlots.forEach((s) => {
+      const rId =
+        s.serviceRoomID ||
+        item?.serviceRoomId ||
+        item?.serviceRoomID;
+      if (rId && !map.has(rId)) {
+        map.set(rId, {
+          serviceRoomID: rId,
+          genderMessage: s.genderMessage || "Available for both Gender",
+        });
+      }
+    });
+    return Array.from(map.values());
+  }, [rawTherapySlots, item]);
+
+  const activeRoomId = useMemo(() => {
+    const currentDaySelectedRoom =
+      activePickerIndex !== null
+        ? days[activePickerIndex]?.selectedSlots?.[0]?.serviceRoomID
+        : null;
+    if (currentDaySelectedRoom) {
+      return currentDaySelectedRoom;
+    }
+    if (
+      selectedRoomId &&
+      availableRooms.some((r) => r.serviceRoomID === selectedRoomId)
+    ) {
+      return selectedRoomId;
+    }
+    if (selectedGuest?.gender && availableRooms.length > 0) {
+      const compatibleRoom = availableRooms.find((r) =>
+        isTherapySlotSelectable(r, selectedGuest),
+      );
+      if (compatibleRoom) return compatibleRoom.serviceRoomID;
+    }
+    return availableRooms[0]?.serviceRoomID || null;
+  }, [activePickerIndex, days, selectedRoomId, availableRooms, selectedGuest]);
+
+  useEffect(() => {
+    if (!rawTherapySlots.length) {
+      setTherapySlots([]);
+      return;
+    }
+
+    let filtered = rawTherapySlots;
+    if (activeRoomId) {
+      filtered = rawTherapySlots.filter(
+        (s) =>
+          (s.serviceRoomID || item?.serviceRoomId || item?.serviceRoomID) ===
+          activeRoomId,
+      );
+    }
+
+    const uniqueMap = new Map();
+    filtered.forEach((s) => {
+      if (s?.startTime && !uniqueMap.has(s.startTime)) {
+        uniqueMap.set(s.startTime, s);
+      }
+    });
+
+    const sorted = Array.from(uniqueMap.values()).sort((a, b) =>
+      (a.startTime || "").localeCompare(b.startTime || ""),
+    );
+
+    setTherapySlots(sorted);
+  }, [rawTherapySlots, activeRoomId, item]);
 
   if (!open || !item) return null;
 
@@ -458,7 +598,13 @@ export default function BookTherapySession({ open, onClose, item }) {
       if (!d.date) return false;
       return (
         format(d.date, "yyyy-MM-dd") === currentSessionDateStr &&
-        d.selectedSlots.some((s) => s.startTime === slot.startTime)
+        d.selectedSlots.some(
+          (s) =>
+            s.startTime === slot.startTime &&
+            (s.serviceRoomID && slot.serviceRoomID
+              ? s.serviceRoomID === slot.serviceRoomID
+              : true),
+        )
       );
     });
 
@@ -505,7 +651,11 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
 
     const startIdx = availableSlots.findIndex(
-      (s) => s.startTime === startSlot.startTime,
+      (s) =>
+        s.startTime === startSlot.startTime &&
+        (s.serviceRoomID && startSlot.serviceRoomID
+          ? s.serviceRoomID === startSlot.serviceRoomID
+          : true),
     );
 
     if (startIdx < 0) {
@@ -539,6 +689,17 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
 
     for (const s of group) {
+      if (
+        startSlot.serviceRoomID &&
+        s.serviceRoomID &&
+        s.serviceRoomID !== startSlot.serviceRoomID
+      ) {
+        return {
+          valid: false,
+          reason: `All consecutive slots for the therapy session must be in the same room (Room ${startSlot.serviceRoomID}).`,
+          slots: [],
+        };
+      }
       if (!isSingleSlotSelectable(s, dayIdx, targetDate)) {
         return {
           valid: false,
@@ -552,6 +713,23 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
 
   const handleTimeSelect = (slot, dayIdx) => {
+    if (!isTherapySlotSelectable(slot, selectedGuest)) {
+      const g = String(selectedGuest?.gender || "").trim();
+      const guestGender = g.startsWith("f")
+        ? "Female"
+        : g.startsWith("m")
+          ? "Male"
+          : g;
+      errorAlert(
+        `Room ${slot.serviceRoomID || ""} is designated as "${slot.genderMessage || "restricted"}" for ${item?.serviceName || "this therapy"} and cannot be booked for ${selectedGuest?.label || "guest"} (${guestGender}).`,
+      );
+      return;
+    }
+
+    if (slot.serviceRoomID) {
+      setSelectedRoomId(slot.serviceRoomID);
+    }
+
     const isSequential = !isCustomFrequency && typeof frequency === "number";
     const step = typeof frequency === "number" ? frequency : 1;
 
@@ -573,7 +751,11 @@ export default function BookTherapySession({ open, onClose, item }) {
       let selectedSlots = isDateChanging ? [] : [...(day.selectedSlots || [])];
 
       const existingIdx = selectedSlots.findIndex(
-        (s) => s.startTime === slot.startTime,
+        (s) =>
+          s.startTime === slot.startTime &&
+          (s.serviceRoomID && slot.serviceRoomID
+            ? s.serviceRoomID === slot.serviceRoomID
+            : true),
       );
 
       // If clicking already selected slot -> Deselect it
@@ -726,21 +908,40 @@ export default function BookTherapySession({ open, onClose, item }) {
     }
     if (isPaymentPending) return;
 
-    const allValid =
-      totalSelectedSlots === totalRequiredSlots &&
-      days.every((d) => Boolean(d.date)) &&
-      days.every((day) =>
-        day.selectedSlots.every(
-          (slot) =>
-            isTherapySlotSelectable(slot, selectedGuest) && slot.serviceRoomID,
-        ),
-      );
-
-    if (!allValid) {
+    if (totalSelectedSlots !== totalRequiredSlots) {
       errorAlert(
-        "Please select all required time slots for your sessions and ensure they are available.",
+        "Please select all required time slots for your scheduled sessions.",
       );
       return;
+    }
+
+    if (!selectedGuest) {
+      errorAlert("Please select a guest for this therapy booking.");
+      return;
+    }
+
+    // Check room and gender validity for every selected slot
+    for (const day of days) {
+      for (const slot of day.selectedSlots) {
+        if (!slot.serviceRoomID) {
+          errorAlert(
+            "One or more selected slots do not have an assigned room. Please re-select your slots.",
+          );
+          return;
+        }
+        if (!isTherapySlotSelectable(slot, selectedGuest)) {
+          const g = String(selectedGuest?.gender || "").trim();
+          const guestGender = g.startsWith("f")
+            ? "Female"
+            : g.startsWith("m")
+              ? "Male"
+              : g;
+          errorAlert(
+            `Room ${slot.serviceRoomID} allows "${slot.genderMessage || "restricted"}" for ${item?.serviceName || "this therapy"}, which does not permit guest ${selectedGuest?.label || ""} (${guestGender}). Please select an eligible slot.`,
+          );
+          return;
+        }
+      }
     }
     const saveObj = {
       userId:
@@ -1238,10 +1439,83 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   })}
                                 </div>
 
+                                {/* Room Selector if multiple rooms available */}
+                                {availableRooms.length > 1 && (
+                                  <div className="mb-3">
+                                    <div className="flex items-center justify-between mb-1.5">
+                                      <span className="text-[#6d8a7c] text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                                        <MeetingRoom sx={{ fontSize: 13 }} />
+                                        Select Room
+                                      </span>
+                                      {activeRoomId && (
+                                        <span className="text-[10px] font-bold text-ayuMid bg-[#f0f4ef] px-2 py-0.5 rounded border border-[#e4ebdd]">
+                                          Showing Room {activeRoomId}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-wrap items-center gap-2">
+                                      {availableRooms.map((rm) => {
+                                        const isRoomActive =
+                                          activeRoomId === rm.serviceRoomID;
+                                        const validation =
+                                          getSlotGenderValidation(
+                                            {
+                                              serviceRoomID: rm.serviceRoomID,
+                                              genderMessage: rm.genderMessage,
+                                            },
+                                            selectedGuest,
+                                            item?.serviceName,
+                                          );
+                                        const isAllowed = validation
+                                          ? validation.isValid
+                                          : true;
+
+                                        return (
+                                          <button
+                                            key={rm.serviceRoomID}
+                                            type="button"
+                                            onClick={() =>
+                                              setSelectedRoomId(
+                                                rm.serviceRoomID,
+                                              )
+                                            }
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 active:scale-95 ${
+                                              isRoomActive
+                                                ? "bg-ayuMid text-white border-ayuMid shadow-xs"
+                                                : "bg-white text-gray-700 border-[#e4ebdd] hover:border-ayuMid hover:bg-[#f0f4ef]"
+                                            }`}
+                                          >
+                                            <span>Room {rm.serviceRoomID}</span>
+                                            <span
+                                              className={`text-[9px] px-1.5 py-0.5 rounded font-normal ${
+                                                isRoomActive
+                                                  ? "bg-white/20 text-white"
+                                                  : isAllowed
+                                                    ? "bg-[#eef6ec] text-[#4a6b5d]"
+                                                    : "bg-rose-50 text-rose-700 font-semibold"
+                                              }`}
+                                            >
+                                              {rm.genderMessage}
+                                            </span>
+                                          </button>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+
                                 <div className="flex items-center justify-between mb-2">
                                   <span className="text-[#6d8a7c] text-[10px] font-bold uppercase tracking-widest">
                                     Available Slots
                                   </span>
+                                  {activeRoomId && availableRooms.length <= 1 && (
+                                    <span className="text-[10px] font-bold text-ayuMid bg-[#f0f4ef] px-2 py-0.5 rounded border border-[#e4ebdd]">
+                                      Room {activeRoomId}
+                                      {availableRooms[0]?.genderMessage
+                                        ? ` • ${availableRooms[0].genderMessage}`
+                                        : ""}
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="slots-scroll flex flex-wrap gap-2 min-h-[40px] max-h-[220px] overflow-y-auto pr-1 items-center content-start">
                                   {isSlotsLoading ? (
@@ -1262,7 +1536,11 @@ export default function BookTherapySession({ open, onClose, item }) {
                                       const isSelected =
                                         isExploringSameDate &&
                                         schedule.selectedSlots.some(
-                                          (s) => s.startTime === t,
+                                          (s) =>
+                                            s.startTime === t &&
+                                            (s.serviceRoomID && slot.serviceRoomID
+                                              ? s.serviceRoomID === slot.serviceRoomID
+                                              : true),
                                         );
 
                                       const isSingleValid =
@@ -1311,6 +1589,67 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     </div>
                                   )}
                                 </div>
+
+                                {/* Room & Gender Validation Box */}
+                                {(() => {
+                                  const activeSlot =
+                                    schedule.selectedSlots?.[0] ||
+                                    (therapySlots.length > 0
+                                      ? therapySlots[0]
+                                      : null);
+                                  const isSlotSelected =
+                                    schedule.selectedSlots?.length > 0;
+                                  const validation = getSlotGenderValidation(
+                                    activeSlot,
+                                    selectedGuest,
+                                    item?.serviceName,
+                                  );
+                                  if (!validation) return null;
+
+                                  return (
+                                    <div
+                                      className={`mt-3 p-3 rounded-xl border flex items-start gap-2.5 transition-all ${validation.boxClass}`}
+                                    >
+                                      <div className="mt-0.5 shrink-0">
+                                        {validation.iconType === "success" ? (
+                                          <CheckCircleOutline
+                                            fontSize="small"
+                                            className="text-emerald-600"
+                                          />
+                                        ) : validation.iconType === "error" ? (
+                                          <ErrorOutline
+                                            fontSize="small"
+                                            className="text-rose-600"
+                                          />
+                                        ) : (
+                                          <InfoOutlined
+                                            fontSize="small"
+                                            className="text-ayuTulsi"
+                                          />
+                                        )}
+                                      </div>
+                                      <div className="flex-1 text-xs">
+                                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                          <span className="font-bold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-white/80 border border-current shadow-xs">
+                                            Room {validation.roomId}
+                                          </span>
+                                          <span className="font-semibold text-[10px] px-2 py-0.5 rounded bg-white/80 border border-current shadow-xs">
+                                            {validation.genderMsg}
+                                          </span>
+                                          {isSlotSelected && (
+                                            <span className="text-[10px] font-bold text-ayuMid bg-white/80 px-2 py-0.5 rounded border border-ayuMid/30">
+                                              Selected Slot
+                                            </span>
+                                          )}
+                                        </div>
+                                        <p className="font-medium text-[11px] leading-snug">
+                                          {validation.message}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  );
+                                })()}
+
                                 <div className="mt-3 flex justify-end">
                                   <button
                                     type="button"
@@ -1351,37 +1690,53 @@ export default function BookTherapySession({ open, onClose, item }) {
                                 }}
                                 className="bg-white border border-[#e4ebdd] rounded-2xl p-3 flex justify-between items-center cursor-pointer hover:shadow-sm active:scale-[0.99] transition-all"
                               >
-                                <div className="flex flex-col">
-                                  <span className="text-gray-800 font-bold text-sm">
-                                    {schedule.date
-                                      ? format(
-                                          schedule.date,
-                                          "EEE, MMM d, yyyy",
-                                        )
-                                      : "Select Date"}
-                                  </span>
-                                  <span
-                                    className={`text-[11px] font-bold uppercase mt-0.5 ${
-                                      schedule.selectedSlots?.length > 0
-                                        ? "text-ayuMid"
-                                        : "text-amber-600"
-                                    }`}
-                                  >
-                                    {schedule.selectedSlots?.length > 0
-                                      ? `${Math.floor(schedule.selectedSlots.length / slotsNeeded)} session(s) (${formatTime(schedule.selectedSlots[0].startTime)}${
-                                          schedule.selectedSlots[
-                                            schedule.selectedSlots.length - 1
-                                          ].endTime
-                                            ? ` - ${formatTime(
-                                                schedule.selectedSlots[
-                                                  schedule.selectedSlots
-                                                    .length - 1
-                                                ].endTime,
-                                              )}`
-                                            : ""
-                                        })`
-                                      : "Select slot"}
-                                  </span>
+                                <div className="flex flex-col gap-1">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-gray-800 font-bold text-sm">
+                                      {schedule.date
+                                        ? format(
+                                            schedule.date,
+                                            "EEE, MMM d, yyyy",
+                                          )
+                                        : "Select Date"}
+                                    </span>
+                                    {schedule.selectedSlots?.length > 0 &&
+                                      schedule.selectedSlots[0]?.serviceRoomID && (
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#f0f4ef] text-ayuMid border border-[#e4ebdd]">
+                                          Room {schedule.selectedSlots[0].serviceRoomID}
+                                        </span>
+                                      )}
+                                  </div>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span
+                                      className={`text-[11px] font-bold uppercase ${
+                                        schedule.selectedSlots?.length > 0
+                                          ? "text-ayuMid"
+                                          : "text-amber-600"
+                                      }`}
+                                    >
+                                      {schedule.selectedSlots?.length > 0
+                                        ? `${Math.floor(schedule.selectedSlots.length / slotsNeeded)} session(s) (${formatTime(schedule.selectedSlots[0].startTime)}${
+                                            schedule.selectedSlots[
+                                              schedule.selectedSlots.length - 1
+                                            ].endTime
+                                              ? ` - ${formatTime(
+                                                  schedule.selectedSlots[
+                                                    schedule.selectedSlots
+                                                      .length - 1
+                                                  ].endTime,
+                                                )}`
+                                              : ""
+                                          })`
+                                        : "Select slot"}
+                                    </span>
+                                    {schedule.selectedSlots?.length > 0 &&
+                                      schedule.selectedSlots[0]?.genderMessage && (
+                                        <span className="text-[10px] font-medium text-[#4a6b5d] bg-[#eef6ec] px-1.5 py-0.5 rounded border border-[#dce8d8]">
+                                          {schedule.selectedSlots[0].genderMessage}
+                                        </span>
+                                      )}
+                                  </div>
                                 </div>
                                 <div className="bg-[#f0f4ef] p-1.5 rounded-lg text-ayuMid">
                                   <AccessTime fontSize="small" />
@@ -1486,6 +1841,36 @@ export default function BookTherapySession({ open, onClose, item }) {
                     isClearable={true}
                     searchIcon={true}
                   />
+                  {selectedGuest && (
+                    <div className="mt-2.5 p-2.5 rounded-xl border bg-white border-[#e4ebdd] flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">
+                          Guest Gender:
+                        </span>
+                        <span className="text-xs font-bold text-ayuTulsi bg-[#f0f4ef] px-2 py-0.5 rounded border border-[#e4ebdd] capitalize">
+                          {selectedGuest.gender || "Not specified"}
+                        </span>
+                      </div>
+                      {days.some((d) => d.selectedSlots.length > 0) && (() => {
+                        const allPassed = days.every((d) =>
+                          d.selectedSlots.every((s) =>
+                            isTherapySlotSelectable(s, selectedGuest),
+                          ),
+                        );
+                        return allPassed ? (
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                            <CheckCircleOutline sx={{ fontSize: 13 }} />
+                            Eligible for selected room(s)
+                          </span>
+                        ) : (
+                          <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 flex items-center gap-1">
+                            <ErrorOutline sx={{ fontSize: 13 }} />
+                            Room restriction mismatch
+                          </span>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1513,13 +1898,23 @@ export default function BookTherapySession({ open, onClose, item }) {
                       {days.some((d) => d.selectedSlots.length > 0) ? (
                         days.flatMap((d, dIdx) =>
                           d.selectedSlots.map((slot, sIdx) => (
-                            <span
+                            <div
                               key={`${dIdx}-${sIdx}`}
-                              className="text-ayuMid text-[10px] bg-white px-2 py-0.5 rounded border border-ayuMid/20"
+                              className="flex flex-col items-end gap-0.5"
                             >
-                              {format(d.date, "MMM d")} •{" "}
-                              {formatTime(slot.startTime)}
-                            </span>
+                              <span className="text-ayuMid text-[10px] bg-white px-2 py-0.5 rounded border border-ayuMid/20 font-bold">
+                                {format(d.date, "MMM d")} •{" "}
+                                {formatTime(slot.startTime)}
+                                {slot.serviceRoomID
+                                  ? ` • Room ${slot.serviceRoomID}`
+                                  : ""}
+                              </span>
+                              {slot.genderMessage && (
+                                <span className="text-[9px] text-[#4a6b5d] bg-[#eef6ec] px-1.5 py-0.5 rounded font-medium">
+                                  {slot.genderMessage}
+                                </span>
+                              )}
+                            </div>
                           )),
                         )
                       ) : (
@@ -1592,7 +1987,11 @@ export default function BookTherapySession({ open, onClose, item }) {
       <ConfirmationModal
         confirmationOpen={openConfirmationModal}
         confirmationLabel="Confirm Therapy Booking"
-        confirmationMsg={`Are you sure you want to book ${sessionsCount} session of ${item?.serviceName}? Total Amount: ₹${total.toLocaleString()}`}
+        confirmationMsg={`Are you sure you want to book ${sessionsCount} session(s) of ${item?.serviceName}${
+          days.flatMap((d) => d.selectedSlots).find((s) => s?.serviceRoomID)?.serviceRoomID
+            ? ` in Room ${days.flatMap((d) => d.selectedSlots).find((s) => s?.serviceRoomID)?.serviceRoomID}`
+            : ""
+        }? Total Amount: ₹${total.toLocaleString()}`}
         confirmationSubmitFunc={initiateBookingPayment}
         confirmationHandleClose={() => {
           if (cancelPaymentRef.current) {

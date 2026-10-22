@@ -33,13 +33,6 @@ import mission9 from "../../assets/commune/missionSlider/mission-9.webp";
 import mission10 from "../../assets/commune/missionSlider/mission-10.webp";
 import mission11 from "../../assets/commune/missionSlider/mission-11.webp";
 
-if (typeof document !== "undefined") {
-  const link = document.createElement("link");
-
-  link.rel = "stylesheet";
-
-  document.head.appendChild(link);
-}
 
 export const academyData = [
   {

@@ -1,20 +1,22 @@
-import { useInView } from "framer-motion";
-import { useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { eventsData2026 } from "../pages/eventsCalander/EventCalander";
-import OPDBookingModal from "../pages/opdBooking/OPDBookingModal";
 import { getNextTwoEvents } from "./HomePageConstants";
 
 // Sections
-import VisitorsFormModal from "../pages/communityActivities/vision/VisitorsFormModal";
 import CommunityHealers from "./sections/CommunityHealers";
 import FounderSection from "./sections/FounderSection";
 import HeroSection from "./sections/HeroSection";
 import PillarsSection from "./sections/PillarsSection";
 import ServicesSection from "./sections/ServicesSection";
-import TopStoriesModals from "./sections/TopStoriesModals";
 import TopStoriesSection from "./sections/TopStoriesSection";
 import UpcomingEventsSection from "./sections/UpcomingEventsSection";
+
+// Lazy-loaded modals (never in the critical render path)
+const TopStoriesModals = lazy(() => import("./sections/TopStoriesModals"));
+const VisitorsFormModal = lazy(
+  () => import("../pages/communityActivities/vision/VisitorsFormModal"),
+);
+const OPDBookingModal = lazy(() => import("../pages/opdBooking/OPDBookingModal"));
 
 export default function AyurvedaLanding({ userData }) {
   const [modal1, setModal1] = useState(false);
@@ -22,27 +24,31 @@ export default function AyurvedaLanding({ userData }) {
   const [openEventRegisterModal, setOpenRegisterModal] = useState(false);
   const [selectedEvents, setSelectedEvents] = useState(null);
   const [openAppointementModal, setOpenAppointmentModal] = useState(false);
+  const [upcommingEvent, setUpcomingEvent] = useState([]);
 
-  const foundersRef = useRef(null);
-  const healersRef = useRef(null);
+  useEffect(() => {
+    let isMounted = true;
+    import("../pages/eventsCalander/eventsData2026")
+      .then((m) => {
+        if (isMounted && m.eventsData2026) {
+          setUpcomingEvent(getNextTwoEvents(m.eventsData2026));
+        }
+      })
+      .catch((err) => console.error("Error loading events", err));
 
-  const isFoundersInView = useInView(foundersRef, {
-    once: true,
-    margin: "-100px",
-  });
-
-  const isHealersInView = useInView(healersRef, {
-    once: true,
-    margin: "-100px",
-  });
-
-  const upcommingEvent = useMemo(() => getNextTwoEvents(eventsData2026), []);
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <div className="w-full overflow-x-hidden bg-gradient-to-br from-lime-50 via-green-50 to-amber-50">
       <Helmet>
         <title>स्वग्राम SwaGrama | Ayurveda • Yoga • Nisarga • Agro • Tourism</title>
-        <meta name="description" content="SwaGrama is a self-sufficient village connected to cultural roots, embracing the traditional Indian science of health - Ayurveda and Yoga." />
+        <meta
+          name="description"
+          content="SwaGrama is a self-sufficient village connected to cultural roots, embracing the traditional Indian science of health - Ayurveda and Yoga."
+        />
       </Helmet>
 
       <HeroSection
@@ -60,43 +66,41 @@ export default function AyurvedaLanding({ userData }) {
         setSelectedEvents={setSelectedEvents}
       />
 
-      <FounderSection
-        foundersRef={foundersRef}
-        isFoundersInView={isFoundersInView}
-      />
+      <FounderSection />
 
-      <PillarsSection
-        healersRef={healersRef}
-        isHealersInView={isHealersInView}
-      />
+      <PillarsSection />
 
       <CommunityHealers />
 
-      <TopStoriesModals
-        modal1={modal1}
-        setModal1={setModal1}
-        modal2={modal2}
-        setModal2={setModal2}
-      />
+      <Suspense fallback={null}>
+        {(modal1 || modal2) && (
+          <TopStoriesModals
+            modal1={modal1}
+            setModal1={setModal1}
+            modal2={modal2}
+            setModal2={setModal2}
+          />
+        )}
 
-      {openEventRegisterModal && (
-        <VisitorsFormModal
-          open={openEventRegisterModal}
-          handleClose={() => {
-            setOpenRegisterModal(false);
-            setSelectedEvents(null);
-          }}
-          serviceDetails={selectedEvents}
-          origin={"AnnualEvents"}
-        />
-      )}
+        {openEventRegisterModal && (
+          <VisitorsFormModal
+            open={openEventRegisterModal}
+            handleClose={() => {
+              setOpenRegisterModal(false);
+              setSelectedEvents(null);
+            }}
+            serviceDetails={selectedEvents}
+            origin={"AnnualEvents"}
+          />
+        )}
 
-      {openAppointementModal && (
-        <OPDBookingModal
-          open={openAppointementModal}
-          handleClose={() => setOpenAppointmentModal(false)}
-        />
-      )}
+        {openAppointementModal && (
+          <OPDBookingModal
+            open={openAppointementModal}
+            handleClose={() => setOpenAppointmentModal(false)}
+          />
+        )}
+      </Suspense>
     </div>
   );
 }

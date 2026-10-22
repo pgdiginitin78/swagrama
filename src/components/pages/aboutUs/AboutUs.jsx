@@ -18,7 +18,6 @@ import SandipMehetre from "../../assets/landing-page/ourexperts/Sandip Mehetre.w
 import SantoshSuryavanshi from "../../assets/landing-page/ourexperts/Vaidya Santosh Suryawanshi.webp";
 import VaishaliHolmukhe from "../../assets/landing-page/ourexperts/Vaishali Holmukhe.webp";
 import SmitaMehetre from "../../assets/landing-page/ourexperts/Vd Smita mehetre.webp";
-
 import MedicalServices from "@mui/icons-material/MedicalServices";
 import { Card, Container } from "@mui/material";
 import FounderSection from "../../homePage/sections/FounderSection";
@@ -612,6 +611,8 @@ const AboutUs = () => {
                 <img
                   src={healer.image}
                   alt={healer.name}
+                  loading="lazy"
+                  decoding="async"
                   className={`absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 
                    object-bottom
                   `}

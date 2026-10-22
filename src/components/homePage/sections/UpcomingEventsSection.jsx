@@ -1,9 +1,9 @@
 import React, { memo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const UpcomingEventsSection = ({
-  eventsDataUpdated,
+  eventsDataUpdated = [],
   setOpenRegisterModal,
   setSelectedEvents,
 }) => {
@@ -34,22 +34,32 @@ const UpcomingEventsSection = ({
         </motion.h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {eventsDataUpdated.map((event, i) => (
-            <motion.div
-              key={i}
-              className="relative h-[350px] 2xl:h-[550px] rounded-[1rem] overflow-hidden group cursor-pointer shadow-2xl"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.6 }}
-              whileHover={{ y: -10 }}
-              onClick={() => navigate("/calendar", { state: event })}
-            >
-              <motion.img
-                src={event.image}
-                alt={event.serviceName}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+          {eventsDataUpdated.length === 0 ? (
+            Array.from({ length: 4 }).map((_, idx) => (
+              <div
+                key={idx}
+                className="relative h-[350px] 2xl:h-[550px] rounded-[1rem] bg-stone-200/70 animate-pulse"
               />
+            ))
+          ) : (
+            eventsDataUpdated.map((event, i) => (
+              <motion.div
+                key={i}
+                className="relative h-[350px] 2xl:h-[550px] rounded-[1rem] overflow-hidden group cursor-pointer shadow-2xl"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.6 }}
+                whileHover={{ y: -10 }}
+                onClick={() => navigate("/calendar", { state: event })}
+              >
+                <motion.img
+                  src={event.image}
+                  alt={event.serviceName}
+                  loading="lazy"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                />
 
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-80 group-hover:opacity-90 transition-opacity duration-300" />
 
@@ -98,7 +108,8 @@ const UpcomingEventsSection = ({
                 </div>
               </div>
             </motion.div>
-          ))}
+          ))
+        )}
         </div>
       </motion.div>
     </section>

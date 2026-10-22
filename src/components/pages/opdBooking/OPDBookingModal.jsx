@@ -1,13 +1,17 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
 import { format } from "date-fns";
 import { AnimatePresence, motion } from "framer-motion";
-import { Calendar, Clock, Stethoscope, User } from "lucide-react";
-import { useEffect, useState, useRef } from "react";
+import { Clock, Stethoscope } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import PatientInfoIcon from "../../../assets/PatientInfo.svg";
+import ScheduleIcon from "../../../assets/ScheduleIcon.svg";
+import TimeSlotsIcon from "../../../assets/timeSlotsIcon.svg";
+import { useAuth } from "../../../context/AuthContext";
 import {
   bookAppointment,
   getClinicList,
@@ -27,10 +31,6 @@ import DropdownField from "../../common/formFields/DropdownField";
 import { errorAlert, successAlert } from "../../common/toast/CustomToast";
 import AddPatientModal from "./AddPatientModal";
 import { RedirectToSabPaisa } from "./RedirectToSabPaisa";
-import { useAuth } from "../../../context/AuthContext";
-import TimeSlotsIcon from "../../../assets/timeSlotsIcon.svg";
-import ScheduleIcon from "../../../assets/ScheduleIcon.svg";
-import PatientInfoIcon from "../../../assets/PatientInfo.svg";
 
 import BookAppointmentIcon from "../../../assets/bookAppointment.svg";
 

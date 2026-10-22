@@ -1,5 +1,4 @@
 import { Helmet } from "react-helmet-async";
-import Skeleton from "@mui/material/Skeleton";
 import { Suspense, lazy } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
@@ -8,9 +7,10 @@ import Navbar from "./components/navbar/Navbar";
 import { useAuth } from "./context/AuthContext";
 import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
-import Feeds from "./components/pages/feeds/Feeds";
 import ErrorBoundary from "./components/common/ErrorBoundary";
-import Registration from "./components/pages/registration/Registration";
+
+const Feeds = lazy(() => import("./components/pages/feeds/Feeds"));
+const Registration = lazy(() => import("./components/pages/registration/Registration"));
 
 const SwagramaRefundPolicy = lazy(
   () => import("./components/pages/refund-policy/RefundPolicy"),
@@ -47,14 +47,14 @@ const AdminLayout = lazy(() => import("./components/pages/admin/AdminLayout"));
 
 function PageSkeleton() {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6">
-      <Skeleton variant="rectangular" height={260} sx={{ borderRadius: 2 }} />
-      <Skeleton height={48} sx={{ mt: 2 }} />
-      <Skeleton height={32} width="60%" />
+    <div className="max-w-7xl mx-auto px-4 py-6 animate-pulse">
+      <div className="h-[260px] bg-stone-200/80 rounded-2xl w-full" />
+      <div className="h-12 bg-stone-200/80 rounded-lg mt-4 w-full" />
+      <div className="h-8 bg-stone-200/80 rounded-lg mt-2 w-3/5" />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 2 }} />
-        <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 2 }} />
-        <Skeleton variant="rectangular" height={180} sx={{ borderRadius: 2 }} />
+        <div className="h-[180px] bg-stone-200/80 rounded-2xl" />
+        <div className="h-[180px] bg-stone-200/80 rounded-2xl" />
+        <div className="h-[180px] bg-stone-200/80 rounded-2xl" />
       </div>
     </div>
   );

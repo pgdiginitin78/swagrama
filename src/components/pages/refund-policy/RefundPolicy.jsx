@@ -1,14 +1,13 @@
-import { useEffect, useRef } from "react";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import SelfImprovementIcon from "@mui/icons-material/SelfImprovement";
-import EventAvailableIcon from "@mui/icons-material/EventAvailable";
-import BlockIcon from "@mui/icons-material/Block";
-import EventRepeatIcon from "@mui/icons-material/EventRepeat";
-import CancelScheduleSendIcon from "@mui/icons-material/CancelScheduleSend";
-import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+import BlockIcon from "@mui/icons-material/Block";
+import CancelScheduleSendIcon from "@mui/icons-material/CancelScheduleSend";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import EventRepeatIcon from "@mui/icons-material/EventRepeat";
 import SpaIcon from "@mui/icons-material/Spa";
+import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 
 const policies = [
   {
@@ -336,7 +335,7 @@ export default function SwagramaRefundPolicy() {
         <motion.div
           ref={agreementRef}
           initial={{ opacity: 0, y: 40 }}
-          animate={agreementInView ? { opacity: 1, opacity: 1, y: 0 } : {}}
+          animate={agreementInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
           className="relative rounded-3xl overflow-hidden border text-center px-7 sm:px-12 py-12 sm:py-16 backdrop-blur-xl bg-white/40 shadow-xl"
           style={{

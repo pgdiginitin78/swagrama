@@ -1,6 +1,15 @@
 import { Skeleton } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
-import { Filter, Leaf, Menu, Package, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import {
+  Filter,
+  Leaf,
+  Menu,
+  Package,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import AllSeasonSpicesImage from "../../assets/eshop/All Season Spices.webp";
@@ -118,13 +127,12 @@ import EyeCareImage from "../../assets/eshop/Eye Care.webp";
 import EarDischargeOilImage from "../../assets/eshop/Ear Discharge Oil.webp";
 import EarNourishOilImage from "../../assets/eshop/Ear Nourish Oil.webp";
 
-
 const CATEGORY_ACCENTS = [
-  { from: "#166534", to: "#4ade80", light: "#f0fdf4" }, 
-  { from: "#4d7c0f", to: "#a3e635", light: "#f7fee7" }, 
-  { from: "#78350f", to: "#d97706", light: "#fffbeb" }, 
-  { from: "#14532d", to: "#22c55e", light: "#f0fdf4" }, 
-  { from: "#3f6212", to: "#84cc16", light: "#f7fee7" }, 
+  { from: "#166534", to: "#4ade80", light: "#f0fdf4" },
+  { from: "#4d7c0f", to: "#a3e635", light: "#f7fee7" },
+  { from: "#78350f", to: "#d97706", light: "#fffbeb" },
+  { from: "#14532d", to: "#22c55e", light: "#f0fdf4" },
+  { from: "#3f6212", to: "#84cc16", light: "#f7fee7" },
   { from: "#713f12", to: "#eab308", light: "#fefce8" },
 ];
 
@@ -178,13 +186,36 @@ const ProductCardSkeleton = ({ index }) => (
     }}
     className="flex flex-col h-full"
   >
-    <Skeleton variant="rectangular" height={180} sx={{ bgcolor: "rgba(22,163,74,0.07)" }} />
+    <Skeleton
+      variant="rectangular"
+      height={180}
+      sx={{ bgcolor: "rgba(22,163,74,0.07)" }}
+    />
     <div className="p-4 flex flex-col gap-2 flex-1">
-      <Skeleton variant="rounded" height={14} sx={{ bgcolor: "rgba(22,163,74,0.08)", borderRadius: 8 }} />
-      <Skeleton variant="rounded" width="75%" height={12} sx={{ bgcolor: "rgba(22,163,74,0.06)", borderRadius: 8 }} />
+      <Skeleton
+        variant="rounded"
+        height={14}
+        sx={{ bgcolor: "rgba(22,163,74,0.08)", borderRadius: 8 }}
+      />
+      <Skeleton
+        variant="rounded"
+        width="75%"
+        height={12}
+        sx={{ bgcolor: "rgba(22,163,74,0.06)", borderRadius: 8 }}
+      />
       <div className="mt-auto pt-3 flex items-center justify-between">
-        <Skeleton variant="rounded" width={60} height={22} sx={{ bgcolor: "rgba(22,163,74,0.1)", borderRadius: 10 }} />
-        <Skeleton variant="rounded" width={90} height={32} sx={{ bgcolor: "rgba(22,163,74,0.12)", borderRadius: 12 }} />
+        <Skeleton
+          variant="rounded"
+          width={60}
+          height={22}
+          sx={{ bgcolor: "rgba(22,163,74,0.1)", borderRadius: 10 }}
+        />
+        <Skeleton
+          variant="rounded"
+          width={90}
+          height={32}
+          sx={{ bgcolor: "rgba(22,163,74,0.12)", borderRadius: 12 }}
+        />
       </div>
     </div>
   </motion.div>
@@ -208,14 +239,23 @@ const LazyProductCard = ({ product, index, onOpenModal, allCategories }) => {
       { rootMargin: "120px", threshold: 0.01 },
     );
     if (cardRef.current) observer.observe(cardRef.current);
-    return () => { if (cardRef.current) observer.unobserve(cardRef.current); };
+    return () => {
+      if (cardRef.current) observer.unobserve(cardRef.current);
+    };
   }, []);
 
   return (
     <div ref={cardRef} className="h-full">
-      {isVisible && isLoaded
-        ? <ProductCard product={product} index={index} onOpenModal={onOpenModal} allCategories={allCategories} />
-        : <ProductCardSkeleton index={index} />}
+      {isVisible && isLoaded ? (
+        <ProductCard
+          product={product}
+          index={index}
+          onOpenModal={onOpenModal}
+          allCategories={allCategories}
+        />
+      ) : (
+        <ProductCardSkeleton index={index} />
+      )}
     </div>
   );
 };
@@ -238,14 +278,11 @@ const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
         background: "#fff",
         borderRadius: 20,
         overflow: "hidden",
-        boxShadow: "0 2px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(134,239,172,0.25)",
+        boxShadow:
+          "0 2px 16px rgba(0,0,0,0.07), 0 0 0 1px rgba(134,239,172,0.25)",
         transition: "box-shadow 0.3s",
       }}
     >
-
-
-
-
       <div
         className="relative flex-shrink-0 overflow-hidden"
         style={{ height: 180, background: accent.light }}
@@ -255,12 +292,17 @@ const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
             src={product.image}
             alt={product.name}
             className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-500"
-            style={{ transition: "transform 0.5s cubic-bezier(.25,.46,.45,.94)" }}
+            style={{
+              transition: "transform 0.5s cubic-bezier(.25,.46,.45,.94)",
+            }}
             onError={() => setImgErr(true)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Leaf className="w-12 h-12 opacity-30" style={{ color: accent.from }} />
+            <Leaf
+              className="w-12 h-12 opacity-30"
+              style={{ color: accent.from }}
+            />
           </div>
         )}
 
@@ -271,17 +313,9 @@ const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
         >
           ₹{product.value}
         </div> */}
-
-
-  
-
-
-
       </div>
 
-
       <div className="flex flex-col flex-1 p-3.5 gap-2">
-   
         <h3
           className="font-bold leading-snug line-clamp-2 py-1"
           style={{ fontSize: 12.5, color: "#1a2e1a", letterSpacing: "-0.01em" }}
@@ -289,16 +323,23 @@ const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
           {product.name}
         </h3>
 
-
         {product.tagline && (
-          <p className="text-[10.5px] line-clamp-1" style={{ color: accent.from, opacity: 0.8 }}>
+          <p
+            className="text-[10.5px] line-clamp-1"
+            style={{ color: accent.from, opacity: 0.8 }}
+          >
             {product.tagline}
           </p>
         )}
 
         <div className="flex items-center gap-1 mt-auto">
-          <Package className="w-3 h-3 flex-shrink-0" style={{ color: accent.from, opacity: 0.6 }} />
-          <span className="text-[10px]" style={{ color: "#64748b" }}>{product.package}</span>
+          <Package
+            className="w-3 h-3 flex-shrink-0"
+            style={{ color: accent.from, opacity: 0.6 }}
+          />
+          <span className="text-[10px]" style={{ color: "#64748b" }}>
+            {product.package}
+          </span>
         </div>
 
         {/* Footer */}
@@ -309,7 +350,10 @@ const ProductCard = ({ product, index, onOpenModal, allCategories }) => {
           <motion.button
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.96 }}
-            onClick={(e) => { e.stopPropagation(); onOpenModal(product); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenModal(product);
+            }}
             className="text-white text-xs font-bold px-4 py-2 rounded-xl shadow-md"
             style={{
               background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`,
@@ -363,21 +407,27 @@ const EShop = () => {
 
   const categories = useMemo(() => {
     const set = new Set();
-    allProducts.forEach((p) => { if (p.category) set.add(p.category); });
+    allProducts.forEach((p) => {
+      if (p.category) set.add(p.category);
+    });
     return ["All", ...Array.from(set).sort()];
   }, [allProducts]);
 
   const filteredProducts = useMemo(() => {
     let filtered = allProducts.filter((product) => {
       const q = searchQuery.toLowerCase().trim();
-      const matchesSearch = q === "" ||
+      const matchesSearch =
+        q === "" ||
         (product.name ?? "").toLowerCase().includes(q) ||
         (product.tagline ?? "").toLowerCase().includes(q) ||
         (product.ingredients ?? "").toLowerCase().includes(q) ||
         (product.category ?? "").toLowerCase().includes(q) ||
-        (Array.isArray(product.benefits) && product.benefits.some((b) => (b ?? "").toLowerCase().includes(q)));
-      const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
-      const matchesPrice = product.value >= priceRange[0] && product.value <= priceRange[1];
+        (Array.isArray(product.benefits) &&
+          product.benefits.some((b) => (b ?? "").toLowerCase().includes(q)));
+      const matchesCategory =
+        selectedCategory === "All" || product.category === selectedCategory;
+      const matchesPrice =
+        product.value >= priceRange[0] && product.value <= priceRange[1];
       return matchesSearch && matchesCategory && matchesPrice;
     });
     filtered.sort((a, b) => {
@@ -399,14 +449,18 @@ const EShop = () => {
       if (!groups[p.category]) groups[p.category] = [];
       groups[p.category].push(p);
     });
-    return Object.entries(groups).map(([category, products]) => ({ category, products }));
+    return Object.entries(groups).map(([category, products]) => ({
+      category,
+      products,
+    }));
   }, [filteredProducts, selectedCategory]);
 
   return (
     <div
       className="min-h-screen w-full"
       style={{
-        background: "linear-gradient(135deg, #f8fffe 0%, #f0fdf4 30%, #fafff5 60%, #f0fdf4 100%)",
+        background:
+          "linear-gradient(135deg, #f8fffe 0%, #f0fdf4 30%, #fafff5 60%, #f0fdf4 100%)",
         fontFamily: "'Inter', 'Segoe UI', sans-serif",
       }}
     >
@@ -414,13 +468,26 @@ const EShop = () => {
       <div
         className="relative overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, #052e16 0%, #14532d 40%, #166534 70%, #15803d 100%)",
+          background:
+            "linear-gradient(135deg, #052e16 0%, #14532d 40%, #166534 70%, #15803d 100%)",
           paddingBottom: 32,
         }}
       >
         {/* Decorative circles */}
-        <div className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-5" style={{ background: "radial-gradient(circle, #86efac, transparent)", transform: "translate(30%, -30%)" }} />
-        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-5" style={{ background: "radial-gradient(circle, #4ade80, transparent)", transform: "translate(-20%, 30%)" }} />
+        <div
+          className="absolute top-0 right-0 w-64 h-64 rounded-full opacity-5"
+          style={{
+            background: "radial-gradient(circle, #86efac, transparent)",
+            transform: "translate(30%, -30%)",
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 w-48 h-48 rounded-full opacity-5"
+          style={{
+            background: "radial-gradient(circle, #4ade80, transparent)",
+            transform: "translate(-20%, 30%)",
+          }}
+        />
 
         <div className="relative max-w-7xl mx-auto px-4 pt-8 pb-2 text-center">
           <motion.div
@@ -430,9 +497,14 @@ const EShop = () => {
           >
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-4">
               <Sparkles className="w-3.5 h-3.5 text-lime-300" />
-              <span className="text-lime-200 text-xs font-semibold tracking-widest uppercase">Ayurvedic Wellness Store</span>
+              <span className="text-lime-200 text-xs font-semibold tracking-widest uppercase">
+                Ayurvedic Wellness Store
+              </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-2" style={{ letterSpacing: "-0.03em" }}>
+            <h1
+              className="text-3xl sm:text-4xl font-black text-white mb-2"
+              style={{ letterSpacing: "-0.03em" }}
+            >
               स्वविपणि <span style={{ color: "#86efac" }}>Shop</span>
             </h1>
             <p className="text-green-200 text-sm font-medium">
@@ -447,7 +519,10 @@ const EShop = () => {
             transition={{ duration: 0.6, delay: 0.15 }}
             className="relative max-w-md mx-auto mt-5"
           >
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "#4ade80" }} />
+            <Search
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4"
+              style={{ color: "#4ade80" }}
+            />
             <input
               type="text"
               placeholder="Search products, herbs, benefits..."
@@ -474,7 +549,7 @@ const EShop = () => {
         </div>
 
         {/* Stats bar */}
-        <div className="relative max-w-7xl mx-auto px-4 mt-5">
+        <div className="relative max-w-[1480px] mx-auto px-4 mt-5">
           <div className="flex items-center justify-center gap-4 sm:gap-8 text-center">
             {[
               { label: "Products", value: allProducts.length },
@@ -483,15 +558,16 @@ const EShop = () => {
             ].map((s) => (
               <div key={s.label}>
                 <div className="text-xl font-black text-white">{s.value}</div>
-                <div className="text-xs text-green-300 font-medium">{s.label}</div>
+                <div className="text-xs text-green-300 font-medium">
+                  {s.label}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 xl:px-6 py-6">
-
+      <div className="max-w-[1480px] mx-auto px-3 sm:px-4 xl:px-6 py-6">
         <div className="lg:hidden mb-4">
           <motion.button
             whileHover={{ scale: 1.01 }}
@@ -508,7 +584,11 @@ const EShop = () => {
               <SlidersHorizontal className="w-4 h-4" />
               Filters & Categories
             </span>
-            {showFilters ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            {showFilters ? (
+              <X className="w-4 h-4" />
+            ) : (
+              <Menu className="w-4 h-4" />
+            )}
           </motion.button>
         </div>
 
@@ -539,11 +619,18 @@ const EShop = () => {
                   <div className="flex items-center gap-2">
                     <div
                       className="w-8 h-8 rounded-xl flex items-center justify-center"
-                      style={{ background: "linear-gradient(135deg, #052e16, #15803d)" }}
+                      style={{
+                        background: "linear-gradient(135deg, #052e16, #15803d)",
+                      }}
                     >
                       <Filter className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-black text-base" style={{ color: "#052e16" }}>Filters</span>
+                    <span
+                      className="font-black text-base"
+                      style={{ color: "#052e16" }}
+                    >
+                      Filters
+                    </span>
                   </div>
                   <button
                     onClick={() => setShowFilters(false)}
@@ -557,19 +644,27 @@ const EShop = () => {
                 {/* Product count */}
                 <div
                   className="flex items-center justify-between mb-4 px-3 py-2 rounded-xl"
-                  style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)", border: "1px solid #bbf7d0" }}
+                  style={{
+                    background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                    border: "1px solid #bbf7d0",
+                  }}
                 >
-                  <span className="text-xs font-semibold" style={{ color: "#166534" }}>Showing</span>
                   <span
-                    className="text-xs font-black px-2 py-0.5 rounded-full text-green-600"
-                
+                    className="text-xs font-semibold"
+                    style={{ color: "#166534" }}
                   >
+                    Showing
+                  </span>
+                  <span className="text-xs font-black px-2 py-0.5 rounded-full text-green-600">
                     {filteredProducts.length} / {allProducts.length}
                   </span>
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-xs font-bold mb-2 uppercase tracking-wider" style={{ color: "#166534" }}>
+                  <label
+                    className="block text-xs font-bold mb-2 uppercase tracking-wider"
+                    style={{ color: "#166534" }}
+                  >
                     Sort By
                   </label>
                   <select
@@ -588,9 +683,11 @@ const EShop = () => {
                   </select>
                 </div>
 
-
                 <div className="mb-4">
-                  <label className="block text-xs font-bold mb-3 uppercase tracking-wider" style={{ color: "#166534" }}>
+                  <label
+                    className="block text-xs font-bold mb-3 uppercase tracking-wider"
+                    style={{ color: "#166534" }}
+                  >
                     Category
                   </label>
                   <div
@@ -599,13 +696,25 @@ const EShop = () => {
                   >
                     {isInitialLoading
                       ? Array.from({ length: 7 }).map((_, i) => (
-                          <Skeleton key={i} variant="rounded" height={38} sx={{ bgcolor: "rgba(22,163,74,0.07)", borderRadius: 12 }} />
+                          <Skeleton
+                            key={i}
+                            variant="rounded"
+                            height={38}
+                            sx={{
+                              bgcolor: "rgba(22,163,74,0.07)",
+                              borderRadius: 12,
+                            }}
+                          />
                         ))
                       : categories.map((cat, i) => {
                           const isActive = selectedCategory === cat;
-                          const accent = cat === "All"
-                            ? { from: "#052e16", to: "#15803d" }
-                            : getCategoryAccent(cat, categories.filter((c) => c !== "All"));
+                          const accent =
+                            cat === "All"
+                              ? { from: "#052e16", to: "#15803d" }
+                              : getCategoryAccent(
+                                  cat,
+                                  categories.filter((c) => c !== "All"),
+                                );
                           return (
                             <motion.button
                               key={cat}
@@ -621,11 +730,15 @@ const EShop = () => {
                                   ? `linear-gradient(135deg, ${accent.from}, ${accent.to})`
                                   : "#f8fffe",
                                 color: isActive ? "#fff" : "#374151",
-                                boxShadow: isActive ? `0 4px 16px ${accent.from}35` : "none",
+                                boxShadow: isActive
+                                  ? `0 4px 16px ${accent.from}35`
+                                  : "none",
                                 border: isActive ? "none" : "1px solid #e5e7eb",
                               }}
                             >
-                              <span className="leading-tight line-clamp-2 py-1">{cat}</span>
+                              <span className="leading-tight line-clamp-2 py-1">
+                                {cat}
+                              </span>
                             </motion.button>
                           );
                         })}
@@ -643,7 +756,9 @@ const EShop = () => {
                     setSortBy("name");
                   }}
                   className="w-full py-2.5 rounded-xl font-bold text-sm text-white shadow-md"
-                  style={{ background: "linear-gradient(135deg, #dc2626, #f97316)" }}
+                  style={{
+                    background: "linear-gradient(135deg, #dc2626, #f97316)",
+                  }}
                 >
                   Reset All Filters
                 </motion.button>
@@ -676,18 +791,33 @@ const EShop = () => {
                 >
                   <div
                     className="w-20 h-20 rounded-3xl flex items-center justify-center mb-5 shadow-xl"
-                    style={{ background: "linear-gradient(135deg, #f0fdf4, #dcfce7)" }}
+                    style={{
+                      background: "linear-gradient(135deg, #f0fdf4, #dcfce7)",
+                    }}
                   >
                     <Leaf className="w-10 h-10" style={{ color: "#86efac" }} />
                   </div>
-                  <h3 className="text-xl font-black mb-2" style={{ color: "#052e16" }}>No Products Found</h3>
-                  <p className="text-sm" style={{ color: "#6b7280" }}>Try adjusting your filters or search query</p>
+                  <h3
+                    className="text-xl font-black mb-2"
+                    style={{ color: "#052e16" }}
+                  >
+                    No Products Found
+                  </h3>
+                  <p className="text-sm" style={{ color: "#6b7280" }}>
+                    Try adjusting your filters or search query
+                  </p>
                 </motion.div>
               ) : (
-                <motion.div key="products" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.div
+                  key="products"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                >
                   {groupedProducts.map(({ category, products }, groupIndex) => (
-                    <div key={category} className={groupIndex > 0 ? "mt-8" : ""}>
-                 
+                    <div
+                      key={category}
+                      className={groupIndex > 0 ? "mt-8" : ""}
+                    >
                       {selectedCategory === "All" && (
                         <motion.div
                           initial={{ opacity: 0, x: -16 }}
@@ -698,7 +828,17 @@ const EShop = () => {
                           <div
                             className="h-8 flex items-center px-4 rounded-full text-white text-xs font-black shadow-md flex-shrink-0"
                             style={{
-                              background: `linear-gradient(135deg, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).from}, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).to})`,
+                              background: `linear-gradient(135deg, ${
+                                getCategoryAccent(
+                                  category,
+                                  categories.filter((c) => c !== "All"),
+                                ).from
+                              }, ${
+                                getCategoryAccent(
+                                  category,
+                                  categories.filter((c) => c !== "All"),
+                                ).to
+                              })`,
                             }}
                           >
                             {products.length} items
@@ -706,7 +846,10 @@ const EShop = () => {
                           <div className="flex-1">
                             <h2
                               className="font-black text-sm leading-tight line-clamp-2 py-1"
-                              style={{ color: "#052e16", letterSpacing: "-0.01em" }}
+                              style={{
+                                color: "#052e16",
+                                letterSpacing: "-0.01em",
+                              }}
                             >
                               {category}
                             </h2>
@@ -714,12 +857,16 @@ const EShop = () => {
                           <div
                             className="flex-1 h-px"
                             style={{
-                              background: `linear-gradient(to right, ${getCategoryAccent(category, categories.filter((c) => c !== "All")).from}40, transparent)`,
+                              background: `linear-gradient(to right, ${
+                                getCategoryAccent(
+                                  category,
+                                  categories.filter((c) => c !== "All"),
+                                ).from
+                              }40, transparent)`,
                             }}
                           />
                         </motion.div>
                       )}
-
 
                       <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
                         {products.map((product, idx) => (
@@ -728,7 +875,9 @@ const EShop = () => {
                             product={product}
                             index={idx}
                             onOpenModal={handleOpenModal}
-                            allCategories={categories.filter((c) => c !== "All")}
+                            allCategories={categories.filter(
+                              (c) => c !== "All",
+                            )}
                           />
                         ))}
                       </div>
@@ -774,7 +923,7 @@ const medicineProducts = [
         ingredients: "Sugar Cane (Saccharum officinarum)",
         package: "1 kg Pouch",
         value: 280,
-        image: PureDesiJaggeryImage
+        image: PureDesiJaggeryImage,
       },
       {
         id: 2,
@@ -787,7 +936,7 @@ const medicineProducts = [
         ingredients: "Halite / Sodium Chloride (NaCl)",
         package: "250 gms Pouch",
         value: 120,
-        image: RockSaltBottleImage
+        image: RockSaltBottleImage,
       },
       {
         id: 46,
@@ -797,9 +946,10 @@ const medicineProducts = [
           "Naturally rich in essential trace minerals",
           "Enhances the natural flavor of food",
           "Less processed than refined table salt",
-          "Ideal for everyday cooking and seasoning"
+          "Ideal for everyday cooking and seasoning",
         ],
-        ingredients: "100% Natural Raw Sea Salt. No additives, anti-caking agents, preservatives, or chemicals.",
+        ingredients:
+          "100% Natural Raw Sea Salt. No additives, anti-caking agents, preservatives, or chemicals.",
         package: "500 gms Pouch",
         value: 120,
         image: RawSeaSaltImage,
@@ -818,7 +968,7 @@ const medicineProducts = [
           "6 types of Red Chillis, Coriander, Coconut, Sesame seeds, Salt, Spices",
         package: "1 kg Pouch",
         value: 450,
-        image: AllSeasonSpicesImage
+        image: AllSeasonSpicesImage,
       },
       {
         id: 32,
@@ -829,7 +979,7 @@ const medicineProducts = [
           "Betel Leaves, Lime, Catechu Betel Leaf, Lime, Catechu, Betel Nut, Cardamom, Cloves, Fennel, Coconut, Nutmeg, Jeshthmadh, Camphor, Kankol, Saffron, Poppy Seeds",
         package: "100 gms Pouch",
         value: 120,
-        image: BetelLeafPortionImage
+        image: BetelLeafPortionImage,
       },
       {
         id: 4,
@@ -839,7 +989,7 @@ const medicineProducts = [
         ingredients: "Sesamum indicum Seed Oil",
         package: "1 litre Bottle",
         value: 550,
-        image: SesameOilBottleImage
+        image: SesameOilBottleImage,
       },
       {
         id: 470,
@@ -849,9 +999,10 @@ const medicineProducts = [
           "Rich, in healthy fats and Vitamin E",
           "Suitable for everyday cooking and frying",
           "Supports heart health when used as part of a balanced diet",
-          "Naturally retains the aroma and nutrients of peanuts"
+          "Naturally retains the aroma and nutrients of peanuts",
         ],
-        ingredients: "100% Cold Pressed Peanut Oil. No preservatives, additives, or chemicals.",
+        ingredients:
+          "100% Cold Pressed Peanut Oil. No preservatives, additives, or chemicals.",
         package: "100 ml Bottle",
         value: 200,
         image: PeanutOilBottleImage,
@@ -868,7 +1019,7 @@ const medicineProducts = [
         ingredients: "Triticum dicoccum Schrank",
         package: "1 kg Pouch",
         value: 200,
-        image: KhapliEmmerWheatFlourImage
+        image: KhapliEmmerWheatFlourImage,
       },
       {
         id: 52,
@@ -878,9 +1029,10 @@ const medicineProducts = [
           "Naturally gluten free",
           "Rich in dietary fiber for healthy digestion",
           "A good source of essential nutrients and antioxidants",
-          "Ideal for making soft rotis and other traditional recipes"
+          "Ideal for making soft rotis and other traditional recipes",
         ],
-        ingredients: "100% Stone Milled Jowar (Sorghum). No preservatives, additives, or artificial ingredients.",
+        ingredients:
+          "100% Stone Milled Jowar (Sorghum). No preservatives, additives, or artificial ingredients.",
         package: "500 gms Pouch",
         value: 150,
         image: JowarSorghumFlourPouchImage,
@@ -893,9 +1045,10 @@ const medicineProducts = [
           "Rich in dietary fiber for healthy digestion",
           "A good source of protein and essential minerals",
           "Provides sustained energy throughout the day",
-          "Ideal for making nutritious bhakri, rotis, and traditional recipes"
+          "Ideal for making nutritious bhakri, rotis, and traditional recipes",
         ],
-        ingredients: "100% Stone Milled Pearl Millet (Bajra). No preservatives, additives, or artificial ingredients.",
+        ingredients:
+          "100% Stone Milled Pearl Millet (Bajra). No preservatives, additives, or artificial ingredients.",
         package: "500 gms Pouch",
         value: 160,
         image: PearlMilletFlourImage,
@@ -908,9 +1061,10 @@ const medicineProducts = [
           "Rich in dietary fiber for better digestion",
           "Provides sustained energy throughout the day",
           "Naturally nutritious and wholesome",
-          "Ideal for breakfast and healthy meals"
+          "Ideal for breakfast and healthy meals",
         ],
-        ingredients: "100% Stone Milled Khapli (Emmer) Wheat. No preservatives, additives, or artificial ingredients.",
+        ingredients:
+          "100% Stone Milled Khapli (Emmer) Wheat. No preservatives, additives, or artificial ingredients.",
         package: "500 gms Pouch",
         value: 180,
         image: KhapliGahuLapsiImage,
@@ -923,7 +1077,7 @@ const medicineProducts = [
         ingredients: "Curry Leaves, Spices",
         package: "100 gms Pouch",
         value: 120,
-        image: CurryLeavesChutneyImage
+        image: CurryLeavesChutneyImage,
       },
       {
         id: 30,
@@ -933,7 +1087,7 @@ const medicineProducts = [
         ingredients: "Garlic, Ginger, Spices",
         package: "100 gms Pouch",
         value: 130,
-        image: GarlicGingerChutneyImage
+        image: GarlicGingerChutneyImage,
       },
       {
         id: 31,
@@ -943,7 +1097,7 @@ const medicineProducts = [
         ingredients: "8 salts & spices",
         package: "100 gms Pouch",
         value: 140,
-        image: SharbatMasala
+        image: SharbatMasala,
       },
       {
         id: 47,
@@ -972,7 +1126,7 @@ const medicineProducts = [
         ingredients: "Linum usitatissimum Linn. Seeds Oil",
         package: "500 ml Bottle",
         value: 400,
-        image: FlaxseedsOilImage
+        image: FlaxseedsOilImage,
       },
       {
         id: 20,
@@ -985,7 +1139,7 @@ const medicineProducts = [
         ingredients: "Carthamus tinctorius Linn. Seeds Oil",
         package: "500 ml Bottle",
         value: 350,
-        image: SafflowerOilImage
+        image: SafflowerOilImage,
       },
       {
         id: 21,
@@ -995,7 +1149,7 @@ const medicineProducts = [
         ingredients: "Zea mays Linn.",
         package: "500 gms Pouch",
         value: 200,
-        image: MaizeCornPorridgeImage
+        image: MaizeCornPorridgeImage,
       },
       {
         id: 22,
@@ -1009,7 +1163,7 @@ const medicineProducts = [
         ingredients: "Panicum sumatrense Roth ex Roem. & Schult.",
         package: "500 gms Pouch",
         value: 220,
-        image: VaraiMilletImage
+        image: VaraiMilletImage,
       },
       {
         id: 23,
@@ -1023,7 +1177,7 @@ const medicineProducts = [
         ingredients: "Macrotyloma uniflorum",
         package: "500 gms Pouch",
         value: 180,
-        image: HorseGramFlourImage
+        image: HorseGramFlourImage,
       },
     ],
   },
@@ -1054,7 +1208,7 @@ const medicineProducts = [
         ingredients: "Sesame seeds, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
-        image: SesameChutneyImage
+        image: SesameChutneyImage,
       },
       {
         id: 25,
@@ -1064,7 +1218,7 @@ const medicineProducts = [
         ingredients: "Peanuts, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
-        image: PeanutChutneyImage
+        image: PeanutChutneyImage,
       },
       {
         id: 26,
@@ -1074,17 +1228,21 @@ const medicineProducts = [
         ingredients: "Coconut, Salt, Spices",
         package: "100 gms Pouch",
         value: 120,
-        image: CoconutChutneyImage
+        image: CoconutChutneyImage,
       },
       {
         id: 26,
         name: "Coconut Oil",
         tagline: "Cold Pressed Coconut Oil",
-        benefits: ["Supports digestion", "Rich in nutrients", "Good for hair & skin"],
+        benefits: [
+          "Supports digestion",
+          "Rich in nutrients",
+          "Good for hair & skin",
+        ],
         ingredients: "Coconut",
         package: "100 ml Bottle",
         value: 120,
-        image: CoconutOilImage
+        image: CoconutOilImage,
       },
       {
         id: 27,
@@ -1094,7 +1252,7 @@ const medicineProducts = [
         ingredients: "Niger Seeds, Spices",
         package: "100 gms Pouch",
         value: 130,
-        image: NigerSeedsChutney
+        image: NigerSeedsChutney,
       },
       {
         id: 28,
@@ -1104,7 +1262,7 @@ const medicineProducts = [
         ingredients: "Flaxseeds, Spices",
         package: "100 gms Pouch",
         value: 130,
-        image: FlaxseedChutneyImage
+        image: FlaxseedChutneyImage,
       },
       {
         id: 45,
@@ -1114,13 +1272,14 @@ const medicineProducts = [
           "Adds rich color and authentic spicy flavor to dishes",
           "Made from carefully selected premium red chillies",
           "Free from artificial colors, preservatives, and additives",
-          "Ideal for daily cooking and traditional Indian recipes"
+          "Ideal for daily cooking and traditional Indian recipes",
         ],
-        ingredients: "100% Pure Red Chillies. No artificial colors, preservatives, or additives.",
+        ingredients:
+          "100% Pure Red Chillies. No artificial colors, preservatives, or additives.",
         package: "100 gms Pouch",
         value: 120,
         image: RedChilliPowderImage,
-      }
+      },
     ],
   },
   {
@@ -1164,9 +1323,10 @@ const medicineProducts = [
           "Naturally rich in nutrients and energy",
           "Easy to digest and suitable for daily meals",
           "Supports a balanced and healthy diet",
-          "Ideal for traditional Indian recipes"
+          "Ideal for traditional Indian recipes",
         ],
-        ingredients: "100% Naturally Grown Desi Rice. No preservatives, additives, or artificial polishing.",
+        ingredients:
+          "100% Naturally Grown Desi Rice. No preservatives, additives, or artificial polishing.",
         package: "1 kg Pouch",
         value: 180,
         image: DesiRiceImage,
@@ -1179,9 +1339,10 @@ const medicineProducts = [
           "Made from naturally grown desi rice",
           "Easy to digest and suitable for everyday cooking",
           "Ideal for rotis, bhakri, dosa, idli, and traditional recipes",
-          "Free from preservatives and artificial additives"
+          "Free from preservatives and artificial additives",
         ],
-        ingredients: "100% Stone Milled Desi Rice. No preservatives, additives, or artificial ingredients.",
+        ingredients:
+          "100% Stone Milled Desi Rice. No preservatives, additives, or artificial ingredients.",
         package: "500 gms LDE Pack",
         value: 150,
         image: DesiRiceFlourLDEImage,
@@ -1259,7 +1420,7 @@ const medicineProducts = [
           "Camellia sinensis, Ginger, Coriander, Fennel, Black Pepper, Cinnamon, Liquorice",
         package: "250 gms Pouch",
         value: 160,
-        image: AllSeasonTeaImage
+        image: AllSeasonTeaImage,
       },
       {
         id: 41,
@@ -1276,7 +1437,7 @@ const medicineProducts = [
           "Camellia sinensis, Ginger, Coriander, Fennel, Black Pepper",
         package: "250 gm Pouch",
         value: 350,
-        image: GreenTeaImage
+        image: GreenTeaImage,
       },
       {
         id: 42,
@@ -1323,9 +1484,10 @@ const medicineProducts = [
           "Naturally contains essential trace minerals",
           "Enhances the taste of food",
           "Suitable for everyday cooking and seasoning",
-          "Less processed than refined table salt"
+          "Less processed than refined table salt",
         ],
-        ingredients: "100% Natural Sea Salt. No additives, anti-caking agents, or preservatives.",
+        ingredients:
+          "100% Natural Sea Salt. No additives, anti-caking agents, or preservatives.",
         package: "100 gms Pouch",
         value: 120,
         image: SeaSaltImage,
@@ -1374,7 +1536,7 @@ const medicineProducts = [
           "Amalaki, Ashwagandha, Shatavari, Ghee, Honey, 40+ Herbs & Spices",
         package: "500 gms Container",
         value: 750,
-        image: राणप्राशावलेहVitalElectuaryimage
+        image: राणप्राशावलेहVitalElectuaryimage,
       },
       {
         id: 49,
@@ -1400,7 +1562,7 @@ const medicineProducts = [
         ingredients: "Combination of Ayurvedic herbs & Ghee",
         package: "500 gms Container",
         value: 700,
-        image: राणप्राशावलेहVitalElectuaryimage
+        image: राणप्राशावलेहVitalElectuaryimage,
       },
       {
         id: 51,
@@ -1431,7 +1593,7 @@ const medicineProducts = [
           "Ginger, Fennel, Black Pepper, Cinnamon, Liquorice, Cardamom, Clove, Nutmeg",
         package: "250 gm Pouch",
         value: 200,
-        image: SpiceDrinkIamge
+        image: SpiceDrinkIamge,
       },
     ],
   },
@@ -1527,7 +1689,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 200,
-        image:PenisHealthOilImage
+        image: PenisHealthOilImage,
       },
       {
         id: 63,
@@ -1537,9 +1699,10 @@ const medicineProducts = [
           "Rich in natural antioxidants and healthy fats",
           "Supports overall wellness and balanced nutrition",
           "Suitable for everyday cooking and traditional use",
-          "Cold pressed to retain natural nutrients and aroma"
+          "Cold pressed to retain natural nutrients and aroma",
         ],
-        ingredients: "100% Cold Pressed Niger Seeds Oil. No preservatives, additives, or chemicals.",
+        ingredients:
+          "100% Cold Pressed Niger Seeds Oil. No preservatives, additives, or chemicals.",
         package: "100 ml Clear Pharma Grade Bottle",
         value: 220,
         image: NigerSeedsOilBottleImage,
@@ -1552,12 +1715,13 @@ const medicineProducts = [
           "Rich in Vitamin E and antioxidants",
           "Supports heart health",
           "Light and easy to digest",
-          "Suitable for everyday cooking"
+          "Suitable for everyday cooking",
         ],
-        ingredients: "100% Cold Pressed Sunflower Seed Oil. No preservatives, additives, or chemicals.",
+        ingredients:
+          "100% Cold Pressed Sunflower Seed Oil. No preservatives, additives, or chemicals.",
         package: "100 ml Bottle",
         value: 200,
-        image: SunflowerOilBottleImage
+        image: SunflowerOilBottleImage,
       },
       {
         id: 63,
@@ -1630,7 +1794,7 @@ const medicineProducts = [
         ingredients: "Pongamia seeds",
         package: "100 ml Bottle",
         value: 220,
-        image: TherapeuticOilImage
+        image: TherapeuticOilImage,
       },
       {
         id: 70,
@@ -1696,7 +1860,7 @@ const medicineProducts = [
         ingredients: "Herbal extracts",
         package: "10 ml Drop Bottle",
         value: 160,
-        image:EyeCareImage
+        image: EyeCareImage,
       },
       {
         id: 48,
@@ -1706,9 +1870,10 @@ const medicineProducts = [
           "Helps relieve joint and muscle pain",
           "Provides soothing relief from stiffness and soreness",
           "Supports relaxation after physical activity",
-          "Ideal for daily massage and body care"
+          "Ideal for daily massage and body care",
         ],
-        ingredients: "A blend of herbal oils including Sesame Oil and traditional Ayurvedic herbs. Free from mineral oil and harmful chemicals.",
+        ingredients:
+          "A blend of herbal oils including Sesame Oil and traditional Ayurvedic herbs. Free from mineral oil and harmful chemicals.",
         package: "100 ml Bottle",
         value: 250,
         image: PainReliefOilImage,
@@ -1721,7 +1886,7 @@ const medicineProducts = [
         ingredients: "Herbal oils & extracts",
         package: "15 ml Drop Bottle",
         value: 180,
-        image:EyeCareImage
+        image: EyeCareImage,
       },
       {
         id: 77,
@@ -1731,8 +1896,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image:EyeCareImage
-
+        image: EyeCareImage,
       },
       {
         id: 78,
@@ -1742,7 +1906,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image:EarDischargeOilImage
+        image: EarDischargeOilImage,
       },
       {
         id: 79,
@@ -1752,7 +1916,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image:EarNourishOilImage
+        image: EarNourishOilImage,
       },
       {
         id: 80,
@@ -1762,7 +1926,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image: MicroNourishNasalDropImage
+        image: MicroNourishNasalDropImage,
       },
       {
         id: 81,
@@ -1772,7 +1936,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image: DeepNourishNasalDropImage
+        image: DeepNourishNasalDropImage,
       },
       {
         id: 82,
@@ -1782,7 +1946,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "10 ml Drop Bottle",
         value: 160,
-        image: SensesNourishNasalDropImage
+        image: SensesNourishNasalDropImage,
       },
       {
         id: 83,
@@ -1792,7 +1956,7 @@ const medicineProducts = [
         ingredients: "Herbal powders",
         package: "100 gms Pouch",
         value: 140,
-        image: ToothPowderImage
+        image: ToothPowderImage,
       },
     ],
   },
@@ -1838,7 +2002,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
-        image: PainReliefMassageOilImage
+        image: PainReliefMassageOilImage,
       },
       {
         id: 88,
@@ -1976,7 +2140,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: PilesTonicImage
+        image: PilesTonicImage,
       },
       {
         id: 17,
@@ -1986,7 +2150,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 101,
@@ -2016,7 +2180,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 104,
@@ -2026,7 +2190,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 105,
@@ -2036,7 +2200,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 106,
@@ -2046,7 +2210,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 450,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 108,
@@ -2056,7 +2220,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 109,
@@ -2066,7 +2230,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 450,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 110,
@@ -2076,7 +2240,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 111,
@@ -2086,7 +2250,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 380,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 112,
@@ -2106,7 +2270,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 114,
@@ -2116,7 +2280,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 420,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 115,
@@ -2136,7 +2300,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 117,
@@ -2146,7 +2310,7 @@ const medicineProducts = [
         ingredients: "Ayurvedic herbal Dispense",
         package: "200 ml Bottle",
         value: 400,
-        image: IntellectTonicImage
+        image: IntellectTonicImage,
       },
       {
         id: 118,
@@ -2156,7 +2320,7 @@ const medicineProducts = [
         ingredients: "Herbal oils",
         package: "100 ml Bottle",
         value: 220,
-        image:PenisHealthOilImage
+        image: PenisHealthOilImage,
       },
       {
         id: 119,
@@ -2166,7 +2330,7 @@ const medicineProducts = [
         ingredients: "Herbal decoction",
         package: "100 gms Pouch",
         value: 150,
-        image:VaginalWashImage
+        image: VaginalWashImage,
       },
       {
         id: 120,
@@ -2303,7 +2467,7 @@ const medicineProducts = [
         ingredients: "Bos indicus Urina (Gomutra)",
         package: "1 litre Bottle",
         value: 450,
-        image: CowNectorImage
+        image: CowNectorImage,
       },
       {
         id: 159,

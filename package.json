@@ -42,6 +42,7 @@
     "start": "react-scripts start",
     "dev": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node -e \"const fs = require('fs-extra'); const p = require('path'); fs.copySync('public', 'build', { dereference: true, filter: f => p.basename(f).toLowerCase() !== 'index.html' });\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -64,8 +65,7 @@
     ]
   },
   "devDependencies": {
+    "sharp": "^0.35.5",
     "tailwindcss": "^3.4.19"
   }
 }
-
-

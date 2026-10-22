@@ -12,7 +12,7 @@
     <link rel="alternate icon" href="%PUBLIC_URL%/swagramaLogo.svg">
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/swagramaLogo.svg">
     <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest">
-    <link rel="preload" as="image" href="%PUBLIC_URL%/heroPoster.webp" type="image/webp">
+    <link rel="preload" as="image" href="%PUBLIC_URL%/heroPoster.webp" type="image/webp" fetchpriority="high">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -24,6 +24,25 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script src="https://cdn.lordicon.com/lordicon.js" defer></script>
+    <script>
+      // Load lordicon.js only when needed or after main thread is free
+      window.addEventListener('load', function() {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(function() {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.lordicon.com/lordicon.js';
+            s.async = true;
+            document.body.appendChild(s);
+          }, { timeout: 3000 });
+        } else {
+          setTimeout(function() {
+            var s = document.createElement('script');
+            s.src = 'https://cdn.lordicon.com/lordicon.js';
+            s.async = true;
+            document.body.appendChild(s);
+          }, 2000);
+        }
+      });
+    </script>
   </body>
 </html>

@@ -8,6 +8,7 @@ import { useAuth } from "./context/AuthContext";
 import { useTokenRefresh } from "./hooks/useTokenRefresh";
 import ScrollToTopButton from "./ScrollToTopButton";
 import ErrorBoundary from "./components/common/ErrorBoundary";
+import HomePage from "./components/homePage/HomePage";
 
 const Feeds = lazy(() => import("./components/pages/feeds/Feeds"));
 const Registration = lazy(() => import("./components/pages/registration/Registration"));
@@ -16,7 +17,6 @@ const SwagramaRefundPolicy = lazy(
   () => import("./components/pages/refund-policy/RefundPolicy"),
 );
 
-const HomePage = lazy(() => import("./components/homePage/HomePage"));
 const ServicesTabs = lazy(
   () => import("./components/pages/healingServices/ServicesTabs"),
 );

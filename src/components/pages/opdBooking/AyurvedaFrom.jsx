@@ -691,21 +691,34 @@ function AyurvedaForm({
         .then((res) => {
           const data = res?.data?.data;
           if (data?.length) {
-            setServicesOptions(
-              data.map((item) => ({
-                ...item,
-                id: item.serviceFid,
-                value: item.serviceFid,
-                label: `${item.serviceName}`,
-              })),
-            );
+            const mappedServices = data.map((item) => ({
+              ...item,
+              id: item.serviceFid,
+              value: item.serviceFid,
+              label: `${item.serviceName}`,
+            }));
+            setServicesOptions(mappedServices);
+            if (mappedServices.length === 1) {
+              setValue("serviceFid", mappedServices[0], {
+                shouldValidate: true,
+                shouldDirty: true,
+              });
+            }
           } else {
             setServicesOptions([]);
+            setValue("serviceFid", null, { shouldValidate: true });
           }
         })
-        .catch((error) => setServicesOptions([]));
+        .catch((error) => {
+          console.error(error);
+          setServicesOptions([]);
+          setValue("serviceFid", null);
+        });
+    } else {
+      setServicesOptions([]);
+      setValue("serviceFid", null);
     }
-  }, [patientFid, selectedDoctorId]);
+  }, [patientFid, selectedDoctorId, setValue]);
 
   useEffect(() => {
     if (selectedDoctorId !== null) {
@@ -1576,7 +1589,7 @@ function AyurvedaForm({
                 <DropdownField
                   control={control}
                   name="serviceFid"
-                  placeholder="Service *"
+                  placeholder="Service  "
                   dataArray={servicesOptions}
                   error={errors.serviceFid}
                   className="scale-90"

@@ -10,26 +10,43 @@ const HeroSection = () => {
   const [canStreamVideo, setCanStreamVideo] = useState(false);
 
   useEffect(() => {
-    // Delay video stream connection slightly so initial paint and LCP happen instantaneously
+    // Only stream the 13.8MB video on desktop devices with high-speed connection after idle/load
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 768 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent,
+        ));
+
+    if (isMobile) {
+      // Mobile displays the high-res crisp hero poster image directly without 13.8MB data waste
+      return;
+    }
+
     if ("requestIdleCallback" in window) {
       const handle = window.requestIdleCallback(
         () => setCanStreamVideo(true),
-        { timeout: 1200 },
+        { timeout: 3500 },
       );
       return () => window.cancelIdleCallback(handle);
     } else {
-      const timer = setTimeout(() => setCanStreamVideo(true), 800);
+      const timer = setTimeout(() => setCanStreamVideo(true), 2500);
       return () => clearTimeout(timer);
     }
   }, []);
 
   return (
-    <motion.section
-      className="relative min-h-screen overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.4 }}
-    >
+    <section className="relative min-h-screen overflow-hidden">
+      {/* High-priority immediate LCP image for mobile, video for desktop */}
+      <img
+        src={heroPoster}
+        alt="Swagrama Holistic Wellness"
+        width="1920"
+        height="1080"
+        fetchPriority="high"
+        decoding="async"
+        className="md:hidden absolute inset-0 w-full h-full object-cover"
+      />
       <video
         autoPlay
         loop
@@ -40,7 +57,7 @@ const HeroSection = () => {
         width="1920"
         height="1080"
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="hidden md:block absolute inset-0 w-full h-full object-cover"
       >
         {canStreamVideo && <source src={landigPageS1} type="video/webm" />}
       </video>
@@ -105,7 +122,7 @@ const HeroSection = () => {
           </motion.button>
         </motion.div>
       </div>
-    </motion.section>
+    </section>
   );
 };
 

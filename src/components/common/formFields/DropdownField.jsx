@@ -282,66 +282,94 @@ const DropdownField = ({
           control={control}
           name={name}
           defaultValue={defaultValue}
-          render={({ field }) => (
-            <ReactSelect
-              className={className + "text-[14px] text-gray-600 w-full"}
-              isDisabled={isDisabled}
-              inputRef={inputRef}
-              {...field}
-              ref={(e) => {
-                field.ref(e);
-                if (referance) {
-                  if (typeof referance === "function") {
-                    referance(e);
-                  } else {
-                    referance.current = e;
+          render={({ field }) => {
+            const selectValue = isMulti
+              ? Array.isArray(field.value)
+                ? field.value.map((v) =>
+                    typeof v === "object" && v !== null
+                      ? v
+                      : (dataArray?.find(
+                          (item) => item.value === v || item.id === v,
+                        ) ?? v),
+                  )
+                : []
+              : typeof field.value === "object" && field.value !== null
+                ? field.value
+                : (dataArray?.find(
+                    (item) =>
+                      item.value === field.value || item.id === field.value,
+                  ) ?? null);
+
+            return (
+              <ReactSelect
+                className={className + "text-[14px] text-gray-600 w-full"}
+                isDisabled={isDisabled}
+                inputRef={inputRef}
+                {...field}
+                value={selectValue}
+                onChange={(val, actionMeta) => {
+                  field.onChange(val);
+                }}
+                onBlur={(e) => {
+                  field.onBlur();
+                }}
+                ref={(e) => {
+                  field.ref(e);
+                  if (referance) {
+                    if (typeof referance === "function") {
+                      referance(e);
+                    } else {
+                      referance.current = e;
+                    }
                   }
+                }}
+                onKeyDown={onKeyDown}
+                isMulti={isMulti}
+                closeMenuOnSelect={!isMulti}
+                maxMenuHeight={maxMenuHeight || 180}
+                options={dataArray}
+                isClearable={isClearable}
+                clearValue={true}
+                isSearchable={true}
+                placeholder={placeholder}
+                defaultValue={defaultValue}
+                styles={selectStyles}
+                blurInputOnSelect={true}
+                menuPlacement={menuPlacement}
+                menuShouldBlockScroll={menuShouldBlockScroll}
+                closeMenuOnScroll={true}
+                onInputChange={onInputChange}
+                menuPortalTarget={
+                  typeof document !== "undefined" ? document.body : null
                 }
-              }}
-              onKeyDown={onKeyDown}
-              isMulti={isMulti}
-              closeMenuOnSelect={isMulti ? false : true}
-              maxMenuHeight={maxMenuHeight || 180}
-              options={dataArray}
-              isClearable={isClearable}
-              clearValue={true}
-              isSearchable={true}
-              placeholder={placeholder}
-              defaultValue={defaultValue}
-              styles={selectStyles}
-              blurInputOnSelect={true}
-              menuPlacement={menuPlacement}
-              menuShouldBlockScroll={menuShouldBlockScroll}
-              closeMenuOnScroll={true}
-              onInputChange={onInputChange}
-              menuPortalTarget={document.body}
-              components={{
-                DropdownIndicator: () =>
-                  isMulti ? (
-                    <KeyboardArrowDownIcon
-                      sx={{
-                        "& .css-1xc3v61-indicatorContainer": {
-                          padding: "0px",
-                        },
-                      }}
-                      className="text-gray-600 p-0"
-                    />
-                  ) : searchIcon ? (
-                    <SearchIcon className=" text-gray-600 p-0 mx-1" />
-                  ) : (
-                    <KeyboardArrowDownIcon
-                      sx={{
-                        "& .css-1xc3v61-indicatorContainer": {
-                          padding: "0px",
-                        },
-                      }}
-                      className="text-gray-600 p-0"
-                    />
-                  ),
-                ValueContainer: CustomValueContainer,
-              }}
-            />
-          )}
+                components={{
+                  DropdownIndicator: () =>
+                    isMulti ? (
+                      <KeyboardArrowDownIcon
+                        sx={{
+                          "& .css-1xc3v61-indicatorContainer": {
+                            padding: "0px",
+                          },
+                        }}
+                        className="text-gray-600 p-0"
+                      />
+                    ) : searchIcon ? (
+                      <SearchIcon className=" text-gray-600 p-0 mx-1" />
+                    ) : (
+                      <KeyboardArrowDownIcon
+                        sx={{
+                          "& .css-1xc3v61-indicatorContainer": {
+                            padding: "0px",
+                          },
+                        }}
+                        className="text-gray-600 p-0"
+                      />
+                    ),
+                  ValueContainer: CustomValueContainer,
+                }}
+              />
+            );
+          }}
         />
       </FormControl>
     </div>

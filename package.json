@@ -39,8 +39,9 @@
     "yup": "^1.7.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "dev": "react-scripts start",
+    "start": "node scripts/start-all.js",
+    "dev": "node scripts/start-all.js",
+    "frontend": "react-scripts start",
     "backend": "dotnet run --project Wellness --launch-profile http",
     "start:all": "node scripts/start-all.js",
     "build": "react-scripts build",

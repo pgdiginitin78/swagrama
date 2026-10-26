@@ -9,8 +9,6 @@ import OrdersIcon from "../../../../assets/Orders.svg";
 import TherapyIcon from "../../../../assets/Therapy.svg";
 import WellnessIcon from "../../../../assets/WellnessIcon.svg";
 
-
-
 export const MEMBERSHIP_TIERS = [
   {
     id: "silver",

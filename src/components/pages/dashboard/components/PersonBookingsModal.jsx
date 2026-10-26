@@ -16,9 +16,26 @@ import { StatusBadge } from "./ActivityCard";
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr || "";
-  const cleanTimeStr = timeStr.replace(/\s*(AM|PM|am|pm)\s*/gi, "").trim();
-  if (cleanTimeStr.includes(":") && cleanTimeStr.split(":").length >= 2) {
-    const [hours, minutes] = cleanTimeStr.split(":");
+
+  const trimmed = timeStr.trim();
+  const ampmMatch = trimmed.match(/(AM|PM)/i);
+
+  if (ampmMatch) {
+    const period = ampmMatch[1].toUpperCase();
+    const cleanTime = trimmed.replace(/\s*(AM|PM)\s*/gi, "").trim();
+    if (cleanTime.includes(":")) {
+      const [hours, minutes] = cleanTime.split(":");
+      const h = parseInt(hours, 10);
+      const m = (minutes || "00").substring(0, 2);
+      if (!isNaN(h)) {
+        return `${h}:${m} ${period}`;
+      }
+    }
+    return trimmed;
+  }
+
+  if (trimmed.includes(":") && trimmed.split(":").length >= 2) {
+    const [hours, minutes] = trimmed.split(":");
     let h = parseInt(hours, 10);
     if (!isNaN(h)) {
       const ampm = h >= 12 ? "PM" : "AM";

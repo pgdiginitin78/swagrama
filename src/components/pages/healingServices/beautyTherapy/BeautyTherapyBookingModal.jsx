@@ -33,17 +33,36 @@ import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
 const formatTime = (timeStr) => {
-  if (!timeStr || typeof timeStr !== "string") return timeStr;
-  if (!timeStr.includes(":")) return timeStr;
-  try {
-    const [h, m] = timeStr.split(":");
-    let hours = parseInt(h);
-    const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12;
-    return `${hours}:${m} ${ampm}`;
-  } catch (e) {
-    return timeStr;
+  if (!timeStr || typeof timeStr !== "string") return timeStr || "";
+
+  const trimmed = timeStr.trim();
+  const ampmMatch = trimmed.match(/(AM|PM)/i);
+
+  if (ampmMatch) {
+    const period = ampmMatch[1].toUpperCase();
+    const cleanTime = trimmed.replace(/\s*(AM|PM)\s*/gi, "").trim();
+    if (cleanTime.includes(":")) {
+      const [hours, minutes] = cleanTime.split(":");
+      const h = parseInt(hours, 10);
+      const m = (minutes || "00").substring(0, 2);
+      if (!isNaN(h)) {
+        return `${h}:${m} ${period}`;
+      }
+    }
+    return trimmed;
   }
+
+  if (trimmed.includes(":") && trimmed.split(":").length >= 2) {
+    const [hours, minutes] = trimmed.split(":");
+    let h = parseInt(hours, 10);
+    if (!isNaN(h)) {
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      const m = (minutes || "00").substring(0, 2);
+      return `${h}:${m} ${ampm}`;
+    }
+  }
+  return timeStr;
 };
 
 const dropdownObjectSchema = yup

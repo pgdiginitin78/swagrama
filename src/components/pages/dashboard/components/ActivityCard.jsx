@@ -29,17 +29,34 @@ export const StatusBadge = ({ status }) => {
 };
 
 const formatTime = (timeStr) => {
-  if (!timeStr || typeof timeStr !== "string") return timeStr;
+  if (!timeStr || typeof timeStr !== "string") return timeStr || "";
 
-  const cleanTimeStr = timeStr.replace(/\s*(AM|PM|am|pm)\s*/g, "");
+  const trimmed = timeStr.trim();
+  const ampmMatch = trimmed.match(/(AM|PM)/i);
 
-  if (cleanTimeStr.includes(":") && cleanTimeStr.split(":").length >= 2) {
-    const [hours, minutes] = cleanTimeStr.split(":");
+  if (ampmMatch) {
+    const period = ampmMatch[1].toUpperCase();
+    const cleanTime = trimmed.replace(/\s*(AM|PM)\s*/gi, "").trim();
+    if (cleanTime.includes(":")) {
+      const [hours, minutes] = cleanTime.split(":");
+      const h = parseInt(hours, 10);
+      const m = (minutes || "00").substring(0, 2);
+      if (!isNaN(h)) {
+        return `${h}:${m} ${period}`;
+      }
+    }
+    return trimmed;
+  }
+
+  if (trimmed.includes(":") && trimmed.split(":").length >= 2) {
+    const [hours, minutes] = trimmed.split(":");
     let h = parseInt(hours, 10);
-    const ampm = h >= 12 ? "PM" : "AM";
-    h = h % 12 || 12;
-    const m = minutes.substring(0, 2);
-    return `${h}:${m} ${ampm}`;
+    if (!isNaN(h)) {
+      const ampm = h >= 12 ? "PM" : "AM";
+      h = h % 12 || 12;
+      const m = (minutes || "00").substring(0, 2);
+      return `${h}:${m} ${ampm}`;
+    }
   }
   return timeStr;
 };
@@ -54,29 +71,35 @@ const getActivityDisplayData = (data) => {
       data.type === "Stay"
         ? "Wellness Stay"
         : data.expert || (data.doctorName ? data.department : data.type),
-    date: data.date?.includes("T")
-      ? new Date(data.date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        })
-      : data.date,
+    date: (() => {
+      if (!data.date) return "";
+      try {
+        const d = new Date(data.date);
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          });
+        }
+      } catch (e) {
+        // fallback
+      }
+      return String(data.date);
+    })(),
     time: formatTime(data.startTime || data.time || data.total),
     type: data.type?.toLowerCase(),
     status: data.status,
     prep: data.prep,
     step: data.step,
-    userName: data.userName,
+    userName: data.userName || data.patientName || data.name || data.doctorName,
     department: data.department,
     gender: data.gender || data.userGender || "male",
-
   };
 };
 
 const ActivityCard = ({ data, onClick }) => {
   const displayData = getActivityDisplayData(data);
-
-  console.log(data, "displayData12233");
 
   return (
     <motion.div

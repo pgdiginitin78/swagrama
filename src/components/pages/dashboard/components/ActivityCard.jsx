@@ -10,10 +10,11 @@ import FemaleIcon from "../../../../assets/3d_female_avatar.webp";
 import BedRoomIcon from "../../../assets/bedRoomIcon.svg";
 
 export const StatusBadge = ({ status }) => {
-  const isActive = status === "Upcoming" || status === "In Transit";
+  const isActive =
+    status === "Upcoming" || status === "In Transit" || status === "Today";
   return (
     <span
-      className={`inline-flex items-center gap-1 px-4 py-1 rounded text-[14px] font-bold whitespace-nowrap ${
+      className={`inline-flex items-center gap-1 px-2 py-1 rounded text-[12px] font-bold whitespace-nowrap ${
         isActive
           ? "bg-emerald-50 text-emerald-600 border border-emerald-600"
           : "bg-gray-100 text-gray-400 border"

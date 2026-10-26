@@ -275,6 +275,47 @@ const DropdownField = ({
       </ValueContainer>
     );
   };
+  const getOptionVal = (option) => {
+    if (option === null || option === undefined) return "";
+    if (typeof option !== "object") return String(option);
+    if (option.value !== undefined && option.value !== null) return String(option.value);
+    if (option.id !== undefined && option.id !== null) return String(option.id);
+    if (option.userId !== undefined && option.userId !== null) return String(option.userId);
+    if (option.patientId !== undefined && option.patientId !== null) return String(option.patientId);
+    if (option.label !== undefined && option.label !== null) return String(option.label);
+    return "";
+  };
+
+  const getOptionLbl = (option) => {
+    if (option === null || option === undefined) return "";
+    if (typeof option !== "object") return String(option);
+    if (option.label !== undefined && option.label !== null) return String(option.label);
+    if (option.name !== undefined && option.name !== null) return String(option.name);
+    if (option.title !== undefined && option.title !== null) return String(option.title);
+    return "";
+  };
+
+  const isOptionSelected = (option, selectValues) => {
+    if (!selectValues || !option) return false;
+
+    if (option === selectValues) return true;
+
+    const optVal = getOptionVal(option);
+    const selectedArr = Array.isArray(selectValues)
+      ? selectValues
+      : [selectValues];
+
+    return selectedArr.some((selected) => {
+      if (!selected) return false;
+      if (selected === option) return true;
+
+      const selVal = getOptionVal(selected);
+      if (!optVal || !selVal) return false;
+
+      return String(optVal) === String(selVal);
+    });
+  };
+
   return (
     <div className=" w-full" ref={ref}>
       <FormControl fullWidth sx={{ overFlowX: "hidden" }}>
@@ -283,22 +324,33 @@ const DropdownField = ({
           name={name}
           defaultValue={defaultValue}
           render={({ field }) => {
+            const findItem = (val) => {
+              if (val === undefined || val === null || val === "") return null;
+              if (typeof val === "object") {
+                const valId = getOptionVal(val);
+                if (!valId) return val;
+                return (
+                  dataArray?.find((item) => {
+                    if (item === val) return true;
+                    const itemVal = getOptionVal(item);
+                    return itemVal && itemVal === valId;
+                  }) ?? val
+                );
+              }
+              const strVal = String(val);
+              return (
+                dataArray?.find((item) => {
+                  const itemVal = getOptionVal(item);
+                  return itemVal && itemVal === strVal;
+                }) ?? null
+              );
+            };
+
             const selectValue = isMulti
               ? Array.isArray(field.value)
-                ? field.value.map((v) =>
-                    typeof v === "object" && v !== null
-                      ? v
-                      : (dataArray?.find(
-                          (item) => item.value === v || item.id === v,
-                        ) ?? v),
-                  )
+                ? field.value.map((v) => findItem(v)).filter(Boolean)
                 : []
-              : typeof field.value === "object" && field.value !== null
-                ? field.value
-                : (dataArray?.find(
-                    (item) =>
-                      item.value === field.value || item.id === field.value,
-                  ) ?? null);
+              : findItem(field.value);
 
             return (
               <ReactSelect
@@ -307,6 +359,9 @@ const DropdownField = ({
                 inputRef={inputRef}
                 {...field}
                 value={selectValue}
+                getOptionValue={getOptionVal}
+                getOptionLabel={getOptionLbl}
+                isOptionSelected={isOptionSelected}
                 onChange={(val, actionMeta) => {
                   field.onChange(val);
                 }}

@@ -14,6 +14,10 @@ import { ThemeProvider } from "@mui/material/styles";
 import theme from "./theme.js";
 import { HelmetProvider } from "react-helmet-async";
 
+if ("scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <HelmetProvider>
     <Provider store={store}>

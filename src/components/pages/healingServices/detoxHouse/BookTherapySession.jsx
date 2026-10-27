@@ -1234,6 +1234,8 @@ export default function BookTherapySession({ open, onClose, item }) {
     setOpenConfirmationModal(true);
   };
 
+  console.log("days12334",days)
+
   const initiateBookingPayment = async () => {
     if (isPaymentPending) return;
     try {
@@ -2549,31 +2551,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                         <span className="text-xs font-bold text-ayuTulsi capitalize">
                           {getEffectiveGuest()?.gender || "Not specified"}
                         </span>
-                        <div className="flex items-center gap-1 ml-2">
-                          {["Male", "Female"].map((gen) => {
-                            const isCurr =
-                              normalizeGender(getEffectiveGuest()) === gen;
-                            return (
-                              <button
-                                key={gen}
-                                type="button"
-                                onClick={() =>
-                                  setGuestGenderOverride({
-                                    guestId: selectedGuestId,
-                                    gender: gen,
-                                  })
-                                }
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                  isCurr
-                                    ? "bg-ayuMid text-white shadow-xs"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                }`}
-                              >
-                                {gen}
-                              </button>
-                            );
-                          })}
-                        </div>
+                 
                       </div>
                       {days.some((d) => d.selectedSlots.length > 0) &&
                         (() => {

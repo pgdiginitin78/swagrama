@@ -1,6 +1,50 @@
 export const NO_ROOM_MESSAGE =
   "No available room matches the selected patient's gender for this time slot. Please choose another time.";
 
+export const toMinutes = (t) => {
+  if (t === null || t === undefined) return NaN;
+  const m = String(t)
+    .trim()
+    .match(/^(\d{1,2}):(\d{2})(?::\d{2})?\s*(AM|PM)?$/i);
+  if (!m) return NaN;
+  let h = parseInt(m[1], 10);
+  const min = parseInt(m[2], 10);
+  const p = m[3] ? m[3].toUpperCase() : null;
+  if (p === "PM" && h < 12) h += 12;
+  if (p === "AM" && h === 12) h = 0;
+  return h * 60 + min;
+};
+
+export const sameTime = (a, b) => {
+  const x = toMinutes(a);
+  const y = toMinutes(b);
+  if (Number.isNaN(x) || Number.isNaN(y)) return a === b;
+  return x === y;
+};
+
+const compareTime = (a, b) => {
+  const x = toMinutes(a);
+  const y = toMinutes(b);
+  if (Number.isNaN(x) || Number.isNaN(y)) {
+    return String(a || "").localeCompare(String(b || ""));
+  }
+  return x - y;
+};
+
+export const isSlotInPast = (slot, date) => {
+  if (!slot?.startTime || !date) return false;
+  const now = new Date();
+  const d = new Date(date);
+  const sameDay =
+    d.getFullYear() === now.getFullYear() &&
+    d.getMonth() === now.getMonth() &&
+    d.getDate() === now.getDate();
+  if (!sameDay) return false;
+  const mins = toMinutes(slot.startTime);
+  if (Number.isNaN(mins)) return false;
+  return mins < now.getHours() * 60 + now.getMinutes();
+};
+
 export const normalizeGender = (person) => {
   if (!person) return "";
   let rawGender = "";
@@ -9,7 +53,9 @@ export const normalizeGender = (person) => {
     rawGender = person;
   } else if (typeof person === "object") {
     if (person.genderLocked) {
-      const lg = String(person.gender || "").toLowerCase().trim();
+      const lg = String(person.gender || "")
+        .toLowerCase()
+        .trim();
       if (lg.startsWith("f")) return "Female";
       if (lg.startsWith("m")) return "Male";
     }
@@ -115,9 +161,9 @@ export const findBestRoomBlock = (
   roomsMap.forEach((slots) => {
     const thisOrder = order++;
     const sorted = [...slots].sort((a, b) =>
-      (a.startTime || "").localeCompare(b.startTime || ""),
+      compareTime(a.startTime, b.startTime),
     );
-    const startIdx = sorted.findIndex((s) => s.startTime === startTime);
+    const startIdx = sorted.findIndex((s) => sameTime(s.startTime, startTime));
     if (startIdx < 0 || startIdx + count > sorted.length) return;
 
     const group = sorted.slice(startIdx, startIdx + count);
@@ -126,7 +172,7 @@ export const findBestRoomBlock = (
       if (
         group[k].endTime &&
         group[k + 1].startTime &&
-        group[k].endTime !== group[k + 1].startTime
+        !sameTime(group[k].endTime, group[k + 1].startTime)
       ) {
         return;
       }

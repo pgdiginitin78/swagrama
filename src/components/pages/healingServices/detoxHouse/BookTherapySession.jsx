@@ -2,7 +2,6 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import {
   AccessTime,
   Block,
-  CheckCircle,
   CheckCircleOutline,
   ChevronLeft,
   ChevronRight,
@@ -56,6 +55,7 @@ import {
   findBestRoomBlock,
   isSlotAllowedForGender,
   isSlotAvailable,
+  isSlotInPast,
   isTherapySlotSelectable,
   normalizeGender,
   rankRoomsForGuest,
@@ -325,9 +325,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                 value: uniqueId,
                 gender: displayGender,
                 normalizedGender: normGender,
-                label: displayGender
-                  ? `${rawName} (${displayGender})`
-                  : rawName,
+                label:  rawName,
               };
             });
             setPatientOptions(formatted);
@@ -670,17 +668,20 @@ export default function BookTherapySession({ open, onClose, item }) {
     setActiveSessionSlotIndex(0);
   };
 
-  const isSingleSlotSelectable = (
+  const resolveTargetDate = (dayIdx, override) =>
+    override ||
+    (activePickerIndex === dayIdx && exploringDate) ||
+    days[dayIdx]?.date ||
+    null;
+
+  const isSlotTakenOrPast = (
     slot,
     dayIdx,
     targetDateOverride,
     activeSessIdx,
   ) => {
-    if (!slot) return false;
-    const currentTargetDate =
-      targetDateOverride ||
-      (activePickerIndex === dayIdx && exploringDate) ||
-      days[dayIdx]?.date;
+    if (!slot) return true;
+    const currentTargetDate = resolveTargetDate(dayIdx, targetDateOverride);
 
     const currentSessionDateStr = currentTargetDate
       ? format(currentTargetDate, "yyyy-MM-dd")
@@ -719,61 +720,79 @@ export default function BookTherapySession({ open, onClose, item }) {
       });
     });
 
-    let isPastTime = false;
-    if (
-      currentTargetDate &&
-      isSameDay(currentTargetDate, startOfToday()) &&
-      slot.startTime
-    ) {
-      try {
-        const [h, m] = slot.startTime.split(":");
-        const slotDate = new Date();
-        slotDate.setHours(parseInt(h, 10) || 0, parseInt(m, 10) || 0, 0, 0);
-        if (slotDate < new Date()) {
-          isPastTime = true;
-        }
-      } catch (e) {
-        isPastTime = false;
+    return isAlreadySelected || isSlotInPast(slot, currentTargetDate);
+  };
+
+  const getSlotBlockStatus = (
+    slot,
+    dayIdx,
+    targetDateOverride,
+    activeSessIdx,
+  ) => {
+    if (!slot) return { ok: false, reason: NO_ROOM_MESSAGE, slots: [] };
+
+    const targetDate = resolveTargetDate(dayIdx, targetDateOverride);
+
+    if (isSlotInPast(slot, targetDate)) {
+      return {
+        ok: false,
+        reason: "This time has already passed. Please choose a later time.",
+        slots: [],
+      };
+    }
+
+    const guest = getEffectiveGuest();
+    const blocked = (s) =>
+      isSlotTakenOrPast(s, dayIdx, targetDateOverride, activeSessIdx);
+
+    const block = findBestRoomBlock(
+      rawTherapySlots,
+      slot.startTime,
+      slotsNeeded,
+      guest,
+      blocked,
+    );
+    if (block) return { ok: true, reason: "", slots: block };
+
+    if (guest) {
+      const anyGenderBlock = findBestRoomBlock(
+        rawTherapySlots,
+        slot.startTime,
+        slotsNeeded,
+        null,
+        blocked,
+      );
+      if (anyGenderBlock) {
+        return { ok: false, reason: NO_ROOM_MESSAGE, slots: [] };
       }
     }
 
-    const isValidForGuest = isTherapySlotSelectable(slot, getEffectiveGuest());
-
-    return isValidForGuest && !isPastTime && !isAlreadySelected;
+    return {
+      ok: false,
+      reason:
+        slotsNeeded > 1
+          ? `This ${durationNum}-minute therapy needs ${slotsNeeded} back-to-back 30-minute slots in the same room starting at ${formatTime(slot.startTime)}. Please choose another start time.`
+          : "This slot is no longer available. Please choose another time.",
+      slots: [],
+    };
   };
 
   const getConsecutiveSlotGroup = (
     startSlot,
-    requiredCount,
-    availableSlots,
     dayIdx,
     targetDate,
     activeSessIdx,
   ) => {
-    if (!startSlot) {
-      return { valid: false, reason: NO_ROOM_MESSAGE, slots: [] };
-    }
-
-    const block = findBestRoomBlock(
-      rawTherapySlots,
-      startSlot.startTime,
-      requiredCount,
-      getEffectiveGuest(),
-      (s) => !isSingleSlotSelectable(s, dayIdx, targetDate, activeSessIdx),
+    const status = getSlotBlockStatus(
+      startSlot,
+      dayIdx,
+      targetDate,
+      activeSessIdx,
     );
-
-    if (block) return { valid: true, slots: block };
-
-    return {
-      valid: false,
-      reason:
-        requiredCount > 1
-          ? `This ${durationNum}-minute therapy requires ${requiredCount} continuous 30-minute slots starting at ${formatTime(startSlot.startTime)}. Please choose another start time.`
-          : NO_ROOM_MESSAGE,
-      slots: [],
-    };
+    if (status.ok) return { valid: true, slots: status.slots };
+    return { valid: false, reason: status.reason, slots: [] };
   };
-  console.log("days1234", days);
+
   const applySlotToSession = (slot, dayIdx, targetDateOverride) => {
     const isSequential = !isCustomFrequency && typeof frequency === "number";
     const step = typeof frequency === "number" ? frequency : 1;
@@ -809,8 +828,6 @@ export default function BookTherapySession({ open, onClose, item }) {
 
     const checkResult = getConsecutiveSlotGroup(
       slot,
-      slotsNeeded,
-      rawTherapySlots,
       dayIdx,
       targetDate,
       targetSessIdx,
@@ -908,10 +925,6 @@ export default function BookTherapySession({ open, onClose, item }) {
   const handleSlotClick = (slot, dayIdx) => {
     const date = days[dayIdx]?.date || exploringDate || startOfToday();
     applySlotToSession(slot, dayIdx, date);
-  };
-
-  const handleTimeSelect = (slot, dayIdx) => {
-    handleSlotClick(slot, dayIdx);
   };
 
   const handleClearDaySessions = (dayIdx) => {
@@ -1848,7 +1861,13 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     <span className="text-[10px] font-bold text-ayuMid bg-[#f0f4ef] px-2.5 py-0.5 rounded-full border border-[#e4ebdd]">
                                       {
                                         therapySlots.filter(
-                                          (s) => s.isSelectableForPatient,
+                                          (s) =>
+                                            getSlotBlockStatus(
+                                              s,
+                                              idx,
+                                              undefined,
+                                              activeSessionSlotIndex,
+                                            ).ok,
                                         ).length
                                       }{" "}
                                       available
@@ -1956,11 +1975,29 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           patientGender,
                                         );
 
+                                      const slotStatus = getSlotBlockStatus(
+                                        slot,
+                                        idx,
+                                        undefined,
+                                        activeSessionSlotIndex,
+                                      );
+                                      const isUnavailable =
+                                        !isSelectedByThisDay && !slotStatus.ok;
+
                                       return (
                                         <button
                                           key={i}
                                           type="button"
+                                          title={
+                                            isUnavailable
+                                              ? slotStatus.reason
+                                              : undefined
+                                          }
                                           onClick={() => {
+                                            if (isUnavailable) {
+                                              errorAlert(slotStatus.reason);
+                                              return;
+                                            }
                                             if (isSelectedByThisDay) {
                                               handleRemoveSession(
                                                 idx,
@@ -1969,17 +2006,23 @@ export default function BookTherapySession({ open, onClose, item }) {
                                               successAlert("Slot unselected.");
                                               return;
                                             }
-
                                             handleSlotClick(slot, idx);
                                           }}
-                                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 active:scale-95 cursor-pointer ${
+                                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 ${
                                             isSelectedByThisDay
                                               ? hasGenderConflict
-                                                ? "bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-400"
-                                                : "bg-emerald-700 text-white border-emerald-700 shadow-md ring-2 ring-emerald-500/50"
-                                              : "bg-white text-gray-700 border-emerald-500 hover:border-emerald-700 hover:bg-emerald-50/50"
+                                                ? "bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-400 active:scale-95 cursor-pointer"
+                                                : "bg-emerald-700 text-white border-emerald-700 shadow-md ring-2 ring-emerald-500/50 active:scale-95 cursor-pointer"
+                                              : "bg-white text-gray-700 border-emerald-500 hover:border-emerald-700 hover:bg-emerald-50/50 active:scale-95 cursor-pointer"
                                           }`}
                                         >
+                                          {isSelectedByThisDay && (
+                                            <Check
+                                              className="text-white shrink-0"
+                                              sx={{ fontSize: 14 }}
+                                            />
+                                          )}
+
                                           <span>
                                             {formatTime(slot.startTime)}
                                             {slot.endTime
@@ -2012,7 +2055,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                                     <span className="w-3.5 h-3.5 rounded border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400">
                                       <Block sx={{ fontSize: 9 }} />
                                     </span>
-                                    <span>Unavailable</span>
+                                    <span>Unavailable (hover to see why)</span>
                                   </span>
                                 </div>
 
@@ -2506,6 +2549,31 @@ export default function BookTherapySession({ open, onClose, item }) {
                         <span className="text-xs font-bold text-ayuTulsi capitalize">
                           {getEffectiveGuest()?.gender || "Not specified"}
                         </span>
+                        <div className="flex items-center gap-1 ml-2">
+                          {["Male", "Female"].map((gen) => {
+                            const isCurr =
+                              normalizeGender(getEffectiveGuest()) === gen;
+                            return (
+                              <button
+                                key={gen}
+                                type="button"
+                                onClick={() =>
+                                  setGuestGenderOverride({
+                                    guestId: selectedGuestId,
+                                    gender: gen,
+                                  })
+                                }
+                                className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
+                                  isCurr
+                                    ? "bg-ayuMid text-white shadow-xs"
+                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                                }`}
+                              >
+                                {gen}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                       {days.some((d) => d.selectedSlots.length > 0) &&
                         (() => {

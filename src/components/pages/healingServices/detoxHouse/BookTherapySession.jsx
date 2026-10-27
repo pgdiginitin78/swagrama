@@ -9,13 +9,8 @@ import {
   Close,
   ErrorOutline,
   EventAvailable,
-  Female,
   InfoOutlined,
-  Male,
-  PeopleOutline,
   PersonOutline,
-  RadioButtonChecked,
-  RadioButtonUnchecked,
   Check,
   Refresh,
 } from "@mui/icons-material";
@@ -56,6 +51,23 @@ import { ModalStyle } from "../../../common/modalStyle/ModalStyle";
 import { errorAlert, successAlert } from "../../../common/toast/CustomToast";
 import AddPatientModal from "../../opdBooking/AddPatientModal";
 import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
+import {
+  NO_ROOM_MESSAGE,
+  findBestRoomBlock,
+  isSlotAllowedForGender,
+  isSlotAvailable,
+  isTherapySlotSelectable,
+  normalizeGender,
+  rankRoomsForGuest,
+  reassignSessionRooms,
+} from "./Therapyroomutils";
+
+export {
+  normalizeGender,
+  isSlotAllowedForGender,
+  isSlotAvailable,
+  isTherapySlotSelectable,
+};
 
 const formatTime = (timeStr) => {
   if (!timeStr || typeof timeStr !== "string") return timeStr || "";
@@ -90,82 +102,6 @@ const formatTime = (timeStr) => {
   return timeStr;
 };
 
-export const normalizeGender = (person) => {
-  if (!person) return "";
-  let rawGender = "";
-  let name = "";
-  if (typeof person === "string") {
-    rawGender = person;
-  } else if (typeof person === "object") {
-    rawGender = person.gender || "";
-    name = String(
-      person.label ||
-        person.name ||
-        `${person.firstName || ""} ${person.lastName || ""}` ||
-        "",
-    ).trim();
-  }
-
-  // Honorific prefix matching (Mr, Shri, Master -> Male; Mrs, Ms, Miss, Smt -> Female)
-  if (/^(mr|shri|master)\b/i.test(name)) return "Male";
-  if (/^(mrs|ms|miss|smt)\b/i.test(name)) return "Female";
-
-  const g = String(rawGender).toLowerCase().trim();
-  if (g.startsWith("m") && !g.includes("fe")) return "Male";
-  if (g.startsWith("f") || g.includes("female")) return "Female";
-
-  return "";
-};
-
-export const isSlotAllowedForGender = (slot, patientOrGender) => {
-  if (!slot) return false;
-  const msg = String(slot.genderMessage || "")
-    .toLowerCase()
-    .trim();
-  if (!msg || msg.includes("both")) return true;
-
-  const patientGender =
-    typeof patientOrGender === "string"
-      ? patientOrGender
-      : normalizeGender(patientOrGender);
-  const normalized = String(patientGender || "")
-    .toLowerCase()
-    .trim();
-
-  // Fail safely if patient gender is unknown or missing
-  if (!normalized) return false;
-
-  const isFemaleSlot = msg.includes("female");
-  const isMaleSlot = msg.includes("male") && !isFemaleSlot;
-
-  if (normalized.startsWith("m") && !normalized.includes("fe")) {
-    return !isFemaleSlot;
-  }
-  if (normalized.startsWith("f") || normalized.includes("female")) {
-    return !isMaleSlot;
-  }
-
-  return false;
-};
-
-export const isSlotAvailable = (slot) => {
-  if (!slot) return false;
-  if (slot.status && String(slot.status).toLowerCase() !== "available")
-    return false;
-  const maxBookings =
-    typeof slot.maxBookings === "number" ? slot.maxBookings : 1;
-  const currentBookingCount =
-    typeof slot.bookingCount === "number" ? slot.bookingCount : 0;
-  if (currentBookingCount >= maxBookings) return false;
-  return true;
-};
-
-export const isTherapySlotSelectable = (slot, guest) => {
-  if (!slot) return false;
-  if (!isSlotAvailable(slot)) return false;
-  return isSlotAllowedForGender(slot, guest);
-};
-
 export default function BookTherapySession({ open, onClose, item }) {
   const backdropRef = useRef(null);
   const scrollContainerRef = useRef(null);
@@ -192,15 +128,11 @@ export default function BookTherapySession({ open, onClose, item }) {
   const [finalSaveObj, setFinalSaveObj] = useState(null);
   const [openAddPatient, setOpenAddPatient] = useState(false);
 
-  // Room selection modal & gender override states
   const [guestGenderOverride, setGuestGenderOverride] = useState(null);
-  const [roomSelectionModal, setRoomSelectionModal] = useState(null);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
   const [confirmModalData, setConfirmModalData] = useState(null);
 
-  console.log("confirmModalData", confirmModalData);
-
   const cancelPaymentRef = useRef(null);
+  const prevGuestKeyRef = useRef(null);
   const { user } = useAuth();
   const { setIsLoading } = useLoader();
 
@@ -222,27 +154,41 @@ export default function BookTherapySession({ open, onClose, item }) {
   });
 
   const selectedGuest = watch("selectGuest");
+  const selectedGuestId = selectedGuest?.id ?? selectedGuest?.value ?? null;
 
   const getEffectiveGuest = () => {
-    let base = null;
-    if (selectedGuest && (selectedGuest.gender || selectedGuest.label)) {
-      base = selectedGuest;
-    }
-    if (!base && guestGenderOverride) {
-      base = { gender: guestGenderOverride };
+    const overrideGender =
+      guestGenderOverride && guestGenderOverride.guestId === selectedGuestId
+        ? guestGenderOverride.gender
+        : null;
+
+    const base =
+      selectedGuest && (selectedGuest.gender || selectedGuest.label)
+        ? selectedGuest
+        : null;
+
+    if (!base && overrideGender) {
+      return {
+        gender: overrideGender,
+        normalizedGender: overrideGender,
+        genderLocked: true,
+      };
     }
     if (!base) return null;
+
     const norm = normalizeGender(base);
-    const resolvedGender = guestGenderOverride || norm || base.gender || "";
+    const resolvedGender = overrideGender || norm || base.gender || "";
     return {
       ...base,
       gender: resolvedGender,
       normalizedGender: resolvedGender,
+      genderLocked: Boolean(overrideGender),
     };
   };
 
-  // Do not automatically wipe user slots on guest change.
-  // Validation is enforced on Done and Confirm Booking.
+  const effectiveGender = normalizeGender(getEffectiveGuest());
+  const guestKey = `${selectedGuestId ?? ""}|${effectiveGender}`;
+
   const durationNum = parseInt(item?.duration) || 30;
   const slotsNeeded = Math.max(1, Math.ceil(durationNum / 30));
 
@@ -464,20 +410,28 @@ export default function BookTherapySession({ open, onClose, item }) {
       return;
     }
 
+    let cancelled = false;
     setIsSlotsLoading(true);
 
     TherapySlots(item.serviceId, activeDate)
       .then((res) => {
-        console.log("therapy slots", res?.data?.data);
+        if (cancelled) return;
         const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
         setRawTherapySlots(data);
       })
       .catch((error) => {
+        if (cancelled) return;
         console.error("therapy slots error", error);
         setRawTherapySlots([]);
         setTherapySlots([]);
       })
-      .finally(() => setIsSlotsLoading(false));
+      .finally(() => {
+        if (!cancelled) setIsSlotsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [open, item?.serviceId, activeDate]);
 
   useEffect(() => {
@@ -488,43 +442,25 @@ export default function BookTherapySession({ open, onClose, item }) {
 
     const effectiveGuest = getEffectiveGuest();
 
-    // Group all raw slots across all rooms by startTime
     const slotsByTime = new Map();
     rawTherapySlots.forEach((s) => {
       if (!s?.startTime) return;
-      if (!slotsByTime.has(s.startTime)) {
-        slotsByTime.set(s.startTime, []);
+      const key = `${s.startTime}|${s.endTime || ""}`;
+      if (!slotsByTime.has(key)) {
+        slotsByTime.set(key, []);
       }
-      slotsByTime.get(s.startTime).push(s);
+      slotsByTime.get(key).push(s);
     });
 
     const combined = [];
     slotsByTime.forEach((roomSlots) => {
-      // Check which rooms are available and gender-eligible for this patient
-      const patientGender = normalizeGender(effectiveGuest);
-      const eligibleRooms = patientGender
-        ? roomSlots.filter((s) => isTherapySlotSelectable(s, effectiveGuest))
-        : roomSlots.filter((s) => isSlotAvailable(s));
-
-      const isSelectableForPatient = eligibleRooms.length > 0;
-
-      let repSlot = eligibleRooms[0];
-      if (!repSlot) {
-        // If not selectable, pick the most descriptive slot (e.g. Female Only)
-        repSlot =
-          roomSlots.find((s) => {
-            const msg = String(s.genderMessage || "").toLowerCase();
-            return (
-              msg.includes("female") ||
-              (msg.includes("male") && !msg.includes("both"))
-            );
-          }) || roomSlots[0];
-      }
+      const eligibleRooms = rankRoomsForGuest(roomSlots, effectiveGuest);
+      const repSlot = eligibleRooms[0] || roomSlots[0];
 
       combined.push({
         ...repSlot,
         allRoomsAtTime: roomSlots,
-        isSelectableForPatient,
+        isSelectableForPatient: eligibleRooms.length > 0,
         eligibleRoomsCount: eligibleRooms.length,
       });
     });
@@ -535,6 +471,89 @@ export default function BookTherapySession({ open, onClose, item }) {
 
     setTherapySlots(sorted);
   }, [rawTherapySlots, selectedGuest, user, guestGenderOverride]);
+
+  const revalidateSelectionsForGuest = async () => {
+    const snapshotDays = days;
+    const guest = getEffectiveGuest();
+
+    const hasSelection = snapshotDays.some(
+      (d) => d.date && Array.isArray(d.sessions) && d.sessions.some(Boolean),
+    );
+    if (!hasSelection) return;
+
+    const dateKeys = [
+      ...new Set(
+        snapshotDays
+          .filter(
+            (d) =>
+              d.date && Array.isArray(d.sessions) && d.sessions.some(Boolean),
+          )
+          .map((d) => format(d.date, "yyyy-MM-dd")),
+      ),
+    ];
+
+    const slotsByDate = {};
+    await Promise.all(
+      dateKeys.map(async (dk) => {
+        if (dk === activeDate) {
+          slotsByDate[dk] = rawTherapySlots;
+          return;
+        }
+        try {
+          const res = await TherapySlots(item.serviceId, dk);
+          slotsByDate[dk] = Array.isArray(res?.data?.data)
+            ? res.data.data
+            : null;
+        } catch (e) {
+          slotsByDate[dk] = null;
+        }
+      }),
+    );
+
+    const takenKeys = new Set();
+    let anyCleared = false;
+
+    const nextDays = snapshotDays.map((d) => {
+      if (!d.date || !Array.isArray(d.sessions)) return d;
+      const dk = format(d.date, "yyyy-MM-dd");
+      const { sessions, cleared } = reassignSessionRooms({
+        sessions: d.sessions,
+        rawSlots: slotsByDate[dk] ?? null,
+        guest,
+        dateKey: dk,
+        takenKeys,
+      });
+      if (cleared.length) anyCleared = true;
+      return {
+        ...d,
+        sessions,
+        selectedSlots: sessions.filter(Boolean).flat(),
+      };
+    });
+
+    setDays((prev) =>
+      prev.map((d, i) => (snapshotDays[i] === d ? nextDays[i] : d)),
+    );
+
+    if (anyCleared) {
+      const firstEmpty = nextDays[0]?.sessions?.findIndex((s) => !s);
+      if (typeof firstEmpty === "number" && firstEmpty >= 0) {
+        setActiveSessionSlotIndex(firstEmpty);
+      }
+      errorAlert(NO_ROOM_MESSAGE);
+    }
+  };
+
+  useEffect(() => {
+    if (prevGuestKeyRef.current === null) {
+      prevGuestKeyRef.current = guestKey;
+      return;
+    }
+    if (prevGuestKeyRef.current === guestKey) return;
+    prevGuestKeyRef.current = guestKey;
+    if (!open || !item?.serviceId) return;
+    revalidateSelectionsForGuest();
+  }, [guestKey]);
 
   if (!open || !item) return null;
 
@@ -667,7 +686,6 @@ export default function BookTherapySession({ open, onClose, item }) {
       ? format(currentTargetDate, "yyyy-MM-dd")
       : activeDate;
 
-    // Check if slot is already taken by another session (on this day or another day)
     const isAlreadySelected = days.some((d, dIdx) => {
       if (!d.date) return false;
       const dDateStr = format(d.date, "yyyy-MM-dd");
@@ -676,7 +694,6 @@ export default function BookTherapySession({ open, onClose, item }) {
       if (Array.isArray(d.sessions)) {
         return d.sessions.some((sessSlots, sIdx) => {
           if (!sessSlots) return false;
-          // If on the same day, ignore the slot if it belongs to the session currently being picked/edited
           if (dIdx === dayIdx && sIdx === activeSessIdx) return false;
           return sessSlots.some(
             (s) =>
@@ -689,7 +706,6 @@ export default function BookTherapySession({ open, onClose, item }) {
       }
 
       return (d.selectedSlots || []).some((s, sIdx) => {
-        // If on the same day, ignore the slot if it belongs to the session currently being picked/edited
         if (dIdx === dayIdx && typeof activeSessIdx === "number") {
           const slotSessionNum = Math.floor(sIdx / slotsNeeded);
           if (slotSessionNum === activeSessIdx) return false;
@@ -721,11 +737,7 @@ export default function BookTherapySession({ open, onClose, item }) {
       }
     }
 
-    const effectiveGuest = getEffectiveGuest();
-    const patientGender = normalizeGender(effectiveGuest);
-    const isValidForGuest = patientGender
-      ? isTherapySlotSelectable(slot, effectiveGuest)
-      : isSlotAvailable(slot);
+    const isValidForGuest = isTherapySlotSelectable(slot, getEffectiveGuest());
 
     return isValidForGuest && !isPastTime && !isAlreadySelected;
   };
@@ -738,97 +750,31 @@ export default function BookTherapySession({ open, onClose, item }) {
     targetDate,
     activeSessIdx,
   ) => {
-    if (!startSlot || requiredCount <= 1) {
-      const isSingleOk = isSingleSlotSelectable(
-        startSlot,
-        dayIdx,
-        targetDate,
-        activeSessIdx,
-      );
-      if (!isSingleOk) {
-        return {
-          valid: false,
-          reason: `The slot at ${formatTime(startSlot?.startTime)} is not available for selection.`,
-          slots: [],
-        };
-      }
-      return { valid: true, slots: [startSlot] };
+    if (!startSlot) {
+      return { valid: false, reason: NO_ROOM_MESSAGE, slots: [] };
     }
 
-    // Group raw slots by room to find an eligible continuous block
-    const roomsMap = new Map();
-    rawTherapySlots.forEach((s) => {
-      const rId =
-        s.serviceRoomID || item?.serviceRoomId || item?.serviceRoomID || 1;
-      if (!roomsMap.has(rId)) roomsMap.set(rId, []);
-      roomsMap.get(rId).push(s);
-    });
+    const block = findBestRoomBlock(
+      rawTherapySlots,
+      startSlot.startTime,
+      requiredCount,
+      getEffectiveGuest(),
+      (s) => !isSingleSlotSelectable(s, dayIdx, targetDate, activeSessIdx),
+    );
 
-    const roomKeys = Array.from(roomsMap.keys());
-    if (startSlot.serviceRoomID) {
-      roomKeys.sort((a, b) =>
-        a === startSlot.serviceRoomID
-          ? -1
-          : b === startSlot.serviceRoomID
-            ? 1
-            : 0,
-      );
-    }
-
-    for (const rId of roomKeys) {
-      const rSlots = roomsMap.get(rId);
-      rSlots.sort((a, b) =>
-        (a.startTime || "").localeCompare(b.startTime || ""),
-      );
-      const startIdx = rSlots.findIndex(
-        (s) => s.startTime === startSlot.startTime,
-      );
-
-      if (startIdx >= 0 && startIdx + requiredCount <= rSlots.length) {
-        const group = rSlots.slice(startIdx, startIdx + requiredCount);
-
-        let isContinuous = true;
-        for (let k = 0; k < group.length - 1; k++) {
-          if (
-            group[k].endTime &&
-            group[k + 1].startTime &&
-            group[k].endTime !== group[k + 1].startTime
-          ) {
-            isContinuous = false;
-            break;
-          }
-        }
-
-        if (isContinuous) {
-          const allOk = group.every((s) =>
-            isSingleSlotSelectable(s, dayIdx, targetDate, activeSessIdx),
-          );
-          if (allOk) {
-            return { valid: true, slots: group };
-          }
-        }
-      }
-    }
+    if (block) return { valid: true, slots: block };
 
     return {
       valid: false,
-      reason: `This ${durationNum}-minute therapy requires ${requiredCount} continuous 30-minute slots starting at ${formatTime(startSlot.startTime)}. Please choose another start time.`,
+      reason:
+        requiredCount > 1
+          ? `This ${durationNum}-minute therapy requires ${requiredCount} continuous 30-minute slots starting at ${formatTime(startSlot.startTime)}. Please choose another start time.`
+          : NO_ROOM_MESSAGE,
       slots: [],
     };
   };
-
+  console.log("days1234", days);
   const applySlotToSession = (slot, dayIdx, targetDateOverride) => {
-    const effectiveGuest = getEffectiveGuest();
-    const patientGender = normalizeGender(effectiveGuest);
-
-    if (patientGender && !isTherapySlotSelectable(slot, effectiveGuest)) {
-      const opp = patientGender === "Male" ? "female" : "male";
-      errorAlert(
-        `Cannot book this slot. This room is only for ${opp} patients.`,
-      );
-      return false;
-    }
-
     const isSequential = !isCustomFrequency && typeof frequency === "number";
     const step = typeof frequency === "number" ? frequency : 1;
 
@@ -960,81 +906,8 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
 
   const handleSlotClick = (slot, dayIdx) => {
-    const effectiveGuest = getEffectiveGuest();
-    const patientGender = normalizeGender(effectiveGuest);
-    const roomsAtTime =
-      slot.allRoomsAtTime ||
-      rawTherapySlots.filter((s) => s.startTime === slot.startTime);
-
-    if (patientGender) {
-      const anyAllowedRoom = roomsAtTime.some((r) =>
-        isTherapySlotSelectable(r, effectiveGuest),
-      );
-
-      if (!anyAllowedRoom) {
-        const opp = patientGender === "Male" ? "female" : "male";
-        errorAlert(`This slot is available only for ${opp} patients.`);
-        return;
-      }
-    } else {
-      const anyAvailable = roomsAtTime.some((r) => isSlotAvailable(r));
-      if (!anyAvailable) {
-        errorAlert("This slot is fully booked or unavailable.");
-        return;
-      }
-    }
-
-    const firstEligible = patientGender
-      ? roomsAtTime.find((r) => isTherapySlotSelectable(r, effectiveGuest))
-      : roomsAtTime.find((r) => isSlotAvailable(r));
-    setSelectedRoomId(
-      firstEligible?.serviceRoomID || roomsAtTime[0]?.serviceRoomID,
-    );
-
-    setRoomSelectionModal({
-      slot,
-      dayIdx,
-      rooms: roomsAtTime,
-      date: days[dayIdx]?.date || exploringDate || startOfToday(),
-    });
-  };
-
-  const handleDoneRoomSelection = () => {
-    if (!roomSelectionModal) return;
-    const { slot, dayIdx, rooms, date } = roomSelectionModal;
-    const effectiveGuest = getEffectiveGuest();
-    const patientGender = normalizeGender(effectiveGuest);
-
-    const chosenRoom =
-      rooms.find((r) => r.serviceRoomID === selectedRoomId) ||
-      (patientGender
-        ? rooms.find((r) => isTherapySlotSelectable(r, effectiveGuest))
-        : rooms.find((r) => isSlotAvailable(r))) ||
-      rooms[0];
-
-    if (!chosenRoom) {
-      errorAlert("Please select an available room.");
-      return;
-    }
-
-    if (patientGender && !isSlotAllowedForGender(chosenRoom, patientGender)) {
-      const opp = patientGender === "Male" ? "female" : "male";
-      errorAlert(
-        `Cannot book this slot. This room is only for ${opp} patients.`,
-      );
-      return;
-    }
-
-    if (!isSlotAvailable(chosenRoom)) {
-      errorAlert("The selected room is fully booked or unavailable.");
-      return;
-    }
-
-    const ok = applySlotToSession(chosenRoom, dayIdx, date);
-    if (ok) {
-      setRoomSelectionModal(null);
-      successAlert(`Room ${chosenRoom.serviceRoomID} selected successfully.`);
-    }
+    const date = days[dayIdx]?.date || exploringDate || startOfToday();
+    applySlotToSession(slot, dayIdx, date);
   };
 
   const handleTimeSelect = (slot, dayIdx) => {
@@ -1109,8 +982,6 @@ export default function BookTherapySession({ open, onClose, item }) {
     days.every((d) => Boolean(d.date)) &&
     selectedGuest;
 
-  console.log("selectedGuest", item);
-
   const handleConfirmBooking = () => {
     if (!user) {
       errorAlert("login first");
@@ -1133,16 +1004,16 @@ export default function BookTherapySession({ open, onClose, item }) {
     const effectiveGuest = getEffectiveGuest();
     const patientGender = normalizeGender(effectiveGuest);
 
-    // Validate every slot against rawTherapySlots and patient gender
     let invalidSlotFound = null;
     let isGenderMismatch = false;
 
-    // Collect every single session group across all scheduled days
     const allScheduledSessions = [];
 
     days.forEach((day, dIdx) => {
       const dDate = day.date || days[0]?.date;
-      const dDateStr = dDate ? format(dDate, "EEE, dd MMM yyyy") : `Day ${dIdx + 1}`;
+      const dDateStr = dDate
+        ? format(dDate, "EEE, dd MMM yyyy")
+        : `Day ${dIdx + 1}`;
 
       const dayTargetSessions = getTargetSessionsForDay(
         dIdx,
@@ -1164,18 +1035,23 @@ export default function BookTherapySession({ open, onClose, item }) {
           const endSlot = sGroup[sGroup.length - 1];
           const timeStr = `${formatTime(startSlot.startTime)} - ${formatTime(endSlot.endTime)}`;
 
-          // Dynamic match in rawTherapySlots matching BOTH startTime and room
+          const isRawDate =
+            day.date && format(day.date, "yyyy-MM-dd") === activeDate;
           const rawStart =
-            rawTherapySlots.find(
-              (r) =>
-                r.startTime === startSlot.startTime &&
-                (!startSlot.serviceRoomID || r.serviceRoomID === startSlot.serviceRoomID),
-            ) || startSlot;
+            (isRawDate
+              ? rawTherapySlots.find(
+                  (r) =>
+                    r.startTime === startSlot.startTime &&
+                    (!startSlot.serviceRoomID ||
+                      r.serviceRoomID === startSlot.serviceRoomID),
+                )
+              : null) || startSlot;
 
-          const genderMsg = rawStart.genderMessage || startSlot.genderMessage || "";
-          const isAllowed = patientGender
-            ? isSlotAllowedForGender(rawStart, patientGender)
-            : true;
+          const genderMsg =
+            rawStart.genderMessage || startSlot.genderMessage || "";
+          const isAllowed = sGroup.every((g) =>
+            isSlotAllowedForGender(g, effectiveGuest),
+          );
           const isAvail = isSlotAvailable(rawStart);
 
           if (!isAllowed) {
@@ -1209,16 +1085,16 @@ export default function BookTherapySession({ open, onClose, item }) {
       ? format(firstDay.date, "EEE, dd MMM yyyy")
       : "Selected Date";
 
-    // Target session: first invalid session if any, otherwise first session
     const targetSession =
       allScheduledSessions.find((s) => !s.isValid) || firstSession;
 
     const timeFormatted =
       allScheduledSessions.length > 1
-        ? allScheduledSessions.map((s) => `Session ${s.sessionNumber}: ${s.timeStr}`).join(", ")
+        ? allScheduledSessions
+            .map((s) => `Session ${s.sessionNumber}: ${s.timeStr}`)
+            .join(", ")
         : targetSession.timeStr || "";
 
-    const dynamicGenderMsg = targetSession.genderMsg || "";
     const dynamicRoomName = targetSession.roomName || "";
     const dynamicRoomNumber = targetSession.roomNumber || "";
     const dynamicServiceRoomId =
@@ -1231,18 +1107,11 @@ export default function BookTherapySession({ open, onClose, item }) {
     let roomFieldLabel = "Slot Type";
 
     if (dynamicRoomName) {
-      roomDisplay = dynamicGenderMsg
-        ? `${dynamicRoomName} (${dynamicGenderMsg})`
-        : dynamicRoomName;
+      roomDisplay = dynamicRoomName;
       roomFieldLabel = "Room";
     } else if (dynamicRoomNumber) {
-      roomDisplay = dynamicGenderMsg
-        ? `Room ${dynamicRoomNumber} (${dynamicGenderMsg})`
-        : `Room ${dynamicRoomNumber}`;
+      roomDisplay = `Room ${dynamicRoomNumber}`;
       roomFieldLabel = "Room";
-    } else if (dynamicGenderMsg) {
-      roomDisplay = dynamicGenderMsg;
-      roomFieldLabel = "Slot Type";
     } else if (dynamicServiceRoomId) {
       roomDisplay = `Room ${dynamicServiceRoomId}`;
       roomFieldLabel = "Room";
@@ -1257,8 +1126,8 @@ export default function BookTherapySession({ open, onClose, item }) {
       "Guest";
     const patientLabel = `${rawPatientName} (${patientGender || "Not Specified"})`;
 
-    const isValidationPassed = !invalidSlotFound && allScheduledSessions.every((s) => s.isValid);
-    const oppMsg = patientGender === "Male" ? "female" : "male";
+    const isValidationPassed =
+      !invalidSlotFound && allScheduledSessions.every((s) => s.isValid);
 
     let validationMessage = "";
     if (isValidationPassed) {
@@ -1266,9 +1135,7 @@ export default function BookTherapySession({ open, onClose, item }) {
         allScheduledSessions.length > 1 ? "s are" : " is"
       } valid for ${patientLabel}.`;
     } else if (isGenderMismatch) {
-      validationMessage = `Cannot book this booking: ${
-        targetSession.sessionNumber ? `Session ${targetSession.sessionNumber} (${targetSession.timeStr})` : "Selected slot"
-      } ${dynamicGenderMsg ? `is ${dynamicGenderMsg}` : `is only for ${oppMsg} patients`}. Selected guest is ${patientGender}.`;
+      validationMessage = NO_ROOM_MESSAGE;
     } else {
       validationMessage = "Selected slot is unavailable or fully booked.";
     }
@@ -1278,7 +1145,6 @@ export default function BookTherapySession({ open, onClose, item }) {
       timeStr: timeFormatted,
       roomStr: roomDisplay,
       roomLabel: roomFieldLabel,
-      genderMsg: dynamicGenderMsg,
       patientStr: patientLabel,
       sessionsList: allScheduledSessions,
       isValid: isValidationPassed,
@@ -1346,11 +1212,11 @@ export default function BookTherapySession({ open, onClose, item }) {
             SlotDate: d.date ? format(d.date, "yyyy-MM-dd") : "N/A",
             slotStart: parseToDisplay(slot.startTime),
             slotEnd: parseToDisplay(slot.endTime),
+            ServiceRoomID: slot.serviceRoomID,
           };
         }),
       ),
     };
-    console.log("saveObj", saveObj);
     setFinalSaveObj(saveObj);
     setOpenConfirmationModal(true);
   };
@@ -1371,7 +1237,6 @@ export default function BookTherapySession({ open, onClose, item }) {
           paymentFor: "TherapyBooking",
           bookingId: bookingId?.therapyBookingId || bookingId,
         };
-        console.log("bookingData", bookingId);
 
         const res = await InitiatePayment(5, bookingId?.patientUserId, tempObj);
         const data = res?.data;
@@ -1397,6 +1262,7 @@ export default function BookTherapySession({ open, onClose, item }) {
               ]);
               setDaysCount(1);
               setSessionsCount(1);
+              setGuestGenderOverride(null);
               reset();
               onClose();
             },
@@ -1428,6 +1294,7 @@ export default function BookTherapySession({ open, onClose, item }) {
   };
   const handleReset = () => {
     reset();
+    setGuestGenderOverride(null);
     setSessionsCount(1);
     setFrequency(1);
     setDays([{ date: startOfToday(), requiredSessions: 1, selectedSlots: [] }]);
@@ -1823,7 +1690,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                                       activeTargetDate &&
                                       isSameDay(date, activeTargetDate);
 
-                                    // Use suggestedDate for scroll focus when no date chosen yet
                                     const isSuggested =
                                       !schedule.date &&
                                       suggestedDate &&
@@ -1873,7 +1739,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   })}
                                 </div>
 
-                                {/* Multi-Session Selector Tabs if this day has >1 session */}
                                 {targetDaySessions > 1 && (
                                   <div className="mb-3 p-2.5 rounded-xl bg-white/90 border border-[#e4ebdd]">
                                     <div className="flex items-center justify-between mb-2">
@@ -1981,7 +1846,12 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   </div>
                                   {therapySlots.length > 0 && (
                                     <span className="text-[10px] font-bold text-ayuMid bg-[#f0f4ef] px-2.5 py-0.5 rounded-full border border-[#e4ebdd]">
-                                      {therapySlots.length} available
+                                      {
+                                        therapySlots.filter(
+                                          (s) => s.isSelectableForPatient,
+                                        ).length
+                                      }{" "}
+                                      available
                                     </span>
                                   )}
                                 </div>
@@ -2004,7 +1874,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                                         );
                                       };
 
-                                      // Check if this slot is part of any scheduled session on this day
                                       let assignedSessionIdx = -1;
                                       let matchedSlotInfo = null;
 
@@ -2069,83 +1938,30 @@ export default function BookTherapySession({ open, onClose, item }) {
 
                                       const isSelectedByThisDay =
                                         assignedSessionIdx >= 0;
-                                      const isSelectedCurrentSession =
-                                        assignedSessionIdx ===
-                                        activeSessionSlotIndex;
-
-                                      const isSingleValid =
-                                        isSingleSlotSelectable(
-                                          slot,
-                                          idx,
-                                          undefined,
-                                          activeSessionSlotIndex,
-                                        );
 
                                       const effectiveGuest =
                                         getEffectiveGuest();
                                       const patientGender =
                                         normalizeGender(effectiveGuest);
 
-                                      const isFemaleOnly =
-                                        slot.genderMessage &&
-                                        slot.genderMessage
-                                          .toLowerCase()
-                                          .includes("female") &&
-                                        !slot.genderMessage
-                                          .toLowerCase()
-                                          .includes("both");
-                                      const isMaleOnly =
-                                        slot.genderMessage &&
-                                        slot.genderMessage
-                                          .toLowerCase()
-                                          .includes("male") &&
-                                        !slot.genderMessage
-                                          .toLowerCase()
-                                          .includes("female") &&
-                                        !slot.genderMessage
-                                          .toLowerCase()
-                                          .includes("both");
-
-                                      const isRestrictedForGender =
-                                        patientGender
-                                          ? (patientGender === "Male" &&
-                                              isFemaleOnly) ||
-                                            (patientGender === "Female" &&
-                                              isMaleOnly)
-                                          : false;
-
                                       const hasGenderConflict =
                                         isSelectedByThisDay &&
-                                        patientGender &&
                                         matchedSlotInfo &&
+                                        !isTherapySlotSelectable(
+                                          matchedSlotInfo,
+                                          effectiveGuest,
+                                        ) &&
                                         !isSlotAllowedForGender(
                                           matchedSlotInfo,
                                           patientGender,
                                         );
 
-                                      const isSlotSelectable =
-                                        slot.isSelectableForPatient !==
-                                        undefined
-                                          ? slot.isSelectableForPatient
-                                          : isSingleValid;
-
-                                      const isDisabledSlot =
-                                        !isSelectedByThisDay &&
-                                        (!isSlotSelectable ||
-                                          isRestrictedForGender ||
-                                          !isSingleValid);
-
                                       return (
                                         <button
                                           key={i}
                                           type="button"
-                                          disabled={
-                                            isDisabledSlot &&
-                                            !isSelectedByThisDay
-                                          }
                                           onClick={() => {
                                             if (isSelectedByThisDay) {
-                                              // Clicking selected slot unselects it
                                               handleRemoveSession(
                                                 idx,
                                                 assignedSessionIdx,
@@ -2153,37 +1969,17 @@ export default function BookTherapySession({ open, onClose, item }) {
                                               successAlert("Slot unselected.");
                                               return;
                                             }
-                                            if (!isDisabledSlot) {
-                                              handleSlotClick(slot, idx);
-                                            } else if (isRestrictedForGender) {
-                                              const opp =
-                                                patientGender === "Male"
-                                                  ? "female"
-                                                  : "male";
-                                              errorAlert(
-                                                `This slot is available only for ${opp} patients.`,
-                                              );
-                                            }
+
+                                            handleSlotClick(slot, idx);
                                           }}
                                           className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border flex items-center gap-1.5 active:scale-95 cursor-pointer ${
                                             isSelectedByThisDay
                                               ? hasGenderConflict
                                                 ? "bg-amber-600 text-white border-amber-600 shadow-md ring-2 ring-amber-400"
                                                 : "bg-emerald-700 text-white border-emerald-700 shadow-md ring-2 ring-emerald-500/50"
-                                              : isDisabledSlot &&
-                                                  isRestrictedForGender
-                                                ? "bg-rose-50 text-rose-700 border-rose-200 cursor-not-allowed opacity-90"
-                                                : isDisabledSlot
-                                                  ? "bg-gray-100/50 text-gray-300 border-gray-200 cursor-not-allowed"
-                                                  : "bg-white text-gray-700 border-emerald-500 hover:border-emerald-700 hover:bg-emerald-50/50"
+                                              : "bg-white text-gray-700 border-emerald-500 hover:border-emerald-700 hover:bg-emerald-50/50"
                                           }`}
                                         >
-                                          {isSelectedByThisDay && (
-                                            <Check
-                                              className="text-white shrink-0"
-                                              sx={{ fontSize: 14 }}
-                                            />
-                                          )}
                                           <span>
                                             {formatTime(slot.startTime)}
                                             {slot.endTime
@@ -2192,32 +1988,9 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           </span>
                                           {isSelectedByThisDay && (
                                             <span className="text-[9px] px-1.5 py-0.2 rounded font-bold bg-white/20 text-white shrink-0">
-                                              {hasGenderConflict
-                                                ? "Mismatch"
-                                                : "Selected"}
+                                              {hasGenderConflict && "Re-select"}
                                             </span>
                                           )}
-                                          {!isSelectedByThisDay &&
-                                            isFemaleOnly && (
-                                              <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold flex items-center gap-0.5 bg-rose-100 text-rose-700 border border-rose-200 shrink-0">
-                                                <Block sx={{ fontSize: 10 }} />
-                                                Female Only
-                                              </span>
-                                            )}
-                                          {!isSelectedByThisDay &&
-                                            isMaleOnly && (
-                                              <span className="text-[9px] px-1.5 py-0.2 rounded font-semibold flex items-center gap-0.5 bg-blue-100 text-blue-700 border border-blue-200 shrink-0">
-                                                <Block sx={{ fontSize: 10 }} />
-                                                Male Only
-                                              </span>
-                                            )}
-                                          {isDisabledSlot &&
-                                            !isFemaleOnly &&
-                                            !isMaleOnly && (
-                                              <span className="text-[9px] text-gray-400 font-normal truncate max-w-[100px]">
-                                                (Unavailable)
-                                              </span>
-                                            )}
                                         </button>
                                       );
                                     })
@@ -2230,36 +2003,19 @@ export default function BookTherapySession({ open, onClose, item }) {
                                   )}
                                 </div>
 
-                                {/* Legend Matching Diagram Panel 2 */}
                                 <div className="mt-2.5 pt-2 border-t border-[#e4ebdd] flex flex-wrap items-center gap-4 text-[10px] text-gray-600">
                                   <span className="flex items-center gap-1.5 font-medium">
                                     <span className="w-3.5 h-3.5 rounded border-2 border-emerald-500 bg-emerald-50 inline-block" />
-                                    <span>
-                                      Selectable slot (allowed for{" "}
-                                      {normalizeGender(getEffectiveGuest())
-                                        ? normalizeGender(
-                                            getEffectiveGuest(),
-                                          ).toLowerCase()
-                                        : "patient"}
-                                      )
-                                    </span>
+                                    <span>Selectable slot</span>
                                   </span>
-                                  <span className="flex items-center gap-1.5 font-medium text-rose-700">
-                                    <span className="w-3.5 h-3.5 rounded border border-rose-300 bg-rose-50 flex items-center justify-center text-rose-600">
+                                  <span className="flex items-center gap-1.5 font-medium text-gray-400">
+                                    <span className="w-3.5 h-3.5 rounded border border-gray-200 bg-gray-100 flex items-center justify-center text-gray-400">
                                       <Block sx={{ fontSize: 9 }} />
                                     </span>
-                                    <span>
-                                      Disabled (
-                                      {normalizeGender(getEffectiveGuest()) ===
-                                      "Male"
-                                        ? "female"
-                                        : "restricted"}{" "}
-                                      only slot)
-                                    </span>
+                                    <span>Unavailable</span>
                                   </span>
                                 </div>
 
-                                {/* Session Breakdown & Guidance */}
                                 <div className="mt-3 flex flex-col gap-2">
                                   {Array.from({
                                     length: targetDaySessions,
@@ -2317,27 +2073,22 @@ export default function BookTherapySession({ open, onClose, item }) {
                                                     )
                                                   : "Selected Date"}
                                               </div>
-                                              {normalizeGender(
-                                                getEffectiveGuest(),
-                                              ) &&
+                                              {selectedGuest &&
+                                                normalizeGender(
+                                                  getEffectiveGuest(),
+                                                ) &&
                                                 !isSlotAllowedForGender(
                                                   sGroup[0],
-                                                  normalizeGender(
-                                                    getEffectiveGuest(),
-                                                  ),
+                                                  getEffectiveGuest(),
                                                 ) && (
                                                   <div className="mt-1 text-[10px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded flex items-center gap-1">
                                                     <Block
                                                       sx={{ fontSize: 11 }}
                                                     />
-                                                    Slot is for{" "}
-                                                    {sGroup[0]?.genderMessage ||
-                                                      "other gender"}
-                                                    . Guest is{" "}
-                                                    {normalizeGender(
-                                                      getEffectiveGuest(),
-                                                    )}
-                                                    .
+                                                    This time is no longer
+                                                    available for the selected
+                                                    guest. Please choose another
+                                                    time.
                                                   </div>
                                                 )}
                                             </div>
@@ -2501,36 +2252,46 @@ export default function BookTherapySession({ open, onClose, item }) {
                                           if (nextDate)
                                             setExploringDate(nextDate);
                                         } else {
-                                          // Independent validation on Done button
-                                          const effectiveGuest =
-                                            getEffectiveGuest();
-                                          const patientGender =
-                                            normalizeGender(effectiveGuest);
-                                          for (const d of days) {
-                                            for (const slot of d.selectedSlots ||
-                                              []) {
-                                              if (
-                                                !isSlotAllowedForGender(
-                                                  slot,
-                                                  patientGender,
-                                                )
-                                              ) {
-                                                const opp =
-                                                  patientGender === "Male"
-                                                    ? "female"
-                                                    : "male";
-                                                errorAlert(
-                                                  `Cannot proceed. Slot at ${formatTime(slot.startTime)} is only for ${opp} patients.`,
-                                                );
-                                                return;
-                                              }
-                                              if (!isSlotAvailable(slot)) {
-                                                errorAlert(
-                                                  `Cannot proceed. Slot at ${formatTime(slot.startTime)} is no longer available.`,
-                                                );
-                                                return;
-                                              }
-                                            }
+                                          const guestNow = getEffectiveGuest();
+                                          const takenKeys = new Set();
+                                          let blocked = false;
+
+                                          const nextDays = days.map((d) => {
+                                            if (
+                                              !d.date ||
+                                              !Array.isArray(d.sessions)
+                                            )
+                                              return d;
+                                            const dk = format(
+                                              d.date,
+                                              "yyyy-MM-dd",
+                                            );
+                                            const { sessions, cleared } =
+                                              reassignSessionRooms({
+                                                sessions: d.sessions,
+                                                rawSlots:
+                                                  dk === activeDate
+                                                    ? rawTherapySlots
+                                                    : null,
+                                                guest: guestNow,
+                                                dateKey: dk,
+                                                takenKeys,
+                                              });
+                                            if (cleared.length) blocked = true;
+                                            return {
+                                              ...d,
+                                              sessions,
+                                              selectedSlots: sessions
+                                                .filter(Boolean)
+                                                .flat(),
+                                            };
+                                          });
+
+                                          setDays(nextDays);
+
+                                          if (blocked) {
+                                            errorAlert(NO_ROOM_MESSAGE);
+                                            return;
                                           }
                                           setActivePickerIndex(null);
                                         }
@@ -2745,26 +2506,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                         <span className="text-xs font-bold text-ayuTulsi capitalize">
                           {getEffectiveGuest()?.gender || "Not specified"}
                         </span>
-                        <div className="flex items-center gap-1 ml-2">
-                          {["Male", "Female"].map((gen) => {
-                            const isCurr =
-                              normalizeGender(getEffectiveGuest()) === gen;
-                            return (
-                              <button
-                                key={gen}
-                                type="button"
-                                onClick={() => setGuestGenderOverride(gen)}
-                                className={`text-[10px] font-bold px-2 py-0.5 rounded transition-all cursor-pointer ${
-                                  isCurr
-                                    ? "bg-ayuMid text-white shadow-xs"
-                                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                                }`}
-                              >
-                                {gen}
-                              </button>
-                            );
-                          })}
-                        </div>
                       </div>
                       {days.some((d) => d.selectedSlots.length > 0) &&
                         (() => {
@@ -2782,7 +2523,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                           ) : (
                             <span className="text-[11px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200 flex items-center gap-1">
                               <ErrorOutline sx={{ fontSize: 13 }} />
-                              Gender restriction mismatch
+                              Please re-select time slot
                             </span>
                           );
                         })()}
@@ -2925,10 +2666,10 @@ export default function BookTherapySession({ open, onClose, item }) {
                     className="text-amber-600 shrink-0"
                   />
                   <span>
-                    {!selectedGuest
-                      ? "Please select a guest above to confirm booking."
-                      : totalSelectedSessions < sessionsCount
-                        ? `Please schedule the remaining ${sessionsCount - totalSelectedSessions} session(s) above to confirm booking.`
+                    {totalSelectedSessions < sessionsCount
+                      ? `Please schedule the remaining ${sessionsCount - totalSelectedSessions} session(s) above to confirm booking.`
+                      : !selectedGuest
+                        ? "Please select a guest above to confirm booking."
                         : "Please complete all day and slot selections to confirm booking."}
                   </span>
                 </div>
@@ -2964,164 +2705,6 @@ export default function BookTherapySession({ open, onClose, item }) {
         />
       )}
 
-      {/* Select Slot Room Selection Modal Matching Diagram Panel 3 */}
-      {roomSelectionModal && (
-        <Modal
-          open={Boolean(roomSelectionModal)}
-          onClose={() => setRoomSelectionModal(null)}
-          className="flex items-center justify-center p-4"
-        >
-          <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-            {/* Header */}
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
-              <h3 className="text-base font-bold text-gray-900 font-serif">
-                Select Slot
-              </h3>
-              <button
-                type="button"
-                onClick={() => setRoomSelectionModal(null)}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded-lg cursor-pointer"
-              >
-                <Close fontSize="small" />
-              </button>
-            </div>
-
-            <div className="p-4 space-y-3">
-              {/* Date and Time Header */}
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-gray-500">
-                  {format(roomSelectionModal.date, "EEEE, do MMMM yyyy")}
-                </div>
-                <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 text-emerald-900 font-bold text-sm">
-                  {formatTime(roomSelectionModal.slot.startTime)} -{" "}
-                  {formatTime(roomSelectionModal.slot.endTime)}
-                </div>
-              </div>
-
-              {/* Rooms List */}
-              <div className="space-y-2.5 pt-1 max-h-[300px] overflow-y-auto">
-                {roomSelectionModal.rooms.map((room) => {
-                  const effectiveGuest = getEffectiveGuest();
-                  const patientGender = normalizeGender(effectiveGuest);
-                  const isAllowed = patientGender
-                    ? isSlotAllowedForGender(room, patientGender)
-                    : true;
-                  const isAvail = isSlotAvailable(room);
-                  const isSelectable = isAllowed && isAvail;
-                  const isSelected = selectedRoomId === room.serviceRoomID;
-
-                  const opp = patientGender === "Male" ? "Female" : "Male";
-                  const isFemaleRoom = room.genderMessage
-                    ?.toLowerCase()
-                    .includes("female");
-                  const isMaleRoom =
-                    room.genderMessage?.toLowerCase().includes("male") &&
-                    !room.genderMessage?.toLowerCase().includes("both");
-
-                  return (
-                    <div
-                      key={room.serviceRoomID}
-                      onClick={() => {
-                        if (isSelectable) {
-                          setSelectedRoomId(room.serviceRoomID);
-                        }
-                      }}
-                      className={`p-3 rounded-xl border flex items-center justify-between gap-3 transition-all ${
-                        !isAllowed
-                          ? "bg-rose-50/70 border-rose-200 text-rose-900 cursor-not-allowed opacity-90"
-                          : isSelected
-                            ? "bg-emerald-50 border-2 border-emerald-600 shadow-sm cursor-pointer"
-                            : "bg-[#f0f4ef] border-[#d4e8c2] hover:border-emerald-500 cursor-pointer"
-                      }`}
-                    >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 ${
-                            !isAllowed
-                              ? "bg-rose-100 text-rose-600"
-                              : "bg-emerald-100 text-emerald-700"
-                          }`}
-                        >
-                          {isFemaleRoom ? (
-                            <Female fontSize="small" />
-                          ) : (
-                            <PeopleOutline fontSize="small" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-xs font-bold text-gray-900">
-                            Room
-                          </div>
-                          <div className="text-[11px] text-gray-600 font-medium truncate">
-                            {room.genderMessage || ""}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        {!isAllowed ? (
-                          <>
-                            <Block
-                              className="text-rose-600"
-                              sx={{ fontSize: 18 }}
-                            />
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-rose-600 text-white">
-                              Not allowed for {patientGender || opp}
-                            </span>
-                          </>
-                        ) : (
-                          <>
-                            {isSelected ? (
-                              <RadioButtonChecked
-                                className="text-emerald-700"
-                                sx={{ fontSize: 18 }}
-                              />
-                            ) : (
-                              <RadioButtonUnchecked
-                                className="text-gray-400"
-                                sx={{ fontSize: 18 }}
-                              />
-                            )}
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-700 text-white">
-                              {patientGender
-                                ? `Allowed for ${patientGender}`
-                                : isFemaleRoom
-                                  ? "Female Only"
-                                  : isMaleRoom
-                                    ? "Male Only"
-                                    : "Allowed for All"}
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setRoomSelectionModal(null)}
-                className="px-4 py-2 text-xs font-bold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDoneRoomSelection}
-                className="px-5 py-2 text-xs font-bold text-white bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-all shadow-sm cursor-pointer"
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {/* Confirm Booking Modal Matching Diagram Panel 5 */}
       {openConfirmationModal && confirmModalData ? (
         <Modal
           open={openConfirmationModal}
@@ -3136,7 +2719,6 @@ export default function BookTherapySession({ open, onClose, item }) {
           className="flex items-center justify-center p-4"
         >
           <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 max-w-md w-full overflow-hidden animate-in fade-in zoom-in duration-200">
-            {/* Header */}
             <div className="p-5 border-b border-gray-100 flex items-center justify-between">
               <h3 className="text-lg font-bold text-gray-900 font-serif">
                 Confirm Booking
@@ -3153,37 +2735,19 @@ export default function BookTherapySession({ open, onClose, item }) {
               </button>
             </div>
 
-            {/* Details */}
             <div className="p-5 space-y-3">
               <div className="grid grid-cols-[80px_1fr] gap-2 text-sm">
-                <span className="text-gray-500 font-medium">Date</span>
-                <span className="text-gray-900 font-semibold">
-                  : {confirmModalData.dateStr}
-                </span>
-
                 <span className="text-gray-500 font-medium">Patient</span>
                 <span className="text-gray-900 font-semibold">
                   : {confirmModalData.patientStr}
                 </span>
-
-                {confirmModalData.sessionsList?.length <= 1 && (
-                  <>
-                    <span className="text-gray-500 font-medium">Time</span>
-                    <span className="text-gray-900 font-semibold">
-                      : {confirmModalData.timeStr}
-                    </span>
-
-                    <span className="text-gray-500 font-medium">
-                      {confirmModalData.roomLabel || "Slot Type"}
-                    </span>
-                    <span className="text-gray-900 font-semibold">
-                      : {confirmModalData.roomStr}
-                    </span>
-                  </>
-                )}
+                <span className="text-gray-500 font-medium">Date</span>
+                <span className="text-gray-900 font-semibold">
+                  : {confirmModalData.dateStr}
+                </span>
               </div>
 
-              {confirmModalData.sessionsList?.length > 1 && (
+              {confirmModalData?.sessionsList && (
                 <div className="pt-2 border-t border-gray-100 space-y-2">
                   <div className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center justify-between">
                     <span>Scheduled Sessions</span>
@@ -3210,7 +2774,6 @@ export default function BookTherapySession({ open, onClose, item }) {
                           </div>
                           <div className="text-[11px] text-gray-500 font-medium mt-0.5 truncate">
                             {sess.dateStr}
-                            {sess.genderMsg ? ` • ${sess.genderMsg}` : ""}
                           </div>
                         </div>
                         <div className="shrink-0">
@@ -3220,7 +2783,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                             </span>
                           ) : (
                             <span className="text-[10px] font-bold text-rose-700 bg-rose-100 px-2 py-0.5 rounded-full">
-                              Mismatch
+                              Unavailable
                             </span>
                           )}
                         </div>
@@ -3230,16 +2793,7 @@ export default function BookTherapySession({ open, onClose, item }) {
                 </div>
               )}
 
-              {/* Status Banner */}
-              {confirmModalData.isValid ? (
-                <div className="mt-4 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-emerald-800 text-xs font-semibold">
-                  <CheckCircle
-                    className="text-emerald-600 shrink-0"
-                    fontSize="small"
-                  />
-                  <span>{confirmModalData.validationMsg}</span>
-                </div>
-              ) : (
+              {!confirmModalData.isValid && (
                 <div className="mt-4 p-3 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-2.5 text-rose-800 text-xs font-semibold">
                   <ErrorOutline
                     className="text-rose-600 shrink-0"
@@ -3250,7 +2804,6 @@ export default function BookTherapySession({ open, onClose, item }) {
               )}
             </div>
 
-            {/* Actions */}
             <div className="p-4 bg-gray-50 border-t border-gray-100 flex items-center justify-end gap-3">
               <button
                 type="button"

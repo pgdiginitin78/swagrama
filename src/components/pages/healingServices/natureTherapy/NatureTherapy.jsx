@@ -9,7 +9,6 @@ import NatureTherapyBookingModal from "./NatureTherapyBookingModal";
 
 const NATURE_THERAPY_PRICE_MAP = {
   114: { single: 400, group: 200, bulk: 100 },
-  168: { single: 400, group: 300, bulk: 200 },
   111: { single: 750, group: 500, bulk: 250 },
   110: { single: 750, group: 500, bulk: 250 },
   115: { single: 400, group: 200, bulk: 100 },
@@ -21,11 +20,14 @@ const getTherapyPricing = (therapy) => {
   const mapped = NATURE_THERAPY_PRICE_MAP[therapy?.serviceId];
   if (mapped) return mapped;
 
-  const base = therapy?.charges || 0;
+  const base = Number(therapy?.charges) || 0;
+  if (base <= 0) {
+    return { single: 0, group: 0, bulk: 0 };
+  }
   return {
     single: base,
-    group: Math.round(base * 0.5),
-    bulk: Math.round(base * 0.25),
+    group: Math.max(1, Math.round(base * 0.5)),
+    bulk: Math.max(1, Math.round(base * 0.25)),
   };
 };
 

@@ -34,7 +34,6 @@ import { RedirectToSabPaisa } from "../../opdBooking/RedirectToSabPaisa";
 
 const NATURE_THERAPY_PRICE_MAP = {
   114: { single: 400, group: 200, bulk: 100 },
-  168: { single: 400, group: 300, bulk: 200 },
   111: { single: 750, group: 500, bulk: 250 },
   110: { single: 750, group: 500, bulk: 250 },
   115: { single: 400, group: 200, bulk: 100 },
@@ -44,18 +43,50 @@ const NATURE_THERAPY_PRICE_MAP = {
 
 const DEFAULT_THERAPY_PRICING = { single: 1000, group: 750, bulk: 500 };
 
-const resolveTherapyPricing = (therapy) => {
+const resolveTherapyPricing = (therapy, origin) => {
   if (
     therapy?.pricing &&
+    !Array.isArray(therapy.pricing) &&
     therapy.pricing.single != null &&
     therapy.pricing.group != null &&
     therapy.pricing.bulk != null
   ) {
-    return therapy.pricing;
+    const single = Number(therapy.pricing.single) || 0;
+    const group = Number(therapy.pricing.group) || 0;
+    const bulk = Number(therapy.pricing.bulk) || 0;
+    if (single > 0) {
+      return {
+        single,
+        group: Math.max(1, group),
+        bulk: Math.max(1, bulk),
+      };
+    }
+    return { single, group, bulk };
+  }
+
+  const baseCharges = Number(therapy?.charges) || 0;
+
+  if (origin === "Yoga Therapy") {
+    if (baseCharges > 0) {
+      return {
+        single: baseCharges,
+        group: Math.max(1, Math.round(baseCharges * 0.75)),
+        bulk: Math.max(1, Math.round(baseCharges * 0.5)),
+      };
+    }
+    return DEFAULT_THERAPY_PRICING;
   }
 
   const mapped = NATURE_THERAPY_PRICE_MAP[therapy?.serviceId];
   if (mapped) return mapped;
+
+  if (baseCharges > 0) {
+    return {
+      single: baseCharges,
+      group: Math.max(1, Math.round(baseCharges * 0.5)),
+      bulk: Math.max(1, Math.round(baseCharges * 0.25)),
+    };
+  }
 
   return DEFAULT_THERAPY_PRICING;
 };
@@ -76,8 +107,8 @@ const schema = yup.object().shape({
   noOfPerson: yup
     .number()
     .typeError("Must be a number")
+    .integer("Must be a whole number")
     .min(1, "At least 1 person is required")
-    .max(20, "Maximum 20 persons allowed")
     .required("Required"),
   termsAccepted: yup
     .boolean()
@@ -149,26 +180,81 @@ const formatTime = (timeStr) => {
   return timeStr;
 };
 
-function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
-  const isDisabled = !slot.isAvailable || slot.isBookedByUser || isPast;
+const getSlotAvailableCapacity = (slot) => {
+  if (!slot || typeof slot.maxBookings !== "number") return null;
+  return Math.max(0, slot.maxBookings - (slot.bookingCount || 0));
+};
+
+const getDisabledReasonBadge = ({ isTimePast, isFull, genderOk, genderMessage }) => {
+  if (isTimePast) return "Time passed";
+  if (isFull) return "Full";
+  if (genderOk === false) {
+    const msg = String(genderMessage || "").toLowerCase();
+    if (msg.includes("female")) return "Female only";
+    if (msg.includes("male")) return "Male only";
+    return "Restricted";
+  }
+  return null;
+};
+
+function TimeSlotChip({
+  slot,
+  isSelected,
+  onSelect,
+  isTimePast = false,
+  requestedPersons = 0,
+}) {
+  const availableCapacity = getSlotAvailableCapacity(slot);
+  const isFull = availableCapacity !== null && availableCapacity <= 0;
+  const exceedsChipCapacity =
+    availableCapacity !== null &&
+    availableCapacity > 0 &&
+    requestedPersons > availableCapacity;
+  const displayRemaining =
+    isSelected &&
+    availableCapacity !== null &&
+    requestedPersons >= 1 &&
+    !exceedsChipCapacity
+      ? Math.max(0, availableCapacity - requestedPersons)
+      : availableCapacity;
+  const isDisabled =
+    !slot.isAvailable ||
+    slot.isBookedByUser ||
+    isTimePast ||
+    isFull ||
+    (!isSelected && exceedsChipCapacity);
+  const disabledReason = isDisabled
+    ? getDisabledReasonBadge({
+        isTimePast,
+        isFull,
+        genderOk: slot.genderOk,
+        genderMessage: slot.genderMessage,
+      })
+    : null;
   return (
     <button
       type="button"
       onClick={onSelect}
       disabled={isDisabled}
       title={
-        isPast
-          ? slot.genderOk === false
-            ? slot.genderMessage
-            : "This time slot is not available"
-          : slot.genderMessage
+        isTimePast
+          ? "This time slot has already passed"
+          : slot.genderOk === false
+            ? slot.genderMessage || "Not allowed for selected patient gender"
+            : isFull
+              ? "No capacity remaining"
+              : exceedsChipCapacity
+                ? `Only ${availableCapacity} spot(s) left; reduce Number of Persons to ${availableCapacity} or less`
+                : availableCapacity !== null
+                  ? `${slot.genderMessage ? `${slot.genderMessage} • ` : ""}${availableCapacity} of ${slot.maxBookings} spots available`
+                  : slot.genderMessage
       }
       className={`
-        relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 
+        relative px-2 py-2 rounded-md font-semibold text-[10px] transition-all duration-200 flex flex-col items-start gap-0.5
         ${
           isSelected
             ? "bg-booking-primary text-white shadow-md"
-            : isPast
+            : isDisabled
               ? "bg-slate-100 text-slate-400 border border-slate-200 line-through"
               : "bg-slate-100 text-booking-label hover:bg-booking-primaryLight border border-booking-border"
         }
@@ -182,6 +268,25 @@ function TimeSlotChip({ slot, isSelected, onSelect, isPast }) {
           {formatTime(slot.slotEndTime)}
         </span>
       </span>
+      {availableCapacity !== null && (
+        <span
+          className={`text-[9px] font-medium ${
+            isSelected
+              ? "text-white/90"
+              : isDisabled || exceedsChipCapacity
+                ? "text-red-500"
+                : "text-emerald-700"
+          }`}
+        >
+          {disabledReason
+            ? isFull
+              ? "Full"
+              : `${availableCapacity} left • ${disabledReason}`
+            : exceedsChipCapacity
+              ? `Only ${availableCapacity} left`
+              : `${displayRemaining} left`}
+        </span>
+      )}
     </button>
   );
 }
@@ -197,6 +302,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   const [patientOptions, setPatientOptions] = useState([]);
   const [therapySlots, setTherapySlots] = useState([]);
   const [isSlotsLoading, setIsSlotsLoading] = useState(false);
+  const [capacityWarning, setCapacityWarning] = useState("");
   const { setIsLoading } = useLoader();
 
   const { user } = useAuth();
@@ -233,15 +339,6 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   const noOfPerson = watch("noOfPerson");
   const termsAccepted = watch("termsAccepted");
 
-  useEffect(() => {
-    if (noOfPerson === "" || noOfPerson === null || noOfPerson === undefined)
-      return;
-    const n = parseInt(noOfPerson, 10);
-    if (isNaN(n) || n < 1) setValue("noOfPerson", 1);
-    else if (n > 20) setValue("noOfPerson", 20);
-    else if (n !== Number(noOfPerson)) setValue("noOfPerson", n);
-  }, [noOfPerson, setValue]);
-
   const isGenderAllowed = (slot, patient) => {
     if (!patient || !patient.gender) return true;
     const g = String(patient.gender).toLowerCase().trim();
@@ -251,19 +348,133 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
     return msg.split(/[^a-z]+/).includes(patientGender);
   };
 
+  const isSlotTimeInPast = (startTime, dateValue) => {
+    if (!dateValue || !startTime) return false;
+    const targetDate = new Date(dateValue);
+    if (isNaN(targetDate.getTime())) return false;
+    const now = new Date();
+    if (targetDate.toDateString() !== now.toDateString()) return false;
+    const [h, m, s] = String(startTime).split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return false;
+    const slotDateTime = new Date();
+    slotDateTime.setHours(h, m, s || 0, 0);
+    return slotDateTime < now;
+  };
+
   const doctorSlots = therapySlots.map((s) => {
     const genderOk = isGenderAllowed(s, patientFid);
+    const availableCapacity = getSlotAvailableCapacity(s);
+    const hasCapacity = availableCapacity === null ? true : availableCapacity > 0;
+    const isTimePast = isSlotTimeInPast(s.startTime, fromDate);
     return {
       ...s,
       slotStartTime: s.startTime,
       slotEndTime: s.endTime,
+      availableCapacity,
       genderOk,
+      isTimePast,
       isAvailable:
         String(s.status || "").toLowerCase() === "available" &&
-        (s.maxBookings == null || (s.bookingCount || 0) < s.maxBookings) &&
+        hasCapacity &&
         genderOk,
     };
   });
+
+  const activeSelectedSlot = selectedTimeSlot
+    ? doctorSlots.find(
+        (s) =>
+          s.slotStartTime === selectedTimeSlot.slotStartTime &&
+          s.serviceRoomID === selectedTimeSlot.serviceRoomID,
+      ) || selectedTimeSlot
+    : null;
+
+  const selectedSlotCapacity = activeSelectedSlot
+    ? getSlotAvailableCapacity(activeSelectedSlot)
+    : null;
+
+  const bookableCapacities = doctorSlots
+    .filter((s) => s.isAvailable && !s.isTimePast && s.availableCapacity !== null)
+    .map((s) => s.availableCapacity);
+
+  const maxDayAvailableCapacity =
+    bookableCapacities.length > 0 ? Math.max(...bookableCapacities) : null;
+
+  const hasAnyBookableSlot = doctorSlots.some(
+    (s) =>
+      s.isAvailable &&
+      !s.isTimePast &&
+      (s.availableCapacity === null || s.availableCapacity > 0),
+  );
+
+  const noCapacityRemains =
+    !isSlotsLoading && Boolean(fromDate) && !hasAnyBookableSlot;
+
+  const activeAvailableCapacity =
+    selectedSlotCapacity !== null
+      ? selectedSlotCapacity
+      : noCapacityRemains
+        ? 0
+        : maxDayAvailableCapacity;
+
+  const parsedRequestedPersons = parseInt(noOfPerson, 10);
+  const requestedPersons = Number.isNaN(parsedRequestedPersons)
+    ? 0
+    : parsedRequestedPersons;
+
+  const exceedsSelectedCapacity =
+    activeAvailableCapacity !== null &&
+    requestedPersons > activeAvailableCapacity;
+
+  const remainingAfterSelection =
+    selectedSlotCapacity !== null &&
+    requestedPersons >= 1 &&
+    requestedPersons <= selectedSlotCapacity
+      ? Math.max(0, selectedSlotCapacity - requestedPersons)
+      : selectedSlotCapacity;
+
+  const isBookingDisabled =
+    !termsAccepted ||
+    noCapacityRemains ||
+    (selectedSlotCapacity !== null && selectedSlotCapacity <= 0) ||
+    exceedsSelectedCapacity ||
+    requestedPersons < 1;
+
+  useEffect(() => {
+    if (noOfPerson === "" || noOfPerson === null || noOfPerson === undefined) {
+      setCapacityWarning("");
+      return;
+    }
+    const n = parseInt(noOfPerson, 10);
+    if (isNaN(n) || n < 1) {
+      setCapacityWarning("");
+      setValue("noOfPerson", 1, { shouldValidate: true });
+      return;
+    }
+    if (
+      activeAvailableCapacity !== null &&
+      activeAvailableCapacity > 0 &&
+      n > activeAvailableCapacity
+    ) {
+      setCapacityWarning(
+        `Maximum ${activeAvailableCapacity} person(s) allowed for this slot.`,
+      );
+      setValue("noOfPerson", activeAvailableCapacity, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+      return;
+    }
+    if (n !== activeAvailableCapacity) {
+      setCapacityWarning("");
+    }
+    if (n !== Number(noOfPerson)) {
+      setValue("noOfPerson", n, { shouldValidate: true });
+    }
+  }, [noOfPerson, activeAvailableCapacity, setValue]);
+
+  useEffect(() => {
+    setCapacityWarning("");
+  }, [fromDate, open]);
 
   useEffect(() => {
     if (
@@ -276,8 +487,9 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
   }, [patientFid]);
 
   useEffect(() => {
-    const totalPeople = parseInt(noOfPerson) || 1;
-    const pricing = resolveTherapyPricing(therapy);
+    if (!therapy) return;
+    const totalPeople = parseInt(noOfPerson, 10) || 1;
+    const pricing = resolveTherapyPricing(therapy, origin);
     const pricePerPerson = getPricePerPerson(pricing, totalPeople);
 
     const sessionAmount = pricePerPerson * totalPeople;
@@ -289,7 +501,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       value: therapy.serviceId,
       label: therapy?.serviceName,
     });
-  }, [noOfPerson, therapy, setValue]);
+  }, [noOfPerson, therapy, origin, setValue]);
 
   useEffect(() => {
     setSelectedTimeSlot(null);
@@ -410,14 +622,17 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       .then((res) => {
         console.log("therapy slots", res?.data?.data);
         const data = Array.isArray(res?.data?.data) ? res?.data?.data : [];
-        const uniqueData = [];
-        const seenStartTimes = new Set();
+        const slotByStartTime = new Map();
         data.forEach((s) => {
-          if (s?.startTime && !seenStartTimes.has(s.startTime)) {
-            seenStartTimes.add(s.startTime);
-            uniqueData.push(s);
+          if (!s?.startTime) return;
+          const existing = slotByStartTime.get(s.startTime);
+          const cap = getSlotAvailableCapacity(s) ?? 0;
+          const existingCap = existing ? getSlotAvailableCapacity(existing) ?? 0 : -1;
+          if (!existing || cap > existingCap) {
+            slotByStartTime.set(s.startTime, s);
           }
         });
+        const uniqueData = Array.from(slotByStartTime.values());
         uniqueData.sort((a, b) =>
           (a.startTime || "").localeCompare(b.startTime || ""),
         );
@@ -445,6 +660,23 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       errorAlert("Selected slot has no room assigned. Please re-select.");
       return;
     }
+    if (noCapacityRemains || (selectedSlotCapacity !== null && selectedSlotCapacity <= 0)) {
+      const msg = "No capacity remaining for the selected slot.";
+      setSlotError(msg);
+      errorAlert(msg);
+      return;
+    }
+    const requestedCount = parseInt(data.noOfPerson, 10) || 1;
+    if (requestedCount < 1) {
+      errorAlert("At least 1 person is required.");
+      return;
+    }
+    if (activeAvailableCapacity !== null && requestedCount > activeAvailableCapacity) {
+      const msg = `Only ${activeAvailableCapacity} person(s) available for the selected slot.`;
+      setSlotError(msg);
+      errorAlert(msg);
+      return;
+    }
     setSlotError("");
     if (!isGenderAllowed(selectedTimeSlot, patientFid)) {
       const msg = selectedTimeSlot?.genderMessage || "Slot not allowed for this patient's gender";
@@ -458,7 +690,7 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       patientFid: patientFid?.userId,
       createdBy: user?.userId,
       clinicFid: 5,
-      no_Of_Person: data.noOfPerson,
+      no_Of_Person: parseInt(data.noOfPerson, 10) || 1,
       No_Of_Sessions: 1,
       TherapyName: therapy?.serviceName,
       doctorFid: null,
@@ -545,7 +777,10 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
       }
     } catch (error) {
       setIsLoading(false);
-      errorAlert("An unexpected error occurred during the booking process.");
+      const serverMsg =
+        error?.response?.data?.message ||
+        "An unexpected error occurred during the booking process.";
+      errorAlert(serverMsg);
       console.error(error);
     }
   };
@@ -726,16 +961,23 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                   label="Number of Persons *"
                                   type="number"
                                   error={errors.noOfPerson}
-                                  InputProps={{
-                                    inputProps: {
-                                      min: 1,
-                                      max: 20,
-                                      step: 1,
-                                      onKeyDown: (e) => {
-                                        if (["-", "+", "e", "E", "."].includes(e.key))
-                                          e.preventDefault();
-                                      },
-                                    },
+                                  disabled={
+                                    noCapacityRemains ||
+                                    (selectedSlotCapacity !== null &&
+                                      selectedSlotCapacity <= 0)
+                                  }
+                                  onKeyDown={(e) => {
+                                    if (["-", "+", "e", "E", "."].includes(e.key))
+                                      e.preventDefault();
+                                  }}
+                                  inputProps={{
+                                    min: 1,
+                                    max:
+                                      activeAvailableCapacity !== null &&
+                                      activeAvailableCapacity > 0
+                                        ? activeAvailableCapacity
+                                        : undefined,
+                                    step: 1,
                                   }}
                                 />
                                 {errors.noOfPerson && (
@@ -743,6 +985,39 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                                     {errors.noOfPerson.message}
                                   </p>
                                 )}
+                                {capacityWarning && (
+                                  <p className="text-amber-700 text-[10px] mt-1 ml-1 font-semibold">
+                                    {capacityWarning}
+                                  </p>
+                                )}
+                                {exceedsSelectedCapacity && activeAvailableCapacity > 0 && (
+                                  <p className="text-red-500 text-[10px] mt-1 ml-1 font-semibold">
+                                    Requested {requestedPersons} person(s) exceeds available capacity ({activeAvailableCapacity} remaining).
+                                  </p>
+                                )}
+                                {selectedSlotCapacity !== null ? (
+                                  selectedSlotCapacity > 0 ? (
+                                    <p className="text-emerald-700 text-[11px] mt-1 ml-1 font-medium">
+                                      Available: {selectedSlotCapacity} of{" "}
+                                      {activeSelectedSlot?.maxBookings}
+                                      {requestedPersons >= 1 && !exceedsSelectedCapacity
+                                        ? ` • Remaining after ${requestedPersons} person(s): ${remainingAfterSelection}`
+                                        : ""}
+                                    </p>
+                                  ) : (
+                                    <p className="text-red-500 text-[11px] mt-1 ml-1 font-semibold">
+                                      No capacity remaining for this slot.
+                                    </p>
+                                  )
+                                ) : noCapacityRemains ? (
+                                  <p className="text-red-500 text-[11px] mt-1 ml-1 font-semibold">
+                                    No capacity remaining for this date.
+                                  </p>
+                                ) : maxDayAvailableCapacity !== null ? (
+                                  <p className="text-slate-500 text-[11px] mt-1 ml-1 font-medium">
+                                    Available capacity: up to {maxDayAvailableCapacity} person(s)
+                                  </p>
+                                ) : null}
                               </div>
                             </div>
                           </div>
@@ -777,11 +1052,30 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                         className="lg:col-span-4 flex flex-col gap-5 lg:sticky lg:top-0 h-fit"
                       >
                         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                          <div className="bg-sky-50 px-5 py-3 flex items-center gap-3">
-                            <Clock className="w-4 h-4 text-sky-600 shrink-0" />
-                            <h2 className="text-xs font-bold text-sky-600 uppercase tracking-widest">
-                              Available Slots
-                            </h2>
+                          <div className="bg-sky-50 px-5 py-3 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-3">
+                              <Clock className="w-4 h-4 text-sky-600 shrink-0" />
+                              <h2 className="text-xs font-bold text-sky-600 uppercase tracking-widest">
+                                Available Slots
+                              </h2>
+                            </div>
+                            {selectedSlotCapacity !== null && (
+                              <span
+                                className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                                  selectedSlotCapacity > 0 && !exceedsSelectedCapacity
+                                    ? "bg-emerald-100 text-emerald-700"
+                                    : "bg-red-100 text-red-600"
+                                }`}
+                              >
+                                {selectedSlotCapacity > 0
+                                  ? `${
+                                      requestedPersons >= 1 && !exceedsSelectedCapacity
+                                        ? remainingAfterSelection
+                                        : selectedSlotCapacity
+                                    } / ${activeSelectedSlot?.maxBookings} left`
+                                  : "Full"}
+                              </span>
+                            )}
                           </div>
 
                           <div className="p-4 min-h-[180px] flex flex-col">
@@ -792,39 +1086,34 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                             ) : doctorSlots?.length > 0 ? (
                               <div className="grid grid-cols-2 gap-2">
                                 {doctorSlots.map((slot, index) => {
-                                  const isToday =
-                                    fromDate &&
-                                    new Date(fromDate).toDateString() ===
-                                      new Date().toDateString();
-                                  let isPast = false;
-                                  if (isToday && slot.slotStartTime) {
-                                    const [h, m, s] = slot.slotStartTime
-                                      .split(":")
-                                      .map(Number);
-                                    const slotDateTime = new Date();
-                                    slotDateTime.setHours(h, m, s, 0);
-                                    isPast = slotDateTime < new Date();
-                                  }
-
+                                  const isPast = Boolean(slot.isTimePast);
                                   const isAvailable = slot.isAvailable;
+                                  const chipCapacity = getSlotAvailableCapacity(slot);
+                                  const isSlotSelected =
+                                    selectedTimeSlot?.slotStartTime ===
+                                    slot.slotStartTime;
+                                  const exceedsThisSlot =
+                                    !isSlotSelected &&
+                                    chipCapacity !== null &&
+                                    chipCapacity > 0 &&
+                                    requestedPersons > chipCapacity;
 
-                                  const isDisabled = isPast || !isAvailable;
+                                  const isDisabled =
+                                    isPast || !isAvailable || exceedsThisSlot;
                                   return (
-                                    <TimeSlotChip
-                                      key={index}
-                                      slot={{ ...slot, isAvailable }}
-                                      isPast={isDisabled}
-                                      isSelected={
-                                        selectedTimeSlot?.slotStartTime ===
-                                        slot.slotStartTime
-                                      }
-                                      onSelect={() => {
-                                        if (!isDisabled) {
-                                          setSelectedTimeSlot(slot);
-                                          setSlotError("");
-                                        }
-                                      }}
-                                    />
+                                      <TimeSlotChip
+                                        key={index}
+                                        slot={{ ...slot, isAvailable }}
+                                        isTimePast={isPast}
+                                        requestedPersons={requestedPersons}
+                                        isSelected={isSlotSelected}
+                                        onSelect={() => {
+                                          if (!isDisabled) {
+                                            setSelectedTimeSlot(slot);
+                                            setSlotError("");
+                                          }
+                                        }}
+                                      />
                                   );
                                 })}
                               </div>
@@ -895,8 +1184,12 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                               <CommonButton
                                 type="submit"
                                 label="Book Now"
-                                className="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white  transition-all"
-                                disabled={!termsAccepted}
+                                className={
+                                  isBookingDisabled
+                                    ? "bg-slate-400 text-white cursor-not-allowed opacity-70"
+                                    : "bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white transition-all"
+                                }
+                                disabled={isBookingDisabled}
                               />
                             </div>
                           </div>
@@ -914,7 +1207,12 @@ const NatureTherapyBookingModal = ({ open, handleClose, therapy, origin }) => {
                       <CommonButton
                         type="submit"
                         label="Confirm Booking"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs"
+                        className={
+                          isBookingDisabled
+                            ? "bg-slate-400 text-white font-bold px-4 py-2 rounded-lg text-xs cursor-not-allowed opacity-70"
+                            : "bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2 rounded-lg text-xs"
+                        }
+                        disabled={isBookingDisabled}
                       />
                     </div>
                   </form>
